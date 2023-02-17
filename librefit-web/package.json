@@ -30,6 +30,8 @@
 		"@svelteuidev/dates": "^0.10.0",
 		"@svelteuidev/motion": "^0.10.0",
 		"dayjs": "^1.11.7",
-		"librefit-api": "file:../librefit-api"
+		"librefit-api": "file:../librefit-api",
+		"radix-icons-svelte": "^1.2.1",
+		"svelte-routing": "^1.6.0"
 	}
 }
