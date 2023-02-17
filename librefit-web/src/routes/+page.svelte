@@ -1,2 +1,5 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<h1>LibreFit index page</h1>
+<div>
+    <a href="/login">Login Page</a>
+    <a href="/register">Registration Page</a>
+</div>

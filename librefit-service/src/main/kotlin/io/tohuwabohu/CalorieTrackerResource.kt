@@ -58,15 +58,15 @@ class CalorieTrackerResource {
     }
 
     @GET
-    @Path("/read/{id}")
+    @Path("/read/{id:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun read(id: String) = calorieTrackerRepository.findById(id.toLong())
+    fun read(id: Long) = calorieTrackerRepository.findById(id)
 
     @DELETE
-    @Path("/delete")
+    @Path("/delete/{id:\\d+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    fun delete(calorieTracker: CalorieTrackerEntry): Response {
-        return if (calorieTrackerRepository.deleteById(calorieTracker.id!!)) {
+    fun delete(id: Long): Response {
+        return if (calorieTrackerRepository.deleteById(id)) {
             Response.ok().build()
         } else {
             Response.status(Response.Status.NOT_FOUND).build()
@@ -74,9 +74,9 @@ class CalorieTrackerResource {
     }
 
     @GET
-    @Path("/list/{userId}")
+    @Path("/list/{userId:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun list(userId: String): List<CalorieTrackerEntry> {
-        return calorieTrackerRepository.listForUser(userId.toLong())
+    fun list(userId: Long): List<CalorieTrackerEntry> {
+        return calorieTrackerRepository.listForUser(userId)
     }
 }

@@ -34,26 +34,26 @@ class GoalsResource {
     }
 
     @GET
-    @Path("/read/{id}")
+    @Path("/read/{id:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun read(id: String) = goalsRepository.findById(id.toLong())
+    fun read(id: Long) = goalsRepository.findById(id)
 
     @DELETE
-    @Path("/delete")
+    @Path("/delete/{id:\\d+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    fun delete(goal: Goal) = goalsRepository.delete(goal)
+    fun delete(id: Long) = goalsRepository.deleteById(id)
 
     @GET
-    @Path("/list/{userId}")
+    @Path("/list/{userId:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun list(userId: String): List<Goal> {
-        return goalsRepository.listByUser(userId.toLong())
+    fun list(userId: Long): List<Goal> {
+        return goalsRepository.listByUser(userId)
     }
 
     @GET
-    @Path("/latest/{userId}")
+    @Path("/latest/{userId:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun latest(userId: String): Goal {
-        return goalsRepository.findLatestForUser(userId.toLong())
+    fun latest(userId: Long): Goal {
+        return goalsRepository.findLatestForUser(userId)
     }
 }

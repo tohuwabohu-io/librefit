@@ -12,14 +12,24 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
+		"@openapitools/openapi-generator-cli": "^2.5.2",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.5.0",
+		"browserify": "^17.0.0",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.8.1",
 		"svelte": "^3.54.0",
 		"vite": "^4.0.0",
 		"vitest": "^0.25.3"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@svelteuidev/composables": "^0.10.0",
+		"@svelteuidev/core": "^0.10.0",
+		"@svelteuidev/dates": "^0.10.0",
+		"@svelteuidev/motion": "^0.10.0",
+		"dayjs": "^1.11.7",
+		"librefit-api": "file:../librefit-api"
+	}
 }

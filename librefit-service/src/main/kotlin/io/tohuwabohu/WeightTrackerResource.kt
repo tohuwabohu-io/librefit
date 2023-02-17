@@ -41,17 +41,17 @@ class WeightTrackerResource {
     }
 
     @GET
-    @Path("/read/{id}")
+    @Path("/read/{id:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun read(id: String) = weightTrackerRepository.findById(id.toLong())
+    fun read(id: Long) = weightTrackerRepository.findById(id)
 
     @DELETE
-    @Path("/delete/{id}")
+    @Path("/delete/{id:\\d+}")
     @Consumes(MediaType.APPLICATION_JSON)
-    fun delete(weightTrackerEntry: WeightTrackerEntry) = weightTrackerRepository.delete(weightTrackerEntry)
+    fun delete(id: Long) = weightTrackerRepository.deleteById(id)
 
     @GET
-    @Path("/list/{userId}")
+    @Path("/list/{userId:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun list(userId: String) = weightTrackerRepository.listForUser(userId.toLong())
+    fun list(userId: Long) = weightTrackerRepository.listForUser(userId)
 }

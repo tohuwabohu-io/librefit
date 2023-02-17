@@ -1,0 +1,14 @@
+main {
+    max-width: 70vw
+}
+
+.input-form {
+    border: black solid 1px;
+    border-radius: 1em;
+    padding: 1em;
+    max-width: 30em;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}

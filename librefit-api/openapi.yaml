@@ -1,0 +1,459 @@
+---
+openapi: 3.0.3
+info:
+  title: librefit API
+  version: 1.0.0-SNAPSHOT
+paths:
+  /goals/create:
+    post:
+      tags:
+      - Goals Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Goal'
+      responses:
+        "201":
+          description: Created
+  /goals/delete/{id}:
+    delete:
+      tags:
+      - Goals Resource
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /goals/latest/{userId}:
+    get:
+      tags:
+      - Goals Resource
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+  /goals/list/{userId}:
+    get:
+      tags:
+      - Goals Resource
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Goal'
+  /goals/read/{id}:
+    get:
+      tags:
+      - Goals Resource
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+  /goals/update:
+    put:
+      tags:
+      - Goals Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Goal'
+      responses:
+        "204":
+          description: No Content
+  /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}:
+    get:
+      tags:
+      - Tdee Resource
+      parameters:
+      - name: activityLevel
+        in: path
+        required: true
+        schema:
+          format: float
+          type: number
+      - name: age
+        in: path
+        required: true
+        schema:
+          format: int32
+          type: integer
+      - name: height
+        in: path
+        required: true
+        schema:
+          format: int32
+          type: integer
+      - name: sex
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: weight
+        in: path
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tdee'
+  /tracker/calories/create:
+    post:
+      tags:
+      - Calorie Tracker Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalorieTrackerEntry'
+      responses:
+        "200":
+          description: OK
+  /tracker/calories/delete/{id}:
+    delete:
+      tags:
+      - Calorie Tracker Resource
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+  /tracker/calories/list/{userId}:
+    get:
+      tags:
+      - Calorie Tracker Resource
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalorieTrackerEntry'
+  /tracker/calories/read/{id}:
+    get:
+      tags:
+      - Calorie Tracker Resource
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieTrackerEntry'
+  /tracker/calories/update:
+    put:
+      tags:
+      - Calorie Tracker Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalorieTrackerEntry'
+      responses:
+        "200":
+          description: OK
+  /tracker/weight/create:
+    post:
+      tags:
+      - Weight Tracker Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeightTrackerEntry'
+      responses:
+        "201":
+          description: Created
+  /tracker/weight/delete/{id}:
+    delete:
+      tags:
+      - Weight Tracker Resource
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /tracker/weight/list/{userId}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeightTrackerEntry'
+  /tracker/weight/read/{id}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightTrackerEntry'
+  /tracker/weight/update:
+    put:
+      tags:
+      - Weight Tracker Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeightTrackerEntry'
+      responses:
+        "204":
+          description: No Content
+  /user:
+    post:
+      tags:
+      - User Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /user/login:
+    post:
+      tags:
+      - User Resource
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+              - email
+              - password
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: OK
+  /user/register:
+    post:
+      tags:
+      - User Resource
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+              - name
+              - email
+              - password
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    CalorieTrackerEntry:
+      required:
+      - added
+      - updated
+      - description
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+          nullable: true
+        userId:
+          format: int64
+          type: integer
+          nullable: true
+        amount:
+          format: float
+          type: number
+          nullable: true
+        added:
+          $ref: '#/components/schemas/LocalDateTime'
+        updated:
+          $ref: '#/components/schemas/LocalDateTime'
+        description:
+          type: string
+    Goal:
+      required:
+      - startDate
+      - endDate
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+          nullable: true
+        userId:
+          format: int64
+          type: integer
+          nullable: true
+        startAmount:
+          format: float
+          type: number
+          nullable: true
+        endAmount:
+          format: float
+          type: number
+          nullable: true
+        startDate:
+          $ref: '#/components/schemas/LocalDateTime'
+        endDate:
+          $ref: '#/components/schemas/LocalDateTime'
+    LocalDateTime:
+      format: date-time
+      type: string
+      example: 2022-03-10T12:15:50
+    Tdee:
+      required:
+      - age
+      - sex
+      - weight
+      - height
+      - activityLevel
+      type: object
+      properties:
+        age:
+          type: number
+        sex:
+          type: string
+        weight:
+          type: number
+        height:
+          type: number
+        activityLevel:
+          type: number
+        bmr:
+          format: double
+          type: number
+        tdee:
+          format: double
+          type: number
+    WeightTrackerEntry:
+      required:
+      - added
+      - updated
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+          nullable: true
+        userId:
+          format: int64
+          type: integer
+          nullable: true
+        amount:
+          format: float
+          type: number
+          nullable: true
+        added:
+          $ref: '#/components/schemas/LocalDateTime'
+        updated:
+          $ref: '#/components/schemas/LocalDateTime'
