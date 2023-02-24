@@ -1,28 +1,31 @@
+<script>
+    import {Button, Checkbox, Container, TextInput, Title} from "@svelteuidev/core";
+</script>
+
 <svelte:head>
     <title>LibreFit - Registration</title>
 </svelte:head>
 
-<div class="registration-page">
-    <h1>Register</h1>
-    <p>Please fill the registration form.</p>
-    <form action="http://localhost:8080/user/register" method="POST">
-        <div class="input-form">
-            <label for="name">Nickname</label>
-            <input id="name" type="text">
-            <label for="email">E-Mail</label>
-            <input id="email" type="email">
-            <label for="password">Password</label>
-            <input id="password" type="password">
-            <div>
-                <button type="submit">Register</button>
-            </div>
-        </div>
-    </form>
-</div>
+<Container>
+    <Title ordering={1}>Registration</Title>
 
-<style>
-    .registration-page {
-        display: flex;
-        flex-direction: column;
-    }
-</style>
+    <form method="POST">
+        <TextInput label="Nickname" name="nickname">
+
+        </TextInput>
+
+        <TextInput label="E-Mail" name="username">
+
+        </TextInput>
+
+        <TextInput label="Password" type="password" name="password">
+
+        </TextInput>
+
+        <Checkbox label="I agree to LibreFit's terms and conditions." />
+
+        <Button>
+            Register
+        </Button>
+    </form>
+</Container>

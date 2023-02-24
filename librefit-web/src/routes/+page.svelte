@@ -1,5 +1,14 @@
-<h1>LibreFit index page</h1>
-<div>
-    <a href="/login">Login Page</a>
-    <a href="/register">Registration Page</a>
-</div>
+<script>
+    import {Container, Text, Title} from "@svelteuidev/core";
+</script>
+
+<Container>
+    <Title order="{1}">
+        LibreFit
+    </Title>
+
+    <Text>
+        Welcome to LibreFit, an Open Source calorie tracker!
+    </Text>
+</Container>
+

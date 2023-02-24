@@ -3,44 +3,34 @@
 </svelte:head>
 
 <script>
+    import {Button, Container, TextInput, Title} from "@svelteuidev/core";
+
     /** @type {import('./$types').PageData} */  export let data;
     /** @type {import('./$types').ActionData} */  export let form;
 </script>
 
-<style>
-    .login-page {
-        display: flex;
-        flex-direction: column;
-    }
-</style>
-
-<div class="login-page">
-
-    <h1>Login</h1>
-    <p>Hallo!</p>
+<Container>
+    <Title ordering={1}>Login</Title>
 
     <form method="POST">
-        <div class="input-form">
-            <label for="username">Username</label>
-            <input id="username" name="username" type="text">
-            <label for="password">Password</label>
-            <input id="password" name="password" type="password">
+        <TextInput label="E-Mail" name="username">
 
-            <div>
-                <button>Login</button>
-            </div>
-        </div>
+        </TextInput>
+
+        <TextInput label="Password" type="password" name="password">
+
+        </TextInput>
+
+        <Button>
+            Login
+        </Button>
     </form>
+</Container>
 
+{#if form?.success}
+    <p>Login successful! Welcome!</p>
+{/if}
 
-    <div>
-        {#if form?.success}
-            <p>Login successful! Welcome!</p>
-        {/if}
-
-        {#if !form?.success}
-            <p>Error during login.</p>
-        {/if}
-    </div>
-
-</div>
+{#if !form?.success}
+    <p>Error during login.</p>
+{/if}
