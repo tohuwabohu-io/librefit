@@ -102,7 +102,7 @@ paths:
       responses:
         "204":
           description: No Content
-  /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}:
+  /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{diff}/{gain}:
     get:
       tags:
       - Tdee Resource
@@ -119,6 +119,17 @@ paths:
         schema:
           format: int32
           type: integer
+      - name: diff
+        in: path
+        required: true
+        schema:
+          format: float
+          type: number
+      - name: gain
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CalculationGoal'
       - name: height
         in: path
         required: true
@@ -129,7 +140,7 @@ paths:
         in: path
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/CalculationSex'
       - name: weight
         in: path
         required: true
@@ -143,41 +154,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tdee'
-  /tdee/calculate/{tdee}/{bmr}/{diff}/{gain}:
-    get:
-      tags:
-      - Tdee Resource
-      parameters:
-      - name: bmr
-        in: path
-        required: true
-        schema:
-          format: float
-          type: number
-      - name: diff
-        in: path
-        required: true
-        schema:
-          format: float
-          type: number
-      - name: gain
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: tdee
-        in: path
-        required: true
-        schema:
-          format: float
-          type: number
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Limit'
   /tracker/calories/create:
     post:
       tags:
@@ -390,6 +366,16 @@ paths:
           description: OK
 components:
   schemas:
+    CalculationGoal:
+      enum:
+      - GAIN
+      - LOSS
+      type: string
+    CalculationSex:
+      enum:
+      - MALE
+      - FEMALE
+      type: string
     CalorieTrackerEntry:
       required:
       - added
@@ -441,27 +427,6 @@ components:
           $ref: '#/components/schemas/LocalDateTime'
         endDate:
           $ref: '#/components/schemas/LocalDateTime'
-    Limit:
-      required:
-      - tdee
-      - bmr
-      - weeklyDifference
-      type: object
-      properties:
-        tdee:
-          type: number
-        bmr:
-          type: number
-        weeklyDifference:
-          type: number
-        gain:
-          type: boolean
-        deficit:
-          format: float
-          type: number
-        target:
-          format: float
-          type: number
     LocalDateTime:
       format: date-time
       type: string
@@ -473,23 +438,35 @@ components:
       - weight
       - height
       - activityLevel
+      - weeklyDifference
+      - calculationGoal
       type: object
       properties:
         age:
           type: number
         sex:
-          type: string
+          $ref: '#/components/schemas/CalculationSex'
         weight:
           type: number
         height:
           type: number
         activityLevel:
           type: number
+        weeklyDifference:
+          type: number
+        calculationGoal:
+          $ref: '#/components/schemas/CalculationGoal'
         bmr:
           format: double
           type: number
         tdee:
           format: double
+          type: number
+        deficit:
+          format: float
+          type: number
+        target:
+          format: float
           type: number
     WeightTrackerEntry:
       required:

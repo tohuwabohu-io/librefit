@@ -1,19 +1,16 @@
 <script lang="ts">
-	import {
-		Button,
-		Container,
-		NativeSelect,
-		NumberInput,
-		RadioGroup,
-		Text,
-		Title
-	} from '@svelteuidev/core';
-	import { Tdee } from 'librefit-api/rest/api';
+	import {Button, Container, NativeSelect, NumberInput, RadioGroup, Text, Title} from '@svelteuidev/core';
+
+	import {CalculationGoal, CalculationSex, Tdee} from 'librefit-api/rest/api';
 
 	/** @type {import('./$types').ActionData} */ export let form;
 
 	let step = 1;
-	let tdee: Tdee = { age: 0, height: 0, sex: '', weight: 0, activityLevel: 1 };
+	let tdee: Tdee = { age: 0, height: 0, sex: CalculationSex.Female, weight: 0, activityLevel: 1,
+		calculationGoal: CalculationGoal.Loss,
+		target: 0,
+		weeklyDifference: 0
+	}
 
 	if (form) {
 		tdee = form.tdee;
@@ -27,21 +24,21 @@
 		{ label: 'Level 5: Professional Athlete', value: 2 }
 	];
 
+	const sex = [ CalculationSex.Female, CalculationSex.Male ]
+
 	const goals = [
-		{ label: 'Weight Loss', value: 'l' },
-		{ label: 'Weight Gain', value: 'g' }
+		{ label: 'Weight Loss', value: CalculationGoal.Loss },
+		{ label: 'Weight Gain', value: CalculationGoal.Gain }
 	];
 
-	let goal = 0;
-
-	const nextStep = (e) => {
+	const nextStep = (e: Event) => {
 		e.preventDefault();
 
 		if (step < 3) {
 			step++;
 		}
 	};
-	const previousStep = (e) => {
+	const previousStep = (e: Event) => {
 		e.preventDefault();
 
 		if (step > 1) {
@@ -72,7 +69,7 @@
 		<NativeSelect
 			name="sex"
 			label="Sex"
-			data={['m', 'f']}
+			data={sex}
 			bind:value={tdee.sex}
 			placeholder="Pick one"
 		/>
@@ -110,21 +107,22 @@
 
 		<Text>Do you aim for weight loss or weight gain?</Text>
 
-		<RadioGroup items={goals} />
+		<RadioGroup name="gain" items={goals} bind:value={tdee.calculationGoal} />
 
 		<Text>How much weight are you looking to lose/gain per week?</Text>
 
 		<div class="slider-container">
-			<input class="slider" type="range" min="0" max="7" bind:value={goal} />
+			<input name="diff" class="slider" type="range" min="0" max="7" bind:value={tdee.weeklyDifference} />
 		</div>
-		<Text>{goal / 10}kg</Text>
+		<Text>{tdee.weeklyDifference / 10}kg</Text>
 
 		<Button>Confirm</Button>
 	</form>
 
-	<Title ordering={2}>Your result</Title>
 
 	{#if form?.status === 200}
+		<Title ordering={2}>Your result</Title>
+
 		<Text>
 			Based on your input, your basic metabolic rate is {form.tdee.bmr}kcal. Your daily calorie
 			consumption to hold your weight should be around {form.tdee.tdee}kcal.

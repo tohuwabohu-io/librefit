@@ -16,14 +16,18 @@ export const actions = {
 		const height = data.get('height');
 		const sex = data.get('sex');
 		const weight = data.get('weight');
+		const diff = data.get('diff') / 10;
+		const gain = data.get('gain');
 
 		try {
-			const response = await tdeeApi.tdeeCalculateAgeSexWeightHeightActivityLevelGet(
+			const response = await tdeeApi.tdeeCalculateAgeSexWeightHeightActivityLevelDiffGainGet(
 				activityLevel,
 				age,
+				diff,
+				gain,
 				height,
 				sex,
-				weight
+				weight,
 			);
 
 			result = {
@@ -41,27 +45,5 @@ export const actions = {
 		}
 
 		return result;
-	},
-	limit: async({cookies, request}) => {
-		let result = {
-			status: 404,
-			limit: null
-		};
-
-		const data = await request.formData();
-
-
-		const tdeeApi = new TdeeResourceApi(undefined, 'http://127.0.0.1:8080');
-
-		try {
-			const response = await tdeeApi.tdeeCalculateTdeeBmrDiffGainGet(data.bmr, data.goal, data.gain, data.tdee);
-		}
-		catch (e) {
-			console.log(e.statusCode);
-			console.log(e.message);
-
-			result.status = e.statusCode;
-		}
 	}
-
 };
