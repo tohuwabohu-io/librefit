@@ -1,5 +1,7 @@
 <script>
-	import { Button, Checkbox, Container, TextInput, Title } from '@svelteuidev/core';
+	import {Button, Checkbox, Container, Text, TextInput, Title} from '@svelteuidev/core';
+
+	/** @type {import('./$types').ActionData} */ export let form;
 </script>
 
 <svelte:head>
@@ -10,9 +12,9 @@
 	<Title ordering={1}>Registration</Title>
 
 	<form method="POST">
-		<TextInput label="Nickname" name="nickname" />
+		<TextInput label="Nickname" name="username" />
 
-		<TextInput label="E-Mail" name="username" />
+		<TextInput label="E-Mail" name="email" />
 
 		<TextInput label="Password" type="password" name="password" />
 
@@ -20,4 +22,8 @@
 
 		<Button>Register</Button>
 	</form>
+
+	{#if form && !form.success}
+		<Text>An error occured during registration.</Text>
+	{/if}
 </Container>
