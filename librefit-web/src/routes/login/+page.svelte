@@ -1,36 +1,29 @@
-<svelte:head>
-    <title>LibreFit - Login</title>
-</svelte:head>
-
 <script>
-    import {Button, Container, TextInput, Title} from "@svelteuidev/core";
+	import { Button, Container, TextInput, Title } from '@svelteuidev/core';
 
-    /** @type {import('./$types').PageData} */  export let data;
-    /** @type {import('./$types').ActionData} */  export let form;
+	/** @type {import('./$types').ActionData} */ export let form;
 </script>
 
+<svelte:head>
+	<title>LibreFit - Login</title>
+</svelte:head>
+
 <Container>
-    <Title ordering={1}>Login</Title>
+	<Title ordering={1}>Login</Title>
 
-    <form method="POST">
-        <TextInput label="E-Mail" name="username">
+	<form method="POST">
+		<TextInput label="E-Mail" name="username" />
 
-        </TextInput>
+		<TextInput label="Password" type="password" name="password" />
 
-        <TextInput label="Password" type="password" name="password">
-
-        </TextInput>
-
-        <Button>
-            Login
-        </Button>
-    </form>
+		<Button>Login</Button>
+	</form>
 </Container>
 
 {#if form?.success}
-    <p>Login successful! Welcome!</p>
+	<p>Login successful! Welcome!</p>
 {/if}
 
-{#if !form?.success}
-    <p>Error during login.</p>
+{#if form && !form?.success}
+	<p>Error during login.</p>
 {/if}

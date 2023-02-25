@@ -4,7 +4,7 @@
   "description": "Generator for librefit-api OpenAPI specification",
   "main": "rest/api.js",
   "scripts": {
-    "generate-api": "openapi-generator-cli generate -i openapi.yaml -g typescript-axios -o ts-api/ --additional-properties=supportsES6=true",
+    "generate-api": "openapi-generator-cli generate -i openapi.yaml -g typescript-axios -o rest/ --additional-properties=supportsES6=true",
     "build": "tsc"
   },
   "author": "Stefan Poindl",

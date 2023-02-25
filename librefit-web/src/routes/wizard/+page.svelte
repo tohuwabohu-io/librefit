@@ -1,175 +1,172 @@
-<script>
-    import {Container, Text, Title, NumberInput, NativeSelect, Button, Group, RadioGroup} from "@svelteuidev/core";
+<script lang="ts">
+	import {
+		Button,
+		Container,
+		NativeSelect,
+		NumberInput,
+		RadioGroup,
+		Text,
+		Title
+	} from '@svelteuidev/core';
+	import { Tdee } from 'librefit-api/rest/api';
 
-    /** @type {import('./$types').PageData} */  export let data;
-    /** @type {import('./$types').ActionData} */  export let form;
+	/** @type {import('./$types').ActionData} */ export let form;
 
-    let step = 1;
-    let tdee = {
-        activityLevel: 1,
-        bmr: 0
-    }
+	let step = 1;
+	let tdee: Tdee = { age: 0, height: 0, sex: '', weight: 0, activityLevel: 1 };
 
-    if (form) {
-        tdee = form.tdee;
-    }
+	if (form) {
+		tdee = form.tdee;
+	}
 
-    const activityLevels = [
-        { label: 'Level 1: Mostly Sedentary', value: 1 },
-        { label: 'Level 2: Light Activity', value: 1.25 },
-        { label: 'Level 3: Moderate Activity', value: 1.50 },
-        { label: 'Level 4: Highly Active', value: 1.75 },
-        { label: 'Level 5: Professional Athlete', value: 2 }
-    ];
+	const activityLevels = [
+		{ label: 'Level 1: Mostly Sedentary', value: 1 },
+		{ label: 'Level 2: Light Activity', value: 1.25 },
+		{ label: 'Level 3: Moderate Activity', value: 1.5 },
+		{ label: 'Level 4: Highly Active', value: 1.75 },
+		{ label: 'Level 5: Professional Athlete', value: 2 }
+	];
 
-    const goals = [
-        { label: 'Weight Loss', value: 'l'},
-        { label: 'Weight Gain', value: 'g' }
-    ];
+	const goals = [
+		{ label: 'Weight Loss', value: 'l' },
+		{ label: 'Weight Gain', value: 'g' }
+	];
 
-    let goal = 0;
+	let goal = 0;
 
-    const nextStep = (e) => {
-        e.preventDefault();
+	const nextStep = (e) => {
+		e.preventDefault();
 
-        if (step < 3) {
-            step++;
-        }
-    }
-    const previousStep = (e) => {
-        e.preventDefault();
+		if (step < 3) {
+			step++;
+		}
+	};
+	const previousStep = (e) => {
+		e.preventDefault();
 
-        if (step > 1) {
-            step--;
-        }
-    }
-
+		if (step > 1) {
+			step--;
+		}
+	};
 </script>
 
 <Container>
-    <form method="POST">
-        <!-- {#if step === 1} -->
-        <Title ordering={1}>
-            Wizard
-        </Title>
+	<form method="POST">
+		<!-- {#if step === 1} -->
+		<Title ordering={1}>Wizard</Title>
 
-        <Text>
-            To find the optimal amount of how many calories you should consume per day to reach
-            a specific goal, it's a good idea to calculate your TDEE.
-        </Text>
+		<Text>
+			To find the optimal amount of how many calories you should consume per day to reach a specific
+			goal, it's a good idea to calculate your TDEE.
+		</Text>
 
-        <Text>
-            In order to do so, please provide some necessary information about yourself to
-            make the calculation work.
-        </Text>
+		<Text>
+			In order to do so, please provide some necessary information about yourself to make the
+			calculation work.
+		</Text>
 
-        <Title ordering={2}>
-            Step 1
-        </Title>
+		<Title ordering={2}>Step 1</Title>
 
-        <NumberInput name="age" label="Age" bind:value={tdee.age}>
-        </NumberInput>
+		<NumberInput name="age" label="Age" bind:value={tdee.age} />
 
-        <NativeSelect name="sex" label="Sex" data="{['m', 'f']}" bind:value={tdee.sex}
-                      placeholder="Pick one">
+		<NativeSelect
+			name="sex"
+			label="Sex"
+			data={['m', 'f']}
+			bind:value={tdee.sex}
+			placeholder="Pick one"
+		/>
 
-        </NativeSelect>
+		<NumberInput
+			name="height"
+			label="Height"
+			bind:value={tdee.height}
+			description="Your height in cm."
+		/>
 
-        <NumberInput name="height" label="Height" bind:value={tdee.height}
-                     description="Your height in cm.">
-        </NumberInput>
+		<NumberInput
+			name="weight"
+			label="Weight"
+			bind:value={tdee.weight}
+			description="Your current weight in kg."
+		/>
+		<!--{/if} -->
 
-        <NumberInput name="weight" label="Weight" bind:value={tdee.weight}
-                     description="Your current weight in kg.">
+		<Title ordering={2}>Step 2</Title>
 
-        </NumberInput>
-        <!--{/if} -->
+		<Text>
+			How active are you during your day? Please choose what describes your daily activity level
+			best.
+		</Text>
 
-        <Title ordering={2}>
-            Step 2
-        </Title>
+		<RadioGroup
+			name="activityLevel"
+			items={activityLevels}
+			bind:value={tdee.activityLevel}
+			itemDirection={'down'}
+		/>
 
-        <Text>
-            How active are you during your day? Please choose what describes your daily activity
-            level best.
-        </Text>
+		<Title ordering={2}>Step 3</Title>
 
-        <RadioGroup name="activityLevel" items={activityLevels} bind:value={tdee.activityLevel}
-                    itemDirection={'down'}>
+		<Text>Do you aim for weight loss or weight gain?</Text>
 
-        </RadioGroup>
+		<RadioGroup items={goals} />
 
-        <Title ordering={2}>
-            Step 3
-        </Title>
+		<Text>How much weight are you looking to lose/gain per week?</Text>
 
-        <Text>
-            Do you aim for weight loss or weight gain?
-        </Text>
+		<div class="slider-container">
+			<input class="slider" type="range" min="0" max="7" bind:value={goal} />
+		</div>
+		<Text>{goal / 10}kg</Text>
 
-        <RadioGroup items={goals}>
+		<Button>Confirm</Button>
+	</form>
 
-        </RadioGroup>
+	<Title ordering={2}>Your result</Title>
 
-        <Text>
-            How much weight are you looking to lose/gain per week?
-        </Text>
+	{#if form?.status === 200}
+		<Text>
+			Based on your input, your basic metabolic rate is {form.tdee.bmr}kcal. Your daily calorie
+			consumption to hold your weight should be around {form.tdee.tdee}kcal.
+		</Text>
+	{/if}
 
-        <div class="slider-container">
-            <input class="slider" type="range" min="0" max="7" bind:value={goal}>
-        </div>
-        <Text>{goal / 10}kg</Text>
-
-        <Button>Confirm</Button>
-    </form>
-
-    <Title ordering={2}>
-        Your result
-    </Title>
-
-    {#if form?.status === 200}
-    <Text>
-        Based on your input, your basic metabolic rate is {form.tdee.bmr}kcal. Your daily calorie consumption to hold
-        your weight should be around {form.tdee.tdee}kcal.
-    </Text>
-    {/if}
-
-    <Button on:click={previousStep}>Previous</Button>
-    <Button on:click={nextStep}>Next</Button>
+	<Button on:click={previousStep}>Previous</Button>
+	<Button on:click={nextStep}>Next</Button>
 </Container>
 
 <style>
-    .slider-container {
-        width: 100%;
-    }
+	.slider-container {
+		width: 100%;
+	}
 
-    .slider {
-        -webkit-appearance: none;
-        height: 25px;
-        background: #d3d3d3;
-        outline: none;
-        opacity: 0.7;
-        -webkit-transition: .2s;
-        transition: opacity .2s;
-    }
+	.slider {
+		-webkit-appearance: none;
+		height: 25px;
+		background: #d3d3d3;
+		outline: none;
+		opacity: 0.7;
+		-webkit-transition: 0.2s;
+		transition: opacity 0.2s;
+	}
 
-    .slider:hover {
-        opacity: 1;
-    }
+	.slider:hover {
+		opacity: 1;
+	}
 
-    .slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 25px;
-        height: 25px;
-        background: #04AA6D;
-        cursor: pointer;
-    }
+	.slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 25px;
+		height: 25px;
+		background: #04aa6d;
+		cursor: pointer;
+	}
 
-    .slider::-moz-range-thumb {
-        width: 25px;
-        height: 25px;
-        background: #04AA6D;
-        cursor: pointer;
-    }
+	.slider::-moz-range-thumb {
+		width: 25px;
+		height: 25px;
+		background: #04aa6d;
+		cursor: pointer;
+	}
 </style>

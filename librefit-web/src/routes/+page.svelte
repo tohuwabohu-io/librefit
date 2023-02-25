@@ -1,14 +1,9 @@
 <script>
-    import {Container, Text, Title} from "@svelteuidev/core";
+	import { Container, Text, Title } from '@svelteuidev/core';
 </script>
 
 <Container>
-    <Title order="{1}">
-        LibreFit
-    </Title>
+	<Title order={1}>LibreFit</Title>
 
-    <Text>
-        Welcome to LibreFit, an Open Source calorie tracker!
-    </Text>
+	<Text>Welcome to LibreFit, an Open Source calorie tracker!</Text>
 </Container>
-

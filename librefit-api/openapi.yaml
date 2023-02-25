@@ -1,7 +1,7 @@
 ---
 openapi: 3.0.3
 info:
-  title: librefit API
+  title: librefit-service API
   version: 1.0.0-SNAPSHOT
 paths:
   /goals/create:
@@ -143,6 +143,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tdee'
+  /tdee/calculate/{tdee}/{bmr}/{diff}/{gain}:
+    get:
+      tags:
+      - Tdee Resource
+      parameters:
+      - name: bmr
+        in: path
+        required: true
+        schema:
+          format: float
+          type: number
+      - name: diff
+        in: path
+        required: true
+        schema:
+          format: float
+          type: number
+      - name: gain
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: tdee
+        in: path
+        required: true
+        schema:
+          format: float
+          type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Limit'
   /tracker/calories/create:
     post:
       tags:
@@ -406,6 +441,27 @@ components:
           $ref: '#/components/schemas/LocalDateTime'
         endDate:
           $ref: '#/components/schemas/LocalDateTime'
+    Limit:
+      required:
+      - tdee
+      - bmr
+      - weeklyDifference
+      type: object
+      properties:
+        tdee:
+          type: number
+        bmr:
+          type: number
+        weeklyDifference:
+          type: number
+        gain:
+          type: boolean
+        deficit:
+          format: float
+          type: number
+        target:
+          format: float
+          type: number
     LocalDateTime:
       format: date-time
       type: string

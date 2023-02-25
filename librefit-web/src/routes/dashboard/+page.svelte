@@ -1,8 +1,5 @@
 <script>
-    import {Container} from "@svelteuidev/core";
+	import { Container } from '@svelteuidev/core';
 </script>
 
-<Container>
-
-
-</Container>
+<Container />

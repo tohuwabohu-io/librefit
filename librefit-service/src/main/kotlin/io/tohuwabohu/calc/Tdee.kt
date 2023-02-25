@@ -16,3 +16,12 @@ data class Tdee (val age: Number, val sex: String, val weight: Number, val heigh
     val tdee = round(activityLevel.toFloat() * bmr)
 }
 
+data class Limit(val tdee: Number, val bmr: Number, val weeklyDifference: Number, val gain: Boolean) {
+    val deficit = weeklyDifference.toFloat() * 7000
+
+    val target = if (gain) {
+        tdee.toFloat() + deficit
+    } else {
+        tdee.toFloat() - deficit
+    }
+}
