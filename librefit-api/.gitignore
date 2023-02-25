@@ -4,3 +4,4 @@ typings
 dist
 rest/
 rest/.openapi-generator/
+.openapi-generator/
