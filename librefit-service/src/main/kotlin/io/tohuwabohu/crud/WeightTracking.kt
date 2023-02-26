@@ -9,7 +9,7 @@ import javax.persistence.Id
 import javax.transaction.Transactional
 
 @Entity
-class WeightTrackerEntry{
+class WeightTrackerEntry {
     @Id
     @GeneratedValue
     var id: Long? = null
@@ -20,7 +20,7 @@ class WeightTrackerEntry{
 }
 
 @ApplicationScoped
-class WeightTrackerRepository: PanacheRepository<WeightTrackerEntry> {
+class WeightTrackerRepository : PanacheRepository<WeightTrackerEntry> {
     fun listForUser(userId: Long) = find("userId", userId).list()
 
     @Transactional
@@ -29,5 +29,6 @@ class WeightTrackerRepository: PanacheRepository<WeightTrackerEntry> {
     @Transactional
     fun updateTrackingEntry(weightTrackerEntry: WeightTrackerEntry) = update(
         "amount = ?1, updated = ?2 where id=?3",
-        weightTrackerEntry.amount!!, LocalDateTime.now(), weightTrackerEntry.id!!)
+        weightTrackerEntry.amount!!, LocalDateTime.now(), weightTrackerEntry.id!!
+    )
 }

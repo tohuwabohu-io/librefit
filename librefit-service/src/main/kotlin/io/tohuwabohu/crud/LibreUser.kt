@@ -21,8 +21,9 @@ class LibreUser {
 }
 
 @ApplicationScoped
-class LibreUserRepository: PanacheRepository<LibreUser> {
-    fun findByEmailAndPassword(email: String, password: String) = find("email = ?1 and password = ?2", email, password).firstResult()
+class LibreUserRepository : PanacheRepository<LibreUser> {
+    fun findByEmailAndPassword(email: String, password: String) =
+        find("email = ?1 and password = ?2", email, password).firstResult()
 
     @Transactional
     fun create(user: LibreUser) = persist(user)
