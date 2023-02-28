@@ -460,23 +460,6 @@
         }
       }
     },
-    "/user" : {
-      "post" : {
-        "tags" : [ "User Resource" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/user/login" : {
       "post" : {
         "tags" : [ "User Resource" ],
