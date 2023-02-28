@@ -315,17 +315,6 @@ paths:
       responses:
         "204":
           description: No Content
-  /user:
-    post:
-      tags:
-      - User Resource
-      responses:
-        "200":
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: string
   /user/login:
     post:
       tags:

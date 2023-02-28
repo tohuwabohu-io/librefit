@@ -15,12 +15,9 @@ class UserResource {
     lateinit var userRepository: LibreUserRepository
 
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
-    fun hello() = "User"
-
-    @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_PLAIN)
     fun register(
         @FormParam("name") name: String,
         @FormParam("email") email: String,
@@ -48,6 +45,7 @@ class UserResource {
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_PLAIN)
     fun login(@FormParam("email") email: String, @FormParam("password") password: String): Response {
         var response = Response.ok()
 
