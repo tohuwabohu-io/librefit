@@ -1,16 +1,14 @@
 {
   "name": "librefit-api",
   "version": "1.0.0",
-  "description": "Generator for librefit-api OpenAPI specification",
+  "description": "Package containing the librefit-api OpenAPI specification",
   "main": "rest/api.js",
   "scripts": {
-    "generate-api": "openapi-generator-cli generate -i openapi.yaml -g typescript-axios -o rest/ --additional-properties=supportsES6=true",
     "build": "tsc"
   },
   "author": "Stefan Poindl",
   "license": "MIT",
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.5.2",
     "@rollup/plugin-commonjs": "^24.0.1",
     "typescript": "^4.9.5",
     "axios": "^1.3.3"

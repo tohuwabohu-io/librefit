@@ -10,4 +10,8 @@ pluginManagement {
         id(quarkusPluginId) version quarkusPluginVersion
     }
 }
-rootProject.name="librefit-service"
+
+rootProject.name = "librefit"
+include("librefit-api")
+include("librefit-web")
+include("librefit-service")

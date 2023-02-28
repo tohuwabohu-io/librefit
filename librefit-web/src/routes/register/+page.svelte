@@ -14,9 +14,9 @@
 	<form method="POST">
 		<TextInput label="Nickname" name="username" />
 
-		<TextInput label="E-Mail" name="email" />
+		<TextInput label="E-Mail" name="email" required />
 
-		<TextInput label="Password" type="password" name="password" />
+		<TextInput label="Password" type="password" name="password" required />
 
 		<Checkbox label="I agree to LibreFit's terms and conditions." />
 

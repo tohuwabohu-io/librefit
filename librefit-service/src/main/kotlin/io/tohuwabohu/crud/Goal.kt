@@ -21,7 +21,7 @@ class Goal {
 }
 
 @ApplicationScoped
-class GoalsRepository: PanacheRepository<Goal> {
+class GoalsRepository : PanacheRepository<Goal> {
     fun listByUser(userId: Number) = find("userId", userId).list()
     fun findLatestForUser(userId: Number) = find("userId", userId).list().minByOrNull { it.startDate }!!
 
@@ -29,6 +29,8 @@ class GoalsRepository: PanacheRepository<Goal> {
     fun create(goal: Goal) = persist(goal)
 
     @Transactional
-    fun updateGoal(goal: Goal) = update("startDate = ?1, endDate = ?2, startAmount = ?3, endAmount = ?4",
-        goal.startDate, goal.endDate, goal.startAmount!!, goal.endAmount!!)
+    fun updateGoal(goal: Goal) = update(
+        "startDate = ?1, endDate = ?2, startAmount = ?3, endAmount = ?4",
+        goal.startDate, goal.endDate, goal.startAmount!!, goal.endAmount!!
+    )
 }

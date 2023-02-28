@@ -30,5 +30,6 @@ class CalorieTrackerRepository : PanacheRepository<CalorieTrackerEntry> {
     @Transactional
     fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry) = update(
         "amount = ?1, description = ?2, updated = ?3 where id=?4",
-        calorieTrackerEntry.amount!!, calorieTrackerEntry.description, LocalDateTime.now(), calorieTrackerEntry.id!!)
+        calorieTrackerEntry.amount!!, calorieTrackerEntry.description, LocalDateTime.now(), calorieTrackerEntry.id!!
+    )
 }

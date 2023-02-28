@@ -21,9 +21,11 @@ class UserResource {
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    fun register(@FormParam("name") name: String,
-                 @FormParam("email") email: String,
-                 @FormParam("password") password: String): Response {
+    fun register(
+        @FormParam("name") name: String,
+        @FormParam("email") email: String,
+        @FormParam("password") password: String
+    ): Response {
         var response = Response.ok()
 
         try {
