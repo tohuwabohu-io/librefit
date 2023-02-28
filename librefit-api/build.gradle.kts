@@ -30,14 +30,11 @@ tasks.openApiGenerate {
     additionalProperties.put("supportsES6", "true")
 }
 
-tasks.npmInstall {
-    dependsOn(tasks.openApiGenerate)
-
-    nodeModulesOutputFilter {
-        exclude("nonExistingFile")
-    }
+tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_link") {
+    dependsOn(tasks.npmInstall)
 }
 
 tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_build") {
     dependsOn(tasks.npmInstall)
+    dependsOn(tasks.openApiGenerate)
 }

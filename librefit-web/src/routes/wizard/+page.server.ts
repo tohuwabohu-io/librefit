@@ -1,4 +1,4 @@
-import { TdeeResourceApi } from 'librefit-api/rest/api';
+import { TdeeResourceApi } from 'librefit-api/rest';
 
 export const actions = {
 	default: async ({ cookies, request }) => {
@@ -7,7 +7,7 @@ export const actions = {
 			tdee: null
 		};
 
-		const tdeeApi = new TdeeResourceApi(undefined, 'http://127.0.0.1:8080');
+		const tdeeApi = new TdeeResourceApi();
 
 		const data = await request.formData();
 
@@ -20,7 +20,8 @@ export const actions = {
 		const gain = data.get('gain');
 
 		try {
-			const response = await tdeeApi.tdeeCalculateAgeSexWeightHeightActivityLevelDiffGainGet(
+			const response = {};
+			/*const response = await tdeeApi.tdeeCalculateAgeSexWeightHeightActivityLevelDiffGainGet(
 				activityLevel,
 				age,
 				diff,
@@ -36,7 +37,7 @@ export const actions = {
 			};
 
 			console.log(response.status);
-			console.log(response.data);
+			console.log(response.data);*/
 		} catch (e) {
 			console.log(e.statusCode);
 			console.log(e.message);
