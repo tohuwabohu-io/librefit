@@ -28,14 +28,6 @@ tasks.openApiGenerate {
     outputDir.set("${project.projectDir}/rest")
     generatorName.set("typescript-axios")
     additionalProperties.put("supportsES6", "true")
-
-    doLast {
-        delete("${project.projectDir}/src/lib/gen/api/.openapi-generator")
-        delete("${project.projectDir}/src/lib/gen/api/.gitignore")
-        delete(fileTree("${project.projectDir}/src/lib/gen/api").matching {
-            exclude("*.ts")
-        })
-    }
 }
 
 tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_link") {
