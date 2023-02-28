@@ -26,7 +26,7 @@ tasks.openApiGenerate {
 
     inputSpec.set("openapi.yaml")
     outputDir.set("${project.projectDir}/rest")
-    generatorName.set("typescript-axios")
+    generatorName.set("typescript-fetch")
     additionalProperties.put("supportsES6", "true")
 }
 

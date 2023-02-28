@@ -1,12 +1,8 @@
 import { TdeeResourceApi } from 'librefit-api/rest';
+import { CalculationSex } from 'librefit-api/rest/api';
 
 export const actions = {
 	default: async ({ cookies, request }) => {
-		let result = {
-			status: 404,
-			tdee: null
-		};
-
 		const tdeeApi = new TdeeResourceApi();
 
 		const data = await request.formData();
@@ -19,32 +15,16 @@ export const actions = {
 		const diff = data.get('diff') / 10;
 		const gain = data.get('gain');
 
-		try {
-			const response = {};
-			/*const response = await tdeeApi.tdeeCalculateAgeSexWeightHeightActivityLevelDiffGainGet(
-				activityLevel,
-				age,
-				diff,
-				gain,
-				height,
-				sex,
-				weight,
-			);
-
-			result = {
-				status: response.status,
-				tdee: response.data
-			};
-
-			console.log(response.status);
-			console.log(response.data);*/
-		} catch (e) {
-			console.log(e.statusCode);
-			console.log(e.message);
-
-			result.status = e.statusCode;
-		}
-
-		return result;
+		return await tdeeApi
+			.tdeeCalculateAgeSexWeightHeightActivityLevelDiffGainGet({
+				age: age,
+				activityLevel: activityLevel,
+				height: height,
+				sex: sex,
+				weight: weight,
+				diff: diff,
+				gain: gain
+			})
+			.catch((error) => console.error(error));
 	}
 };

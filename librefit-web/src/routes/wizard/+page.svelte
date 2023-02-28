@@ -25,7 +25,7 @@
 	};
 
 	if (form) {
-		tdee = form.tdee;
+		tdee = form;
 	}
 
 	const activityLevels = [
@@ -132,12 +132,12 @@
 		<Button>Confirm</Button>
 	</form>
 
-	{#if form?.status === 200}
+	{#if form}
 		<Title ordering={2}>Your result</Title>
 
 		<Text>
-			Based on your input, your basic metabolic rate is {form.tdee.bmr}kcal. Your daily calorie
-			consumption to hold your weight should be around {form.tdee.tdee}kcal.
+			Based on your input, your basic metabolic rate is {tdee.bmr}kcal. Your daily calorie
+			consumption to hold your weight should be around {tdee.tdee}kcal.
 		</Text>
 	{/if}
 
