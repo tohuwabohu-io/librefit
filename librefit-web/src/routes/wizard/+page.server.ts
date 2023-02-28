@@ -20,7 +20,7 @@ export const actions = {
 		const gain = data.get('gain');
 
 		try {
-			const response = {}
+			const response = {};
 			/*const response = await tdeeApi.tdeeCalculateAgeSexWeightHeightActivityLevelDiffGainGet(
 				activityLevel,
 				age,

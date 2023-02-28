@@ -1,15 +1,28 @@
 <script lang="ts">
-	import {Button, Container, NativeSelect, NumberInput, RadioGroup, Text, Title} from '@svelteuidev/core';
-	import {CalculationGoal, CalculationSex, Tdee} from "librefit-api/rest";
+	import {
+		Button,
+		Container,
+		NativeSelect,
+		NumberInput,
+		RadioGroup,
+		Text,
+		Title
+	} from '@svelteuidev/core';
+	import { CalculationGoal, CalculationSex, Tdee } from 'librefit-api/rest';
 
 	/** @type {import('./$types').ActionData} */ export let form;
 
 	let step = 1;
-	let tdee: Tdee = { age: 0, height: 0, sex: CalculationSex.Female, weight: 0, activityLevel: 1,
+	let tdee: Tdee = {
+		age: 0,
+		height: 0,
+		sex: CalculationSex.Female,
+		weight: 0,
+		activityLevel: 1,
 		calculationGoal: CalculationGoal.Loss,
 		target: 0,
 		weeklyDifference: 0
-	}
+	};
 
 	if (form) {
 		tdee = form.tdee;
@@ -23,7 +36,7 @@
 		{ label: 'Level 5: Professional Athlete', value: 2 }
 	];
 
-	const sex = [ CalculationSex.Female, CalculationSex.Male ]
+	const sex = [CalculationSex.Female, CalculationSex.Male];
 
 	const goals = [
 		{ label: 'Weight Loss', value: CalculationGoal.Loss },
@@ -65,13 +78,7 @@
 
 		<NumberInput name="age" label="Age" bind:value={tdee.age} />
 
-		<NativeSelect
-			name="sex"
-			label="Sex"
-			data={sex}
-			bind:value={tdee.sex}
-			placeholder="Pick one"
-		/>
+		<NativeSelect name="sex" label="Sex" data={sex} bind:value={tdee.sex} placeholder="Pick one" />
 
 		<NumberInput
 			name="height"
@@ -111,13 +118,19 @@
 		<Text>How much weight are you looking to lose/gain per week?</Text>
 
 		<div class="slider-container">
-			<input name="diff" class="slider" type="range" min="0" max="7" bind:value={tdee.weeklyDifference} />
+			<input
+				name="diff"
+				class="slider"
+				type="range"
+				min="0"
+				max="7"
+				bind:value={tdee.weeklyDifference}
+			/>
 		</div>
 		<Text>{tdee.weeklyDifference / 10}kg</Text>
 
 		<Button>Confirm</Button>
 	</form>
-
 
 	{#if form?.status === 200}
 		<Title ordering={2}>Your result</Title>

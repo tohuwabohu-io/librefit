@@ -1,5 +1,5 @@
 <script>
-	import {Button, Checkbox, Container, Text, TextInput, Title} from '@svelteuidev/core';
+	import { Button, Checkbox, Container, Text, TextInput, Title } from '@svelteuidev/core';
 
 	/** @type {import('./$types').ActionData} */ export let form;
 </script>

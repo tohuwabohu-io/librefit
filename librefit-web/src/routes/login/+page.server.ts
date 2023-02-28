@@ -11,7 +11,7 @@ export const actions = {
 		const email = data.get('username');
 		const password = data.get('password');
 
-		const userApi = new UserResourceApi(undefined, 'http://127.0.0.1:8080' );
+		const userApi = new UserResourceApi(undefined, 'http://127.0.0.1:8080');
 
 		try {
 			const response = await userApi.userLoginPost(email, password);
