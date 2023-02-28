@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {Button, Container, NativeSelect, NumberInput, RadioGroup, Text, Title} from '@svelteuidev/core';
-
-	import {CalculationGoal, CalculationSex, Tdee} from 'librefit-api/rest/api';
+	import {CalculationGoal, CalculationSex, Tdee} from "librefit-api/rest";
 
 	/** @type {import('./$types').ActionData} */ export let form;
 

@@ -1,4 +1,4 @@
-import {UserResourceApi} from "librefit-api/rest";
+import {UserResourceApi} from 'librefit-api/rest';
 
 export const actions = {
     default: async ({request}) => {

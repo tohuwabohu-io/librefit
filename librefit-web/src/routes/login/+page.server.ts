@@ -1,6 +1,6 @@
-/** @type {import('./$types').Actions} */
-import {UserResourceApi} from "librefit-api/rest";
+import { UserResourceApi } from 'librefit-api/rest';
 
+/** @type {import('./$types').Actions} */
 export const actions = {
 	default: async ({ cookies, request }) => {
 		let status = 404;
