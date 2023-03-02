@@ -1,9 +1,12 @@
-import { TdeeResourceApi } from 'librefit-api/rest';
-import { CalculationSex } from 'librefit-api/rest/api';
+import { Configuration, TdeeResourceApi } from 'librefit-api/rest';
 
 export const actions = {
 	default: async ({ cookies, request }) => {
-		const tdeeApi = new TdeeResourceApi();
+		const tdeeApi = new TdeeResourceApi(
+			new Configuration({
+				basePath: import.meta.env.VITE_API_BASE_PATH
+			})
+		);
 
 		const data = await request.formData();
 
