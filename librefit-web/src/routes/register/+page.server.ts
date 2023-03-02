@@ -1,10 +1,14 @@
-import { UserResourceApi } from 'librefit-api/rest';
+import { Configuration, UserResourceApi } from 'librefit-api/rest';
 
 export const actions = {
 	default: async ({ request }) => {
 		const data = await request.formData();
 
-		const userApi = new UserResourceApi();
+		const userApi = new UserResourceApi(
+			new Configuration({
+				basePath: import.meta.env.VITE_API_BASE_PATH
+			})
+		);
 
 		const username = data.get('username');
 		const email = data.get('email');

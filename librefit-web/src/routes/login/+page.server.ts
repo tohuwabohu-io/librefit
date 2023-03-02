@@ -1,5 +1,6 @@
 /** @type {import('./$types').Actions} */
 import { UserResourceApi } from 'librefit-api/rest';
+import { Configuration } from 'librefit-api/rest';
 
 export const actions = {
 	default: async ({ cookies, request }) => {
@@ -9,8 +10,15 @@ export const actions = {
 		const email = data.get('username');
 		const password = data.get('password');
 
-		const userApi = new UserResourceApi();
+		const userApi = new UserResourceApi(
+			new Configuration({
+				basePath: import.meta.env.VITE_API_BASE_PATH
+			})
+		);
 
-		return await userApi.userLoginPost(email, password);
+		return await userApi.userLoginPost({
+			email,
+			password
+		});
 	}
 };
