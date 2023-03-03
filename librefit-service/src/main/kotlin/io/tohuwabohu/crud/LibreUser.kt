@@ -7,7 +7,6 @@ import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
 import javax.persistence.Cacheable
 import javax.persistence.Entity
-import javax.transaction.Transactional
 
 @Entity
 @Cacheable
@@ -22,5 +21,5 @@ class LibreUser: PanacheEntity() {
 @ApplicationScoped
 class LibreUserRepository : PanacheRepository<LibreUser> {
     fun findByEmailAndPassword(email: String, password: String): Uni<LibreUser?> =
-        find("email = ?1 and password = ?2", email, password).firstResult()
+        find("email = ?1 and password = crypt(?2, password)", email, password).firstResult()
 }
