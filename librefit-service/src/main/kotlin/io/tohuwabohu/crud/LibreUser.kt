@@ -1,5 +1,6 @@
 package io.tohuwabohu.crud
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.smallrye.mutiny.Uni
@@ -12,10 +13,15 @@ import javax.persistence.Entity
 @Cacheable
 class LibreUser: PanacheEntity() {
     lateinit var name: String
+    @JsonIgnore
     lateinit var password: String
     lateinit var email: String
     lateinit var registered: LocalDateTime
     var lastLogin: LocalDateTime? = null
+
+    override fun toString(): String {
+        return "LibreUser<name=$name,email=$email,registered=$registered,lastLogin=$lastLogin>"
+    }
 }
 
 @ApplicationScoped
