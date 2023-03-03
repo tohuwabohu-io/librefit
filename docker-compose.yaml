@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15.2-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=librefit
+      - POSTGRES_PASSWORD=librefit
+      - POSTGRES_DB=dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+      - db-init:/docker-entrypoint-initdb.d
+volumes:
+  db:
+    driver: local
+  db-init:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './librefit-service/src/main/resources/db'
