@@ -1,6 +1,6 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.orm.panache.kotlin.PanacheRepository
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
 import javax.persistence.Entity
@@ -23,7 +23,7 @@ class Goal {
 @ApplicationScoped
 class GoalsRepository : PanacheRepository<Goal> {
     fun listByUser(userId: Number) = find("userId", userId).list()
-    fun findLatestForUser(userId: Number) = find("userId", userId).list().minByOrNull { it.startDate }!!
+    fun findLatestForUser(userId: Number) = find("userId", userId).list() //..minByOrNull { it.startDate }!!
 
     @Transactional
     fun create(goal: Goal) = persist(goal)
