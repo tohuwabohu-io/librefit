@@ -33,6 +33,7 @@ class UserResource(val userRepository: LibreUserRepository) {
 
         return userRepository.persistAndFlush(libreUser)
             .onItem().transform { Response.ok(libreUser).status(Response.Status.CREATED).build() }
+            .onFailure().invoke(Log::error)
             .onFailure().recoverWithItem(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build())
     }
 
@@ -44,9 +45,9 @@ class UserResource(val userRepository: LibreUserRepository) {
         Log.info("Searching user with email=$email and pwd=$password")
 
         return userRepository.findByEmailAndPassword(email, password)
-            .onItem().ifNotNull().transform { user -> Response.ok(user) }
-            .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND) }
-            .onFailure { true }.recoverWithItem(Response.status(Response.Status.INTERNAL_SERVER_ERROR))
-            .map { it.build() }
+            .onItem().ifNotNull().transform { user -> Response.ok(user).build() }
+            .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
+            .onFailure().invoke(Log::error)
+            .onFailure().recoverWithItem(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build())
     }
 }
