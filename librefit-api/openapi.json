@@ -25,8 +25,15 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Goal"
+                }
+              }
+            }
           }
         }
       }
@@ -243,7 +250,10 @@
         },
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "text/plain" : { }
+            }
           }
         }
       }
@@ -262,7 +272,10 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "text/plain" : { }
+            }
           }
         }
       }
@@ -283,14 +296,7 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/CalorieTrackerEntry"
-                  }
-                }
-              }
+              "application/json" : { }
             }
           }
         }
@@ -312,11 +318,7 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/CalorieTrackerEntry"
-                }
-              }
+              "application/json" : { }
             }
           }
         }
@@ -336,7 +338,10 @@
         },
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "text/plain" : { }
+            }
           }
         }
       }
@@ -483,7 +488,10 @@
         },
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : { }
+            }
           }
         }
       }
@@ -514,7 +522,10 @@
         },
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : { }
+            }
           }
         }
       }

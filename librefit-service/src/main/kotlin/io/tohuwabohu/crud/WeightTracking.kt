@@ -1,6 +1,6 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.orm.panache.kotlin.PanacheRepository
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
 import javax.persistence.Entity

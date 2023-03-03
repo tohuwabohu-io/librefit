@@ -14,10 +14,7 @@ import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 
 @Path("/tracker/weight")
-class WeightTrackerResource {
-    @Inject
-    lateinit var weightTrackerRepository: WeightTrackerRepository
-
+class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository) {
     @POST
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -34,9 +31,9 @@ class WeightTrackerResource {
         val weightTrackerEntry = weightTrackerRepository.findById(weightTracker.id!!)
 
         if (weightTrackerEntry != null) {
-            weightTrackerEntry.amount = weightTracker.amount
+            /*weightTrackerEntry.amount = weightTracker.amount
 
-            weightTrackerRepository.updateTrackingEntry(weightTrackerEntry)
+            weightTrackerRepository.updateTrackingEntry(weightTrackerEntry)*/
         }
     }
 

@@ -19,8 +19,12 @@ paths:
             schema:
               $ref: '#/components/schemas/Goal'
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
   /goals/delete/{id}:
     delete:
       tags:
@@ -171,6 +175,8 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            text/plain: {}
   /tracker/calories/delete/{id}:
     delete:
       tags:
@@ -185,6 +191,8 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            text/plain: {}
   /tracker/calories/list/{userId}:
     get:
       tags:
@@ -200,11 +208,7 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CalorieTrackerEntry'
+            application/json: {}
   /tracker/calories/read/{id}:
     get:
       tags:
@@ -220,9 +224,7 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CalorieTrackerEntry'
+            application/json: {}
   /tracker/calories/update:
     put:
       tags:
@@ -235,6 +237,8 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            text/plain: {}
   /tracker/weight/create:
     post:
       tags:
@@ -335,6 +339,8 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json: {}
   /user/register:
     post:
       tags:
@@ -358,6 +364,8 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json: {}
 components:
   schemas:
     CalculationGoal:

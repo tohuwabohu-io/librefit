@@ -1,5 +1,6 @@
 package io.tohuwabohu
 
+import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.Goal
 import io.tohuwabohu.crud.GoalsRepository
 import javax.inject.Inject
@@ -7,11 +8,7 @@ import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
 @Path("/goals")
-class GoalsResource {
-
-    @Inject
-    lateinit var goalsRepository: GoalsRepository
-
+class GoalsResource(val goalsRepository: GoalsRepository) {
     @POST
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -24,12 +21,12 @@ class GoalsResource {
         val goalEntry = goalsRepository.findById(goal.id!!)
 
         if (goalEntry != null) {
-            goalEntry.startAmount = goal.startAmount
+            /*goalEntry.startAmount = goal.startAmount
             goalEntry.endAmount = goal.endAmount
             goalEntry.startDate = goal.startDate
             goalEntry.endDate = goal.endDate
 
-            goalsRepository.updateGoal(goalEntry)
+            goalsRepository.updateGoal(goalEntry)*/
         }
     }
 
@@ -46,14 +43,10 @@ class GoalsResource {
     @GET
     @Path("/list/{userId:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun list(userId: Long): List<Goal> {
-        return goalsRepository.listByUser(userId)
-    }
+    fun list(userId: Long): Uni<List<Goal>> = goalsRepository.listByUser(userId)
 
     @GET
     @Path("/latest/{userId:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun latest(userId: Long): Goal {
-        return goalsRepository.findLatestForUser(userId)
-    }
+    fun latest(userId: Long): Uni<Goal> = goalsRepository.findLatestForUser(userId).onItem().transform { it.first() }
 }
