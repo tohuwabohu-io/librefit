@@ -11,16 +11,12 @@
 
 	<form method="POST">
 		<label class="label">
-			<span>
-				E-Mail
-			</span>
+			<span> E-Mail </span>
 			<input class="input" type="text" name="username" />
 		</label>
 
 		<label class="label">
-			<span>
-				Password
-			</span>
+			<span> Password </span>
 
 			<input class="input" type="password" name="password" />
 		</label>

@@ -11,34 +11,26 @@
 
 	<form method="POST">
 		<label>
-			<span>
-				Nickname
-			</span>
+			<span> Nickname </span>
 
-			<input class="input" type="text" name="username">
+			<input class="input" type="text" name="username" />
 		</label>
 
 		<label>
-			<span>
-				E-Mail
-			</span>
+			<span> E-Mail </span>
 
-			<input class="input" type="text" name="email" required>
+			<input class="input" type="text" name="email" required />
 		</label>
 
 		<label>
-			<span>
-				Password
-			</span>
+			<span> Password </span>
 
-			<input class="input" type="password" name="password" required>
+			<input class="input" type="password" name="password" required />
 		</label>
 
 		<label>
-			<span>
-				I agree to LibreFit's terms and conditions.
-			</span>
-			<input class="input" type="checkbox" name="confirmation">
+			<span> I agree to LibreFit's terms and conditions. </span>
+			<input class="input" type="checkbox" name="confirmation" />
 		</label>
 
 		<button>Register</button>

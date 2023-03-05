@@ -2,7 +2,7 @@
 	import '@skeletonlabs/skeleton/themes/theme-crimson.css';
 	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.postcss';
-	import {AppShell, LightSwitch} from "@skeletonlabs/skeleton";
+	import { AppShell, LightSwitch } from '@skeletonlabs/skeleton';
 
 	let isDark = false;
 	let opened = false;
@@ -22,7 +22,7 @@
 		<a href="/register">Registration</a>
 		<a href="/wizard">Wizard</a>
 		<a href="/dashboard">Dashboard</a>
-		<LightSwitch></LightSwitch>
+		<LightSwitch />
 	</svelte:fragment>
 	<!-- <svelte:fragment slot="sidebarLeft">Sidebar Left</svelte:fragment>
 	<svelte:fragment slot="sidebarRight">Sidebar Right</svelte:fragment> -->
