@@ -1,14 +1,6 @@
 <script lang="ts">
-	import {
-		Button,
-		Container,
-		NativeSelect,
-		NumberInput,
-		RadioGroup,
-		Text,
-		Title
-	} from '@svelteuidev/core';
 	import { CalculationGoal, CalculationSex, Tdee } from 'librefit-api/rest';
+	import {RadioGroup, RadioItem} from "@skeletonlabs/skeleton";
 
 	/** @type {import('./$types').ActionData} */ export let form;
 
@@ -59,124 +51,111 @@
 	};
 </script>
 
-<Container>
+<div>
 	<form method="POST">
 		<!-- {#if step === 1} -->
-		<Title ordering={1}>Wizard</Title>
+		<h1>Wizard</h1>
 
-		<Text>
+		<p>
 			To find the optimal amount of how many calories you should consume per day to reach a specific
 			goal, it's a good idea to calculate your TDEE.
-		</Text>
+		</p>
 
-		<Text>
+		<p>
 			In order to do so, please provide some necessary information about yourself to make the
 			calculation work.
-		</Text>
+		</p>
 
-		<Title ordering={2}>Step 1</Title>
+		<h2>Step 1</h2>
 
-		<NumberInput name="age" label="Age" bind:value={tdee.age} />
+		<label>
+			<span>
+				Age
+			</span>
+			<input class="input" type="number" name="age" bind:value={tdee.age} />
+		</label>
 
-		<NativeSelect name="sex" label="Sex" data={sex} bind:value={tdee.sex} placeholder="Pick one" />
+		<label>
+			<span>
+				Sex
+			</span>
 
-		<NumberInput
-			name="height"
-			label="Height"
-			bind:value={tdee.height}
-			description="Your height in cm."
-		/>
+			<select class="select" name="sex" bind:value={tdee.sex}>
+				<option value="" disabled selected>Pick one</option>
+				{#each sex as s}
+					<option value={s}>
+						s
+					</option>
+				{/each}
+			</select>
+		</label>
 
-		<NumberInput
-			name="weight"
-			label="Weight"
-			bind:value={tdee.weight}
-			description="Your current weight in kg."
-		/>
+		<label>
+			<span>Height</span>
+			<input type="number" bind:value={tdee.height}>
+		</label>
+			<!-- description="Your height in cm." -->
+
+		<label>
+			<span>Weight</span>
+			<input type="number" bind:value={tdee.weight}>
+		</label>
+
+			<!--description="Your current weight in kg."-->
 		<!--{/if} -->
 
-		<Title ordering={2}>Step 2</Title>
+		<h2>Step 2</h2>
 
-		<Text>
+		<p>
 			How active are you during your day? Please choose what describes your daily activity level
 			best.
-		</Text>
+		</p>
 
-		<RadioGroup
-			name="activityLevel"
-			items={activityLevels}
-			bind:value={tdee.activityLevel}
-			itemDirection={'down'}
-		/>
+		<label>
+			<span>Activity Level</span>
 
-		<Title ordering={2}>Step 3</Title>
+			<RadioGroup>
+				{#each activityLevels as activityLevel}
+					<RadioItem bind:group={tdee.activityLevel} name="activityLevel" value={activityLevel.value}>{activityLevel.label}</RadioItem>
+				{/each}
+			</RadioGroup>
+		</label>
 
-		<Text>Do you aim for weight loss or weight gain?</Text>
+		<h2>Step 3</h2>
 
-		<RadioGroup name="gain" items={goals} bind:value={tdee.calculationGoal} />
+		<p>Do you aim for weight loss or weight gain?</p>
 
-		<Text>How much weight are you looking to lose/gain per week?</Text>
+		<label>
+			<span>Goal</span>
 
-		<div class="slider-container">
-			<input
-				name="diff"
-				class="slider"
-				type="range"
-				min="0"
-				max="7"
-				bind:value={tdee.weeklyDifference}
-			/>
-		</div>
-		<Text>{tdee.weeklyDifference / 10}kg</Text>
+			<RadioGroup>
+				{#each goals as goal}
+					<RadioItem bind:group={tdee.calculationGoal} name="gain" value={goal.value}>{goal.label}</RadioItem>
+				{/each}
+			</RadioGroup>
+		</label>
 
-		<Button>Confirm</Button>
+		<p>How much weight are you looking to lose/gain per week?</p>
+
+		<label class="label">
+			<span>Gain/Loss</span>
+			<input type="range" bind:value={tdee.weeklyDifference} min="0" max="7" />
+		</label>
+
+		<p>{tdee.weeklyDifference / 10}kg</p>
+
+		<button>Confirm</button>
 	</form>
 
 	{#if form}
-		<Title ordering={2}>Your result</Title>
+		<h2>Your result</h2>
 
-		<Text>
+		<p>
 			Based on your input, your basic metabolic rate is {tdee.bmr}kcal. Your daily calorie
 			consumption to hold your weight should be around {tdee.tdee}kcal.
-		</Text>
+		</p>
 	{/if}
 
-	<Button on:click={previousStep}>Previous</Button>
-	<Button on:click={nextStep}>Next</Button>
-</Container>
-
-<style>
-	.slider-container {
-		width: 100%;
-	}
-
-	.slider {
-		-webkit-appearance: none;
-		height: 25px;
-		background: #d3d3d3;
-		outline: none;
-		opacity: 0.7;
-		-webkit-transition: 0.2s;
-		transition: opacity 0.2s;
-	}
-
-	.slider:hover {
-		opacity: 1;
-	}
-
-	.slider::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		appearance: none;
-		width: 25px;
-		height: 25px;
-		background: #04aa6d;
-		cursor: pointer;
-	}
-
-	.slider::-moz-range-thumb {
-		width: 25px;
-		height: 25px;
-		background: #04aa6d;
-		cursor: pointer;
-	}
-</style>
+	<button on:click={previousStep}>Previous</button>
+	<button on:click={nextStep}>Next</button>
+</div>

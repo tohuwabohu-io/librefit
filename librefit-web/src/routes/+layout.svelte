@@ -1,12 +1,8 @@
 <script>
-	import {
-		Anchor,
-		AppShell,
-		Header,
-		Navbar,
-		ShellSection,
-		SvelteUIProvider
-	} from '@svelteuidev/core';
+	import '@skeletonlabs/skeleton/themes/theme-skeleton.css';
+	import '@skeletonlabs/skeleton/styles/all.css';
+	import '../app.postcss';
+	import {AppShell} from "@skeletonlabs/skeleton";
 
 	let isDark = false;
 	let opened = false;
@@ -19,18 +15,20 @@
 	}
 </script>
 
-<SvelteUIProvider withNormalizeCSS withGlobalStyling>
-	<AppShell>
-		<Header slot="header">
-			<Anchor href="/">Home</Anchor>
-			<Anchor href="/login">Login</Anchor>
-			<Anchor href="/register">Registration</Anchor>
-			<Anchor href="/wizard">Wizard</Anchor>
-			<Anchor href="/dashboard">Dashboard</Anchor>
-		</Header>
-
-		<ShellSection>
-			<slot />
-		</ShellSection>
-	</AppShell>
-</SvelteUIProvider>
+<AppShell>
+	<svelte:fragment slot="header">Header
+		<a href="/">Home</a>
+		<a href="/login">Login</a>
+		<a href="/register">Registration</a>
+		<a href="/wizard">Wizard</a>
+		<a href="/dashboard">Dashboard</a>
+	</svelte:fragment>
+	<!-- <svelte:fragment slot="sidebarLeft">Sidebar Left</svelte:fragment>
+	<svelte:fragment slot="sidebarRight">Sidebar Right</svelte:fragment> -->
+	<svelte:fragment slot="pageHeader">Page Header</svelte:fragment>
+	<!-- Router Slot -->
+	<slot />
+	<!-- ---- / ---- -->
+	<svelte:fragment slot="pageFooter">Page Footer</svelte:fragment>
+	<svelte:fragment slot="footer">Footer</svelte:fragment>
+</AppShell>

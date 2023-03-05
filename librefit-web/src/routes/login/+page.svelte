@@ -1,6 +1,4 @@
 <script>
-	import { Button, Container, TextInput, Title } from '@svelteuidev/core';
-
 	/** @type {import('./$types').ActionData} */ export let form;
 </script>
 
@@ -8,17 +6,28 @@
 	<title>LibreFit - Login</title>
 </svelte:head>
 
-<Container>
-	<Title ordering={1}>Login</Title>
+<div>
+	<h1>Login</h1>
 
 	<form method="POST">
-		<TextInput label="E-Mail" name="username" />
+		<label class="label">
+			<span>
+				E-Mail
+			</span>
+			<input class="input" type="text" name="username" />
+		</label>
 
-		<TextInput label="Password" type="password" name="password" />
+		<label class="label">
+			<span>
+				Password
+			</span>
 
-		<Button>Login</Button>
+			<input class="input" type="password" name="password" />
+		</label>
+
+		<button class="button">Login</button>
 	</form>
-</Container>
+</div>
 
 {#if form?.success}
 	<p>Login successful! Welcome!</p>
