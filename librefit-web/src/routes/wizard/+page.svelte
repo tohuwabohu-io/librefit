@@ -57,21 +57,6 @@
             step--;
         }
     };
-    const calculate = async (e: Event) => {
-        e.preventDefault();
-
-        await tdeeApi
-            .tdeeCalculateAgeSexWeightHeightActivityLevelDiffGainGet({
-                age: tdee.age,
-                activityLevel: tdee.activityLevel,
-                diff: tdee.weeklyDifference,
-                gain: tdee.calculationGoal,
-                sex: tdee.sex,
-                height: tdee.height,
-                weight: tdee.weight
-            })
-            .catch((reason) => console.error(reason));
-    };
 </script>
 
 <section>
