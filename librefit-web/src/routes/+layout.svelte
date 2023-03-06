@@ -3,15 +3,12 @@
 	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.pcss';
 	import { AppShell, LightSwitch } from '@skeletonlabs/skeleton';
+	import TopBar from "$lib/components/TopBar.svelte";
 </script>
 
 <AppShell>
 	<svelte:fragment slot="header">
-		<a href="/">Home</a>
-		<a href="/login">Login</a>
-		<a href="/register">Registration</a>
-		<a href="/wizard">Wizard</a>
-		<a href="/dashboard">Dashboard</a>
+		<TopBar/>
 	</svelte:fragment>
 	<!-- Router Slot -->
 	<slot />
