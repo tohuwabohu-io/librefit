@@ -13,17 +13,17 @@
         <form method="POST" class="variant-ringed p-4 space-y-4 rounded-container-token">
             <label class="label">
                 <span>E-Mail</span>
-                <input name="username" class="input" type="email" placeholder="Enter E-Mail..." required/>
+                <input name="email" class="input" type="email" placeholder="Enter E-Mail" required/>
             </label>
 
             <label class="label">
                 <span>Password</span>
-                <input name="password" class="input" type="password" placeholder="Enter Password..." required/>
+                <input name="password" class="input" type="password" placeholder="Enter Password" required/>
             </label>
 
             <label>
-                <span>Nickname (optional)</span>
-                <input class="input" type="text" name="username"/>
+                <span>Nickname</span>
+                <input name="username" class="input" type="text" placeholder="Enter Nickname (optional)"/>
             </label>
 
             <label>
