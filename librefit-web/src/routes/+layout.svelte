@@ -3,16 +3,6 @@
 	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.pcss';
 	import { AppShell, LightSwitch } from '@skeletonlabs/skeleton';
-
-	let isDark = false;
-	let opened = false;
-
-	function toggleTheme() {
-		isDark = !isDark;
-	}
-	function toggleOpened() {
-		opened = !opened;
-	}
 </script>
 
 <AppShell>
