@@ -13,12 +13,12 @@
 		<a href="/wizard">Wizard</a>
 		<a href="/dashboard">Dashboard</a>
 	</svelte:fragment>
-	<!-- <svelte:fragment slot="sidebarLeft">Sidebar Left</svelte:fragment>
-	<svelte:fragment slot="sidebarRight">Sidebar Right</svelte:fragment> -->
-	<svelte:fragment slot="pageHeader">Page Header</svelte:fragment>
 	<!-- Router Slot -->
 	<slot />
 	<!-- ---- / ---- -->
-	<svelte:fragment slot="pageFooter">Page Footer</svelte:fragment>
-	<svelte:fragment slot="footer">Footer</svelte:fragment>
+	<svelte:fragment slot="footer">
+		<div class="text-center">
+			<p>&copy; {new Date().getFullYear()} tohuwabohu.io</p>
+		</div>
+	</svelte:fragment>
 </AppShell>
