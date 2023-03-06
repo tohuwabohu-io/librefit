@@ -98,11 +98,11 @@
                         {/each}
                     </RadioGroup>
 
-                    <RangeSlider accent="accent-primary-500" name="height" bind:value={tdee.height} min={100} max={220}>Height in cm</RangeSlider>
-                    <input class="input" type="text" bind:value={tdee.height} aria-label="Height"/>
+                    <RangeSlider accent="accent-primary-500" name="height" bind:value={tdee.height} min={100} max={220} aria-hidden="true">Height in cm</RangeSlider>
+                    <input class="input" name="height" type="text" bind:value={tdee.height} aria-label="Height in cm"/>
 
-                    <RangeSlider accent="accent-primary-500" name="weight" type="range" bind:value={tdee.weight} min={30} max={300}>Weight in kg</RangeSlider>
-                    <input class="input" type="text" bind:value={tdee.weight} aria-label="Weight"/>
+                    <RangeSlider accent="accent-primary-500" name="weight" bind:value={tdee.weight} min={30} max={300} aria-hidden="true">Weight in kg</RangeSlider>
+                    <input class="input" name="weight" type="text" bind:value={tdee.weight} aria-label="Weight in cm"/>
                 </Step>
 
                 <Step>
@@ -190,9 +190,18 @@
 
                     <p>How much weight are you looking to lose or gain per week?</p>
 
-                    <RangeSlider accent="accent-primary-500" name="diff" bind:value={tdee.weeklyDifference} min={0} max={7} ticked>Gain/Loss</RangeSlider>
-
-                    <p>{tdee.weeklyDifference / 10}kg</p>
+                    <RangeSlider accent="accent-primary-500" name="diff" bind:value={tdee.weeklyDifference} min={0} max={7} ticked>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text">Gain/Loss</p>
+                            </div>
+                            <div class="text-xs">
+                                <p>
+                                    {tdee.weeklyDifference / 10} kg
+                                </p>
+                            </div>
+                        </div>
+                    </RangeSlider>
                 </Step>
             </Stepper>
         </form>
