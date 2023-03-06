@@ -12,7 +12,6 @@
 		<a href="/register">Registration</a>
 		<a href="/wizard">Wizard</a>
 		<a href="/dashboard">Dashboard</a>
-		<LightSwitch />
 	</svelte:fragment>
 	<!-- <svelte:fragment slot="sidebarLeft">Sidebar Left</svelte:fragment>
 	<svelte:fragment slot="sidebarRight">Sidebar Right</svelte:fragment> -->
