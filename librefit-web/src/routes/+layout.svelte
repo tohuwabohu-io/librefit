@@ -1,7 +1,7 @@
 <script>
-	import '@skeletonlabs/skeleton/themes/theme-crimson.css';
+	import '../theme.pcss';
 	import '@skeletonlabs/skeleton/styles/all.css';
-	import '../app.postcss';
+	import '../app.pcss';
 	import { AppShell, LightSwitch } from '@skeletonlabs/skeleton';
 
 	let isDark = false;
