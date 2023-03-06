@@ -120,8 +120,8 @@
                         less.
                     </p>
 
-                    <div class="activity-level-container">
-                        <RadioGroup class="btn-group-vertical" rounded="rounded-xl">
+                    <div class="activity-level-container flex gap-4">
+                        <RadioGroup class="btn-group-vertical" rounded="rounded-xl flex-none">
                             {#each activityLevels as activityLevel}
                                 <RadioItem
                                         bind:group={tdee.activityLevel}
@@ -132,7 +132,7 @@
                             {/each}
                         </RadioGroup>
 
-                        <div class="card variant-glass-secondary p-4 text-left space-y-2 activity-level">
+                        <div class="card variant-glass-secondary p-4 text-left space-y-2 flex-auto w-64">
                             {#if tdee.activityLevel === 1}
                                 <strong>Level 1 - Mostly Sedentary</strong>
                                 <p>
@@ -218,14 +218,4 @@
 </section>
 
 <style>
-    .activity-level-container {
-        display: flex;
-        flex-direction: row;
-        gap: 1em;
-    }
-
-    .activity-level {
-        flex-grow: 1;
-        max-width: 70%;
-    }
 </style>
