@@ -6,12 +6,12 @@
         Tdee,
         TdeeResourceApi
     } from 'librefit-api/rest';
-    import {RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
+    import {RadioGroup, RadioItem, RangeSlider} from '@skeletonlabs/skeleton';
 
     /** @type {import('./$types').ActionData} */ export let form;
 
     let step = 1;
-    let tdee: Tdee = {
+    const exampleTdee: Tdee = {
         age: 30,
         height: 160,
         sex: CalculationSex.Female,
@@ -21,16 +21,18 @@
         weeklyDifference: 3
     };
 
+    let tdee = exampleTdee;
+
     if (form) {
         tdee = form;
     }
 
     const activityLevels = [
-        {label: 'Level 1: Mostly Sedentary', value: 1},
-        {label: 'Level 2: Light Activity', value: 1.25},
-        {label: 'Level 3: Moderate Activity', value: 1.5},
-        {label: 'Level 4: Highly Active', value: 1.75},
-        {label: 'Level 5: Professional Athlete', value: 2}
+        {label: 'Mostly Sedentary', value: 1},
+        {label: 'Light Activity', value: 1.25},
+        {label: 'Moderate Activity', value: 1.5},
+        {label: 'Highly Active', value: 1.75},
+        {label: 'Professional Athlete', value: 2}
     ];
 
     const sexes = [
@@ -59,12 +61,14 @@
     };
 </script>
 
+<svelte:head>
+    <title>LibreFit - TDEE Wizard</title>
+</svelte:head>
+
 <section>
     <div class="container mx-auto p-8 space-y-8">
+        <h1>Wizard</h1>
         <form method="POST">
-            <!-- {#if step === 1} -->
-            <h1>Wizard</h1>
-
             <p>
                 To find the optimal amount of how many calories you should consume per day to reach a
                 specific goal, it's a good idea to calculate your TDEE.
@@ -77,11 +81,8 @@
 
             <h2>Step 1</h2>
 
-            <label class="label" id="lblAge">
-                <span>Age</span>
-                <input class="input" type="text" bind:value={tdee.age} disabled aria-labelledby="lblAge"/>
-                <input class="input" type="range" name="age" bind:value={tdee.age} min="15" max="99" aria-labelledby="lblAge"/>
-            </label>
+            <RangeSlider accent="accent-primary-500" name="age" bind:value={tdee.age} min={15} max={99}>Age</RangeSlider>
+            <input class="input variant-ringed-secondary" type="text" bind:value={tdee.age} aria-label="Age"/>
 
             <label class="label">
                 <span>Sex</span>
@@ -95,22 +96,11 @@
                 </RadioGroup>
             </label>
 
-            <label class="label" id="lblHeight">
-                <span>Height in cm</span>
-                <input class="input" type="text" bind:value={tdee.height} disabled aria-labelledby="lblHeight"/>
-                <input type="range" name="height" bind:value={tdee.height} min="100" max="220" aria-labelledby="lblHeight"/>
-            </label>
+            <RangeSlider accent="accent-primary-500" name="height" bind:value={tdee.height} min={100} max={220}>Height in cm</RangeSlider>
+            <input class="input" type="text" bind:value={tdee.height} disabled aria-label="Height"/>
 
-            <!-- description="Your height in cm." -->
-
-            <label class="label" id="lblWeight">
-                <span>Weight</span>
-                <input class="input" type="text" bind:value={tdee.weight} disabled aria-labelledby="lblWeight"/>
-                <input type="range" name="weight" bind:value={tdee.weight} min="30" max="300" aria-labelledby="lblWeight"/>
-            </label>
-
-            <!--description="Your current weight in kg."-->
-            <!--{/if} -->
+            <RangeSlider accent="accent-primary-500" name="weight" type="range" bind:value={tdee.weight} min={30} max={300}>Weight in kg</RangeSlider>
+            <input class="input" type="text" bind:value={tdee.weight} disabled aria-label="Weight"/>
 
             <h2>Step 2</h2>
 
@@ -122,7 +112,7 @@
             <label class="label">
                 <span>Activity Level</span>
 
-                <RadioGroup class="btn-group-vertical">
+                <RadioGroup class="btn-group-vertical activity-level" rounded="rounded-xl">
                     {#each activityLevels as activityLevel}
                         <RadioItem
                                 bind:group={tdee.activityLevel}
@@ -132,6 +122,10 @@
                         </RadioItem>
                     {/each}
                 </RadioGroup>
+
+                <card class="card variant-ghost-tertiary p-4 text-center space-y-2">
+                    lala land
+                </card>
             </label>
 
             <h2>Step 3</h2>
@@ -152,14 +146,11 @@
 
             <p>How much weight are you looking to lose/gain per week?</p>
 
-            <label class="label">
-                <span>Gain/Loss</span>
-                <input type="range" name="diff" bind:value={tdee.weeklyDifference} min="0" max="7"/>
-            </label>
+            <RangeSlider accent="accent-primary-500" name="diff" bind:value={tdee.weeklyDifference} min={0} max={7} ticked>Gain/Loss</RangeSlider>
 
             <p>{tdee.weeklyDifference / 10}kg</p>
 
-            <button class="btn">Confirm</button>
+            <button class="btn variant-ghost-primary">Confirm</button>
         </form>
 
         {#if form}
@@ -171,7 +162,10 @@
             </p>
         {/if}
 
-        <button class="btn" on:click={previousStep}>Previous</button>
-        <button class="btn" on:click={nextStep}>Next</button>
+        <button class="btn variant-ghost" on:click={previousStep}>Previous</button>
+        <button class="btn variant-ghost-primary" on:click={nextStep}>Next</button>
     </div>
 </section>
+
+<style>
+</style>
