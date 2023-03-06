@@ -1,42 +1,43 @@
 <script>
-	/** @type {import('./$types').ActionData} */ export let form;
+    /** @type {import('./$types').ActionData} */ export let form;
 </script>
 
 <svelte:head>
-	<title>LibreFit - Registration</title>
+    <title>LibreFit - Registration</title>
 </svelte:head>
 
-<div>
-	<h1>Registration</h1>
+<section>
+    <div class="container mx-auto p-8 space-y-10">
+        <h1>Registration</h1>
 
-	<form method="POST">
-		<label>
-			<span> Nickname </span>
+        <form method="POST" class="variant-ringed p-4 space-y-4 rounded-container-token">
+            <label class="label">
+                <span>E-Mail</span>
+                <input name="username" class="input" type="email" placeholder="Enter E-Mail..." required/>
+            </label>
 
-			<input class="input" type="text" name="username" />
-		</label>
+            <label class="label">
+                <span>Password</span>
+                <input name="password" class="input" type="password" placeholder="Enter Password..." required/>
+            </label>
 
-		<label>
-			<span> E-Mail </span>
+            <label>
+                <span>Nickname (optional)</span>
+                <input class="input" type="text" name="username"/>
+            </label>
 
-			<input class="input" type="text" name="email" required />
-		</label>
+            <label>
+                <span>I agree to LibreFit's terms and conditions.</span>
+                <input class="checkbox" type="checkbox" name="confirmation"/>
+            </label>
 
-		<label>
-			<span> Password </span>
+            <div>
+                <button class="btn variant-filled-primary">Register</button>
+            </div>
+        </form>
+    </div>
+    {#if form && !form.success}
+        <p>An error occured during registration.</p>
+    {/if}
+</section>
 
-			<input class="input" type="password" name="password" required />
-		</label>
-
-		<label>
-			<span> I agree to LibreFit's terms and conditions. </span>
-			<input class="input" type="checkbox" name="confirmation" />
-		</label>
-
-		<button>Register</button>
-	</form>
-
-	{#if form && !form.success}
-		<p>An error occured during registration.</p>
-	{/if}
-</div>
