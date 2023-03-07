@@ -15,7 +15,7 @@
 	<!-- ---- / ---- -->
 	<svelte:fragment slot="footer">
 		<div class="text-center">
-			<p>&copy; {new Date().getFullYear()} tohuwabohu.io</p>
+			<p class="unstyled text-xs">&copy; {new Date().getFullYear()} tohuwabohu.io</p>
 		</div>
 	</svelte:fragment>
 </AppShell>

@@ -8,7 +8,10 @@
 
 <section>
 	<div class="container mx-auto p-8 space-y-10">
-		<h1>Login</h1>
+		<h1 class="font-logo">
+			<span class="text-primary-500">Log</span>
+			<span class="text-secondary-500">in</span>
+		</h1>
 
 		<form method="POST" class="variant-ringed p-4 space-y-4 rounded-container-token">
 			<label class="label">
