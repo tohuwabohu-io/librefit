@@ -5,7 +5,11 @@ const config = {
 		require('path').join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')
 	],
 	theme: {
-		extend: {}
+		extend: {
+			fontFamily: {
+				'Soda Berry': ['Soda Berry', 'sans-serif']
+			}
+		}
 	},
 	plugins: [
 		require('@tailwindcss/forms'),
