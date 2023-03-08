@@ -1,10 +1,11 @@
 import { Configuration, TdeeResourceApi } from 'librefit-api/rest';
+import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 
 export const actions = {
 	default: async ({ cookies, request }) => {
 		const tdeeApi = new TdeeResourceApi(
 			new Configuration({
-				basePath: import.meta.env.VITE_API_BASE_PATH
+				basePath: PUBLIC_API_BASE_PATH
 			})
 		);
 
@@ -15,7 +16,7 @@ export const actions = {
 		const height = data.get('height');
 		const sex = data.get('sex');
 		const weight = data.get('weight');
-		const diff = data.get('diff') / 10;
+		const diff = data.get('diff');
 		const gain = data.get('gain');
 
 		return await tdeeApi

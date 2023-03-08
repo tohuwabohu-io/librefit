@@ -1,36 +1,21 @@
 <script>
-	import {
-		Anchor,
-		AppShell,
-		Header,
-		Navbar,
-		ShellSection,
-		SvelteUIProvider
-	} from '@svelteuidev/core';
-
-	let isDark = false;
-	let opened = false;
-
-	function toggleTheme() {
-		isDark = !isDark;
-	}
-	function toggleOpened() {
-		opened = !opened;
-	}
+	import '../theme.pcss';
+	import '@skeletonlabs/skeleton/styles/all.css';
+	import '../app.pcss';
+	import { AppShell, LightSwitch } from '@skeletonlabs/skeleton';
+	import TopBar from '$lib/components/TopBar.svelte';
 </script>
 
-<SvelteUIProvider withNormalizeCSS withGlobalStyling>
-	<AppShell>
-		<Header slot="header">
-			<Anchor href="/">Home</Anchor>
-			<Anchor href="/login">Login</Anchor>
-			<Anchor href="/register">Registration</Anchor>
-			<Anchor href="/wizard">Wizard</Anchor>
-			<Anchor href="/dashboard">Dashboard</Anchor>
-		</Header>
-
-		<ShellSection>
-			<slot />
-		</ShellSection>
-	</AppShell>
-</SvelteUIProvider>
+<AppShell>
+	<svelte:fragment slot="header">
+		<TopBar />
+	</svelte:fragment>
+	<!-- Router Slot -->
+	<slot />
+	<!-- ---- / ---- -->
+	<svelte:fragment slot="pageFooter">
+		<div class="text-center">
+			<p class="unstyled text-xs">&copy; {new Date().getFullYear()} tohuwabohu.io</p>
+		</div>
+	</svelte:fragment>
+</AppShell>

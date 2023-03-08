@@ -1,42 +1,44 @@
 <script lang="ts">
 	import {
-		Button,
-		Container,
-		NativeSelect,
-		NumberInput,
-		RadioGroup,
-		Text,
-		Title
-	} from '@svelteuidev/core';
-	import { CalculationGoal, CalculationSex, Tdee } from 'librefit-api/rest';
+		CalculationGoal,
+		CalculationSex,
+		Configuration,
+		Tdee,
+		TdeeResourceApi
+	} from 'librefit-api/rest';
+	import { RadioGroup, RadioItem, RangeSlider, Step, Stepper } from '@skeletonlabs/skeleton';
 
 	/** @type {import('./$types').ActionData} */ export let form;
 
 	let step = 1;
-	let tdee: Tdee = {
-		age: 0,
-		height: 0,
+	const exampleTdee: Tdee = {
+		age: 30,
+		height: 160,
 		sex: CalculationSex.Female,
-		weight: 0,
-		activityLevel: 1,
+		weight: 60,
+		activityLevel: 1.25,
 		calculationGoal: CalculationGoal.Loss,
-		target: 0,
-		weeklyDifference: 0
+		weeklyDifference: 3
 	};
+
+	let tdee = exampleTdee;
 
 	if (form) {
 		tdee = form;
 	}
 
 	const activityLevels = [
-		{ label: 'Level 1: Mostly Sedentary', value: 1 },
-		{ label: 'Level 2: Light Activity', value: 1.25 },
-		{ label: 'Level 3: Moderate Activity', value: 1.5 },
-		{ label: 'Level 4: Highly Active', value: 1.75 },
-		{ label: 'Level 5: Professional Athlete', value: 2 }
+		{ label: 'Mostly Sedentary', value: 1 },
+		{ label: 'Light Activity', value: 1.25 },
+		{ label: 'Moderate Activity', value: 1.5 },
+		{ label: 'Highly Active', value: 1.75 },
+		{ label: 'Athlete', value: 2 }
 	];
 
-	const sex = [CalculationSex.Female, CalculationSex.Male];
+	const sexes = [
+		{ label: 'Female', value: CalculationSex.Female },
+		{ label: 'Male', value: CalculationSex.Male }
+	];
 
 	const goals = [
 		{ label: 'Weight Loss', value: CalculationGoal.Loss },
@@ -59,124 +61,195 @@
 	};
 </script>
 
-<Container>
-	<form method="POST">
-		<!-- {#if step === 1} -->
-		<Title ordering={1}>Wizard</Title>
+<svelte:head>
+	<title>LibreFit - TDEE Wizard</title>
+</svelte:head>
 
-		<Text>
-			To find the optimal amount of how many calories you should consume per day to reach a specific
-			goal, it's a good idea to calculate your TDEE.
-		</Text>
+<section>
+	<div class="container mx-auto p-8 space-y-8">
+		<h1>TDEE Calculator</h1>
+		<form method="POST">
+			<Stepper>
+				<Step>
+					<svelte:fragment slot="header">Step 1: Body Metrics</svelte:fragment>
+					<p>
+						To find the optimal amount of how many calories you should consume per day to reach a
+						specific goal, it's a good idea to calculate your TDEE.
+					</p>
 
-		<Text>
-			In order to do so, please provide some necessary information about yourself to make the
-			calculation work.
-		</Text>
+					<p>Please provide some necessary information about yourself for the calculation.</p>
 
-		<Title ordering={2}>Step 1</Title>
+					<RangeSlider
+						accent="accent-primary-500"
+						name="age"
+						bind:value={tdee.age}
+						min={15}
+						max={99}>Age</RangeSlider
+					>
+					<input
+						class="input variant-ringed-secondary"
+						type="text"
+						bind:value={tdee.age}
+						aria-label="Age"
+					/>
 
-		<NumberInput name="age" label="Age" bind:value={tdee.age} />
+					<p>Your sex is:</p>
 
-		<NativeSelect name="sex" label="Sex" data={sex} bind:value={tdee.sex} placeholder="Pick one" />
+					<RadioGroup>
+						{#each sexes as sex}
+							<RadioItem bind:group={tdee.sex} value={sex.value} name="sex">
+								{sex.label}
+							</RadioItem>
+						{/each}
+					</RadioGroup>
 
-		<NumberInput
-			name="height"
-			label="Height"
-			bind:value={tdee.height}
-			description="Your height in cm."
-		/>
+					<RangeSlider
+						accent="accent-primary-500"
+						name="height"
+						bind:value={tdee.height}
+						min={100}
+						max={220}
+						aria-hidden="true">Height in cm</RangeSlider
+					>
+					<input
+						class="input"
+						name="height"
+						type="text"
+						bind:value={tdee.height}
+						aria-label="Height in cm"
+					/>
 
-		<NumberInput
-			name="weight"
-			label="Weight"
-			bind:value={tdee.weight}
-			description="Your current weight in kg."
-		/>
-		<!--{/if} -->
+					<RangeSlider
+						accent="accent-primary-500"
+						name="weight"
+						bind:value={tdee.weight}
+						min={30}
+						max={300}
+						aria-hidden="true">Weight in kg</RangeSlider
+					>
+					<input
+						class="input"
+						name="weight"
+						type="text"
+						bind:value={tdee.weight}
+						aria-label="Weight in cm"
+					/>
+				</Step>
 
-		<Title ordering={2}>Step 2</Title>
+				<Step>
+					<svelte:fragment slot="header">Step 2: Activity Level</svelte:fragment>
 
-		<Text>
-			How active are you during your day? Please choose what describes your daily activity level
-			best.
-		</Text>
+					<p>
+						How active are you during your day? Choose what describes your daily activity level
+						best.
+					</p>
+					<p>
+						Please be honest, the descriptions are in no way meant to be judgemental and are a rough
+						estimate of how your day looks like. If your goal is weight loss and you are unsure what
+						to pick, just assume one level less.
+					</p>
 
-		<RadioGroup
-			name="activityLevel"
-			items={activityLevels}
-			bind:value={tdee.activityLevel}
-			itemDirection={'down'}
-		/>
+					<div class="activity-level-container flex gap-4">
+						<RadioGroup class="btn-group-vertical" rounded="rounded-xl flex-none">
+							{#each activityLevels as activityLevel}
+								<RadioItem
+									bind:group={tdee.activityLevel}
+									name="activityLevel"
+									value={activityLevel.value}
+								>
+									{activityLevel.label}
+								</RadioItem>
+							{/each}
+						</RadioGroup>
 
-		<Title ordering={2}>Step 3</Title>
+						<div class="card variant-glass-secondary p-4 text-left space-y-2 flex-auto w-64">
+							{#if tdee.activityLevel === 1}
+								<strong>Level 1 - Mostly Sedentary</strong>
+								<p>
+									You likely have an office job and try your best reaching your daily step goal.
+									Apart from that, you do not work out regularly and spend most of your day
+									stationary.
+								</p>
+							{:else if tdee.activityLevel === 1.25}
+								<strong>Level 2 - Light Activity</strong>
+								<p>
+									You either have a job that requires you to move around frequently or you hit the
+									gym 2x - 3x times a week. In either way, you are regularly lifting weight and
+									training your cardiovascular system.
+								</p>
+							{:else if tdee.activityLevel === 1.5}
+								<strong>Level 3 - Moderate Activity</strong>
+								<p>
+									You consistently train your body 3x - 4x times a week. Your training plan became
+									more sophisticated over the years and include cardiovascular HIIT sessions. You
+									realized how important nutrition is and want to improve your sportive results.
+								</p>
+							{:else if tdee.activityLevel === 1.75}
+								<strong>Level 4 - Highly Active</strong>
+								<p>
+									Fitness is your top priority in life. You dedicate large parts of your week to
+									train your body, maybe even regularly visit sportive events. You work out almost
+									every day and certainly know what you are doing.
+								</p>
+							{:else if tdee.activityLevel === 2}
+								<strong>Level 5 - Athlete</strong>
+								<p>
+									Your fitness level reaches into the (semi-) professional realm. Calculators like
+									this won't fulfill your needs and you are curious how far off the results will be.
+								</p>
+							{/if}
+						</div>
+					</div>
+				</Step>
 
-		<Text>Do you aim for weight loss or weight gain?</Text>
+				<Step>
+					<svelte:fragment slot="header">Step 3: Your Goal</svelte:fragment>
 
-		<RadioGroup name="gain" items={goals} bind:value={tdee.calculationGoal} />
+					<p>Do you aim for weight loss or weight gain?</p>
 
-		<Text>How much weight are you looking to lose/gain per week?</Text>
+					<RadioGroup>
+						{#each goals as goal}
+							<RadioItem bind:group={tdee.calculationGoal} name="gain" value={goal.value}>
+								{goal.label}
+							</RadioItem>
+						{/each}
+					</RadioGroup>
 
-		<div class="slider-container">
-			<input
-				name="diff"
-				class="slider"
-				type="range"
-				min="0"
-				max="7"
-				bind:value={tdee.weeklyDifference}
-			/>
-		</div>
-		<Text>{tdee.weeklyDifference / 10}kg</Text>
+					<p>How much weight are you looking to lose or gain per week?</p>
 
-		<Button>Confirm</Button>
-	</form>
+					<RangeSlider
+						accent="accent-primary-500"
+						name="diff"
+						bind:value={tdee.weeklyDifference}
+						min={0}
+						max={7}
+						ticked
+					>
+						<div class="flex justify-between items-center">
+							<div>
+								<p class="text">Gain/Loss</p>
+							</div>
+							<div class="text-xs">
+								<p>
+									{tdee.weeklyDifference / 10} kg
+								</p>
+							</div>
+						</div>
+					</RangeSlider>
+				</Step>
+			</Stepper>
+		</form>
 
-	{#if form}
-		<Title ordering={2}>Your result</Title>
+		{#if form}
+			<h2>Your result</h2>
 
-		<Text>
-			Based on your input, your basic metabolic rate is {tdee.bmr}kcal. Your daily calorie
-			consumption to hold your weight should be around {tdee.tdee}kcal.
-		</Text>
-	{/if}
-
-	<Button on:click={previousStep}>Previous</Button>
-	<Button on:click={nextStep}>Next</Button>
-</Container>
+			<p>
+				Based on your input, your basic metabolic rate is {tdee.bmr}kcal. Your daily calorie
+				consumption to hold your weight should be around {tdee.tdee}kcal.
+			</p>
+		{/if}
+	</div>
+</section>
 
 <style>
-	.slider-container {
-		width: 100%;
-	}
-
-	.slider {
-		-webkit-appearance: none;
-		height: 25px;
-		background: #d3d3d3;
-		outline: none;
-		opacity: 0.7;
-		-webkit-transition: 0.2s;
-		transition: opacity 0.2s;
-	}
-
-	.slider:hover {
-		opacity: 1;
-	}
-
-	.slider::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		appearance: none;
-		width: 25px;
-		height: 25px;
-		background: #04aa6d;
-		cursor: pointer;
-	}
-
-	.slider::-moz-range-thumb {
-		width: 25px;
-		height: 25px;
-		background: #04aa6d;
-		cursor: pointer;
-	}
 </style>

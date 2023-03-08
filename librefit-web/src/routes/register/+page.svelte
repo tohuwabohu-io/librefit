@@ -1,6 +1,4 @@
 <script>
-	import { Button, Checkbox, Container, Text, TextInput, Title } from '@svelteuidev/core';
-
 	/** @type {import('./$types').ActionData} */ export let form;
 </script>
 
@@ -8,22 +6,46 @@
 	<title>LibreFit - Registration</title>
 </svelte:head>
 
-<Container>
-	<Title ordering={1}>Registration</Title>
+<section>
+	<div class="container mx-auto p-8 space-y-10">
+		<h1 class="font-logo">
+			<span class="text-primary-500">Sign</span>
+			<span class="text-secondary-500">Up</span>
+		</h1>
 
-	<form method="POST">
-		<TextInput label="Nickname" name="username" />
+		<form method="POST" class="variant-ringed p-4 space-y-4 rounded-container-token">
+			<label class="label">
+				<span>E-Mail</span>
+				<input name="email" class="input" type="email" placeholder="Enter E-Mail" required />
+			</label>
 
-		<TextInput label="E-Mail" name="email" required />
+			<label class="label">
+				<span>Password</span>
+				<input
+					name="password"
+					class="input"
+					type="password"
+					placeholder="Enter Password"
+					required
+				/>
+			</label>
 
-		<TextInput label="Password" type="password" name="password" required />
+			<label>
+				<span>Nickname</span>
+				<input name="username" class="input" type="text" placeholder="Enter Nickname (optional)" />
+			</label>
 
-		<Checkbox label="I agree to LibreFit's terms and conditions." />
+			<label>
+				<span>I agree to LibreFit's terms and conditions.</span>
+				<input class="checkbox" type="checkbox" name="confirmation" />
+			</label>
 
-		<Button>Register</Button>
-	</form>
-
+			<div>
+				<button class="btn variant-filled-primary">Register</button>
+			</div>
+		</form>
+	</div>
 	{#if form && !form.success}
-		<Text>An error occured during registration.</Text>
+		<p>An error occured during registration.</p>
 	{/if}
-</Container>
+</section>

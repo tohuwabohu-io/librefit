@@ -1,0 +1,21 @@
+/* Write your global styles here, in PostCSS syntax */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind typography;
+
+@font-face {
+	font-family: Soda Berry;
+	font-weight: 400;
+	src: url('/src/assets/fonts/Soda Berry.ttf');
+}
+
+html,
+body {
+	@apply h-full overflow-hidden;
+}
+
+.font-logo {
+	font-family: Soda Berry, serif !important;
+}

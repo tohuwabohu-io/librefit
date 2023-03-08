@@ -1,6 +1,7 @@
 /** @type {import('./$types').Actions} */
 import { UserResourceApi } from 'librefit-api/rest';
 import { Configuration } from 'librefit-api/rest';
+import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 
 export const actions = {
 	default: async ({ cookies, request }) => {
@@ -12,7 +13,7 @@ export const actions = {
 
 		const userApi = new UserResourceApi(
 			new Configuration({
-				basePath: import.meta.env.VITE_API_BASE_PATH
+				basePath: PUBLIC_API_BASE_PATH
 			})
 		);
 
