@@ -5,7 +5,7 @@
 			<span class="text-secondary-500 text-9xl">Fit</span>
 		</h1>
 
-		<p class="text-xl">Welcome to LibreFit, an Open Source calorie tracker!</p>
+		<p class="unstyled text-3xl">Welcome to LibreFit, an Open Source calorie tracker!</p>
 	</div>
 </section>
 
