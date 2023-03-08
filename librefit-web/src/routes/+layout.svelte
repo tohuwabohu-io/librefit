@@ -13,7 +13,7 @@
 	<!-- Router Slot -->
 	<slot />
 	<!-- ---- / ---- -->
-	<svelte:fragment slot="footer">
+	<svelte:fragment slot="pageFooter">
 		<div class="text-center">
 			<p class="unstyled text-xs">&copy; {new Date().getFullYear()} tohuwabohu.io</p>
 		</div>
