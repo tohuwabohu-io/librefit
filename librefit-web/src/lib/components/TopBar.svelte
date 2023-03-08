@@ -2,13 +2,13 @@
 import {AppBar} from "@skeletonlabs/skeleton";
 </script>
 
-<AppBar>
+<AppBar shadow="drop-shadow">
     <svelte:fragment slot="lead">
-        <a href="/" class="font-logo">
-            <span class="variant-filled-primary">
+        <a href="/" class="font-logo text-2xl">
+            <span class="text-primary-500">
                 Libre
             </span>
-            <span class="variant-filled-secondary">
+            <span class="text-secondary-500">
                 Fit
             </span>
         </a>
