@@ -3,12 +3,12 @@
 	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.pcss';
 	import { AppShell, LightSwitch } from '@skeletonlabs/skeleton';
-	import TopBar from "$lib/components/TopBar.svelte";
+	import TopBar from '$lib/components/TopBar.svelte';
 </script>
 
 <AppShell>
 	<svelte:fragment slot="header">
-		<TopBar/>
+		<TopBar />
 	</svelte:fragment>
 	<!-- Router Slot -->
 	<slot />

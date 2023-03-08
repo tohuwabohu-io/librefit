@@ -8,4 +8,3 @@
 		<p class="unstyled text-3xl">Welcome to LibreFit, an Open Source calorie tracker!</p>
 	</div>
 </section>
-
