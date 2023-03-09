@@ -1,5 +1,5 @@
 <script>
-	import {Configuration, UserResourceApi} from "librefit-api/rest";
+	import {Configuration, UserResourceApi} from 'librefit-api/rest';
 
 	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 	import {toastStore} from "@skeletonlabs/skeleton";
@@ -26,7 +26,7 @@
 				toastStore.trigger({
 					message: 'Login successful!',
 					autohide: false,
-					classes: 'variant-glass-success'
+					classes: 'variant-filled-primary' // TODO there seems to be a bug in Toast - secondary is displayed
 				});
 			}).catch((e) => {
 				let errorMessage = 'Error during login';
@@ -38,7 +38,7 @@
 				toastStore.trigger({
 					message: errorMessage,
 					autohide: false,
-					classes: 'variant-glass-error'
+					classes: 'variant-filled-error'
 				});
 			});
 		}
