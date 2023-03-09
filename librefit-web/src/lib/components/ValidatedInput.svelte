@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
     export let value, name;
     export let label = 'Input';
     export let type = 'text';
     export let placeholder;
-    export let customValidate = () => true
+    export let customValidate: () => { valid: boolean, errorMessage?: string } = () => { return { valid: true }}
     export let customErrorText = '';
     export let emptyMessage = `${label} is empty.`
     export let required;
@@ -20,10 +20,19 @@
 
         if (isEmpty()) {
             errorMessage = emptyMessage;
-        } else if (!customValidate()) {
-            errorMessage = customErrorText;
+        } else if (customValidate) {
+            const validationResult = customValidate();
+
+            valid = validationResult.valid;
+            errorMessage = validationResult.errorMessage;
         } else {
             valid = true;
+        }
+
+        if (!valid) {
+            error.classList.remove('invisible');
+        } else {
+            error.classList.add('invisible');
         }
 
         return valid;
