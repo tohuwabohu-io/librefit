@@ -1,5 +1,51 @@
 <script>
-	/** @type {import('./$types').ActionData} */ export let form;
+	import ValidatedInput from "$lib/components/ValidatedInput.svelte";
+	import {Configuration, UserResourceApi} from "librefit-api/rest";
+	import {PUBLIC_API_BASE_PATH} from "$env/static/public";
+
+	let emailInput, passwordInput, passwordConfirmationInput, tosInput, registrationButton;
+
+	let registrationData = {
+		name: '', email: '', password: ''
+	}
+
+	const userApi = new UserResourceApi(
+			new Configuration({
+				basePath: PUBLIC_API_BASE_PATH
+			})
+	);
+
+	const register = async () => {
+		await userApi.userRegisterPost(registrationData)
+				.catch((error) => console.error(error));
+	}
+
+	const passwordValidation = () => {
+		// some arbitrary rules
+		if (passwordInput.value.indexOf('a') < 0) {
+			return {
+				valid: false,
+				errorMessage: 'Chosen password must contain at least one \'a\' letter.'
+			}
+		}
+
+		return {
+			valid: true
+		}
+	}
+
+	const passwordConfirmationValidation = () => {
+		if (passwordInput.value !== passwordConfirmationInput.value) {
+			return {
+				valid: false,
+				errorMessage: 'Passwords do not match.'
+			}
+		}
+
+		return {
+			valid: true
+		}
+	}
 </script>
 
 <svelte:head>
@@ -14,38 +60,25 @@
 		</h1>
 
 		<form method="POST" class="variant-ringed p-4 space-y-4 rounded-container-token">
-			<label class="label">
-				<span>E-Mail</span>
-				<input name="email" class="input" type="email" placeholder="Enter E-Mail" required />
-			</label>
+			<ValidatedInput name="email" type="email" placeholder="Enter E-Mail"
+							label="E-Mail" required bind:this={emailInput} bind:value={registrationData.email} />
 
-			<label class="label">
-				<span>Password</span>
-				<input
-					name="password"
-					class="input"
-					type="password"
-					placeholder="Enter Password"
-					required
-				/>
-			</label>
+			<ValidatedInput name="password" type="password" placeholder="Enter Password"
+							label="Password" required bind:this={passwordInput} validateDetail={passwordValidation} bind:value={registrationData.password} />
+			<ValidatedInput name="passwordConfirmation" type="password" placeholder="Confirm Password" validateDetail={passwordConfirmationValidation}
+							label="Confirm Password" required bind:this={passwordConfirmationInput} />
 
 			<label>
 				<span>Nickname</span>
-				<input name="username" class="input" type="text" placeholder="Enter Nickname (optional)" />
+				<input name="username" class="input" type="text" placeholder="Enter Nickname (optional)"
+					bind:value={registrationData.name}/>
 			</label>
 
-			<label>
-				<span>I agree to LibreFit's terms and conditions.</span>
-				<input class="checkbox" type="checkbox" name="confirmation" />
-			</label>
-
+			<ValidatedInput name="confirmation" type="checkbox" styling="checkbox"
+				label="I agree to LibreFit's terms and conditions." bind:this={tosInput} />
 			<div>
-				<button class="btn variant-filled-primary">Register</button>
+				<button bind:this={registrationButton} on:click={register} class="btn variant-filled-primary">Register</button>
 			</div>
 		</form>
 	</div>
-	{#if form && !form.success}
-		<p>An error occured during registration.</p>
-	{/if}
 </section>

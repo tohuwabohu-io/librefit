@@ -2,9 +2,9 @@
     export let value, name;
     export let label = 'Input';
     export let type = 'text';
+    export let styling = 'input';
     export let placeholder;
-    export let customValidate: () => { valid: boolean, errorMessage?: string } = () => { return { valid: true }}
-    export let customErrorText = '';
+    export let validateDetail: () => { valid: boolean, errorMessage?: string };
     export let emptyMessage = `${label} is empty.`
     export let required;
 
@@ -18,10 +18,10 @@
     export const validate = () => {
         let valid = false;
 
-        if (isEmpty()) {
+        if (isEmpty() && required) {
             errorMessage = emptyMessage;
-        } else if (customValidate) {
-            const validationResult = customValidate();
+        } else if (validateDetail) {
+            const validationResult = validateDetail();
 
             valid = validationResult.valid;
             errorMessage = validationResult.errorMessage;
@@ -45,13 +45,18 @@
     $:value;
     $:label;
     $:type;
-    $:customValidate
-    $:customErrorText;
+    $:validateDetail;
 </script>
 
+<svelte:options accessors={true}/>
+
 <label class="label">
-    <span>{label}</span>
-    <input {name} class="input" use:getType {placeholder} {required}
+    <span>
+        {label}
+    </span>
+    <input {name} class={styling} use:getType {placeholder} {required}
            bind:value={value} on:focusout={validate} />
-    <span bind:this={error} class="text-sm invisible validation-error-text">{errorMessage}</span>
+    <span bind:this={error} class="text-sm invisible validation-error-text">
+        {errorMessage}
+    </span>
 </label>
