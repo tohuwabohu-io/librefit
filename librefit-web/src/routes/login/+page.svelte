@@ -34,9 +34,7 @@
 				.catch((e) => {
 					let errorMessage = 'Error during login';
 
-					console.log(e);
-
-					if (e.status === 404) {
+					if (e.response.status === 404) {
 						errorMessage = 'Invalid username or password.';
 					}
 
