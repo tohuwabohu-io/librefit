@@ -69,8 +69,6 @@
 	};
 
 	const tosValidation = () => {
-		console.log(tosAccepted);
-
 		if (!tosAccepted) {
 			return {
 				valid: false,
