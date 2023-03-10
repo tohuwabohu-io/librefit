@@ -18,7 +18,7 @@
 	);
 
 	const login = async () => {
-		if (emailInput.validate() && passwordInput.validate()) {
+		if (![emailInput, passwordInput].map(control => control.validate()).includes(false)) {
 			// TODO: disable login button, re-enable in finally block.
 
 			await userApi.userLoginPost(loginData).then(() => {
