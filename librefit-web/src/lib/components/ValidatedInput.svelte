@@ -87,7 +87,15 @@
 				<span>
 					<slot />
 				</span>
-				<input {name} class={styling} use:getType bind:this={control} bind:value />
+				<input
+					{name}
+					class={styling}
+					use:getType
+					bind:value
+					bind:this={control}
+					on:change={(e) => (value = e.target.checked)}
+					on:focusout={validate}
+				/>
 			</span>
 			<span class="text-sm invisible validation-error-text self-center" bind:this={error}>
 				{errorMessage}

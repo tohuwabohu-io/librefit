@@ -2,16 +2,17 @@
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
 	import { Configuration, UserResourceApi } from 'librefit-api/rest';
 	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
+	import { toastStore } from '@skeletonlabs/skeleton';
 
-	let emailInput, passwordInput, passwordConfirmationInput, tosInput, tosError, registrationButton;
+	let emailInput, passwordInput, passwordConfirmationInput, tosInput, registrationButton;
 	let registrationData = {
 		name: '',
 		email: '',
 		password: ''
 	};
 
-	let tosAccepted; // useless bind
 	let passwordConfirmation;
+	let tosAccepted = false;
 
 	const userApi = new UserResourceApi(
 		new Configuration({
@@ -25,7 +26,22 @@
 				.map((control) => control.validate())
 				.includes(false)
 		) {
-			await userApi.userRegisterPost(registrationData).catch((error) => console.error(error));
+			await userApi
+				.userRegisterPost(registrationData)
+				.then(() => {
+					toastStore.trigger({
+						message: 'Successfully signed up!',
+						classes: 'variant-filled-success'
+					});
+				})
+				.catch((error) => {
+					toastStore.trigger({
+						message: 'An error occured.',
+						classes: 'variant-glass-error'
+					});
+
+					console.error(error);
+				});
 		}
 	};
 
@@ -53,7 +69,9 @@
 	};
 
 	const tosValidation = () => {
-		if (!tosInput.checked) {
+		console.log(tosAccepted);
+
+		if (!tosAccepted) {
 			return {
 				valid: false,
 				errorMessage: 'Please accept our terms and conditions.'
@@ -123,22 +141,11 @@
 				type="checkbox"
 				styling="checkbox self-center"
 				bind:this={tosInput}
+				bind:value={tosAccepted}
 				validateDetail={tosValidation}
 			>
 				I agree to LibreFit's terms and conditions.
 			</ValidatedInput>
-
-			<label class="label">
-				<!-- <span class="flex justify-between">
-					<span>
-						<span>I agree to LibreFit's terms and conditions.</span>
-						<input class="checkbox self-center m-1" type="checkbox" name="confirmation" bind:this={tosInput} bind:value={tosAccepted} />
-					</span>
-					<span class="text-sm invisible validation-error-text self-center" bind:this={tosError}>
-						Please accept our terms and conditions.
-					</span>
-				</span> -->
-			</label>
 
 			<div>
 				<button
