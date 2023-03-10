@@ -145,12 +145,21 @@
 				I agree to LibreFit's terms and conditions.
 			</ValidatedInput>
 
-			<div>
+			<div class="flex justify-between">
 				<button
 					bind:this={registrationButton}
 					on:click={register}
 					class="btn variant-filled-primary">Register</button
 				>
+
+				<div class="flex flex-row gap-4">
+					<p class="self-center text-sm unstyled">
+						Already registered?
+					</p>
+					<a href="/login" class="btn variant-filled-secondary cursor-pointer">
+						Login
+					</a>
+				</div>
 			</div>
 		</form>
 	</div>
