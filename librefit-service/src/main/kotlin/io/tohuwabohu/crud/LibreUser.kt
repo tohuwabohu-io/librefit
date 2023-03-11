@@ -34,7 +34,6 @@ class LibreUserRepository(private val validation: LibreUserValidation) : Panache
 
         return find("email = ?1", user.email).firstResult()
             .onItem().ifNotNull().failWith{ ValidationError("A User with this E-Mail already exists.") }
-            .invoke { e -> Log.error(e) }
             .onItem().ifNull().switchTo(persistAndFlush(user))
     }
 
