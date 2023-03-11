@@ -4,6 +4,8 @@ import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
+import io.tohuwabohu.crud.LibreUserValidation
+import io.tohuwabohu.crud.validation.ValidationError
 import java.time.LocalDateTime
 import javax.enterprise.context.RequestScoped
 import javax.ws.rs.*
@@ -12,7 +14,7 @@ import javax.ws.rs.core.Response
 
 @Path("/user")
 @RequestScoped
-class UserResource(val userRepository: LibreUserRepository) {
+class UserResource(val userRepository: LibreUserRepository, val validation: LibreUserValidation) {
 
     @POST
     @Path("/register")
@@ -31,10 +33,17 @@ class UserResource(val userRepository: LibreUserRepository) {
 
         Log.info("Registering a new user=$libreUser")
 
-        return userRepository.persistAndFlush(libreUser)
+        return userRepository.createUser(libreUser)
             .onItem().transform { Response.ok(libreUser).status(Response.Status.CREATED).build() }
+            .invoke { e -> Log.error(e) }
             .onFailure().invoke(Log::error)
-            .onFailure().recoverWithItem(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build())
+            .onFailure().recoverWithItem { throwable ->
+                if (throwable is ValidationError) {
+                    Response.status(Response.Status.BAD_REQUEST).entity(throwable).build()
+                } else {
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).build()
+                }
+            }
     }
 
     @POST
