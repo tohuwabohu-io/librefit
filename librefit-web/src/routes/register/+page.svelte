@@ -5,6 +5,8 @@
 	import { toastStore } from '@skeletonlabs/skeleton';
 
 	let emailInput, passwordInput, passwordConfirmationInput, tosInput, registrationButton;
+	let success, error, errorText;
+
 	let registrationData = {
 		name: '',
 		email: '',
@@ -26,21 +28,22 @@
 				.map((control) => control.validate())
 				.includes(false)
 		) {
+			success.classList.add('hidden');
+			error.classList.add('hidden');
+
 			await userApi
 				.userRegisterPost(registrationData)
 				.then(() => {
-					toastStore.trigger({
-						message: 'Successfully signed up!',
-						classes: 'variant-filled-success'
-					});
+					success.classList.remove('hidden');
+					error.classList.add('hidden');
+					errorText = ''
 				})
-				.catch((error) => {
-					toastStore.trigger({
-						message: 'An error occured.',
-						classes: 'variant-glass-error'
-					});
-
-					console.error(error);
+				.catch((e) => {
+					e.response.json().then(e => {
+						success.classList.add('hidden')
+						error.classList.remove('hidden')
+						errorText = e.message;
+					})
 				});
 		}
 	};
@@ -145,6 +148,15 @@
 				I agree to LibreFit's terms and conditions.
 			</ValidatedInput>
 
+			<div>
+				<p bind:this={success} class="variant-glass-success variant-ringed-success p-4 rounded-full hidden">
+					Successfully signed up! Please proceed to the <a href="/login">Login</a>.
+				</p>
+				<p bind:this={error} class="variant-glass-error variant-ringed-error p-4 rounded-full hidden">
+					{ errorText }
+				</p>
+			</div>
+
 			<div class="flex justify-between">
 				<button
 					bind:this={registrationButton}
@@ -162,5 +174,6 @@
 				</div>
 			</div>
 		</form>
+
 	</div>
 </section>
