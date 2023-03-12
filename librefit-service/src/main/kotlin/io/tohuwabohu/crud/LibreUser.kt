@@ -30,10 +30,9 @@ class LibreUser: PanacheEntity() {
 class LibreUserRepository(private val validation: LibreUserValidation) : PanacheRepository<LibreUser> {
 
     fun createUser(user: LibreUser): Uni<LibreUser?> {
-        validation.checkPassword(user)
-
         return find("email = ?1", user.email).firstResult()
             .onItem().ifNotNull().failWith{ ValidationError("A User with this E-Mail already exists.") }
+            .onItem().ifNull().switchTo(validation.checkPassword(user))
             .onItem().ifNull().switchTo(persistAndFlush(user))
     }
 
@@ -44,9 +43,13 @@ class LibreUserRepository(private val validation: LibreUserValidation) : Panache
 @ApplicationScoped
 class LibreUserValidation {
 
-    fun checkPassword(user: LibreUser) {
+    fun checkPassword(user: LibreUser): Uni<LibreUser> {
         if (user.password.isEmpty()) {
             throw ValidationError("The provided password is empty.")
+        } else if (!user.password.contains('b')) {
+            throw ValidationError("The password must contain at least one 'b' letter.")
         }
+
+        return Uni.createFrom().item(null)
     }
 }
