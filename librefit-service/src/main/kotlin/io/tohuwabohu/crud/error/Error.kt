@@ -21,7 +21,7 @@ class ValidationErrorMapper : ExceptionMapper<ValidationError> {
     private val log: Logger = Logger.getLogger(javaClass)
 
     override fun toResponse(exception: ValidationError): Response {
-        log.error("Validation failed.", exception)
+        log.error("Validation failed", exception)
 
         return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(exception.message)).build()
     }
