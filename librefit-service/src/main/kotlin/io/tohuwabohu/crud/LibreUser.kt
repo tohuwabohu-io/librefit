@@ -31,8 +31,9 @@ class LibreUserRepository(private val validation: LibreUserValidation) : Panache
     fun createUser(user: LibreUser): Uni<LibreUser?> {
         return find("email = ?1", user.email).firstResult()
             .onItem().ifNotNull().failWith(ValidationError("A User with this E-Mail already exists."))
-            .onItem().ifNull().continueWith(user).invoke{ _ -> validation.checkPassword(user) }
-            .onItem().ifNull().switchTo { persistAndFlush(user) }
+            .onItem().ifNull().continueWith(user)
+                .invoke{ new -> validation.checkPassword(new!!) }
+                .chain { new -> persistAndFlush(new!!) }
     }
 
     fun findByEmailAndPassword(email: String, password: String): Uni<LibreUser?> =
