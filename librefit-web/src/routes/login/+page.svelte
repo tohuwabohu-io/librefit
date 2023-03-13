@@ -2,10 +2,10 @@
 	import { Configuration, UserResourceApi } from 'librefit-api/rest';
 
 	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
-	import { toastStore } from '@skeletonlabs/skeleton';
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
 
 	let loginButton, emailInput, passwordInput;
+	let success, error, errorText;
 
 	const loginData = {
 		email: '',
@@ -23,26 +23,21 @@
 			// TODO: disable login button, re-enable in finally block.
 
 			await userApi
-				.userLoginPost(loginData)
+				.userLoginPost({libreUser: loginData})
 				.then(() => {
-					toastStore.trigger({
-						message: 'Login successful!',
-						autohide: false,
-						classes: 'variant-filled-primary' // TODO there seems to be a bug in Toast - secondary is displayed
-					});
+					// TODO redirect
+					success.classList.remove('hidden');
+					error.classList.add('hidden')
 				})
 				.catch((e) => {
-					let errorMessage = 'Error during login';
+					errorText = 'Error during login';
 
 					if (e.response.status === 404) {
-						errorMessage = 'Invalid username or password.';
+						errorText = 'Invalid username or password.';
 					}
 
-					toastStore.trigger({
-						message: errorMessage,
-						autohide: false,
-						classes: 'variant-filled-error'
-					});
+					success.classList.add('hidden');
+					error.classList.remove('hidden');
 				});
 		}
 	};
@@ -78,8 +73,18 @@
 				bind:value={loginData.password}
 				bind:this={passwordInput}
 			/>
+
 			<div>
-				<button bind:this={loginButton} on:click={login} class="btn variant-filled-primary"
+				<p bind:this={success} class="variant-glass-success variant-ringed-success p-4 rounded-full hidden">
+					Successfully logged in!
+				</p>
+				<p bind:this={error} class="variant-glass-error variant-ringed-error p-4 rounded-full hidden">
+					{ errorText }
+				</p>
+			</div>
+
+			<div>
+				<button bind:this={loginButton} on:click|preventDefault={login} class="btn variant-filled-primary"
 					>Login</button
 				>
 			</div>

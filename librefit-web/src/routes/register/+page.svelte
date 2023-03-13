@@ -1,8 +1,7 @@
 <script>
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-	import { Configuration, UserResourceApi } from 'librefit-api/rest';
+	import {Configuration, UserResourceApi} from 'librefit-api/rest';
 	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
-	import { toastStore } from '@skeletonlabs/skeleton';
 
 	let emailInput, passwordInput, passwordConfirmationInput, tosInput, registrationButton;
 	let success, error, errorText;
@@ -10,7 +9,7 @@
 	let registrationData = {
 		name: '',
 		email: '',
-		password: ''
+		password: '',
 	};
 
 	let passwordConfirmation;
@@ -32,18 +31,29 @@
 			error.classList.add('hidden');
 
 			await userApi
-				.userRegisterPost(registrationData)
+				.userRegisterPost({
+					libreUser: registrationData
+				})
 				.then(() => {
 					success.classList.remove('hidden');
 					error.classList.add('hidden');
 					errorText = ''
 				})
 				.catch((e) => {
-					e.response.json().then(e => {
-						success.classList.add('hidden')
-						error.classList.remove('hidden')
-						errorText = e.message;
-					})
+					console.log(e);
+
+					if (e.response.status === 500 || e.response.status !== 400) {
+						errorText = "An error occurred. Please try again later."
+					} else {
+						e.response.json().then(e => {
+							console.log(e);
+
+							errorText = e.message;
+						})
+					}
+
+					success.classList.add('hidden')
+					error.classList.remove('hidden')
 				});
 		}
 	};
@@ -160,7 +170,7 @@
 			<div class="flex justify-between">
 				<button
 					bind:this={registrationButton}
-					on:click={register}
+					on:click|preventDefault={register}
 					class="btn variant-filled-primary">Register</button
 				>
 
