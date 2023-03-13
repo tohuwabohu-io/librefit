@@ -1,6 +1,10 @@
 package io.tohuwabohu.crud.error
 
 import io.tohuwabohu.crud.validation.ValidationError
+import org.eclipse.microprofile.openapi.annotations.media.Content
+import org.eclipse.microprofile.openapi.annotations.media.Schema
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.jboss.logging.Logger
 import javax.ws.rs.core.Response
 import javax.ws.rs.ext.ExceptionMapper
@@ -14,7 +18,7 @@ fun createErrorResponse(throwable: Throwable): Response {
     }
 }
 
-data class ErrorResponse(val message: String)
+class ErrorResponse(val message: String)
 
 @Provider
 class ValidationErrorMapper : ExceptionMapper<ValidationError> {
