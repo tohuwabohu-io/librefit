@@ -18,7 +18,7 @@ class LibreUser: PanacheEntity() {
     @JsonIgnore
     lateinit var password: String
     lateinit var email: String
-    lateinit var registered: LocalDateTime
+    var registered: LocalDateTime? = null
     var lastLogin: LocalDateTime? = null
 
     override fun toString(): String {
