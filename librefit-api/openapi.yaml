@@ -354,9 +354,7 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LibreUser'
+            application/json: {}
         "400":
           description: Bad Request
           content:
@@ -437,6 +435,7 @@ components:
           $ref: '#/components/schemas/LocalDateTime'
     LibreUser:
       required:
+      - password
       - email
       type: object
       properties:
@@ -444,6 +443,8 @@ components:
           format: int64
           type: integer
           nullable: true
+        password:
+          type: string
         email:
           type: string
         name:

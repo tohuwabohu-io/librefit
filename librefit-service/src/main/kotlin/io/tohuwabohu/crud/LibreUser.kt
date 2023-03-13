@@ -14,7 +14,6 @@ import javax.persistence.Entity
 @Entity
 @Cacheable
 class LibreUser: PanacheEntity() {
-    @JsonIgnore
     lateinit var password: String
     lateinit var email: String
     var name: String? = null

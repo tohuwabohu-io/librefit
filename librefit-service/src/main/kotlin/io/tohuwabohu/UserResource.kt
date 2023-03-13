@@ -25,10 +25,7 @@ class UserResource(val userRepository: LibreUserRepository) {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK", content = [ Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = LibreUser::class)
-        )]),
+        APIResponse(responseCode = "200", description = "OK"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class),
