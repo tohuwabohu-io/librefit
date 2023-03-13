@@ -325,17 +325,9 @@ paths:
       - User Resource
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              required:
-              - email
-              - password
-              type: object
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/LibreUser'
       responses:
         "200":
           description: OK
@@ -355,25 +347,16 @@ paths:
       - User Resource
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              required:
-              - name
-              - email
-              - password
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/LibreUser'
       responses:
         "200":
           description: OK
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibreUser'
         "400":
           description: Bad Request
           content:
@@ -452,6 +435,30 @@ components:
           $ref: '#/components/schemas/LocalDateTime'
         endDate:
           $ref: '#/components/schemas/LocalDateTime'
+    LibreUser:
+      required:
+      - email
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+          nullable: true
+        email:
+          type: string
+        name:
+          type: string
+          nullable: true
+        registered:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+        lastLogin:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
     LocalDateTime:
       format: date-time
       type: string

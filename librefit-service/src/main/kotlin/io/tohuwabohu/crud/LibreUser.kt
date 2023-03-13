@@ -14,10 +14,10 @@ import javax.persistence.Entity
 @Entity
 @Cacheable
 class LibreUser: PanacheEntity() {
-    lateinit var name: String
     @JsonIgnore
     lateinit var password: String
     lateinit var email: String
+    var name: String? = null
     var registered: LocalDateTime? = null
     var lastLogin: LocalDateTime? = null
 

@@ -22,25 +22,20 @@ class UserResource(val userRepository: LibreUserRepository) {
 
     @POST
     @Path("/register")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "200", description = "OK", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = LibreUser::class)
+        )]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class),
         )]),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun register(
-        @FormParam("name") name: String,
-        @FormParam("email") email: String,
-        @FormParam("password") password: String
-    ): Uni<Response> {
-        val libreUser = LibreUser()
-        libreUser.name = name
-        libreUser.email = email
-        libreUser.password = password
+    fun register(libreUser: LibreUser): Uni<Response> {
         libreUser.registered = LocalDateTime.now()
 
         Log.info("Registering a new user=$libreUser")
@@ -53,7 +48,7 @@ class UserResource(val userRepository: LibreUserRepository) {
 
     @POST
     @Path("/login")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
@@ -63,8 +58,8 @@ class UserResource(val userRepository: LibreUserRepository) {
         )]),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun login(@FormParam("email") email: String, @FormParam("password") password: String): Uni<Response> {
-        return userRepository.findByEmailAndPassword(email, password)
+    fun login(libreUser: LibreUser): Uni<Response> {
+        return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password)
             .onItem().ifNotNull().transform { user -> Response.ok(user).build() }
             .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
             .onFailure().invoke{ e -> Log.error(e) }
