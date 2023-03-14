@@ -1,9 +1,7 @@
 package io.tohuwabohu.crud
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
-import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.validation.ValidationError
 import java.time.LocalDateTime
@@ -26,10 +24,12 @@ class LibreUser: PanacheEntity() {
 }
 
 @ApplicationScoped
-class LibreUserRepository(private val validation: LibreUserValidation) : PanacheRepository<LibreUser> {
+class LibreUserRepository(val validation: LibreUserValidation) : PanacheRepository<LibreUser> {
+
+    fun findByEmail(email: String): Uni<LibreUser?> = find("email = ?1", email).firstResult()
 
     fun createUser(user: LibreUser): Uni<LibreUser?> {
-        return find("email = ?1", user.email).firstResult()
+        return findByEmail(user.email)
             .onItem().ifNotNull().failWith(ValidationError("A User with this E-Mail already exists."))
             .onItem().ifNull().continueWith(user)
                 .invoke{ new -> validation.checkPassword(new!!) }
