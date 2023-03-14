@@ -1,5 +1,46 @@
 <script>
-	/** @type {import('./$types').ActionData} */ export let form;
+	import { Configuration, UserResourceApi } from 'librefit-api/rest';
+
+	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
+	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
+
+	let loginButton, emailInput, passwordInput;
+	let success, error, errorText;
+
+	const loginData = {
+		email: '',
+		password: ''
+	};
+
+	const userApi = new UserResourceApi(
+		new Configuration({
+			basePath: PUBLIC_API_BASE_PATH
+		})
+	);
+
+	const login = async () => {
+		if (![emailInput, passwordInput].map((control) => control.validate()).includes(false)) {
+			// TODO: disable login button, re-enable in finally block.
+
+			await userApi
+				.userLoginPost({libreUser: loginData})
+				.then(() => {
+					// TODO redirect
+					success.classList.remove('hidden');
+					error.classList.add('hidden')
+				})
+				.catch((e) => {
+					errorText = 'Error during login';
+
+					if (e.response.status === 404) {
+						errorText = 'Invalid username or password.';
+					}
+
+					success.classList.add('hidden');
+					error.classList.remove('hidden');
+				});
+		}
+	};
 </script>
 
 <svelte:head>
@@ -13,26 +54,40 @@
 			<span class="text-secondary-500">in</span>
 		</h1>
 
-		<form method="POST" class="variant-ringed p-4 space-y-4 rounded-container-token">
-			<label class="label">
-				<span>E-Mail</span>
-				<input name="username" class="input" type="email" placeholder="Your E-Mail" required />
-			</label>
-			<label class="label">
-				<span>Password</span>
-				<input name="password" class="input" type="password" placeholder="Your Password" required />
-			</label>
+		<form class="variant-ringed p-4 space-y-4 rounded-container-token">
+			<ValidatedInput
+				label="E-Mail"
+				type="email"
+				name="email"
+				placeholder="Your E-Mail"
+				required
+				bind:value={loginData.email}
+				bind:this={emailInput}
+			/>
+			<ValidatedInput
+				label="Password"
+				type="password"
+				name="password"
+				placeholder="Your Password"
+				required
+				bind:value={loginData.password}
+				bind:this={passwordInput}
+			/>
+
 			<div>
-				<button class="btn variant-filled-primary">Login</button>
+				<p bind:this={success} class="variant-glass-success variant-ringed-success p-4 rounded-full hidden">
+					Successfully logged in!
+				</p>
+				<p bind:this={error} class="variant-glass-error variant-ringed-error p-4 rounded-full hidden">
+					{ errorText }
+				</p>
+			</div>
+
+			<div>
+				<button bind:this={loginButton} on:click|preventDefault={login} class="btn variant-filled-primary"
+					>Login</button
+				>
 			</div>
 		</form>
 	</div>
 </section>
-
-{#if form?.success}
-	<p>Login successful! Welcome!</p>
-{/if}
-
-{#if form && !form?.success}
-	<p>Error during login.</p>
-{/if}

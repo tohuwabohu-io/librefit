@@ -4,6 +4,12 @@ import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
+import io.tohuwabohu.crud.error.ErrorResponse
+import io.tohuwabohu.crud.error.createErrorResponse
+import org.eclipse.microprofile.openapi.annotations.media.Content
+import org.eclipse.microprofile.openapi.annotations.media.Schema
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDateTime
 import javax.enterprise.context.RequestScoped
 import javax.ws.rs.*
@@ -16,38 +22,44 @@ class UserResource(val userRepository: LibreUserRepository) {
 
     @POST
     @Path("/register")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun register(
-        @FormParam("name") name: String,
-        @FormParam("email") email: String,
-        @FormParam("password") password: String
-    ): Uni<Response> {
-        val libreUser = LibreUser()
-        libreUser.name = name
-        libreUser.email = email
-        libreUser.password = password
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class),
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    fun register(libreUser: LibreUser): Uni<Response> {
         libreUser.registered = LocalDateTime.now()
 
         Log.info("Registering a new user=$libreUser")
 
-        return userRepository.persistAndFlush(libreUser)
+        return userRepository.createUser(libreUser)
             .onItem().transform { Response.ok(libreUser).status(Response.Status.CREATED).build() }
-            .onFailure().invoke(Log::error)
-            .onFailure().recoverWithItem(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build())
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
     @POST
     @Path("/login")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun login(@FormParam("email") email: String, @FormParam("password") password: String): Uni<Response> {
-        Log.info("Searching user with email=$email and pwd=$password")
-
-        return userRepository.findByEmailAndPassword(email, password)
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class),
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    fun login(libreUser: LibreUser): Uni<Response> {
+        return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password)
             .onItem().ifNotNull().transform { user -> Response.ok(user).build() }
             .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
-            .onFailure().invoke(Log::error)
-            .onFailure().recoverWithItem(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build())
+            .onFailure().invoke{ e -> Log.error(e) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
 }

@@ -470,18 +470,9 @@
         "tags" : [ "User Resource" ],
         "requestBody" : {
           "content" : {
-            "application/x-www-form-urlencoded" : {
+            "application/json" : {
               "schema" : {
-                "required" : [ "email", "password" ],
-                "type" : "object",
-                "properties" : {
-                  "email" : {
-                    "type" : "string"
-                  },
-                  "password" : {
-                    "type" : "string"
-                  }
-                }
+                "$ref" : "#/components/schemas/LibreUser"
               }
             }
           }
@@ -492,6 +483,19 @@
             "content" : {
               "application/json" : { }
             }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
           }
         }
       }
@@ -501,21 +505,9 @@
         "tags" : [ "User Resource" ],
         "requestBody" : {
           "content" : {
-            "application/x-www-form-urlencoded" : {
+            "application/json" : {
               "schema" : {
-                "required" : [ "name", "email", "password" ],
-                "type" : "object",
-                "properties" : {
-                  "name" : {
-                    "type" : "string"
-                  },
-                  "email" : {
-                    "type" : "string"
-                  },
-                  "password" : {
-                    "type" : "string"
-                  }
-                }
+                "$ref" : "#/components/schemas/LibreUser"
               }
             }
           }
@@ -526,6 +518,19 @@
             "content" : {
               "application/json" : { }
             }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
           }
         }
       }
@@ -571,6 +576,15 @@
           }
         }
       },
+      "ErrorResponse" : {
+        "required" : [ "message" ],
+        "type" : "object",
+        "properties" : {
+          "message" : {
+            "type" : "string"
+          }
+        }
+      },
       "Goal" : {
         "required" : [ "startDate", "endDate" ],
         "type" : "object",
@@ -600,6 +614,41 @@
           },
           "endDate" : {
             "$ref" : "#/components/schemas/LocalDateTime"
+          }
+        }
+      },
+      "LibreUser" : {
+        "required" : [ "password", "email" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "format" : "int64",
+            "type" : "integer",
+            "nullable" : true
+          },
+          "password" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "registered" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            } ],
+            "nullable" : true
+          },
+          "lastLogin" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            } ],
+            "nullable" : true
           }
         }
       },

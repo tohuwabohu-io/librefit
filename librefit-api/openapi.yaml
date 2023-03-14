@@ -325,47 +325,44 @@ paths:
       - User Resource
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              required:
-              - email
-              - password
-              type: object
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/LibreUser'
       responses:
         "200":
           description: OK
           content:
             application/json: {}
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /user/register:
     post:
       tags:
       - User Resource
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              required:
-              - name
-              - email
-              - password
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/LibreUser'
       responses:
         "200":
           description: OK
           content:
             application/json: {}
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
 components:
   schemas:
     CalculationGoal:
@@ -403,6 +400,13 @@ components:
           $ref: '#/components/schemas/LocalDateTime'
         description:
           type: string
+    ErrorResponse:
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          type: string
     Goal:
       required:
       - startDate
@@ -429,6 +433,33 @@ components:
           $ref: '#/components/schemas/LocalDateTime'
         endDate:
           $ref: '#/components/schemas/LocalDateTime'
+    LibreUser:
+      required:
+      - password
+      - email
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+          nullable: true
+        password:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+          nullable: true
+        registered:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+        lastLogin:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
     LocalDateTime:
       format: date-time
       type: string

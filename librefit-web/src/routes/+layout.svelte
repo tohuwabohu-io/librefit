@@ -2,7 +2,7 @@
 	import '../theme.pcss';
 	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.pcss';
-	import { AppShell, LightSwitch } from '@skeletonlabs/skeleton';
+	import { AppShell, Toast } from '@skeletonlabs/skeleton';
 	import TopBar from '$lib/components/TopBar.svelte';
 </script>
 
@@ -19,3 +19,5 @@
 		</div>
 	</svelte:fragment>
 </AppShell>
+
+<Toast />
