@@ -14,5 +14,6 @@
 		<a href="/register">Registration</a>
 		<a href="/wizard">Wizard</a>
 		<a href="/dashboard">Dashboard</a>
+		<a href="/tracker">Tracker</a>
 	</svelte:fragment>
 </AppBar>
