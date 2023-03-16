@@ -1,5 +1,5 @@
 <script type="ts">
-    import TrackingRadial from "$lib/components/TrackingRadial.svelte";
+    import TrackerRadial from "$lib/components/TrackerRadial.svelte";
     import TrackerInput from "$lib/components/TrackerInput.svelte";
     import { CalorieTrackerEntry } from 'librefit-api/rest'
     import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
@@ -37,17 +37,18 @@
                     <AccordionItem open={todayStr === trackerKey}>
                         <svelte:fragment slot="summary">{trackerKey}</svelte:fragment>
                         <svelte:fragment slot="content">
-                            <div class="flex space-between">
-                                <TrackingRadial></TrackingRadial>
+                            <div class="flex gap-4 justify-between">
+                                <TrackerRadial></TrackerRadial>
+
+                                <div class="grow">
+                                    <TrackerInput label="kcal"></TrackerInput>
+
+                                    <button class="variant-filled-primary">
+                                        +
+                                    </button>
+                                </div>
                             </div>
 
-                            <div>
-                                <TrackerInput label="kcal"></TrackerInput>
-
-                                <button class="variant-filled-primary">
-                                    +
-                                </button>
-                            </div>
                         </svelte:fragment>
                     </AccordionItem>
                 {/each}
