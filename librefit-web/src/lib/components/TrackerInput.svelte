@@ -1,7 +1,20 @@
 <script>
-	export let value;
+	import {createEventDispatcher} from "svelte";
+
+	export let value, dateStr;
 	export let disabled = false;
 	export let category = 'b';
+
+	const dispatch = createEventDispatcher();
+
+	const add = () => {
+		dispatch('add', {
+			value, category, dateStr
+		});
+	};
+
+	const edit = () => {};
+	const remove = () => {};
 
 	const categories = [
 		{ label: 'Breakfast', value: 'b' },
@@ -22,8 +35,8 @@
 		</select>
 	</div>
 	{#if disabled}
-		<button class="btn variant-filled-primary" disabled={!disabled}>Edit</button>
+		<button class="btn variant-filled-primary" disabled={!disabled} on:click|preventDefault={edit}>Edit</button>
 	{:else}
-		<button class="btn variant-filled-primary" {disabled}>Add</button>
+		<button class="btn variant-filled-primary" {disabled} on:click|preventDefault={add}>Add</button>
 	{/if}
 </div>

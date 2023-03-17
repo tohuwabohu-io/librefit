@@ -10,8 +10,8 @@
 	const outerRadius = (width - stroke) / 2;
 	const innerRadius = outerRadius - stroke;
 
-	let outerEnd = (359 * current) / limit;
-	let innerEnd = (359 * current) / maximum;
+	$: outerEnd = (359 * current) / limit;
+	$: innerEnd = (359 * current) / maximum;
 
 	const polarToCartesian = (cx, cy, radius, angleDeg) => {
 		const angleInRadians = ((angleDeg - 90) * Math.PI) / 180.0;
