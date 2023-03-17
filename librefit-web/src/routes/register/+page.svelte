@@ -1,6 +1,6 @@
 <script>
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-	import {Configuration, UserResourceApi} from 'librefit-api/rest';
+	import { Configuration, UserResourceApi } from 'librefit-api/rest';
 	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 
 	let emailInput, passwordInput, passwordConfirmationInput, tosInput, registrationButton;
@@ -9,7 +9,7 @@
 	let registrationData = {
 		name: '',
 		email: '',
-		password: '',
+		password: ''
 	};
 
 	let passwordConfirmation;
@@ -37,23 +37,23 @@
 				.then(() => {
 					success.classList.remove('hidden');
 					error.classList.add('hidden');
-					errorText = ''
+					errorText = '';
 				})
 				.catch((e) => {
 					console.log(e);
 
 					if (e.response.status === 500 || e.response.status !== 400) {
-						errorText = "An error occurred. Please try again later."
+						errorText = 'An error occurred. Please try again later.';
 					} else {
-						e.response.json().then(e => {
+						e.response.json().then((e) => {
 							console.log(e);
 
 							errorText = e.message;
-						})
+						});
 					}
 
-					success.classList.add('hidden')
-					error.classList.remove('hidden')
+					success.classList.add('hidden');
+					error.classList.remove('hidden');
 				});
 		}
 	};
@@ -159,11 +159,17 @@
 			</ValidatedInput>
 
 			<div>
-				<p bind:this={success} class="variant-glass-success variant-ringed-success p-4 rounded-full hidden">
+				<p
+					bind:this={success}
+					class="variant-glass-success variant-ringed-success p-4 rounded-full hidden"
+				>
 					Successfully signed up! Please proceed to the <a href="/login">Login</a>.
 				</p>
-				<p bind:this={error} class="variant-glass-error variant-ringed-error p-4 rounded-full hidden">
-					{ errorText }
+				<p
+					bind:this={error}
+					class="variant-glass-error variant-ringed-error p-4 rounded-full hidden"
+				>
+					{errorText}
 				</p>
 			</div>
 
@@ -175,15 +181,10 @@
 				>
 
 				<div class="flex flex-row gap-4">
-					<p class="self-center text-sm unstyled">
-						Already registered?
-					</p>
-					<a href="/login" class="btn variant-filled-secondary cursor-pointer">
-						Login
-					</a>
+					<p class="self-center text-sm unstyled">Already registered?</p>
+					<a href="/login" class="btn variant-filled-secondary cursor-pointer"> Login </a>
 				</div>
 			</div>
 		</form>
-
 	</div>
 </section>
