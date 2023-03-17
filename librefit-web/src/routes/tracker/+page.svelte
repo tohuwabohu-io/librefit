@@ -40,12 +40,11 @@
                             <div class="flex gap-4 justify-between">
                                 <TrackerRadial></TrackerRadial>
 
-                                <div class="grow">
-                                    <TrackerInput label="kcal"></TrackerInput>
-
-                                    <button class="variant-filled-primary">
-                                        +
-                                    </button>
+                                <div class="flex flex-col grow gap-4">
+                                    <TrackerInput category={'s'}></TrackerInput>
+                                    <TrackerInput disabled={true} value={300} category={'b'}></TrackerInput>
+                                    <TrackerInput disabled={true} value={200} category={'l'}></TrackerInput>
+                                    <TrackerInput disabled={true} value={700} category={'d'}></TrackerInput>
                                 </div>
                             </div>
 
