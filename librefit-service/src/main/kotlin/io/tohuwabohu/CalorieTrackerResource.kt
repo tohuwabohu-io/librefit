@@ -27,7 +27,12 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "201", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = CalorieTrackerEntry::class)
+            )
+        ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class)
@@ -40,7 +45,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
 
         return calorieTrackerRepository.create(calorieTracker)
-            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
+            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).entity(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
