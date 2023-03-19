@@ -1,8 +1,15 @@
 package io.tohuwabohu
 
+import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.CalorieTrackerRepository
 import io.tohuwabohu.crud.CalorieTrackerEntry
+import io.tohuwabohu.crud.error.ErrorResponse
+import io.tohuwabohu.crud.error.createErrorResponse
+import org.eclipse.microprofile.openapi.annotations.media.Content
+import org.eclipse.microprofile.openapi.annotations.media.Schema
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDateTime
 import javax.enterprise.context.RequestScoped
 import javax.inject.Inject
@@ -19,12 +26,23 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
     fun create(calorieTracker: CalorieTrackerEntry): Uni<Response> {
         calorieTracker.added = LocalDateTime.now()
 
-        return calorieTrackerRepository.persistAndFlush(calorieTracker).onItem()
-            .transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }.onFailure()
-            .recoverWithItem(Response.serverError().build())
+        Log.info("Creating a new calorie tracker entry=$calorieTracker")
+
+        return calorieTrackerRepository.create(calorieTracker)
+            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
 
     @PUT
