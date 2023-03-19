@@ -377,9 +377,8 @@ components:
       type: string
     CalorieTrackerEntry:
       required:
+      - category
       - added
-      - updated
-      - description
       type: object
       properties:
         id:
@@ -394,12 +393,26 @@ components:
           format: float
           type: number
           nullable: true
+        category:
+          $ref: '#/components/schemas/Category'
         added:
           $ref: '#/components/schemas/LocalDateTime'
         updated:
-          $ref: '#/components/schemas/LocalDateTime'
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
         description:
           type: string
+          nullable: true
+    Category:
+      enum:
+      - BREAKFAST
+      - LUNCH
+      - DINNER
+      - SNACK
+      - UNSET
+      type: string
     ErrorResponse:
       required:
       - message

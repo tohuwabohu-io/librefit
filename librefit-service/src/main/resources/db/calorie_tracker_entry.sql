@@ -1,4 +1,4 @@
-create table calorie_tracker_entry
+create table public.calorie_tracker_entry
 (
     id          bigint not null
         primary key,
@@ -6,9 +6,10 @@ create table calorie_tracker_entry
     amount      real,
     description varchar(255),
     updated     timestamp,
-    user_id     bigint
+    user_id     bigint,
+    category    varchar(255)
 );
 
-alter table calorie_tracker_entry
+alter table public.calorie_tracker_entry
     owner to librefit;
 

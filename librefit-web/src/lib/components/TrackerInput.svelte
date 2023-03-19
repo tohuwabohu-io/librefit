@@ -1,9 +1,12 @@
-<script>
+<script lang="ts">
 	import {createEventDispatcher} from "svelte";
 
-	export let value, dateStr;
+	import Icon from '@iconify/svelte';
+
+	export let value, dateStr, id;
 	export let disabled = false;
-	export let category = 'b';
+	export let categories;
+	export let category;
 
 	const dispatch = createEventDispatcher();
 
@@ -13,15 +16,17 @@
 		});
 	};
 
-	const edit = () => {};
-	const remove = () => {};
+	const edit = () => {
+		dispatch('edit', {
+			dateStr, id
+		});
+	};
 
-	const categories = [
-		{ label: 'Breakfast', value: 'b' },
-		{ label: 'Lunch', value: 'l' },
-		{ label: 'Dinner', value: 'd' },
-		{ label: 'Snack', value: 's' }
-	];
+	const remove = () => {
+		dispatch('remove', {
+			dateStr, id
+		});
+	};
 </script>
 
 <div class="flex gap-2">
@@ -35,8 +40,10 @@
 		</select>
 	</div>
 	{#if disabled}
-		<button class="btn variant-filled-primary" disabled={!disabled} on:click|preventDefault={edit}>Edit</button>
+			<button class="btn rounded-full variant-filled-secondary"
+					disabled={!disabled} on:click|preventDefault={edit}><Icon icon="iconoir:edit-pencil" /></button>
+			<button class="btn btn-icon variant-filled" disabled={!disabled} on:click|preventDefault={remove}>D</button>
 	{:else}
-		<button class="btn variant-filled-primary" {disabled} on:click|preventDefault={add}>Add</button>
+		<button class="btn btn-icon variant-filled-primary" {disabled} on:click|preventDefault={add}>A</button>
 	{/if}
 </div>

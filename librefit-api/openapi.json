@@ -547,7 +547,7 @@
         "type" : "string"
       },
       "CalorieTrackerEntry" : {
-        "required" : [ "added", "updated", "description" ],
+        "required" : [ "category", "added" ],
         "type" : "object",
         "properties" : {
           "id" : {
@@ -565,16 +565,28 @@
             "type" : "number",
             "nullable" : true
           },
+          "category" : {
+            "$ref" : "#/components/schemas/Category"
+          },
           "added" : {
             "$ref" : "#/components/schemas/LocalDateTime"
           },
           "updated" : {
-            "$ref" : "#/components/schemas/LocalDateTime"
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            } ],
+            "nullable" : true
           },
           "description" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         }
+      },
+      "Category" : {
+        "enum" : [ "BREAKFAST", "LUNCH", "DINNER", "SNACK", "UNSET" ],
+        "type" : "string"
       },
       "ErrorResponse" : {
         "required" : [ "message" ],

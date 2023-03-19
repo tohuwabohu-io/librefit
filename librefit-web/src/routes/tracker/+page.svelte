@@ -1,7 +1,8 @@
 <script type="ts">
+    import {CalorieTrackerEntry} from 'librefit-api/rest'
+    import {Category} from 'librefit-api/rest/models';
     import TrackerRadial from '$lib/components/TrackerRadial.svelte';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
-    import {CalorieTrackerEntry} from 'librefit-api/rest';
     import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
 
     let today = new Date();
@@ -11,11 +12,19 @@
     let trackerMap: Map<String, Array<CalorieTrackerEntry>> = new Map();
     let progressMap: Map<String, number> = new Map();
 
+    const categories = [
+        { label: 'Choose...', value: Category.Unset },
+        { label: 'Breakfast', value: Category.Breakfast },
+        { label: 'Lunch', value: Category.Lunch },
+        { label: 'Dinner', value: Category.Dinner },
+        { label: 'Snack', value: Category.Snack }
+    ];
+
     let trackerInputs: Array<CalorieTrackerEntry> = [
         {
             added: today,
             amount: 300,
-            description: 'b',
+            category: Category.Breakfast,
             updated: today,
             userId: 1,
             id: 1
@@ -23,24 +32,24 @@
         {
             added: today,
             amount: 500,
-            description: 'l',
+            category: Category.Lunch,
             updated: today,
             userId: 1,
-            id: 1
+            id: 2
         },
         {
             added: today,
             amount: 400,
-            description: 'd',
+            category: Category.Dinner,
             updated: today,
             userId: 1,
-            id: 1
+            id: 3
         }
     ];
 
     const addEntry = (e) => {
         const newEntry: CalorieTrackerEntry = {
-            userId: 1, id: 2, updated: today, added: today, amount: e.detail.value, description: e.detail.category
+            userId: 1, id: 2, updated: today, added: today, amount: e.detail.value, category: e.detail.category
         }
 
         trackerMap.get(e.detail.dateStr).push(newEntry);
@@ -49,11 +58,11 @@
         trackerMap = trackerMap;
     }
 
-    const editEntry = (dateStr: String) => {
+    const editEntry = (e) => {
 
     }
 
-    const removeEntry = (dateStr: String) => {
+    const removeEntry = (e) => {
 
     }
 
@@ -70,7 +79,7 @@
         {
             added: notToday,
             amount: 1400,
-            description: 'Lunch',
+            category: Category.Lunch,
             updated: notToday,
             userId: 1,
             id: 1
@@ -94,14 +103,17 @@
                             <TrackerRadial current={progressMap.get(trackerKey)}/>
 
                             <div class="flex flex-col grow gap-4">
-                                <TrackerInput category={'s'} value=""
+                                <TrackerInput categories={categories} value=""
                                               dateStr={trackerKey}
+                                              id={-1}
                                               on:add={addEntry}/>
                                 {#each trackerMap.get(trackerKey) as trackerInput}
                                     <TrackerInput disabled={true}
                                                   value={trackerInput.amount}
-                                                  category={trackerInput.description}
+                                                  categories={categories}
+                                                  category={trackerInput.category}
                                                   dateStr={trackerKey}
+                                                  id={trackerInput.id}
                                                   on:add={addEntry}
                                                   on:edit={editEntry}
                                                   on:remove={removeEntry}/>
