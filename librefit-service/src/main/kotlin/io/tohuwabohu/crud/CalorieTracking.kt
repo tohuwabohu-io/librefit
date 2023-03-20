@@ -58,12 +58,12 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
         calorieTrackerEntry.amount!!, LocalDateTime.now(), calorieTrackerEntry.category, calorieTrackerEntry.id!!
     )
 
-    fun listDatesForUser(userId: Long): Uni<List<LocalDate>> {
+    fun listDatesForUser(userId: Long): Uni<List<LocalDate>?> {
         validation.checkUserId(userId)
 
         return client.preparedQuery("select added from calorie_tracker_entry where user_id = $1 group by added")
             .execute(Tuple.of(userId))
-            .onItem().transformToMulti{ rowSet -> Multi.createFrom().iterable(rowSet)}
+            .onItem().ifNotNull().transformToMulti{ rowSet -> Multi.createFrom().iterable(rowSet)}
             .onItem().transform { row -> row.getLocalDate("added")}
             .collect().asList()
             .onFailure().invoke { throwable -> Log.error(throwable) }

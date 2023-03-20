@@ -91,13 +91,11 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class)
         )]),
-        APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     fun listDates(userId: Long): Uni<Response> =
         calorieTrackerRepository.listDatesForUser(userId)
-            .onItem().ifNotNull().transform { Response.ok(it).build() }
-            .onItem().ifNull().continueWith(Response.status(Response.Status.NOT_FOUND).build())
+            .onItem().transform { Response.ok(it).build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 
@@ -114,14 +112,12 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class)
         )]),
-        APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Produces(MediaType.APPLICATION_JSON)
     fun listEntries(userId: Long, date: LocalDate): Uni<Response> {
         return calorieTrackerRepository.listEntriesForUserAndDate(userId, date)
-            .onItem().ifNotNull().transform { Response.ok(it).build() }
-            .onItem().ifNull().continueWith(Response.status(Response.Status.NOT_FOUND).build())
+            .onItem().transform { Response.ok(it).build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
