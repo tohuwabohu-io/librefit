@@ -1,7 +1,7 @@
 <script>
 	export let limit = 2800,
 		maximum = 3300,
-		current = 1200;
+		current = 0;
 	export let width = 512,
 		height = 512;
 

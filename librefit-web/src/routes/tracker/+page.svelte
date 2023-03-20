@@ -1,61 +1,38 @@
 <script type="ts">
-    import {CalorieTrackerEntry, CalorieTrackerResourceApi, Configuration} from 'librefit-api/rest'
+    import {Configuration} from 'librefit-api/rest';
+    import {CalorieTrackerResourceApi} from 'librefit-api/rest/apis';
+    import {CalorieTrackerEntry } from 'librefit-api/rest/models';
     import {Category} from 'librefit-api/rest/models';
     import TrackerRadial from '$lib/components/TrackerRadial.svelte';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
     import {onMount} from "svelte";
     import {PUBLIC_API_BASE_PATH} from "$env/static/public";
+    import {format} from 'date-fns';
 
     const api = new CalorieTrackerResourceApi(new Configuration({
         basePath: PUBLIC_API_BASE_PATH
     }));
 
     let today = new Date();
-    let notToday = new Date(2023, 2, 1);
-    let todayStr = today.toDateString();
+    let todayStr = format(today, 'yyyy-MM-dd')
+
+    let availableDates: Array<String> = new Array<String>();
+    availableDates.push(todayStr);
 
     let trackerMap: Map<String, Array<CalorieTrackerEntry>> = new Map();
     let progressMap: Map<String, number> = new Map();
 
-    const categories = [
-        { label: 'Choose...', value: Category.Unset },
-        { label: 'Breakfast', value: Category.Breakfast },
-        { label: 'Lunch', value: Category.Lunch },
-        { label: 'Dinner', value: Category.Dinner },
-        { label: 'Snack', value: Category.Snack }
-    ];
-
-    let trackerInputs: Array<CalorieTrackerEntry> = [
-        {
-            added: today,
-            amount: 300,
-            category: Category.Breakfast,
-            updated: today,
-            userId: 1,
-            id: 1
-        },
-        {
-            added: today,
-            amount: 500,
-            category: Category.Lunch,
-            updated: today,
-            userId: 1,
-            id: 2
-        },
-        {
-            added: today,
-            amount: 400,
-            category: Category.Dinner,
-            updated: today,
-            userId: 1,
-            id: 3
+    const categories = Object.keys(Category).map(key => {
+        return {
+            label: key,
+            value: Category[key]
         }
-    ];
+    })
 
     const addEntry = (e) => {
         const newEntry: CalorieTrackerEntry = {
-            userId: 1, id: 2, added: new Date(), amount: e.detail.value, category: e.detail.category
+            userId: 1, id: 2, added: todayStr, amount: e.detail.value, category: e.detail.category
         }
 
         trackerMap.get(e.detail.dateStr).push(newEntry);
@@ -76,63 +53,72 @@
         const progress = trackerMap.get(dateStr).map((entry) => entry.amount).reduce((part, a) => part + a);
 
         progressMap.set(dateStr, progress);
-
-        progressMap = progressMap;
     }
 
-    trackerMap.set(todayStr, trackerInputs);
-    trackerMap.set(notToday.toDateString(), [
-        {
-            added: notToday,
-            amount: 1400,
-            category: Category.Lunch,
-            updated: notToday,
-            userId: 1,
-            id: 1
-        }
-    ]);
+    const loadEntriesForDate = async (dateStr: String) => {
+        if (!trackerMap.has(dateStr)) {
+            await api.trackerCaloriesListUserIdDateGet({
+                userId: 1,
+                date: dateStr
+            }).then((entries: Array<CalorieTrackerEntry>) => {
+                for (let key of trackerMap.keys()) {
+                    calculateProgress(key)
+                }
 
-    for (let key of trackerMap.keys()) {
-        calculateProgress(key)
+                progressMap = progressMap
+
+                trackerMap.set(dateStr, entries);
+                trackerMap = trackerMap
+            }).catch((e) => console.error(e));
+        }
     }
 
     onMount(async () => {
-        await api.trackerCaloriesListUserIdGet({
+        await api.trackerCaloriesListUserIdDatesGet({
             userId: 1
-        })
-    })
+        }).then((dates: Array<String>) => {
+            availableDates.push(...dates)
 
+            for (let date of dates) {
+                loadEntriesForDate(date)
+            }
+
+            availableDates = availableDates
+        }).catch((e) => console.error(e));
+    })
 </script>
 
 <section>
     <div class="container mx-auto p-8 space-y-10">
         <Accordion>
-            {#each [...trackerMap.keys()] as trackerKey}
-                <AccordionItem open={todayStr === trackerKey}>
-                    <svelte:fragment slot="summary">{trackerKey}</svelte:fragment>
-                    <svelte:fragment slot="content">
-                        <div class="flex gap-4 justify-between">
-                            <TrackerRadial current={progressMap.get(trackerKey)}/>
+            {#each availableDates as date}
+                <AccordionItem id={date} open={todayStr === date}>
+                    <svelte:fragment slot="summary">{date}</svelte:fragment>
+                        <svelte:fragment slot="content">
+                            <div class="flex gap-4 justify-between">
+                                <TrackerRadial current={progressMap.get(date)}/>
 
-                            <div class="flex flex-col grow gap-4">
-                                <TrackerInput categories={categories} value=""
-                                              dateStr={trackerKey}
-                                              id={-1}
-                                              on:add={addEntry}/>
-                                {#each trackerMap.get(trackerKey) as trackerInput}
-                                    <TrackerInput disabled={true}
-                                                  value={trackerInput.amount}
-                                                  categories={categories}
-                                                  category={trackerInput.category}
-                                                  dateStr={trackerKey}
-                                                  id={trackerInput.id}
-                                                  on:add={addEntry}
-                                                  on:edit={editEntry}
-                                                  on:remove={removeEntry}/>
-                                {/each}
+                                <div class="flex flex-col grow gap-4">
+                                    <TrackerInput categories={categories} value=""
+                                                  dateStr={date}
+                                                  id={-1}
+                                                  on:add={addEntry}/>
+                                    {#if trackerMap.has(date)}
+                                        {#each trackerMap.get(date) as trackerInput}
+                                            <TrackerInput disabled={true}
+                                                          value={trackerInput.amount}
+                                                          categories={categories}
+                                                          category={trackerInput.category}
+                                                          dateStr={date}
+                                                          id={trackerInput.id}
+                                                          on:add={addEntry}
+                                                          on:edit={editEntry}
+                                                          on:remove={removeEntry}/>
+                                        {/each}
+                                    {/if}
+                                </div>
                             </div>
-                        </div>
-                    </svelte:fragment>
+                        </svelte:fragment>
                 </AccordionItem>
             {/each}
         </Accordion>
