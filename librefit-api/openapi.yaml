@@ -451,7 +451,7 @@ components:
         category:
           $ref: '#/components/schemas/Category'
         added:
-          $ref: '#/components/schemas/LocalDateTime'
+          $ref: '#/components/schemas/LocalDate'
         updated:
           type: string
           allOf:

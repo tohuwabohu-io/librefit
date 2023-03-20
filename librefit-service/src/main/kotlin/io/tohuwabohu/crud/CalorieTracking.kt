@@ -1,9 +1,11 @@
 package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
+import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
+import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.crud.util.enumContains
 import io.tohuwabohu.crud.validation.ValidationError
 import io.vertx.mutiny.pgclient.PgPool
@@ -27,7 +29,7 @@ class CalorieTrackerEntry {
     var amount: Float? = null
     @Convert(converter = CalorieTrackerCategoryConverter::class)
     lateinit var category: Category
-    lateinit var added: LocalDateTime
+    lateinit var added: LocalDate
     var updated: LocalDateTime? = null
     var description: String? = null
 
@@ -62,16 +64,16 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
         return client.preparedQuery("select added from calorie_tracker_entry where user_id = $1 group by added")
             .execute(Tuple.of(userId))
             .onItem().transformToMulti{ rowSet -> Multi.createFrom().iterable(rowSet)}
-            .onItem().transform { row -> row.getLocalDateTime("added")}
-            .onItem().transform { dateTime -> dateTime.toLocalDate() }
+            .onItem().transform { row -> row.getLocalDate("added")}
             .collect().asList()
+            .onFailure().invoke { throwable -> Log.error(throwable) }
     }
 
     fun listEntriesForUserAndDate(userId: Long, date: LocalDate): Uni<List<CalorieTrackerEntry>> {
         validation.checkUserId(userId)
         validation.checkAddedDate(added = date)
 
-        return list("where user_id = ?1 and added = ?2", userId, date)
+        return list("userId = ?1 and added = ?2", userId, date)
     }
 }
 
@@ -81,7 +83,7 @@ class CalorieTrackerValidation {
         // TODO check userId integrity
 
         checkUserId(entry.userId!!)
-        checkAddedDate(entry.added.toLocalDate())
+        checkAddedDate(entry.added)
 
         if (entry.amount == null || entry.amount!! <= 0f) {
             throw ValidationError("The amount specified is invalid.")

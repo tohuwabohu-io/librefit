@@ -40,10 +40,6 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     fun create(calorieTracker: CalorieTrackerEntry): Uni<Response> {
-        if (calorieTracker.added == null) {
-            calorieTracker.added = LocalDateTime.now()
-        }
-
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
 
         return calorieTrackerRepository.create(calorieTracker)
@@ -99,8 +95,9 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     )
     fun listDates(userId: Long): Uni<Response> =
         calorieTrackerRepository.listDatesForUser(userId)
-            .onItem().transform { Response.ok(it).build() }.onFailure()
-            .recoverWithItem(Response.serverError().build())
+            .onItem().transform { Response.ok(it).build() }
+            .onFailure().invoke { throwable -> Log.error(throwable) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 
     @GET
     @Path("/list/{userId:\\d+}/{date}")
@@ -121,6 +118,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     fun listEntries(userId: Long, date: LocalDate): Uni<Response> {
         return calorieTrackerRepository.listEntriesForUserAndDate(userId, date)
             .onItem().transform { Response.ok(it).build() }
+            .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
 }

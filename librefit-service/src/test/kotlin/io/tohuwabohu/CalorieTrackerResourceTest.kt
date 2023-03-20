@@ -40,23 +40,20 @@ class CalorieTrackerResourceTest {
     fun `should create three entries and return two dates`() {
         val userId = 42L
 
-        val todayDt = LocalDateTime.now()
-        val today = todayDt.toLocalDate()
-
-        val yesterdayDt = todayDt.minusDays(1)
-        val yesterday = todayDt.toLocalDate()
+        val today = LocalDate.now()
+        val yesterday = today.minusDays(1)
 
         val entry1 = entry()
         entry1.userId = userId
-        entry1.added = todayDt
+        entry1.added = today
 
         val entry2 = entry()
         entry2.userId = userId
-        entry2.added = todayDt
+        entry2.added = today
 
         val entry3 = entry()
         entry3.userId = userId
-        entry3.added = yesterdayDt
+        entry3.added = yesterday
 
         listOf(entry1, entry2, entry3).forEach { entry ->
             given()
@@ -81,11 +78,41 @@ class CalorieTrackerResourceTest {
         assert(dates.count { date -> date == yesterday } == 1)
     }
 
+    @Test
+    fun `should create two entries and list them`() {
+        val userId = 17L
+
+        val entry1 = entry()
+        entry1.userId = userId
+
+        val entry2 = entry()
+        entry2.userId = userId
+
+        val added = entry1.added
+
+        listOf(entry1, entry2).forEach { entry ->
+            given()
+                .header("Content-Type", ContentType.JSON)
+                .body(entry)
+                .post("/tracker/calories/create")
+                .then()
+                .assertThat()
+                .statusCode(201)
+        }
+
+        val body = given().get("/tracker/calories/list/$userId/$added").body
+
+        val entries = body.`as`(Array<CalorieTrackerEntry>::class.java)
+
+        assert(entries.size == 2)
+        assert(entries.map { it.id }.isNotEmpty())
+    }
+
     private fun entry(): CalorieTrackerEntry {
         val entry = CalorieTrackerEntry()
         entry.amount = 100f
         entry.category = Category.SNACK
-        entry.added = LocalDateTime.now()
+        entry.added = LocalDate.now()
         entry.userId = 1
 
         return entry;
