@@ -1,14 +1,22 @@
 package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
+import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import io.tohuwabohu.crud.util.enumContains
 import io.tohuwabohu.crud.validation.ValidationError
+import io.vertx.mutiny.pgclient.PgPool
+import io.vertx.mutiny.sqlclient.Tuple
+import java.lang.IllegalArgumentException
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
-import javax.persistence.*
-import javax.transaction.Transactional
+import javax.inject.Inject
+import javax.persistence.Convert
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
 
 @Entity
 class CalorieTrackerEntry {
@@ -22,6 +30,10 @@ class CalorieTrackerEntry {
     lateinit var added: LocalDateTime
     var updated: LocalDateTime? = null
     var description: String? = null
+
+    override fun toString(): String {
+        return "CalorieTrackerEntry<userId=$userId,amount=$amount,category=$category,added=$added,updated=$updated>"
+    }
 }
 
 enum class Category {
@@ -30,20 +42,37 @@ enum class Category {
 
 @ApplicationScoped
 class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : PanacheRepository<CalorieTrackerEntry> {
-    fun listForUser(userId: Long) = find("userId", userId).list()
+    @Inject
+    lateinit var client: PgPool
 
-    @Transactional
     fun create(calorieTrackerEntry: CalorieTrackerEntry): Uni<CalorieTrackerEntry> {
         validation.checkEntry(calorieTrackerEntry)
 
         return persistAndFlush(calorieTrackerEntry)
     }
 
-    @Transactional
     fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry) = update(
         "amount = ?1 updated = ?2 category = ?3 where id = ?4",
         calorieTrackerEntry.amount!!, LocalDateTime.now(), calorieTrackerEntry.category, calorieTrackerEntry.id!!
     )
+
+    fun listDatesForUser(userId: Long): Uni<List<LocalDate>> {
+        validation.checkUserId(userId)
+
+        return client.preparedQuery("select added from calorie_tracker_entry where user_id = $1 group by added")
+            .execute(Tuple.of(userId))
+            .onItem().transformToMulti{ rowSet -> Multi.createFrom().iterable(rowSet)}
+            .onItem().transform { row -> row.getLocalDateTime("added")}
+            .onItem().transform { dateTime -> dateTime.toLocalDate() }
+            .collect().asList()
+    }
+
+    fun listEntriesForUserAndDate(userId: Long, date: LocalDate): Uni<List<CalorieTrackerEntry>> {
+        validation.checkUserId(userId)
+        validation.checkAddedDate(added = date)
+
+        return list("where user_id = ?1 and added = ?2", userId, date)
+    }
 }
 
 @ApplicationScoped
@@ -51,10 +80,26 @@ class CalorieTrackerValidation {
     fun checkEntry(entry: CalorieTrackerEntry) {
         // TODO check userId integrity
 
+        checkUserId(entry.userId!!)
+        checkAddedDate(entry.added.toLocalDate())
+
         if (entry.amount == null || entry.amount!! <= 0f) {
             throw ValidationError("The amount specified is invalid.")
         } else if (!enumContains<Category>(entry.category.name)) {
             throw ValidationError("The chosen category is invalid.");
+        }
+
+    }
+
+    fun checkUserId(userId: Long) {
+        if (userId <= 0) {
+            throw IllegalArgumentException("Unauthorized Access.")
+        }
+    }
+
+    fun checkAddedDate(added: LocalDate) {
+        if (added.isAfter(LocalDateTime.now().toLocalDate())) {
+            throw IllegalArgumentException("This date lies in the future. $added")
         }
     }
 }

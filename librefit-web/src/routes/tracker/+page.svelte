@@ -1,9 +1,15 @@
 <script type="ts">
-    import {CalorieTrackerEntry} from 'librefit-api/rest'
+    import {CalorieTrackerEntry, CalorieTrackerResourceApi, Configuration} from 'librefit-api/rest'
     import {Category} from 'librefit-api/rest/models';
     import TrackerRadial from '$lib/components/TrackerRadial.svelte';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
+    import {onMount} from "svelte";
+    import {PUBLIC_API_BASE_PATH} from "$env/static/public";
+
+    const api = new CalorieTrackerResourceApi(new Configuration({
+        basePath: PUBLIC_API_BASE_PATH
+    }));
 
     let today = new Date();
     let notToday = new Date(2023, 2, 1);
@@ -49,7 +55,7 @@
 
     const addEntry = (e) => {
         const newEntry: CalorieTrackerEntry = {
-            userId: 1, id: 2, updated: today, added: today, amount: e.detail.value, category: e.detail.category
+            userId: 1, id: 2, added: new Date(), amount: e.detail.value, category: e.detail.category
         }
 
         trackerMap.get(e.detail.dateStr).push(newEntry);
@@ -89,6 +95,12 @@
     for (let key of trackerMap.keys()) {
         calculateProgress(key)
     }
+
+    onMount(async () => {
+        await api.trackerCaloriesListUserIdGet({
+            userId: 1
+        })
+    })
 
 </script>
 

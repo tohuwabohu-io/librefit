@@ -1,6 +1,7 @@
 package io.tohuwabohu
 
 import io.quarkus.logging.Log
+import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.CalorieTrackerRepository
 import io.tohuwabohu.crud.CalorieTrackerEntry
@@ -10,10 +11,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.enterprise.context.RequestScoped
-import javax.inject.Inject
-import javax.persistence.EntityExistsException
 import javax.persistence.EntityNotFoundException
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
@@ -40,7 +40,9 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     fun create(calorieTracker: CalorieTrackerEntry): Uni<Response> {
-        calorieTracker.added = LocalDateTime.now()
+        if (calorieTracker.added == null) {
+            calorieTracker.added = LocalDateTime.now()
+        }
 
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
 
@@ -80,9 +82,45 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         }.onFailure().recoverWithItem(Response.serverError().build())
 
     @GET
-    @Path("/list/{userId:\\d+}")
+    @Path("/list/{userId:\\d+}/dates")
     @Produces(MediaType.APPLICATION_JSON)
-    fun list(userId: Long): Uni<Response> =
-        calorieTrackerRepository.listForUser(userId).onItem().transform { Response.ok(it).build() }.onFailure()
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = Array<LocalDate>::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    fun listDates(userId: Long): Uni<Response> =
+        calorieTrackerRepository.listDatesForUser(userId)
+            .onItem().transform { Response.ok(it).build() }.onFailure()
             .recoverWithItem(Response.serverError().build())
+
+    @GET
+    @Path("/list/{userId:\\d+}/{date}")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = Array<CalorieTrackerEntry>::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    @Produces(MediaType.APPLICATION_JSON)
+    fun listEntries(userId: Long, date: LocalDate): Uni<Response> {
+        return calorieTrackerRepository.listEntriesForUserAndDate(userId, date)
+            .onItem().transform { Response.ok(it).build() }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    }
 }
