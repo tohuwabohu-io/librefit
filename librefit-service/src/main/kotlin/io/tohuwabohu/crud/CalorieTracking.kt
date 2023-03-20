@@ -5,12 +5,10 @@ import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
-import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.crud.util.enumContains
 import io.tohuwabohu.crud.validation.ValidationError
 import io.vertx.mutiny.pgclient.PgPool
 import io.vertx.mutiny.sqlclient.Tuple
-import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
@@ -66,6 +64,7 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
             .onItem().ifNotNull().transformToMulti{ rowSet -> Multi.createFrom().iterable(rowSet)}
             .onItem().transform { row -> row.getLocalDate("added")}
             .collect().asList()
+            .onItem().invoke{ list -> list.sortDescending() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
     }
 
