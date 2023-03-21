@@ -36,6 +36,73 @@ class CalorieTrackerResourceTest {
     }
 
     @Test
+    fun `should create and update an entry`() {
+        val entry = entry()
+
+        val assured = given()
+            .header("Content-Type", ContentType.JSON)
+            .body(entry)
+            .post("/tracker/calories/create")
+            .then()
+
+        assured.assertThat().statusCode(201)
+
+        val created = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
+
+        assert(created.id != null)
+
+        created.amount = 200f
+        created.category = Category.LUNCH
+
+        val assuredUpdate = given()
+            .header("Content-Type", ContentType.JSON)
+            .body(created)
+            .put("/tracker/calories/update")
+            .then()
+
+        assuredUpdate.assertThat().statusCode(200)
+
+        val updated = assuredUpdate.extract().body().`as`(CalorieTrackerEntry::class.java)
+
+        assert(created.id == updated.id)
+        assert(entry.amount != updated.amount)
+        assert(entry.category != updated.category)
+    }
+
+    @Test
+    fun `should fail on update`() {
+        given()
+            .header("Content-Type", ContentType.JSON)
+            .body(entry())
+            .put("/tracker/calories/update")
+            .then()
+            .assertThat()
+            .statusCode(304)
+    }
+
+    @Test
+    fun `should create and delete an entry`() {
+        val assured = given()
+            .header("Content-Type", ContentType.JSON)
+            .body(entry())
+            .post("/tracker/calories/create")
+            .then()
+
+        assured.assertThat().statusCode(201)
+
+        val created = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
+
+        given().delete("/tracker/calories/delete/${created.id}").then().assertThat().statusCode(200)
+    }
+
+    @Test
+    fun `should fail on delete`() {
+        val calorieTrackerId = 123L
+
+        given().delete("/tracker/calories/delete/$calorieTrackerId").then().assertThat().statusCode(304)
+    }
+
+    @Test
     fun `should create three entries and return two dates`() {
         val userId = 42L
 

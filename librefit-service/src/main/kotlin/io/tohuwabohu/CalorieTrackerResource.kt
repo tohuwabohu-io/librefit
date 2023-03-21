@@ -25,7 +25,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     @POST
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "201", description = "OK", content = [
             Content(
@@ -50,15 +50,42 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
 
     @PUT
     @Path("/update")
-    @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = CalorieTrackerEntry::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
     fun update(calorieTracker: CalorieTrackerEntry): Uni<Response> =
-        calorieTrackerRepository.findById(calorieTracker.id!!).onItem().ifNull().failWith { EntityNotFoundException() }
+        calorieTrackerRepository.findById(calorieTracker.id!!)
+            .onItem().ifNull().failWith { EntityNotFoundException() }
             .onItem().ifNotNull().invoke(calorieTrackerRepository::updateTrackingEntry)
             .map { entry -> Response.ok(entry).build() }.onFailure(EntityNotFoundException::class.java)
             .recoverWithItem(Response.status(Response.Status.NOT_FOUND).build()).onFailure()
             .recoverWithItem(Response.serverError().build())
 
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = CalorieTrackerEntry::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
     @GET
     @Path("/read/{id:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -68,10 +95,18 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
             .recoverWithItem(Response.status(Response.Status.NOT_FOUND).build()).onFailure()
             .recoverWithItem(Response.serverError().build())
 
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "304", description = "Not Modified"),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
     @DELETE
     @Path("/delete/{id:\\d+}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     fun delete(id: Long): Uni<Response> =
         calorieTrackerRepository.deleteById(id).onItem().ifNotNull().transform { deleted ->
             if (deleted == true) Response.ok().build() else Response.notModified().build()
