@@ -65,13 +65,12 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         )]),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun update(calorieTracker: CalorieTrackerEntry): Uni<Response> =
-        calorieTrackerRepository.findById(calorieTracker.id!!)
-            .onItem().ifNull().failWith { EntityNotFoundException() }
-            .onItem().ifNotNull().invoke(calorieTrackerRepository::updateTrackingEntry)
-            .map { entry -> Response.ok(entry).build() }.onFailure(EntityNotFoundException::class.java)
-            .recoverWithItem(Response.status(Response.Status.NOT_FOUND).build()).onFailure()
-            .recoverWithItem(Response.serverError().build())
+    fun update(calorieTracker: CalorieTrackerEntry): Uni<Response> {
+        return calorieTrackerRepository.updateTrackingEntry(calorieTracker)
+            .onItem().transform { entry -> Response.ok(entry).build() }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    }
 
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [

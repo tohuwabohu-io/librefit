@@ -6,15 +6,24 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.jboss.logging.Logger
+import javax.persistence.EntityNotFoundException
 import javax.ws.rs.core.Response
 import javax.ws.rs.ext.ExceptionMapper
 import javax.ws.rs.ext.Provider
 
 fun createErrorResponse(throwable: Throwable): Response {
-    return if (throwable is ValidationError) {
-        Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(throwable.message)).build()
-    } else {
-        Response.status(Response.Status.INTERNAL_SERVER_ERROR).build()
+    return when (throwable) {
+        is ValidationError -> {
+            Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(throwable.message)).build()
+        }
+
+        is EntityNotFoundException -> {
+            Response.status(Response.Status.NOT_MODIFIED).build()
+        }
+
+        else -> {
+            Response.status(Response.Status.INTERNAL_SERVER_ERROR).build()
+        }
     }
 }
 

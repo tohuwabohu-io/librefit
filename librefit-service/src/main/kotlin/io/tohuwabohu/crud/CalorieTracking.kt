@@ -1,5 +1,6 @@
 package io.tohuwabohu.crud
 
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
@@ -15,14 +16,10 @@ import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 import javax.persistence.Convert
 import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.EntityNotFoundException
 
 @Entity
-class CalorieTrackerEntry {
-    @Id
-    @GeneratedValue
-    var id: Long? = null
+class CalorieTrackerEntry: PanacheEntity() {
     var userId: Long? = null
     var amount: Float? = null
     @Convert(converter = CalorieTrackerCategoryConverter::class)
@@ -32,7 +29,7 @@ class CalorieTrackerEntry {
     var description: String? = null
 
     override fun toString(): String {
-        return "CalorieTrackerEntry<userId=$userId,amount=$amount,category=$category,added=$added,updated=$updated>"
+        return "CalorieTrackerEntry<id=$id,userId=$userId,amount=$amount,category=$category,added=$added,updated=$updated>"
     }
 }
 
@@ -51,10 +48,16 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
         return persistAndFlush(calorieTrackerEntry)
     }
 
-    fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry) = update(
-        "amount = ?1 updated = ?2 category = ?3 where id = ?4",
-        calorieTrackerEntry.amount!!, LocalDateTime.now(), calorieTrackerEntry.category, calorieTrackerEntry.id!!
-    )
+    fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<CalorieTrackerEntry> {
+        validation.checkEntry(calorieTrackerEntry)
+
+        return find("id = ?1", calorieTrackerEntry.id!!).firstResult()
+            .onItem().ifNull().failWith(EntityNotFoundException())
+            .onItem().ifNotNull().invoke { _ -> update(
+                "amount = ?1 updated = ?2 category = ?3 where id = ?4",
+                calorieTrackerEntry.amount!!, LocalDateTime.now(), calorieTrackerEntry.category, calorieTrackerEntry.id!!
+            )}.onItem().transformToUni { _ -> Uni.createFrom().item(calorieTrackerEntry) }
+    }
 
     fun listDatesForUser(userId: Long): Uni<List<LocalDate>?> {
         validation.checkUserId(userId)
