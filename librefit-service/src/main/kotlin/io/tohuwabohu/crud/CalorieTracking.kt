@@ -17,6 +17,7 @@ import javax.inject.Inject
 import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityNotFoundException
+import javax.ws.rs.core.Response
 
 @Entity
 class CalorieTrackerEntry: PanacheEntity() {
@@ -49,6 +50,7 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
     }
 
     fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<CalorieTrackerEntry> {
+        // TODO verify that entry belongs to logged in user -> return 401
         validation.checkEntry(calorieTrackerEntry)
 
         return find("id = ?1", calorieTrackerEntry.id!!).firstResult()
@@ -57,6 +59,14 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
                 "amount = ?1 updated = ?2 category = ?3 where id = ?4",
                 calorieTrackerEntry.amount!!, LocalDateTime.now(), calorieTrackerEntry.category, calorieTrackerEntry.id!!
             )}.onItem().transformToUni { _ -> Uni.createFrom().item(calorieTrackerEntry) }
+    }
+
+    fun deleteTrackingEntry(id: Long): Uni<Boolean> {
+        // TODO verify that entry belongs to logged in user -> return 401
+
+        return find("id = ?1", id).firstResult()
+            .onItem().ifNull().failWith(EntityNotFoundException())
+            .onItem().ifNotNull().transformToUni{ entry -> deleteById(entry!!.id!!) }
     }
 
     fun listDatesForUser(userId: Long): Uni<List<LocalDate>?> {
