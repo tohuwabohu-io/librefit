@@ -71,9 +71,12 @@ class CalorieTrackerResourceTest {
 
     @Test
     fun `should fail on update`() {
+        val entry = entry()
+        entry.id = 43L
+
         given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry())
+            .body(entry)
             .put("/tracker/calories/update")
             .then()
             .assertThat()
