@@ -22,6 +22,33 @@ class CalorieTrackerResourceTest {
     }
 
     @Test
+    fun `should create two entries`() {
+        val created1 = given()
+            .header("Content-Type", ContentType.JSON)
+            .body(entry())
+            .post("/tracker/calories/create")
+            .then()
+
+        created1.assertThat().statusCode(201)
+
+        val createdEntry1 = created1.extract().body().`as`(CalorieTrackerEntry::class.java)
+
+        val created2 = given()
+            .header("Content-Type", ContentType.JSON)
+            .body(entry())
+            .post("/tracker/calories/create")
+            .then()
+
+        created2.assertThat().statusCode(201)
+
+        val createdEntry2 = created2.extract().body().`as`(CalorieTrackerEntry::class.java)
+
+        assert(createdEntry1.id != null)
+        assert(createdEntry2.id != null)
+        assert(createdEntry1.id != createdEntry2.id)
+    }
+
+    @Test
     fun `should fail on creation`() {
         val faultyEntry = entry()
         faultyEntry.amount = -100f
