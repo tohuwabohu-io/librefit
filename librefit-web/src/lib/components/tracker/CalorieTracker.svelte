@@ -3,7 +3,7 @@
     import {PUBLIC_API_BASE_PATH} from "$env/static/public";
     import {onMount} from "svelte";
     import TrackerInput from "$lib/components/TrackerInput.svelte";
-    import {Accordion, AccordionItem} from "@skeletonlabs/skeleton";
+    import {AccordionItem} from "@skeletonlabs/skeleton";
     import TrackerRadial from "$lib/components/TrackerRadial.svelte";
 
     export let date: String;
@@ -11,6 +11,10 @@
 
     let currentValue = 0;
     let trackerEntries = new Array<CalorieTrackerEntry>();
+
+    $: if (trackerEntries.length > 0) {
+        currentValue = trackerEntries.map(entry => entry.amount).reduce((a, b) => a + b)
+    }
 
     const categories = Object.keys(Category).map(key => {
         return {
@@ -33,8 +37,9 @@
 
         api.trackerCaloriesCreatePost({
             calorieTrackerEntry: newEntry
-        }).then((result) => {
-
+        }).then((result: CalorieTrackerEntry) => {
+            trackerEntries.push(result);
+            trackerEntries = trackerEntries;
         }).catch(console.error)
     }
 
@@ -43,52 +48,54 @@
     }
 
     const removeEntry = (e) => {
-
+        api.trackerCaloriesDeleteIdDelete({ id: e.detail.id }).then(_ => {
+            trackerEntries = trackerEntries.filter((entry) => entry.id !== e.detail.id);
+        }).catch(console.error)
     }
 
-    onMount(async () => {
+    const loadEntry = async () => {
         await api.trackerCaloriesListUserIdDateGet({
             date, userId: 1
         }).then((entries: Array<CalorieTrackerEntry>) => {
-            currentValue = entries.map(entry => entry.amount).reduce((a, b) => a + b);
+            if (entries.length > 0) {
+                currentValue = entries.map(entry => entry.amount).reduce((a, b) => a + b);
 
-            trackerEntries.push(...entries);
-            trackerEntries = trackerEntries;
-        }).catch((error) => {
-            if (error.response.status === 404) {
-
-            } else {
-
+                trackerEntries.push(...entries);
+                trackerEntries = trackerEntries;
             }
-        })
+        }).catch(console.error)
+    }
+
+    onMount(async () => {
+        if (date == today) {
+            await loadEntry()
+        }
     })
 </script>
 
-<Accordion>
-    <AccordionItem id={date} open={date === today}>
-        <svelte:fragment slot="summary">{date}</svelte:fragment>
-        <svelte:fragment slot="content">
-            <div class="flex gap-4 justify-between">
-                <TrackerRadial bind:current={currentValue} />
+<AccordionItem id={date} open={date === today} on:toggle|once={loadEntry}>
+    <svelte:fragment slot="summary">{date}</svelte:fragment>
+    <svelte:fragment slot="content">
+        <div class="flex gap-4 justify-between">
+            <TrackerRadial bind:current={currentValue} />
 
-                <div class="flex flex-col grow gap-4">
-                    <TrackerInput categories={categories} value=""
+            <div class="flex flex-col grow gap-4">
+                <TrackerInput categories={categories} value=""
+                              dateStr={date}
+                              id={-1}
+                              on:add={addEntry}/>
+                {#each trackerEntries as trackerInput}
+                    <TrackerInput disabled={true}
+                                  value={trackerInput.amount}
+                                  categories={categories}
+                                  category={trackerInput.category}
                                   dateStr={date}
-                                  id={-1}
-                                  on:add={addEntry}/>
-                    {#each trackerEntries as trackerInput}
-                        <TrackerInput disabled={true}
-                                      value={trackerInput.amount}
-                                      categories={categories}
-                                      category={trackerInput.category}
-                                      dateStr={date}
-                                      id={trackerInput.id}
-                                      on:add={addEntry}
-                                      on:edit={editEntry}
-                                      on:remove={removeEntry}/>
-                    {/each}
-                </div>
+                                  id={trackerInput.id}
+                                  on:add={addEntry}
+                                  on:edit={editEntry}
+                                  on:remove={removeEntry}/>
+                {/each}
             </div>
-        </svelte:fragment>
-    </AccordionItem>
-</Accordion>
+        </div>
+    </svelte:fragment>
+</AccordionItem>

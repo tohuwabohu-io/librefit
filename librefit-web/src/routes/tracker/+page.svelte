@@ -4,6 +4,7 @@
     import {PUBLIC_API_BASE_PATH} from "$env/static/public";
     import format from 'date-fns/format';
     import CalorieTracker from "$lib/components/tracker/CalorieTracker.svelte";
+    import {Accordion} from "@skeletonlabs/skeleton";
 
     const api = new CalorieTrackerResourceApi(new Configuration({
         basePath: PUBLIC_API_BASE_PATH
@@ -27,8 +28,10 @@
 
 <section>
     <div class="container mx-auto p-8 space-y-10">
-        {#each [...availableDates] as date}
-            <CalorieTracker bind:date={date} today={todayStr}/>
-        {/each}
+        <Accordion>
+            {#each [...availableDates] as date}
+                <CalorieTracker bind:date={date} today={todayStr}/>
+            {/each}
+        </Accordion>
     </div>
 </section>
