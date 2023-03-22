@@ -1,26 +1,26 @@
 <script type="ts">
     import {Configuration} from 'librefit-api/rest';
-    import {CalorieTrackerResourceApi} from 'librefit-api/rest/apis';
-    import {CalorieTrackerEntry } from 'librefit-api/rest/models';
-    import {Category} from 'librefit-api/rest/models';
+    import {CalorieTrackerResourceApi} from 'librefit-api/rest';
+    import {CalorieTrackerEntry } from 'librefit-api/rest';
+    import {Category} from 'librefit-api/rest';
     import TrackerRadial from '$lib/components/TrackerRadial.svelte';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
     import {onMount} from "svelte";
     import {PUBLIC_API_BASE_PATH} from "$env/static/public";
-    import {format} from 'date-fns';
+    import format from 'date-fns/format';
 
     const api = new CalorieTrackerResourceApi(new Configuration({
         basePath: PUBLIC_API_BASE_PATH
     }));
 
     let today = new Date();
-    let todayStr = format(today, 'yyyy-MM-dd')
+    let todayStr = format(today, 'yyyy-MM-dd');
 
-    let availableDates: Array<String> = new Array<String>();
+    const availableDates = new Array<String>();
     availableDates.push(todayStr);
 
-    let trackerMap: Map<String, Array<CalorieTrackerEntry>> = new Map();
+    $: trackerMap = new Map<String, Array<CalorieTrackerEntry>>();
     let progressMap: Map<String, number> = new Map();
 
     const categories = Object.keys(Category).map(key => {
@@ -32,13 +32,18 @@
 
     const addEntry = (e) => {
         const newEntry: CalorieTrackerEntry = {
-            userId: 1, id: 2, added: todayStr, amount: e.detail.value, category: e.detail.category
+            userId: 1,
+            added: todayStr,
+            amount: e.detail.value,
+            category: e.detail.category
         }
 
-        trackerMap.get(e.detail.dateStr).push(newEntry);
-        calculateProgress(e.detail.dateStr);
-
-        trackerMap = trackerMap;
+        api.trackerCaloriesCreatePost({
+            calorieTrackerEntry: newEntry
+        }).then((result) => {
+            trackerMap.get(e.detail.dateStr).push(newEntry);
+            calculateProgress(e.detail.dateStr);
+        }).catch(console.error)
     }
 
     const editEntry = (e) => {
@@ -55,6 +60,10 @@
         progressMap.set(dateStr, progress);
     }
 
+    const calc = (dateStr: String): number => {
+        return trackerMap.get(dateStr)?.map((entry) => entry.amount).reduce((a, b) => a + b);
+    }
+
     const loadEntriesForDate = async (dateStr: String) => {
         if (!trackerMap.has(dateStr)) {
             await api.trackerCaloriesListUserIdDateGet({
@@ -65,10 +74,13 @@
                     calculateProgress(key)
                 }
 
+                if (!progressMap.has(todayStr)) {
+                    progressMap.set(todayStr, 0);
+                }
+
                 progressMap = progressMap
 
                 trackerMap.set(dateStr, entries);
-                trackerMap = trackerMap
             }).catch((e) => console.error(e));
         }
     }
@@ -77,13 +89,11 @@
         await api.trackerCaloriesListUserIdDatesGet({
             userId: 1
         }).then((dates: Array<String>) => {
-            availableDates.push(...dates)
-
             for (let date of dates) {
                 loadEntriesForDate(date)
             }
 
-            availableDates = availableDates
+            availableDates.push(...dates)
         }).catch((e) => console.error(e));
     })
 </script>
@@ -96,7 +106,7 @@
                     <svelte:fragment slot="summary">{date}</svelte:fragment>
                         <svelte:fragment slot="content">
                             <div class="flex gap-4 justify-between">
-                                <TrackerRadial current={progressMap.get(date)}/>
+                                <TrackerRadial current={calc(date)} />
 
                                 <div class="flex flex-col grow gap-4">
                                     <TrackerInput categories={categories} value=""
