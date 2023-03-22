@@ -1,6 +1,6 @@
 <script lang="ts">
-	import {CalculationGoal, CalculationSex, Tdee} from 'librefit-api/rest';
-	import {RadioGroup, RadioItem, RangeSlider, Step, Stepper} from '@skeletonlabs/skeleton';
+	import { CalculationGoal, CalculationSex, Tdee } from 'librefit-api/rest';
+	import { RadioGroup, RadioItem, RangeSlider, Step, Stepper } from '@skeletonlabs/skeleton';
 
 	/** @type {import('./$types').ActionData} */ export let form;
 

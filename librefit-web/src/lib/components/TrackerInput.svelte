@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {createEventDispatcher} from "svelte";
+	import { createEventDispatcher } from 'svelte';
 
 	import Icon from '@iconify/svelte';
 
@@ -12,19 +12,23 @@
 
 	const add = () => {
 		dispatch('add', {
-			value, category, dateStr
+			value,
+			category,
+			dateStr
 		});
 	};
 
 	const edit = () => {
 		dispatch('edit', {
-			dateStr, id
+			dateStr,
+			id
 		});
 	};
 
 	const remove = () => {
 		dispatch('remove', {
-			dateStr, id
+			dateStr,
+			id
 		});
 	};
 </script>
@@ -40,10 +44,19 @@
 		</select>
 	</div>
 	{#if disabled}
-			<button class="btn rounded-full variant-filled-secondary"
-					disabled={!disabled} on:click|preventDefault={edit}><Icon icon="iconoir:edit-pencil" /></button>
-			<button class="btn btn-icon variant-filled" disabled={!disabled} on:click|preventDefault={remove}>D</button>
+		<button
+			class="btn rounded-full variant-filled-secondary"
+			disabled={!disabled}
+			on:click|preventDefault={edit}><Icon icon="iconoir:edit-pencil" /></button
+		>
+		<button
+			class="btn btn-icon variant-filled"
+			disabled={!disabled}
+			on:click|preventDefault={remove}>D</button
+		>
 	{:else}
-		<button class="btn btn-icon variant-filled-primary" {disabled} on:click|preventDefault={add}>A</button>
+		<button class="btn btn-icon variant-filled-primary" {disabled} on:click|preventDefault={add}
+			>A</button
+		>
 	{/if}
 </div>
