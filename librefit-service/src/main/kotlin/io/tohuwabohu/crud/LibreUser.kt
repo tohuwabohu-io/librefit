@@ -3,7 +3,7 @@ package io.tohuwabohu.crud
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.validation.ValidationError
+import io.tohuwabohu.crud.error.ValidationError
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
 import javax.persistence.Cacheable

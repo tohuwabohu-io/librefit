@@ -202,7 +202,19 @@ paths:
         "200":
           description: OK
           content:
-            text/plain: {}
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/calories/list/{userId}/dates:
     get:
       tags:
@@ -279,7 +291,19 @@ paths:
         "200":
           description: OK
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieTrackerEntry'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/calories/update:
     put:
       tags:
@@ -293,7 +317,19 @@ paths:
         "200":
           description: OK
           content:
-            text/plain: {}
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/weight/create:
     post:
       tags:

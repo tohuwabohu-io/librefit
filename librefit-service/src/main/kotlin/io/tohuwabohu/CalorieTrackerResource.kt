@@ -53,12 +53,9 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK", content = [
-            Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = CalorieTrackerEntry::class)
-            )
-        ]),
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "304", description = "Not Modified"),
+        APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class)
@@ -69,7 +66,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         Log.info("Updating calorie tracker entry $calorieTracker")
 
         return calorieTrackerRepository.updateTrackingEntry(calorieTracker)
-            .onItem().transform { entry -> Response.ok(entry).build() }
+            .onItem().transform { rowCount -> if (rowCount > 0) Response.ok().build() else Response.notModified().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
@@ -81,6 +78,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
                 schema = Schema(implementation = CalorieTrackerEntry::class)
             )
         ]),
+        APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class)
@@ -91,14 +89,15 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     @Path("/read/{id:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
     fun read(id: Long): Uni<Response> =
-        calorieTrackerRepository.findById(id).onItem().ifNull().failWith(EntityNotFoundException()).onItem().ifNotNull()
-            .transform { entry -> Response.ok(entry).build() }.onFailure(EntityNotFoundException::class.java)
-            .recoverWithItem(Response.status(Response.Status.NOT_FOUND).build()).onFailure()
-            .recoverWithItem(Response.serverError().build())
+        calorieTrackerRepository.readEntry(id)
+            .onItem().transform { entry -> Response.ok(entry).build() }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
         APIResponse(responseCode = "304", description = "Not Modified"),
+        APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class)

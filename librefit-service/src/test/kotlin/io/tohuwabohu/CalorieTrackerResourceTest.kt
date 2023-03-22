@@ -36,7 +36,37 @@ class CalorieTrackerResourceTest {
     }
 
     @Test
-    fun `should create and update an entry`() {
+    fun `should create and read an entry`() {
+        val entry = entry()
+
+        val created = given()
+            .header("Content-Type", ContentType.JSON)
+            .body(entry)
+            .post("/tracker/calories/create")
+            .then()
+
+        created.assertThat().statusCode(201)
+
+        val createdEntry = created.extract().body().`as`(CalorieTrackerEntry::class.java)
+
+        val read = given().get("/tracker/calories/read/${createdEntry.id}")
+            .then()
+
+        read.assertThat().statusCode(200)
+
+        val readEntry = read.extract().body().`as`(CalorieTrackerEntry::class.java)
+
+        println(createdEntry)
+        println(readEntry)
+
+        assert(createdEntry.id == readEntry.id)
+        assert(createdEntry.amount == readEntry.amount)
+        assert(createdEntry.category == readEntry.category)
+        assert(createdEntry.userId == readEntry.userId)
+    }
+
+    @Test
+    fun `should create, update and read an entry`() {
         val entry = entry()
 
         val assured = given()
@@ -54,19 +84,24 @@ class CalorieTrackerResourceTest {
         created.amount = 200f
         created.category = Category.LUNCH
 
-        val assuredUpdate = given()
+        given()
             .header("Content-Type", ContentType.JSON)
             .body(created)
             .put("/tracker/calories/update")
             .then()
+            .assertThat()
+            .statusCode(200)
 
-        assuredUpdate.assertThat().statusCode(200)
+        val assuredRead = given().get("/tracker/calories/read/${created.id}").then()
 
-        val updated = assuredUpdate.extract().body().`as`(CalorieTrackerEntry::class.java)
+        assuredRead.assertThat().statusCode(200)
+
+        val updated = assuredRead.extract().body().`as`(CalorieTrackerEntry::class.java)
 
         assert(created.id == updated.id)
         assert(entry.amount != updated.amount)
         assert(entry.category != updated.category)
+        assert(updated.updated != null)
     }
 
     @Test
@@ -80,7 +115,7 @@ class CalorieTrackerResourceTest {
             .put("/tracker/calories/update")
             .then()
             .assertThat()
-            .statusCode(304)
+            .statusCode(404)
     }
 
     @Test
@@ -102,7 +137,7 @@ class CalorieTrackerResourceTest {
     fun `should fail on delete`() {
         val calorieTrackerId = 123L
 
-        given().delete("/tracker/calories/delete/$calorieTrackerId").then().assertThat().statusCode(304)
+        given().delete("/tracker/calories/delete/$calorieTrackerId").then().assertThat().statusCode(404)
     }
 
     @Test

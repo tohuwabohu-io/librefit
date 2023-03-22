@@ -6,8 +6,9 @@ import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
+import io.tohuwabohu.crud.error.UnmodifiedError
+import io.tohuwabohu.crud.error.ValidationError
 import io.tohuwabohu.crud.util.enumContains
-import io.tohuwabohu.crud.validation.ValidationError
 import io.vertx.mutiny.pgclient.PgPool
 import io.vertx.mutiny.sqlclient.Tuple
 import java.time.LocalDate
@@ -17,7 +18,6 @@ import javax.inject.Inject
 import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityNotFoundException
-import javax.ws.rs.core.Response
 
 @Entity
 class CalorieTrackerEntry: PanacheEntity() {
@@ -49,20 +49,31 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
         return persistAndFlush(calorieTrackerEntry)
     }
 
-    fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<CalorieTrackerEntry> {
-        // TODO verify that entry belongs to logged in user -> return 401
+    fun readEntry(id: Long): Uni<CalorieTrackerEntry> {
+        // TODO verfiy that entry belongs to logged in user -> return 404
+
+        return findById(id)
+            .onItem().ifNull().failWith(EntityNotFoundException())
+    }
+
+    fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<Int> {
+        // TODO verify that entry belongs to logged in user -> return 404
         validation.checkEntry(calorieTrackerEntry)
 
-        return find("id = ?1", calorieTrackerEntry.id!!).firstResult()
+        return find("id = ?1", calorieTrackerEntry.id!!).singleResult()
             .onItem().ifNull().failWith(EntityNotFoundException())
-            .onItem().ifNotNull().invoke { _ -> update(
-                "amount = ?1 updated = ?2 category = ?3 where id = ?4",
-                calorieTrackerEntry.amount!!, LocalDateTime.now(), calorieTrackerEntry.category, calorieTrackerEntry.id!!
-            )}.onItem().transformToUni { _ -> Uni.createFrom().item(calorieTrackerEntry) }
+            .onItem().ifNotNull().transformToUni { _ ->
+                update("amount = ?1, updated = ?2, category = ?3 where id = ?4",
+                    calorieTrackerEntry.amount!!,
+                    LocalDateTime.now(),
+                    calorieTrackerEntry.category,
+                    calorieTrackerEntry.id!!
+                )
+            }.onItem().ifNull().failWith { UnmodifiedError(calorieTrackerEntry.toString()) }
     }
 
     fun deleteTrackingEntry(id: Long): Uni<Boolean> {
-        // TODO verify that entry belongs to logged in user -> return 401
+        // TODO verify that entry belongs to logged in user -> return 404
 
         return find("id = ?1", id).firstResult()
             .onItem().ifNull().failWith(EntityNotFoundException())
