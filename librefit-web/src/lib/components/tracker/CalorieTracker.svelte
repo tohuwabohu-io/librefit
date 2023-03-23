@@ -14,11 +14,12 @@
 	export let date: String;
 	export let today: String;
 
-	let currentValue = 0;
+	let total = 0;
+	let addValue = 0;
 	let trackerEntries = new Array<CalorieTrackerEntry>();
 
 	$: if (trackerEntries.length > 0) {
-		currentValue = trackerEntries.map((entry) => entry.amount).reduce((a, b) => a + b);
+		total = trackerEntries.map((entry) => entry.amount).reduce((a, b) => a + b);
 	}
 
 	const categories = Object.keys(Category).map((key) => {
@@ -49,6 +50,8 @@
 			.then((result: CalorieTrackerEntry) => {
 				trackerEntries.push(result);
 				trackerEntries = trackerEntries;
+
+				addValue = 0;
 			})
 			.catch(console.error);
 	};
@@ -64,6 +67,12 @@
 			.catch(console.error);
 	};
 
+	const initialLoad = async () => {
+		if (date !== today) {
+			await loadEntry();
+		}
+	}
+
 	const loadEntry = async () => {
 		await api
 			.trackerCaloriesListUserIdDateGet({
@@ -72,7 +81,7 @@
 			})
 			.then((entries: Array<CalorieTrackerEntry>) => {
 				if (entries.length > 0) {
-					currentValue = entries.map((entry) => entry.amount).reduce((a, b) => a + b);
+					total = entries.map((entry) => entry.amount).reduce((a, b) => a + b);
 
 					trackerEntries.push(...entries);
 					trackerEntries = trackerEntries;
@@ -82,20 +91,20 @@
 	};
 
 	onMount(async () => {
-		if (date == today) {
+		if (date === today) {
 			await loadEntry();
 		}
 	});
 </script>
 
-<AccordionItem id={date} open={date === today} on:toggle|once={loadEntry}>
+<AccordionItem id={date} open={date === today} on:toggle|once={initialLoad}>
 	<svelte:fragment slot="summary">{date}</svelte:fragment>
 	<svelte:fragment slot="content">
 		<div class="flex gap-4 justify-between">
-			<TrackerRadial bind:current={currentValue} />
+			<TrackerRadial bind:current={total} />
 
 			<div class="flex flex-col grow gap-4">
-				<TrackerInput {categories} value="" dateStr={date} id={-1} on:add={addEntry} />
+				<TrackerInput {categories} bind:value={addValue} dateStr={date} id={-1} on:add={addEntry} />
 				{#each trackerEntries as trackerInput}
 					<TrackerInput
 						disabled={true}
