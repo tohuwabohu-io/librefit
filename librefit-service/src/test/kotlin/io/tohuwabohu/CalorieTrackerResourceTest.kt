@@ -168,6 +168,30 @@ class CalorieTrackerResourceTest {
     }
 
     @Test
+    fun `should create and delete an entry and fail on read`() {
+        val assured = given()
+            .header("Content-Type", ContentType.JSON)
+            .body(entry())
+            .post("/tracker/calories/create")
+            .then()
+            .assertThat().statusCode(201)
+
+        val createdEntry = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
+
+        given()
+            .delete("/tracker/calories/delete/${createdEntry.id}")
+            .then()
+            .assertThat()
+            .statusCode(200)
+
+        given()
+            .get("/tracker/calories/read/${createdEntry.id}")
+            .then()
+            .assertThat()
+            .statusCode(404)
+    }
+
+    @Test
     fun `should create three entries and return two dates`() {
         val userId = 42L
 
