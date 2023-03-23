@@ -1,6 +1,6 @@
 <script>
-	export let limit = 2800,
-		maximum = 3300,
+	export let limit = 1900,
+		maximum = 2500,
 		current = 0;
 	export let width = 512,
 		height = 512;
