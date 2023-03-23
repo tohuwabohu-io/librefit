@@ -1,5 +1,6 @@
 package io.tohuwabohu.crud
 
+import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.quarkus.logging.Log
@@ -18,6 +19,7 @@ import javax.inject.Inject
 import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityNotFoundException
+import javax.transaction.Transactional
 
 @Entity
 class CalorieTrackerEntry: PanacheEntity() {
@@ -72,10 +74,11 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
             }.onItem().ifNull().failWith { UnmodifiedError(calorieTrackerEntry.toString()) }
     }
 
+    @ReactiveTransactional
     fun deleteTrackingEntry(id: Long): Uni<Boolean> {
         // TODO verify that entry belongs to logged in user -> return 404
 
-        return find("id = ?1", id).firstResult()
+        return find("id = ?1", id).singleResult()
             .onItem().ifNull().failWith(EntityNotFoundException())
             .onItem().ifNotNull().transformToUni{ entry -> deleteById(entry!!.id!!) }
     }
