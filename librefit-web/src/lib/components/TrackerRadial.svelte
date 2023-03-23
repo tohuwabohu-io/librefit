@@ -17,9 +17,9 @@
 		if (value >= max) {
 			return 359;
 		} else {
-			return (359 * value) / max
+			return (359 * value) / max;
 		}
-	}
+	};
 
 	const polarToCartesian = (cx, cy, radius, angleDeg) => {
 		const angleInRadians = ((angleDeg - 90) * Math.PI) / 180.0;

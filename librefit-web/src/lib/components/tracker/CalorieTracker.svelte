@@ -71,7 +71,7 @@
 		if (date !== today) {
 			await loadEntry();
 		}
-	}
+	};
 
 	const loadEntry = async () => {
 		await api
