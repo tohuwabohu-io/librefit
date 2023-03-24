@@ -31,6 +31,12 @@
 	});
 </script>
 
+<svelte:head>
+	<title>
+		LibreFit - Calorie Tracker
+	</title>
+</svelte:head>
+
 <section>
 	<div class="container mx-auto p-8 space-y-10">
 		<Accordion>
