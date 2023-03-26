@@ -173,10 +173,20 @@ paths:
             schema:
               $ref: '#/components/schemas/CalorieTrackerEntry'
       responses:
-        "200":
+        "201":
           description: OK
           content:
-            text/plain: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/calories/delete/{id}:
     delete:
       tags:
@@ -192,8 +202,20 @@ paths:
         "200":
           description: OK
           content:
-            text/plain: {}
-  /tracker/calories/list/{userId}:
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /tracker/calories/list/{userId}/dates:
     get:
       tags:
       - Calorie Tracker Resource
@@ -208,7 +230,52 @@ paths:
         "200":
           description: OK
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocalDate'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /tracker/calories/list/{userId}/{date}:
+    get:
+      tags:
+      - Calorie Tracker Resource
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalorieTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/calories/read/{id}:
     get:
       tags:
@@ -224,7 +291,19 @@ paths:
         "200":
           description: OK
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieTrackerEntry'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/calories/update:
     put:
       tags:
@@ -238,7 +317,19 @@ paths:
         "200":
           description: OK
           content:
-            text/plain: {}
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/weight/create:
     post:
       tags:
@@ -377,9 +468,8 @@ components:
       type: string
     CalorieTrackerEntry:
       required:
+      - category
       - added
-      - updated
-      - description
       type: object
       properties:
         id:
@@ -394,12 +484,26 @@ components:
           format: float
           type: number
           nullable: true
+        category:
+          $ref: '#/components/schemas/Category'
         added:
-          $ref: '#/components/schemas/LocalDateTime'
+          $ref: '#/components/schemas/LocalDate'
         updated:
-          $ref: '#/components/schemas/LocalDateTime'
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
         description:
           type: string
+          nullable: true
+    Category:
+      enum:
+      - BREAKFAST
+      - LUNCH
+      - DINNER
+      - SNACK
+      - UNSET
+      type: string
     ErrorResponse:
       required:
       - message
@@ -460,6 +564,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalDateTime'
           nullable: true
+    LocalDate:
+      format: date
+      type: string
+      example: 2022-03-10
     LocalDateTime:
       format: date-time
       type: string

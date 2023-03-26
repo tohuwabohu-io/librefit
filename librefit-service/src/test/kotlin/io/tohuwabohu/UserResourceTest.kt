@@ -12,23 +12,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 @TestMethodOrder(OrderAnnotation::class)
 @QuarkusTest
 class UserResourceTest {
-    private fun user(): LibreUser {
-        val user = LibreUser()
-        user.email = "test1@test.dev"
-        user.password = "tastb1"
-        user.name = "testname"
 
-        return user
-    }
-
-    private fun failingUser(): LibreUser {
-        val failingUser = LibreUser()
-        failingUser.email = "test1@test.dev"
-        failingUser.password = "otherpasswordthanuser2b"
-        failingUser.name = "nottestname"
-
-        return failingUser
-    }
 
     @Test
     @Order(1)
@@ -76,5 +60,23 @@ class UserResourceTest {
             .then()
             .assertThat()
             .statusCode(404)
+    }
+
+    private fun user(): LibreUser {
+        val user = LibreUser()
+        user.email = "test1@test.dev"
+        user.password = "tastb1"
+        user.name = "testname"
+
+        return user
+    }
+
+    private fun failingUser(): LibreUser {
+        val failingUser = LibreUser()
+        failingUser.email = "test1@test.dev"
+        failingUser.password = "otherpasswordthanuser2b"
+        failingUser.name = "nottestname"
+
+        return failingUser
     }
 }

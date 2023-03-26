@@ -23,11 +23,11 @@
 			// TODO: disable login button, re-enable in finally block.
 
 			await userApi
-				.userLoginPost({libreUser: loginData})
+				.userLoginPost({ libreUser: loginData })
 				.then(() => {
 					// TODO redirect
 					success.classList.remove('hidden');
-					error.classList.add('hidden')
+					error.classList.add('hidden');
 				})
 				.catch((e) => {
 					errorText = 'Error during login';
@@ -75,17 +75,25 @@
 			/>
 
 			<div>
-				<p bind:this={success} class="variant-glass-success variant-ringed-success p-4 rounded-full hidden">
+				<p
+					bind:this={success}
+					class="variant-glass-success variant-ringed-success p-4 rounded-full hidden"
+				>
 					Successfully logged in!
 				</p>
-				<p bind:this={error} class="variant-glass-error variant-ringed-error p-4 rounded-full hidden">
-					{ errorText }
+				<p
+					bind:this={error}
+					class="variant-glass-error variant-ringed-error p-4 rounded-full hidden"
+				>
+					{errorText}
 				</p>
 			</div>
 
 			<div>
-				<button bind:this={loginButton} on:click|preventDefault={login} class="btn variant-filled-primary"
-					>Login</button
+				<button
+					bind:this={loginButton}
+					on:click|preventDefault={login}
+					class="btn variant-filled-primary">Login</button
 				>
 			</div>
 		</form>

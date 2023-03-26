@@ -27,6 +27,7 @@ tasks.openApiGenerate {
     inputSpec.set("openapi.yaml")
     outputDir.set("${project.projectDir}/rest")
     generatorName.set("typescript-fetch")
+    typeMappings.put("Date", "String") // see https://github.com/OpenAPITools/openapi-generator/issues/926
     additionalProperties.put("supportsES6", "true")
 }
 
