@@ -39,7 +39,7 @@
 
 <section>
 	<div class="container mx-auto p-8 space-y-10">
-		<Accordion>
+		<Accordion class="variant-ghost-surface rounded-xl">
 			{#each [...availableDates] as date}
 				<CalorieTracker bind:date today={todayStr} />
 			{/each}
