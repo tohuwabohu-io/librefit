@@ -1,14 +1,18 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-
-	import Icon from '@iconify/svelte';
+	import {createEventDispatcher} from 'svelte';
 
 	export let value, dateStr, id;
+	export let existing = false;
 	export let disabled = false;
 	export let categories;
 	export let category;
 
 	const dispatch = createEventDispatcher();
+
+	let editing = false;
+
+	let previous: {category, value};
+	let changeAction;
 
 	const add = () => {
 		dispatch('add', {
@@ -18,19 +22,50 @@
 		});
 	};
 
-	const edit = () => {
-		dispatch('edit', {
-			dateStr,
-			id
-		});
+	const change = (action: String) => {
+		return () => {
+			disabled = false;
+			editing = true;
+
+			changeAction = action;
+
+			if (action === 'update') {
+				previous = { category, value }
+			}
+		}
+	}
+
+	const update = (e: Event) => {
+		e.preventDefault();
+
+		if (value != previous.value || category != previous.category) {
+			dispatch('update', {
+				id, value, category
+			});
+		}
+
+		disabled = true;
+		editing = false;
 	};
 
-	const remove = () => {
+	const remove = (e: Event) => {
+		e.preventDefault();
+
 		dispatch('remove', {
-			dateStr,
 			id
 		});
+
+		disabled = true;
+		editing = false;
 	};
+
+	const discard = () => {
+		disabled = true;
+		editing = false;
+
+		value = previous.value;
+		category = previous.category;
+	}
 </script>
 
 <div class="flex gap-2">
@@ -43,20 +78,31 @@
 			{/each}
 		</select>
 	</div>
-	{#if disabled}
-		<button
-			class="btn rounded-full variant-filled-secondary"
-			disabled={!disabled}
-			on:click|preventDefault={edit}><Icon icon="iconoir:edit-pencil" /></button
-		>
-		<button
-			class="btn btn-icon variant-filled"
-			disabled={!disabled}
-			on:click|preventDefault={remove}>D</button
-		>
+	{#if existing}
+		{#if !editing}
+			<button
+				class="btn-icon variant-filled-secondary"
+				on:click|preventDefault={change('update')}>
+				E
+			</button>
+			<button
+				class="btn-icon variant-filled"
+				on:click|preventDefault={change('delete')}>
+				D</button>
+		{:else}
+			<button class="btn-icon variant-ghost-primary"
+					on:click={changeAction === 'update' ? update : remove}>
+				Y
+			</button>
+			<button class="btn-icon variant-ghost-error"
+					on:click|preventDefault={discard}>
+				N
+			</button>
+		{/if}
 	{:else}
-		<button class="btn btn-icon variant-filled-primary" {disabled} on:click|preventDefault={add}
-			>A</button
-		>
+		<button class="btn-icon variant-filled-primary"
+				on:click|preventDefault={add}>
+			A
+		</button>
 	{/if}
 </div>

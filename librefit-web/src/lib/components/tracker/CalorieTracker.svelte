@@ -56,9 +56,16 @@
 			.catch(console.error);
 	};
 
-	const editEntry = (e) => {};
+	const updateEntry = (e) => {
+		api.trackerCaloriesReadIdGet({ id: e.detail.id}).then((entry: CalorieTrackerEntry) => {
+			entry.amount = e.detail.value;
+			entry.category = e.detail.category;
 
-	const removeEntry = (e) => {
+			api.trackerCaloriesUpdatePut({ calorieTrackerEntry: entry}).then((_) => console.log('updated!')).catch(console.error)
+		})
+	};
+
+	const deleteEntry = (e) => {
 		api
 			.trackerCaloriesDeleteIdDelete({ id: e.detail.id })
 			.then((_) => {
@@ -108,14 +115,15 @@
 				{#each trackerEntries as trackerInput}
 					<TrackerInput
 						disabled={true}
+						existing={true}
 						value={trackerInput.amount}
 						{categories}
 						category={trackerInput.category}
 						dateStr={date}
 						id={trackerInput.id}
 						on:add={addEntry}
-						on:edit={editEntry}
-						on:remove={removeEntry}
+						on:update={updateEntry}
+						on:remove={deleteEntry}
 					/>
 				{/each}
 			</div>
