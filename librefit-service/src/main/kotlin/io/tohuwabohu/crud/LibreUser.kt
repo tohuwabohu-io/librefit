@@ -15,7 +15,7 @@ data class LibreUser (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
-    var id: Long,
+    var id: Long = 0L,
 
     @Column(unique = true, nullable = false)
     var email: String,
@@ -23,23 +23,23 @@ data class LibreUser (
     @Column(nullable = false)
     var password: String,
 
-    var name: String?,
-    var registered: LocalDateTime?,
-    var lastLogin: LocalDateTime?
+    var name: String? = null,
+    var registered: LocalDateTime? = null,
+    var lastLogin: LocalDateTime? = null
 ): PanacheEntityBase {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
         other as LibreUser
 
-        return id == other.id
+        return id != null && id == other.id
     }
 
     override fun hashCode(): Int = javaClass.hashCode()
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(id = $id , password = $password , email = $email , name = $name , registered = $registered , lastLogin = $lastLogin )"
+        return this::class.simpleName + "(id = $id , email = $email , password = $password , name = $name , registered = $registered , lastLogin = $lastLogin )"
     }
 }
 
