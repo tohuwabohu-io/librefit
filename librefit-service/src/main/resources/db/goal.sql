@@ -1,13 +1,16 @@
-create table goal
+create table public.goal
 (
-    id           bigint not null
-        primary key,
+    added        date default CURRENT_TIMESTAMP not null,
+    id           bigint                         not null,
+    user_id      bigint                         not null
+        constraint fk_user
+            references public.libre_user,
     end_amount   real,
     end_date     timestamp,
     start_amount real,
     start_date   timestamp,
-    user_id      bigint
+    primary key (added, id, user_id)
 );
 
-alter table goal
+alter table public.goal
     owner to librefit;
