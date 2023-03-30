@@ -1,19 +1,14 @@
 package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
+import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
 import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
 import javax.transaction.Transactional
 
 @Entity
-class Goal {
-    @Id
-    @GeneratedValue
-    var id: Long? = null
-    var userId: Long? = null
+class Goal : LibreUserWeakEntity() {
     var startAmount: Float? = null
     var endAmount: Float? = null
     lateinit var startDate: LocalDateTime

@@ -1,7 +1,6 @@
 package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
@@ -9,31 +8,32 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.error.ValidationError
+import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import io.tohuwabohu.crud.util.enumContains
 import io.vertx.mutiny.pgclient.PgPool
 import io.vertx.mutiny.sqlclient.Tuple
+import org.hibernate.Hibernate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
+import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityNotFoundException
-import javax.transaction.Transactional
 
 @Entity
-class CalorieTrackerEntry: PanacheEntity() {
-    var userId: Long? = null
-    var amount: Float? = null
+class CalorieTrackerEntry : LibreUserWeakEntity() {
+    @Column(nullable = false)
+    var amount: Float = 0f
+
     @Convert(converter = CalorieTrackerCategoryConverter::class)
-    lateinit var category: Category
-    lateinit var added: LocalDate
+    @Column(nullable = false)
+    var category: Category = Category.UNSET
+
     var updated: LocalDateTime? = null
     var description: String? = null
-
-    override fun toString(): String {
-        return "CalorieTrackerEntry<id=$id,userId=$userId,amount=$amount,category=$category,added=$added,updated=$updated>"
-    }
 }
 
 enum class Category {
@@ -45,6 +45,7 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
     @Inject
     lateinit var client: PgPool
 
+    @ReactiveTransactional
     fun create(calorieTrackerEntry: CalorieTrackerEntry): Uni<CalorieTrackerEntry> {
         validation.checkEntry(calorieTrackerEntry)
 
@@ -52,20 +53,20 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
     }
 
     fun readEntry(id: Long): Uni<CalorieTrackerEntry> {
-        // TODO verfiy that entry belongs to logged in user -> return 404
+        // TODO verify that entry belongs to logged in user -> return 404
 
-        return findById(id)
-            .onItem().ifNull().failWith(EntityNotFoundException())
+        return findById(id).onItem().ifNull().failWith(EntityNotFoundException())
     }
 
+    @ReactiveTransactional
     fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<Int> {
         // TODO verify that entry belongs to logged in user -> return 404
         validation.checkEntry(calorieTrackerEntry)
 
-        return find("id = ?1", calorieTrackerEntry.id!!).singleResult()
-            .onItem().ifNull().failWith(EntityNotFoundException())
-            .onItem().ifNotNull().transformToUni { _ ->
-                update("amount = ?1, updated = ?2, category = ?3 where id = ?4",
+        return find("id = ?1", calorieTrackerEntry.id!!).singleResult().onItem().ifNull()
+            .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni { _ ->
+                update(
+                    "amount = ?1, updated = ?2, category = ?3 where id = ?4",
                     calorieTrackerEntry.amount!!,
                     LocalDateTime.now(),
                     calorieTrackerEntry.category,
@@ -78,21 +79,18 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
     fun deleteTrackingEntry(id: Long): Uni<Boolean> {
         // TODO verify that entry belongs to logged in user -> return 404
 
-        return find("id = ?1", id).singleResult()
-            .onItem().ifNull().failWith(EntityNotFoundException())
-            .onItem().ifNotNull().transformToUni{ entry -> deleteById(entry!!.id!!) }
+        return find("id = ?1", id).singleResult().onItem().ifNull().failWith(EntityNotFoundException()).onItem()
+            .ifNotNull().transformToUni { entry -> deleteById(entry.id!!) }
     }
 
     fun listDatesForUser(userId: Long): Uni<List<LocalDate>?> {
         validation.checkUserId(userId)
 
         return client.preparedQuery("select added from calorie_tracker_entry where user_id = $1 group by added")
-            .execute(Tuple.of(userId))
-            .onItem().ifNotNull().transformToMulti{ rowSet -> Multi.createFrom().iterable(rowSet)}
-            .onItem().transform { row -> row.getLocalDate("added")}
-            .collect().asList()
-            .onItem().invoke{ list -> list.sortDescending() }
-            .onFailure().invoke { throwable -> Log.error(throwable) }
+            .execute(Tuple.of(userId)).onItem().ifNotNull()
+            .transformToMulti { rowSet -> Multi.createFrom().iterable(rowSet) }.onItem()
+            .transform { row -> row.getLocalDate("added") }.collect().asList().onItem()
+            .invoke { list -> list.sortDescending() }.onFailure().invoke { throwable -> Log.error(throwable) }
     }
 
     fun listEntriesForUserAndDate(userId: Long, date: LocalDate): Uni<List<CalorieTrackerEntry>> {
@@ -109,7 +107,7 @@ class CalorieTrackerValidation {
         // TODO check userId integrity
 
         checkUserId(entry.userId!!)
-        checkAddedDate(entry.added)
+        // checkAddedDate(entry.added)
 
         if (entry.amount == null || entry.amount!! <= 0f) {
             throw ValidationError("The amount specified is invalid.")
@@ -125,8 +123,8 @@ class CalorieTrackerValidation {
         }
     }
 
-    fun checkAddedDate(added: LocalDate) {
-        if (added.isAfter(LocalDateTime.now().toLocalDate())) {
+    fun checkAddedDate(added: LocalDate?) {
+        if (added != null && added.isAfter(LocalDateTime.now().toLocalDate())) {
             throw IllegalArgumentException("This date lies in the future. $added")
         }
     }

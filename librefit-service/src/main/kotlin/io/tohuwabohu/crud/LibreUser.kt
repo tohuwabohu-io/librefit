@@ -1,25 +1,45 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.ValidationError
+import org.hibernate.Hibernate
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
-import javax.persistence.Cacheable
-import javax.persistence.Entity
+import javax.persistence.*
 
 @Entity
 @Cacheable
-class LibreUser: PanacheEntity() {
-    lateinit var password: String
-    lateinit var email: String
-    var name: String? = null
-    var registered: LocalDateTime? = null
-    var lastLogin: LocalDateTime? = null
+data class LibreUser (
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
+    var id: Long,
 
+    @Column(unique = true, nullable = false)
+    var email: String,
+
+    @Column(nullable = false)
+    var password: String,
+
+    var name: String?,
+    var registered: LocalDateTime?,
+    var lastLogin: LocalDateTime?
+): PanacheEntityBase {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as LibreUser
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    @Override
     override fun toString(): String {
-        return "LibreUser<name=$name,email=$email,registered=$registered,lastLogin=$lastLogin>"
+        return this::class.simpleName + "(id = $id , password = $password , email = $email , name = $name , registered = $registered , lastLogin = $lastLogin )"
     }
 }
 
