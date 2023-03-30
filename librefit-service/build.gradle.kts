@@ -1,6 +1,8 @@
 plugins {
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.allopen") version "1.7.22"
+    kotlin("plugin.noarg") version "1.7.22"
+    kotlin("plugin.jpa") version "1.7.22"
     id("io.quarkus")
 }
 
@@ -43,6 +45,8 @@ allOpen {
     annotation("javax.enterprise.context.ApplicationScoped")
     annotation("io.quarkus.test.junit.QuarkusTest")
     annotation("javax.persistence.Entity")
+    annotation("javax.persistence.IdClass")
+    annotation("javax.persistence.MappedSuperclass")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
