@@ -86,10 +86,10 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @GET
-    @Path("/read/{id:\\d+}")
+    @Path("/read/{userId:\\d+}/{date}/{id:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun read(id: Long): Uni<Response> =
-        calorieTrackerRepository.readEntry(id)
+    fun read(userId: Long, date: LocalDate, id: Long): Uni<Response> =
+        calorieTrackerRepository.readEntry(userId, date, id)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
@@ -105,12 +105,12 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @DELETE
-    @Path("/delete/{id:\\d+}")
+    @Path("/delete/{userId:\\d+}/{date}/{id:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun delete(id: Long): Uni<Response> {
+    fun delete(userId: Long, date: LocalDate, id: Long): Uni<Response> {
         Log.info("Delete calorie tracker entry with id $id")
 
-        return calorieTrackerRepository.deleteTrackingEntry(id)
+        return calorieTrackerRepository.deleteTrackingEntry(userId, date, id)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

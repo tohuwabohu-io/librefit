@@ -2,17 +2,20 @@ package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.error.ValidationError
+import io.tohuwabohu.crud.relation.LibreUserCompositeKey
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import io.tohuwabohu.crud.util.enumContains
 import io.vertx.mutiny.pgclient.PgPool
 import io.vertx.mutiny.sqlclient.Tuple
 import org.hibernate.Hibernate
+import org.hibernate.annotations.SQLInsert
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -22,26 +25,48 @@ import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityNotFoundException
+import javax.persistence.PrePersist
 
 @Entity
-class CalorieTrackerEntry : LibreUserWeakEntity() {
+data class CalorieTrackerEntry (
     @Column(nullable = false)
-    var amount: Float = 0f
+    var amount: Float = 0f,
 
     @Convert(converter = CalorieTrackerCategoryConverter::class)
     @Column(nullable = false)
-    var category: Category = Category.UNSET
+    var category: Category = Category.UNSET,
 
-    var updated: LocalDateTime? = null
+    var updated: LocalDateTime? = null,
     var description: String? = null
+) : LibreUserWeakEntity() {
+    @PrePersist
+    fun setUpdatedFlag() {
+        updated = LocalDateTime.now()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as CalorieTrackerEntry
+
+        return userId == other.userId
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    @Override
+    override fun toString(): String {
+        return this::class.simpleName + "(userId = $userId , amount = $amount , category = $category , updated = $updated , description = $description , added = $added , id = $id )"
+    }
 }
+
 
 enum class Category {
     BREAKFAST, LUNCH, DINNER, SNACK, UNSET;
 }
 
 @ApplicationScoped
-class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : PanacheRepository<CalorieTrackerEntry> {
+class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : PanacheRepositoryBase<CalorieTrackerEntry, LibreUserCompositeKey> {
     @Inject
     lateinit var client: PgPool
 
@@ -52,10 +77,16 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
         return persistAndFlush(calorieTrackerEntry)
     }
 
-    fun readEntry(id: Long): Uni<CalorieTrackerEntry> {
+    fun readEntry(userId: Long, date: LocalDate, id: Long): Uni<CalorieTrackerEntry> {
         // TODO verify that entry belongs to logged in user -> return 404
 
-        return findById(id).onItem().ifNull().failWith(EntityNotFoundException())
+        val key = LibreUserCompositeKey(
+            userId = userId,
+            added = date,
+            id = id
+        )
+
+        return findById(key).onItem().ifNull().failWith(EntityNotFoundException())
     }
 
     @ReactiveTransactional
@@ -63,24 +94,34 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
         // TODO verify that entry belongs to logged in user -> return 404
         validation.checkEntry(calorieTrackerEntry)
 
-        return find("id = ?1", calorieTrackerEntry.id!!).singleResult().onItem().ifNull()
-            .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni { _ ->
+        return findById(calorieTrackerEntry.getPrimaryKey()).onItem().ifNull()
+            .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni { entry ->
+                val key = entry.getPrimaryKey()
+
                 update(
-                    "amount = ?1, updated = ?2, category = ?3 where id = ?4",
-                    calorieTrackerEntry.amount!!,
-                    LocalDateTime.now(),
+                    "amount = ?1, category = ?2, description = ?3 where userId = ?4 and added = ?5 and id = ?6",
+                    calorieTrackerEntry.amount,
                     calorieTrackerEntry.category,
-                    calorieTrackerEntry.id!!
+                    calorieTrackerEntry.description.let { "" },
+                    key.userId,
+                    key.added,
+                    key.id
                 )
             }.onItem().ifNull().failWith { UnmodifiedError(calorieTrackerEntry.toString()) }
     }
 
     @ReactiveTransactional
-    fun deleteTrackingEntry(id: Long): Uni<Boolean> {
+    fun deleteTrackingEntry(userId: Long, date: LocalDate, id: Long): Uni<Boolean> {
         // TODO verify that entry belongs to logged in user -> return 404
 
-        return find("id = ?1", id).singleResult().onItem().ifNull().failWith(EntityNotFoundException()).onItem()
-            .ifNotNull().transformToUni { entry -> deleteById(entry.id!!) }
+        val key = LibreUserCompositeKey(
+            userId = userId,
+            added = date,
+            id = id
+        )
+
+        return findById(key).onItem().ifNull().failWith(EntityNotFoundException()).onItem()
+            .ifNotNull().transformToUni { entry -> deleteById(entry.getPrimaryKey()) }
     }
 
     fun listDatesForUser(userId: Long): Uni<List<LocalDate>?> {
@@ -106,10 +147,10 @@ class CalorieTrackerValidation {
     fun checkEntry(entry: CalorieTrackerEntry) {
         // TODO check userId integrity
 
-        checkUserId(entry.userId!!)
+        checkUserId(entry.userId)
         // checkAddedDate(entry.added)
 
-        if (entry.amount == null || entry.amount!! <= 0f) {
+        if (entry.amount == null || entry.amount <= 0f) {
             throw ValidationError("The amount specified is invalid.")
         } else if (!enumContains<Category>(entry.category.name)) {
             throw ValidationError("The chosen category is invalid.");
