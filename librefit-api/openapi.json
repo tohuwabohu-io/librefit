@@ -275,11 +275,26 @@
         }
       }
     },
-    "/tracker/calories/delete/{id}" : {
+    "/tracker/calories/delete/{userId}/{date}/{id}" : {
       "delete" : {
         "tags" : [ "Calorie Tracker Resource" ],
         "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
           "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "userId",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -407,11 +422,26 @@
         }
       }
     },
-    "/tracker/calories/read/{id}" : {
+    "/tracker/calories/read/{userId}/{date}/{id}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
         "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
           "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "userId",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -691,7 +721,7 @@
         "type" : "string"
       },
       "CalorieTrackerEntry" : {
-        "required" : [ "category" ],
+        "required" : [ "added", "category" ],
         "type" : "object",
         "properties" : {
           "userId" : {
@@ -699,11 +729,7 @@
             "type" : "integer"
           },
           "added" : {
-            "type" : "string",
-            "allOf" : [ {
-              "$ref" : "#/components/schemas/LocalDate"
-            } ],
-            "nullable" : true
+            "$ref" : "#/components/schemas/LocalDate"
           },
           "id" : {
             "format" : "int64",
@@ -743,7 +769,7 @@
         }
       },
       "Goal" : {
-        "required" : [ "startDate", "endDate" ],
+        "required" : [ "added", "startDate", "endDate" ],
         "type" : "object",
         "properties" : {
           "userId" : {
@@ -751,11 +777,7 @@
             "type" : "integer"
           },
           "added" : {
-            "type" : "string",
-            "allOf" : [ {
-              "$ref" : "#/components/schemas/LocalDate"
-            } ],
-            "nullable" : true
+            "$ref" : "#/components/schemas/LocalDate"
           },
           "id" : {
             "format" : "int64",
@@ -867,7 +889,7 @@
         }
       },
       "WeightTrackerEntry" : {
-        "required" : [ "updated" ],
+        "required" : [ "added", "updated" ],
         "type" : "object",
         "properties" : {
           "userId" : {
@@ -875,11 +897,7 @@
             "type" : "integer"
           },
           "added" : {
-            "type" : "string",
-            "allOf" : [ {
-              "$ref" : "#/components/schemas/LocalDate"
-            } ],
-            "nullable" : true
+            "$ref" : "#/components/schemas/LocalDate"
           },
           "id" : {
             "format" : "int64",
