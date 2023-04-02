@@ -785,13 +785,11 @@
           },
           "startAmount" : {
             "format" : "float",
-            "type" : "number",
-            "nullable" : true
+            "type" : "number"
           },
           "endAmount" : {
             "format" : "float",
-            "type" : "number",
-            "nullable" : true
+            "type" : "number"
           },
           "startDate" : {
             "$ref" : "#/components/schemas/LocalDateTime"
@@ -905,8 +903,7 @@
           },
           "amount" : {
             "format" : "float",
-            "type" : "number",
-            "nullable" : true
+            "type" : "number"
           },
           "updated" : {
             "$ref" : "#/components/schemas/LocalDateTime"

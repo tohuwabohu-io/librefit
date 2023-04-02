@@ -2,7 +2,7 @@
   "name": "librefit-api",
   "version": "1.0.0",
   "description": "Package containing the librefit-api OpenAPI specification",
-  "main": "rest/api.js",
+  "main": "rest/index.js",
   "scripts": {
     "link": "npm link && cd ../librefit-web && npm link ../librefit-api && npm install ../librefit-api --save-dev",
     "build": "tsc"
