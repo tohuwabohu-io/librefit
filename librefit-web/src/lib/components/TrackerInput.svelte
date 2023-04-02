@@ -40,7 +40,7 @@
 
 		if (value != previous.value || category != previous.category) {
 			dispatch('update', {
-				id, value, category
+				id, dateStr, value, category
 			});
 		}
 

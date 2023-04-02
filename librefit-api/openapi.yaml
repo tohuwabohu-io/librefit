@@ -187,12 +187,23 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
-  /tracker/calories/delete/{id}:
+  /tracker/calories/delete/{userId}/{date}/{id}:
     delete:
       tags:
       - Calorie Tracker Resource
       parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
       - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - name: userId
         in: path
         required: true
         schema:
@@ -276,12 +287,23 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
-  /tracker/calories/read/{id}:
+  /tracker/calories/read/{userId}/{date}/{id}:
     get:
       tags:
       - Calorie Tracker Resource
       parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
       - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - name: userId
         in: path
         required: true
         schema:
@@ -468,26 +490,23 @@ components:
       type: string
     CalorieTrackerEntry:
       required:
-      - category
       - added
+      - category
       type: object
       properties:
-        id:
-          format: int64
-          type: integer
-          nullable: true
         userId:
           format: int64
           type: integer
-          nullable: true
+        added:
+          $ref: '#/components/schemas/LocalDate'
+        id:
+          format: int64
+          type: integer
         amount:
           format: float
           type: number
-          nullable: true
         category:
           $ref: '#/components/schemas/Category'
-        added:
-          $ref: '#/components/schemas/LocalDate'
         updated:
           type: string
           allOf:
@@ -513,18 +532,19 @@ components:
           type: string
     Goal:
       required:
+      - added
       - startDate
       - endDate
       type: object
       properties:
-        id:
-          format: int64
-          type: integer
-          nullable: true
         userId:
           format: int64
           type: integer
-          nullable: true
+        added:
+          $ref: '#/components/schemas/LocalDate'
+        id:
+          format: int64
+          type: integer
         startAmount:
           format: float
           type: number
@@ -539,17 +559,16 @@ components:
           $ref: '#/components/schemas/LocalDateTime'
     LibreUser:
       required:
-      - password
       - email
+      - password
       type: object
       properties:
         id:
           format: int64
           type: integer
-          nullable: true
-        password:
-          type: string
         email:
+          type: string
+        password:
           type: string
         name:
           type: string
@@ -615,19 +634,17 @@ components:
       - updated
       type: object
       properties:
-        id:
-          format: int64
-          type: integer
-          nullable: true
         userId:
           format: int64
           type: integer
-          nullable: true
+        added:
+          $ref: '#/components/schemas/LocalDate'
+        id:
+          format: int64
+          type: integer
         amount:
           format: float
           type: number
           nullable: true
-        added:
-          $ref: '#/components/schemas/LocalDateTime'
         updated:
           $ref: '#/components/schemas/LocalDateTime'

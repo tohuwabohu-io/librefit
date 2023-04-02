@@ -57,7 +57,11 @@
 	};
 
 	const updateEntry = (e) => {
-		api.trackerCaloriesReadIdGet({ id: e.detail.id}).then((entry: CalorieTrackerEntry) => {
+		api.trackerCaloriesReadUserIdDateIdGet({
+			userId: 1,
+			id: e.detail.id,
+			date: e.detail.dateStr
+		}).then((entry: CalorieTrackerEntry) => {
 			entry.amount = e.detail.value;
 			entry.category = e.detail.category;
 
@@ -66,9 +70,11 @@
 	};
 
 	const deleteEntry = (e) => {
-		api
-			.trackerCaloriesDeleteIdDelete({ id: e.detail.id })
-			.then((_) => {
+		api.trackerCaloriesDeleteUserIdDateIdDelete({
+			userId: 1,
+			id: e.detail.id,
+			date: e.detail.dateStr
+		}).then((_) => {
 				trackerEntries = trackerEntries.filter((entry) => entry.id !== e.detail.id);
 			})
 			.catch(console.error);
@@ -81,8 +87,7 @@
 	};
 
 	const loadEntry = async () => {
-		await api
-			.trackerCaloriesListUserIdDateGet({
+		await api.trackerCaloriesListUserIdDateGet({
 				date,
 				userId: 1
 			})

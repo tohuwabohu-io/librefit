@@ -14,7 +14,7 @@ class CalorieTrackerResourceTest {
     fun `should create an entry`() {
         given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry())
+            .body(entry(id = 1, userId = 1))
             .post("/tracker/calories/create")
             .then()
             .assertThat()
@@ -25,7 +25,7 @@ class CalorieTrackerResourceTest {
     fun `should create two entries`() {
         val created1 = given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry())
+            .body(entry(id = 4, userId = 1))
             .post("/tracker/calories/create")
             .then()
 
@@ -35,7 +35,7 @@ class CalorieTrackerResourceTest {
 
         val created2 = given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry())
+            .body(entry(5, 1))
             .post("/tracker/calories/create")
             .then()
 
@@ -43,14 +43,12 @@ class CalorieTrackerResourceTest {
 
         val createdEntry2 = created2.extract().body().`as`(CalorieTrackerEntry::class.java)
 
-        assert(createdEntry1.id != null)
-        assert(createdEntry2.id != null)
         assert(createdEntry1.id != createdEntry2.id)
     }
 
     @Test
     fun `should fail on creation`() {
-        val faultyEntry = entry()
+        val faultyEntry = entry(id = 1, userId = 1)
         faultyEntry.amount = -100f
 
         given()
@@ -64,11 +62,9 @@ class CalorieTrackerResourceTest {
 
     @Test
     fun `should create and read an entry`() {
-        val entry = entry()
-
         val created = given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry)
+            .body(entry(id = 2, userId = 1))
             .post("/tracker/calories/create")
             .then()
 
@@ -76,25 +72,23 @@ class CalorieTrackerResourceTest {
 
         val createdEntry = created.extract().body().`as`(CalorieTrackerEntry::class.java)
 
-        val read = given().get("/tracker/calories/read/${createdEntry.id}")
+        val read = given().get("/tracker/calories/read/${createdEntry.userId}/${createdEntry.added}/${createdEntry.id}")
             .then()
 
         read.assertThat().statusCode(200)
 
         val readEntry = read.extract().body().`as`(CalorieTrackerEntry::class.java)
 
-        println(createdEntry)
-        println(readEntry)
-
+        assert(createdEntry.added == readEntry.added)
         assert(createdEntry.id == readEntry.id)
+        assert(createdEntry.userId == readEntry.userId)
         assert(createdEntry.amount == readEntry.amount)
         assert(createdEntry.category == readEntry.category)
-        assert(createdEntry.userId == readEntry.userId)
     }
 
     @Test
     fun `should create, update and read an entry`() {
-        val entry = entry()
+        val entry = entry(id = 1, userId = 4)
 
         val assured = given()
             .header("Content-Type", ContentType.JSON)
@@ -105,9 +99,6 @@ class CalorieTrackerResourceTest {
         assured.assertThat().statusCode(201)
 
         val created = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
-
-        assert(created.id != null)
-
         created.amount = 200f
         created.category = Category.LUNCH
 
@@ -119,7 +110,7 @@ class CalorieTrackerResourceTest {
             .assertThat()
             .statusCode(200)
 
-        val assuredRead = given().get("/tracker/calories/read/${created.id}").then()
+        val assuredRead = given().get("/tracker/calories/read/${created.userId}/${created.added}/${created.id}").then()
 
         assuredRead.assertThat().statusCode(200)
 
@@ -133,12 +124,9 @@ class CalorieTrackerResourceTest {
 
     @Test
     fun `should fail on update`() {
-        val entry = entry()
-        entry.id = 43L
-
         given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry)
+            .body(entry(id = 43L, userId = 1))
             .put("/tracker/calories/update")
             .then()
             .assertThat()
@@ -149,7 +137,7 @@ class CalorieTrackerResourceTest {
     fun `should create and delete an entry`() {
         val assured = given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry())
+            .body(entry(id = 1, userId = 1))
             .post("/tracker/calories/create")
             .then()
 
@@ -157,7 +145,7 @@ class CalorieTrackerResourceTest {
 
         val created = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
 
-        given().delete("/tracker/calories/delete/${created.id}").then().assertThat().statusCode(200)
+        given().delete("/tracker/calories/delete/${created.userId}/${created.added}/${created.id}").then().assertThat().statusCode(200)
     }
 
     @Test
@@ -171,7 +159,7 @@ class CalorieTrackerResourceTest {
     fun `should create and delete an entry and fail on read`() {
         val assured = given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry())
+            .body(entry(id = 3, userId = 1))
             .post("/tracker/calories/create")
             .then()
             .assertThat().statusCode(201)
@@ -179,13 +167,13 @@ class CalorieTrackerResourceTest {
         val createdEntry = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
 
         given()
-            .delete("/tracker/calories/delete/${createdEntry.id}")
+            .delete("/tracker/calories/delete/${createdEntry.userId}/${createdEntry.added}/${createdEntry.id}")
             .then()
             .assertThat()
             .statusCode(200)
 
         given()
-            .get("/tracker/calories/read/${createdEntry.id}")
+            .get("/tracker/calories/read/${createdEntry.userId}/${createdEntry.added}/${createdEntry.id}")
             .then()
             .assertThat()
             .statusCode(404)
@@ -198,15 +186,15 @@ class CalorieTrackerResourceTest {
         val today = LocalDate.now()
         val yesterday = today.minusDays(1)
 
-        val entry1 = entry()
+        val entry1 = entry(id = 1, userId = 1)
         entry1.userId = userId
         entry1.added = today
 
-        val entry2 = entry()
+        val entry2 = entry(id = 2, userId = 1)
         entry2.userId = userId
         entry2.added = today
 
-        val entry3 = entry()
+        val entry3 = entry(id = 3, userId = 1)
         entry3.userId = userId
         entry3.added = yesterday
 
@@ -237,10 +225,10 @@ class CalorieTrackerResourceTest {
     fun `should create two entries and list them`() {
         val userId = 17L
 
-        val entry1 = entry()
+        val entry1 = entry(id = 1, userId)
         entry1.userId = userId
 
-        val entry2 = entry()
+        val entry2 = entry(id = 2, userId)
         entry2.userId = userId
 
         val added = entry1.added
@@ -263,13 +251,16 @@ class CalorieTrackerResourceTest {
         assert(entries.map { it.id }.isNotEmpty())
     }
 
-    private fun entry(): CalorieTrackerEntry {
-        val entry = CalorieTrackerEntry()
-        entry.amount = 100f
-        entry.category = Category.SNACK
-        entry.added = LocalDate.now()
-        entry.userId = 1
+    private fun entry(id: Long, userId: Long): CalorieTrackerEntry {
+        val entry = CalorieTrackerEntry(
+            amount = 100f,
+            category = Category.SNACK,
+        )
 
-        return entry;
+        entry.id = id
+        entry.userId = userId
+        entry.added = LocalDate.now()
+
+        return entry
     }
 }

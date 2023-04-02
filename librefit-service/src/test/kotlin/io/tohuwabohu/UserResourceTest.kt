@@ -12,8 +12,6 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 @TestMethodOrder(OrderAnnotation::class)
 @QuarkusTest
 class UserResourceTest {
-
-
     @Test
     @Order(1)
     fun `should register user`() {
@@ -63,20 +61,18 @@ class UserResourceTest {
     }
 
     private fun user(): LibreUser {
-        val user = LibreUser()
-        user.email = "test1@test.dev"
-        user.password = "tastb1"
-        user.name = "testname"
-
-        return user
+        return LibreUser(
+            email = "test1@test.dev",
+            password = "tastb1",
+            name = "testname",
+        )
     }
 
     private fun failingUser(): LibreUser {
-        val failingUser = LibreUser()
-        failingUser.email = "test1@test.dev"
-        failingUser.password = "otherpasswordthanuser2b"
-        failingUser.name = "nottestname"
-
-        return failingUser
+        return LibreUser(
+            email = "test1@test.dev",
+            password = "otherpasswordthanuser2b",
+            name = "nottestname"
+        )
     }
 }
