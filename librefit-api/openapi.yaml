@@ -548,11 +548,9 @@ components:
         startAmount:
           format: float
           type: number
-          nullable: true
         endAmount:
           format: float
           type: number
-          nullable: true
         startDate:
           $ref: '#/components/schemas/LocalDateTime'
         endDate:
@@ -645,6 +643,5 @@ components:
         amount:
           format: float
           type: number
-          nullable: true
         updated:
           $ref: '#/components/schemas/LocalDateTime'
