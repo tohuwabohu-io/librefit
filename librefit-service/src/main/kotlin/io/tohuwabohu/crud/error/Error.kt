@@ -3,6 +3,7 @@ package io.tohuwabohu.crud.error
 import org.jboss.logging.Logger
 import javax.persistence.EntityNotFoundException
 import javax.persistence.NoResultException
+import javax.validation.ConstraintViolation
 import javax.ws.rs.core.Response
 import javax.ws.rs.ext.ExceptionMapper
 import javax.ws.rs.ext.Provider
@@ -31,9 +32,8 @@ fun createErrorResponse(throwable: Throwable): Response {
     }
 }
 
-class ErrorResponse(val message: String)
-
-class ValidationError(override val message: String) : Throwable()
+class ErrorResponse(val messages: List<String>)
+class ValidationError(val violations: List<String>) : Throwable()
 class UnmodifiedError(override val message: String) : Throwable()
 
 @Provider
@@ -44,7 +44,7 @@ class ValidationErrorMapper : ExceptionMapper<ValidationError> {
     override fun toResponse(exception: ValidationError): Response {
         log.error("Validation failed", exception)
 
-        return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(exception.message)).build()
+        return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(exception.violations)).build()
     }
 }
 

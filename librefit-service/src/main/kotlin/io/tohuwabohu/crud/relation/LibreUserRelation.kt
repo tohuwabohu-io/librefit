@@ -5,9 +5,12 @@ import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactiona
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
+import io.tohuwabohu.crud.error.ValidationError
 import java.io.Serializable
 import java.time.LocalDate
+import javax.inject.Inject
 import javax.persistence.*
+import javax.validation.Validator
 
 class LibreUserCompositeKey(
     var userId: Long = 0L,
@@ -39,6 +42,20 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
     }
 }
 abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : PanacheRepositoryBase<Entity, LibreUserCompositeKey> {
+    @Inject
+    lateinit var validator: Validator
+
+    @ReactiveTransactional
+    fun validateAndPersist(entity: Entity): Uni<Entity> {
+        val violations = validator.validate(entity)
+
+        if (violations.isNotEmpty()) {
+            throw ValidationError(violations.map { violation -> violation.message })
+        }
+
+        return persist(entity)
+    }
+
     fun readEntry(userId: Long, date: LocalDate, id: Long): Uni<Entity> {
         // TODO verify that entry belongs to logged in user -> return 404
 
