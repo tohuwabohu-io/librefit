@@ -10,6 +10,7 @@ import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.error.ValidationError
 import io.tohuwabohu.crud.relation.LibreUserCompositeKey
+import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import io.tohuwabohu.crud.util.enumContains
 import io.vertx.mutiny.pgclient.PgPool
@@ -66,7 +67,7 @@ enum class Category {
 }
 
 @ApplicationScoped
-class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : PanacheRepositoryBase<CalorieTrackerEntry, LibreUserCompositeKey> {
+class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : LibreUserRelatedRepository<CalorieTrackerEntry>() {
     @Inject
     lateinit var client: PgPool
 
@@ -75,18 +76,6 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
         validation.checkEntry(calorieTrackerEntry)
 
         return persistAndFlush(calorieTrackerEntry)
-    }
-
-    fun readEntry(userId: Long, date: LocalDate, id: Long): Uni<CalorieTrackerEntry> {
-        // TODO verify that entry belongs to logged in user -> return 404
-
-        val key = LibreUserCompositeKey(
-            userId = userId,
-            added = date,
-            id = id
-        )
-
-        return findById(key).onItem().ifNull().failWith(EntityNotFoundException())
     }
 
     @ReactiveTransactional
@@ -110,20 +99,6 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
             }.onItem().ifNull().failWith { UnmodifiedError(calorieTrackerEntry.toString()) }
     }
 
-    @ReactiveTransactional
-    fun deleteTrackingEntry(userId: Long, date: LocalDate, id: Long): Uni<Boolean> {
-        // TODO verify that entry belongs to logged in user -> return 404
-
-        val key = LibreUserCompositeKey(
-            userId = userId,
-            added = date,
-            id = id
-        )
-
-        return findById(key).onItem().ifNull().failWith(EntityNotFoundException()).onItem()
-            .ifNotNull().transformToUni { entry -> deleteById(entry.getPrimaryKey()) }
-    }
-
     fun listDatesForUser(userId: Long): Uni<List<LocalDate>?> {
         validation.checkUserId(userId)
 
@@ -132,13 +107,6 @@ class CalorieTrackerRepository(val validation: CalorieTrackerValidation) : Panac
             .transformToMulti { rowSet -> Multi.createFrom().iterable(rowSet) }.onItem()
             .transform { row -> row.getLocalDate("added") }.collect().asList().onItem()
             .invoke { list -> list.sortDescending() }.onFailure().invoke { throwable -> Log.error(throwable) }
-    }
-
-    fun listEntriesForUserAndDate(userId: Long, date: LocalDate): Uni<List<CalorieTrackerEntry>> {
-        validation.checkUserId(userId)
-        validation.checkAddedDate(added = date)
-
-        return list("userId = ?1 and added = ?2", userId, date)
     }
 }
 
