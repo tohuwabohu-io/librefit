@@ -12,6 +12,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
+import javax.validation.Valid
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
@@ -40,10 +41,10 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     @Operation(
         operationId = "createWeightTrackerEntry"
     )
-    fun create(weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
+    fun create(@Valid weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
         Log.info("Creating a new weight tracker entry=$weightTrackerEntry")
 
-        return weightTrackerRepository.create(weightTrackerEntry)
+        return weightTrackerRepository.validateAndPersist(weightTrackerEntry)
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).entity(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{throwable -> createErrorResponse(throwable) }
@@ -66,7 +67,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     @Operation(
         operationId = "updateWeightTrackerEntry"
     )
-    fun update(weightTracker: WeightTrackerEntry): Uni<Response> {
+    fun update(@Valid weightTracker: WeightTrackerEntry): Uni<Response> {
         Log.info("Updating weight tracker entry $weightTracker")
 
         return weightTrackerRepository.updateTrackingEntry(weightTracker)
@@ -127,7 +128,20 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 
     @GET
-    @Path("/list/{userId:\\d+}")
+    @Path("/list/{userId:\\d+}/{date}")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = Array<WeightTrackerEntry>::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
         operationId = "listWeightTrackerEntries"

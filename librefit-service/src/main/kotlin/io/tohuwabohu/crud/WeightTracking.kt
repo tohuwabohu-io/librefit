@@ -24,9 +24,9 @@ import javax.validation.constraints.Min
 
 @Entity
 data class WeightTrackerEntry (
-    @DecimalMin(value = "0.0", message = "Your weight should not be less than zero.")
-    var amount: Float,
-    var updated: LocalDateTime
+    @field:Min(value = 0, message = "Your weight should not be less than zero.")
+    var amount: Float = 0f,
+    var updated: LocalDateTime? = null
 ) : LibreUserWeakEntity() {
     @PrePersist
     fun setUpdatedFlag() {
@@ -52,13 +52,10 @@ data class WeightTrackerEntry (
 @ApplicationScoped
 class WeightTrackerRepository : LibreUserRelatedRepository<WeightTrackerEntry>() {
     @ReactiveTransactional
-    fun create(weightTrackerEntry: WeightTrackerEntry) = persist(weightTrackerEntry)
-
-    @ReactiveTransactional
     fun updateTrackingEntry(weightTrackerEntry: WeightTrackerEntry): Uni<Int> {
         // TODO verify that entry belongs to logged in user -> return 404
 
-        return findById(weightTrackerEntry.getPrimaryKey()).onItem().ifNotNull()
+        return findById(weightTrackerEntry.getPrimaryKey()).onItem().ifNull()
             .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni{ entry ->
                 val key = entry.getPrimaryKey()
 
