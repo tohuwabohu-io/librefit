@@ -45,13 +45,17 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     @Inject
     lateinit var validator: Validator
 
-    @ReactiveTransactional
-    fun validateAndPersist(entity: Entity): Uni<Entity> {
+    fun validate(entity: Entity) {
         val violations = validator.validate(entity)
 
         if (violations.isNotEmpty()) {
             throw ValidationError(violations.map { violation -> violation.message })
         }
+    }
+
+    @ReactiveTransactional
+    fun validateAndPersist(entity: Entity): Uni<Entity> {
+        validate(entity)
 
         return persist(entity)
     }
