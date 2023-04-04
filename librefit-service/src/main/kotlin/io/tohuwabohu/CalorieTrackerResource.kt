@@ -14,7 +14,10 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.enterprise.context.RequestScoped
+import javax.inject.Inject
 import javax.persistence.EntityNotFoundException
+import javax.validation.Valid
+import javax.validation.Validator
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
@@ -39,10 +42,10 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         )]),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun create(calorieTracker: CalorieTrackerEntry): Uni<Response> {
+    fun create(@Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
 
-        return calorieTrackerRepository.create(calorieTracker)
+        return calorieTrackerRepository.validateAndPersist(calorieTracker)
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).entity(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
@@ -62,7 +65,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         )]),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun update(calorieTracker: CalorieTrackerEntry): Uni<Response> {
+    fun update(@Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
         Log.info("Updating calorie tracker entry $calorieTracker")
 
         return calorieTrackerRepository.updateTrackingEntry(calorieTracker)
