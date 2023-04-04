@@ -523,6 +523,7 @@
     "/tracker/weight/create" : {
       "post" : {
         "tags" : [ "Weight Tracker Resource" ],
+        "operationId" : "createWeightTrackerEntry",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -534,16 +535,52 @@
         },
         "responses" : {
           "201" : {
-            "description" : "Created"
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WeightTrackerEntry"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
           }
         }
       }
     },
-    "/tracker/weight/delete/{id}" : {
+    "/tracker/weight/delete/{userId}/{date}/{id}" : {
       "delete" : {
         "tags" : [ "Weight Tracker Resource" ],
+        "operationId" : "deleteWeightTrackerEntry",
         "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
           "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "userId",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -555,20 +592,43 @@
           "200" : {
             "description" : "OK",
             "content" : {
+              "application/json" : { }
+            }
+          },
+          "304" : {
+            "description" : "Not Modified"
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "boolean"
+                  "$ref" : "#/components/schemas/ErrorResponse"
                 }
               }
             }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
           }
         }
       }
     },
-    "/tracker/weight/list/{userId}" : {
+    "/tracker/weight/list/{userId}/{date}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
+        "operationId" : "listWeightTrackerEntries",
         "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
           "name" : "userId",
           "in" : "path",
           "required" : true,
@@ -590,15 +650,44 @@
                 }
               }
             }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
           }
         }
       }
     },
-    "/tracker/weight/read/{id}" : {
+    "/tracker/weight/read/{userId}/{date}/{id}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
+        "operationId" : "readWeightTrackerEntry",
         "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
           "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "userId",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -616,6 +705,22 @@
                 }
               }
             }
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
           }
         }
       }
@@ -623,6 +728,7 @@
     "/tracker/weight/update" : {
       "put" : {
         "tags" : [ "Weight Tracker Resource" ],
+        "operationId" : "updateWeightTrackerEntry",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -633,8 +739,30 @@
           }
         },
         "responses" : {
-          "204" : {
-            "description" : "No Content"
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "304" : {
+            "description" : "Not Modified"
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
           }
         }
       }
@@ -721,7 +849,7 @@
         "type" : "string"
       },
       "CalorieTrackerEntry" : {
-        "required" : [ "added", "category" ],
+        "required" : [ "added", "amount", "category" ],
         "type" : "object",
         "properties" : {
           "userId" : {
@@ -737,6 +865,7 @@
           },
           "amount" : {
             "format" : "float",
+            "minimum" : 0,
             "type" : "number"
           },
           "category" : {
@@ -760,11 +889,14 @@
         "type" : "string"
       },
       "ErrorResponse" : {
-        "required" : [ "message" ],
+        "required" : [ "messages" ],
         "type" : "object",
         "properties" : {
-          "message" : {
-            "type" : "string"
+          "messages" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }
       },
@@ -887,7 +1019,7 @@
         }
       },
       "WeightTrackerEntry" : {
-        "required" : [ "added", "updated" ],
+        "required" : [ "added" ],
         "type" : "object",
         "properties" : {
           "userId" : {
@@ -903,10 +1035,15 @@
           },
           "amount" : {
             "format" : "float",
+            "minimum" : 0,
             "type" : "number"
           },
           "updated" : {
-            "$ref" : "#/components/schemas/LocalDateTime"
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            } ],
+            "nullable" : true
           }
         }
       }
