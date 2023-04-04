@@ -17,6 +17,7 @@
 	const add = () => {
 		dispatch('add', {
 			value,
+			id,
 			category,
 			dateStr
 		});
@@ -63,8 +64,10 @@
 		disabled = true;
 		editing = false;
 
-		value = previous.value;
-		category = previous.category;
+		if (changeAction === 'update') {
+			value = previous.value;
+			category = previous.category;
+		}
 	}
 </script>
 

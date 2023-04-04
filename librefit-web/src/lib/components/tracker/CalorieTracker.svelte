@@ -15,11 +15,13 @@
 	export let today: String;
 
 	let total = 0;
+	let sequence = 1;
 	let addValue = 0;
 	let trackerEntries = new Array<CalorieTrackerEntry>();
 
 	$: if (trackerEntries.length > 0) {
 		total = trackerEntries.map((entry) => entry.amount).reduce((a, b) => a + b);
+		sequence = Math.max(...trackerEntries.map((entry) => entry.id)) + 1;
 	}
 
 	const categories = Object.keys(Category).map((key) => {
@@ -38,6 +40,7 @@
 	const addEntry = (e) => {
 		const newEntry: CalorieTrackerEntry = {
 			userId: 1,
+			id: e.detail.id,
 			added: today,
 			amount: e.detail.value,
 			category: e.detail.category
@@ -116,7 +119,7 @@
 			<TrackerRadial bind:current={total} />
 
 			<div class="flex flex-col grow gap-4">
-				<TrackerInput {categories} bind:value={addValue} dateStr={date} id={-1} on:add={addEntry} />
+				<TrackerInput {categories} bind:value={addValue} dateStr={date} bind:id={sequence} on:add={addEntry} />
 				{#each trackerEntries as trackerInput}
 					<TrackerInput
 						disabled={true}
