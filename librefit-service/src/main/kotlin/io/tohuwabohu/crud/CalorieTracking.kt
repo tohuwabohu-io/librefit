@@ -15,7 +15,11 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.Entity
+import javax.persistence.EntityNotFoundException
+import javax.persistence.PreUpdate
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 
@@ -33,7 +37,7 @@ data class CalorieTrackerEntry (
     var updated: LocalDateTime? = null,
     var description: String? = null
 ) : LibreUserWeakEntity() {
-    @PrePersist
+    @PreUpdate
     fun setUpdatedFlag() {
         updated = LocalDateTime.now()
     }

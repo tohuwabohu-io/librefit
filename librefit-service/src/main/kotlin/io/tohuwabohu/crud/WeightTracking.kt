@@ -1,25 +1,16 @@
 package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.UnmodifiedError
-import io.tohuwabohu.crud.relation.LibreUserCompositeKey
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import org.hibernate.Hibernate
-import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
-import javax.inject.Inject
 import javax.persistence.Entity
 import javax.persistence.EntityNotFoundException
-import javax.persistence.PrePersist
-import javax.validation.ConstraintViolationException
-import javax.validation.Valid
-import javax.validation.Validator
-import javax.validation.constraints.DecimalMin
+import javax.persistence.PreUpdate
 import javax.validation.constraints.Min
 
 @Entity
@@ -28,7 +19,7 @@ data class WeightTrackerEntry (
     var amount: Float = 0f,
     var updated: LocalDateTime? = null
 ) : LibreUserWeakEntity() {
-    @PrePersist
+    @PreUpdate
     fun setUpdatedFlag() {
         updated = LocalDateTime.now()
     }
