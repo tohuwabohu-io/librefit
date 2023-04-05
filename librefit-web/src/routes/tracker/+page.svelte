@@ -32,9 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>
-		LibreFit - Calorie Tracker
-	</title>
+	<title>LibreFit - Calorie Tracker</title>
 </svelte:head>
 
 <section>

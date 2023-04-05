@@ -60,24 +60,31 @@
 	};
 
 	const updateEntry = (e) => {
-		api.trackerCaloriesReadUserIdDateIdGet({
-			userId: 1,
-			id: e.detail.id,
-			date: e.detail.dateStr
-		}).then((entry: CalorieTrackerEntry) => {
-			entry.amount = e.detail.value;
-			entry.category = e.detail.category;
+		api
+			.trackerCaloriesReadUserIdDateIdGet({
+				userId: 1,
+				id: e.detail.id,
+				date: e.detail.dateStr
+			})
+			.then((entry: CalorieTrackerEntry) => {
+				entry.amount = e.detail.value;
+				entry.category = e.detail.category;
 
-			api.trackerCaloriesUpdatePut({ calorieTrackerEntry: entry}).then((_) => console.log('updated!')).catch(console.error)
-		})
+				api
+					.trackerCaloriesUpdatePut({ calorieTrackerEntry: entry })
+					.then((_) => console.log('updated!'))
+					.catch(console.error);
+			});
 	};
 
 	const deleteEntry = (e) => {
-		api.trackerCaloriesDeleteUserIdDateIdDelete({
-			userId: 1,
-			id: e.detail.id,
-			date: e.detail.dateStr
-		}).then((_) => {
+		api
+			.trackerCaloriesDeleteUserIdDateIdDelete({
+				userId: 1,
+				id: e.detail.id,
+				date: e.detail.dateStr
+			})
+			.then((_) => {
 				trackerEntries = trackerEntries.filter((entry) => entry.id !== e.detail.id);
 			})
 			.catch(console.error);
@@ -90,7 +97,8 @@
 	};
 
 	const loadEntry = async () => {
-		await api.trackerCaloriesListUserIdDateGet({
+		await api
+			.trackerCaloriesListUserIdDateGet({
 				date,
 				userId: 1
 			})
@@ -119,7 +127,13 @@
 			<TrackerRadial bind:current={total} />
 
 			<div class="flex flex-col grow gap-4">
-				<TrackerInput {categories} bind:value={addValue} dateStr={date} bind:id={sequence} on:add={addEntry} />
+				<TrackerInput
+					{categories}
+					bind:value={addValue}
+					dateStr={date}
+					bind:id={sequence}
+					on:add={addEntry}
+				/>
 				{#each trackerEntries as trackerInput}
 					<TrackerInput
 						disabled={true}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {createEventDispatcher} from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	export let value, dateStr, id;
 	export let existing = false;
@@ -11,7 +11,7 @@
 
 	let editing = false;
 
-	let previous: {category, value};
+	let previous: { category; value };
 	let changeAction;
 
 	const add = () => {
@@ -31,17 +31,20 @@
 			changeAction = action;
 
 			if (action === 'update') {
-				previous = { category, value }
+				previous = { category, value };
 			}
-		}
-	}
+		};
+	};
 
 	const update = (e: Event) => {
 		e.preventDefault();
 
 		if (value != previous.value || category != previous.category) {
 			dispatch('update', {
-				id, dateStr, value, category
+				id,
+				dateStr,
+				value,
+				category
 			});
 		}
 
@@ -68,7 +71,7 @@
 			value = previous.value;
 			category = previous.category;
 		}
-	}
+	};
 </script>
 
 <div class="flex gap-2">
@@ -83,29 +86,20 @@
 	</div>
 	{#if existing}
 		{#if !editing}
-			<button
-				class="btn-icon variant-filled-secondary"
-				on:click|preventDefault={change('update')}>
+			<button class="btn-icon variant-filled-secondary" on:click|preventDefault={change('update')}>
 				E
 			</button>
-			<button
-				class="btn-icon variant-filled"
-				on:click|preventDefault={change('delete')}>
-				D</button>
+			<button class="btn-icon variant-filled" on:click|preventDefault={change('delete')}> D</button>
 		{:else}
-			<button class="btn-icon variant-ghost-primary"
-					on:click={changeAction === 'update' ? update : remove}>
+			<button
+				class="btn-icon variant-ghost-primary"
+				on:click={changeAction === 'update' ? update : remove}
+			>
 				Y
 			</button>
-			<button class="btn-icon variant-ghost-error"
-					on:click|preventDefault={discard}>
-				N
-			</button>
+			<button class="btn-icon variant-ghost-error" on:click|preventDefault={discard}> N </button>
 		{/if}
 	{:else}
-		<button class="btn-icon variant-filled-primary"
-				on:click|preventDefault={add}>
-			A
-		</button>
+		<button class="btn-icon variant-filled-primary" on:click|preventDefault={add}> A </button>
 	{/if}
 </div>
