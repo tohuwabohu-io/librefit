@@ -16,7 +16,31 @@ class LibreUserCompositeKey(
     var userId: Long = 0L,
     var added: LocalDate = LocalDate.now(),
     var id: Long = 0L
-): Serializable
+): Serializable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LibreUserCompositeKey
+
+        if (userId != other.userId) return false
+        if (added != other.added) return false
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = userId.hashCode()
+        result = 31 * result + added.hashCode()
+        result = 31 * result + id.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "LibreUserCompositeKey(userId=$userId, added=$added, id=$id)"
+    }
+}
 
 @IdClass(LibreUserCompositeKey::class)
 @MappedSuperclass
@@ -74,6 +98,10 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
 
     fun listEntriesForUserAndDate(userId: Long, date: LocalDate): Uni<List<Entity>> {
         return list("userId = ?1 and added = ?2", userId, date)
+    }
+
+    fun listEntriesForUserAndDateRange(userId: Long, dateFrom: LocalDate, dateTo: LocalDate): Uni<List<Entity>> {
+        return list("userId = ?1 and added between ?2 and ?3", userId, dateFrom, dateTo)
     }
 
     @ReactiveTransactional
