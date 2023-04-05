@@ -417,6 +417,45 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
+  /tracker/weight/list/{userId}/{dateFrom}/{dateTo}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      operationId: listWeightTrackerEntriesRange
+      parameters:
+      - name: dateFrom
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: dateTo
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeightTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/weight/list/{userId}/{date}:
     get:
       tags:

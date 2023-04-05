@@ -205,6 +205,45 @@ class WeightTrackerResourceTest {
         assert(entries.map { it.id }.isNotEmpty())
     }
 
+    @Test
+    fun `should create three entries and list 2 in two date ranges`() {
+        val userId = 18L
+        val today = LocalDate.now()
+        val lastWeek = today.minusWeeks(1)
+        val lastMonth = today.minusMonths(1)
+
+        val entry1 = entry(id = 1, userId)
+        entry1.added = today
+
+        val entry2 = entry(id = 1, userId)
+        entry2.added = lastWeek
+
+        val entry3 = entry(id = 1, userId)
+        entry3.added = lastMonth
+
+        listOf(entry1, entry2, entry3).forEach { entry ->
+            RestAssured.given()
+                .header("Content-Type", ContentType.JSON)
+                .body(entry)
+                .post("/tracker/weight/create")
+                .then()
+                .assertThat()
+                .statusCode(201)
+        }
+
+        val range1Body = RestAssured.given().get("/tracker/weight/list/$userId/${entry2.added}/${entry1.added}").body
+        val range2Body = RestAssured.given().get("/tracker/weight/list/$userId/${entry3.added}/${entry2.added}").body
+
+        val range1Keys = range1Body.`as`(Array<WeightTrackerEntry>::class.java).map { it.getPrimaryKey() }
+        val range2Keys = range2Body.`as`(Array<WeightTrackerEntry>::class.java).map { it.getPrimaryKey() }
+
+        assert(range1Keys.containsAll(listOf(entry1.getPrimaryKey(), entry2.getPrimaryKey())))
+        assert(!range1Keys.contains(entry3.getPrimaryKey()))
+
+        assert(range2Keys.containsAll(listOf(entry2.getPrimaryKey(), entry3.getPrimaryKey())))
+        assert(!range2Keys.contains(entry1.getPrimaryKey()))
+    }
+
     private fun entry(id: Long, userId: Long): WeightTrackerEntry {
         val entry = WeightTrackerEntry(
             amount = 100f
