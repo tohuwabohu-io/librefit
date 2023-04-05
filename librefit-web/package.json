@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"@iconify/svelte": "^3.1.0",
 		"@playwright/test": "^1.28.1",
+		"@poppanator/sveltekit-svg": "^3.0.0",
 		"@rollup/plugin-typescript": "^11.0.0",
 		"@skeletonlabs/skeleton": "^1.0.0",
 		"@sveltejs/adapter-auto": "^2.0.0",

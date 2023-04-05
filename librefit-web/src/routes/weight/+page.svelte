@@ -4,6 +4,7 @@
 	import { DataViews, enumKeys, getDateAsStr } from '$lib/util';
 	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 	import { onMount } from 'svelte';
+	import NoScale from '$lib/assets/icons/scale-off.svg?component';
 
 	let filter = DataViews.Month;
 
@@ -22,7 +23,7 @@
     const loadEntries = async () => {
         if (filter === DataViews.Today) {
             return await api.listWeightTrackerEntries({
-				userId: 1,
+				userId: 2,
 				date: getDateAsStr(today)
 			}).then((result: Array<WeightTrackerEntry>) => {
 				entries = result;
@@ -39,7 +40,7 @@
 			}
 
 			return await api.listWeightTrackerEntriesRange({
-				userId: 1,
+				userId: 2,
 				dateFrom: getDateAsStr(fromDate),
 				dateTo: getDateAsStr(toDate)
 			}).then((result: Array<WeightTrackerEntry>) => {
@@ -63,6 +64,13 @@
 			{/each}
 		</RadioGroup>
 	</div>
+
+	{#if entries.length <= 0}
+		<div class="container mx-auto p-8 space-y-10">
+			<NoScale width={200} height={200} />
+			<p>No data.</p>
+		</div>
+	{/if}
 
 	{#each entries as entry}
 		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
