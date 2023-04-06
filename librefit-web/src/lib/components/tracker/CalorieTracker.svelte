@@ -10,6 +10,7 @@
 	import TrackerInput from '$lib/components/TrackerInput.svelte';
 	import { AccordionItem } from '@skeletonlabs/skeleton';
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
+	import { convertDateStrToDisplayDateStr } from '$lib/util.js';
 
 	export let date: String;
 	export let today: String;
@@ -99,7 +100,7 @@
 	const loadEntry = async () => {
 		await api
 			.trackerCaloriesListUserIdDateGet({
-				date,
+				date: date,
 				userId: 1
 			})
 			.then((entries: Array<CalorieTrackerEntry>) => {
@@ -121,7 +122,7 @@
 </script>
 
 <AccordionItem id={date} open={date === today} on:toggle|once={initialLoad}>
-	<svelte:fragment slot="summary">{date}</svelte:fragment>
+	<svelte:fragment slot="summary">{convertDateStrToDisplayDateStr(date)}</svelte:fragment>
 	<svelte:fragment slot="content">
 		<div class="flex gap-4 justify-between">
 			<TrackerRadial bind:current={total} />
