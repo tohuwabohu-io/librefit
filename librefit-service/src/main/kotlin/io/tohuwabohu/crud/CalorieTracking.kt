@@ -37,11 +37,6 @@ data class CalorieTrackerEntry (
     var updated: LocalDateTime? = null,
     var description: String? = null
 ) : LibreUserWeakEntity() {
-    @PreUpdate
-    fun setUpdatedFlag() {
-        updated = LocalDateTime.now()
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -76,10 +71,11 @@ class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>
                 val key = entry.getPrimaryKey()
 
                 update(
-                    "amount = ?1, category = ?2, description = ?3 where userId = ?4 and added = ?5 and id = ?6",
+                    "amount = ?1, category = ?2, description = ?3, updated = ?4 where userId = ?5 and added = ?6 and id = ?7",
                     calorieTrackerEntry.amount,
                     calorieTrackerEntry.category,
                     calorieTrackerEntry.description.let { "" },
+                    LocalDateTime.now(),
                     key.userId,
                     key.added,
                     key.id
