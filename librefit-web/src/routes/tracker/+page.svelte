@@ -2,9 +2,9 @@
 	import { Configuration, CalorieTrackerResourceApi } from 'librefit-api/rest';
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
-	import format from 'date-fns/format';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import { Accordion } from '@skeletonlabs/skeleton';
+	import {getDateAsStr} from '$lib/util';
 
 	const api = new CalorieTrackerResourceApi(
 		new Configuration({
@@ -13,7 +13,7 @@
 	);
 
 	let today = new Date();
-	let todayStr = format(today, 'yyyy-MM-dd');
+	let todayStr = getDateAsStr(today)
 
 	let availableDates = new Set<String>();
 	availableDates.add(todayStr);
