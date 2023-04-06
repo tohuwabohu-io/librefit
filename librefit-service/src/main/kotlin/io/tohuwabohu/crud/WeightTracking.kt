@@ -5,9 +5,11 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
+import io.vertx.mutiny.pgclient.PgPool
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
+import javax.inject.Inject
 import javax.persistence.Entity
 import javax.persistence.EntityNotFoundException
 import javax.persistence.PreUpdate
@@ -51,9 +53,15 @@ class WeightTrackerRepository : LibreUserRelatedRepository<WeightTrackerEntry>()
                 val key = entry.getPrimaryKey()
 
                 update(
-                    "amount = ?1 where user_id = ?2 and added = ?3 and id = ?4",
-                    weightTrackerEntry.amount, key.userId, key.added, key.id
+                    "amount = ?1, updated = ?2 where user_id = ?3 and added = ?4 and id = ?5",
+                    weightTrackerEntry.amount, LocalDateTime.now(), key.userId, key.added, key.id
                 )
             }.onItem().ifNull().failWith{ UnmodifiedError(weightTrackerEntry.toString()) }
     }
+
+    fun findLastEntry(userId: Long): Uni<WeightTrackerEntry?> {
+        return find("user_id = ?1 order by added desc, id desc", userId).firstResult()
+            .onItem().ifNull().failWith { EntityNotFoundException() }
+    }
+
 }

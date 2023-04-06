@@ -617,6 +617,46 @@
         }
       }
     },
+    "/tracker/weight/last/{userId}" : {
+      "get" : {
+        "tags" : [ "Weight Tracker Resource" ],
+        "operationId" : "findLastWeightTrackerEntry",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WeightTrackerEntry"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
+    },
     "/tracker/weight/list/{userId}/{dateFrom}/{dateTo}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],

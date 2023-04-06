@@ -4,7 +4,11 @@
 	import { DataViews, enumKeys, getDateAsStr } from '$lib/util';
 	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 	import { onMount } from 'svelte';
-	import NoScale from '$lib/assets/icons/scale-off.svg?component';
+	import { getDisplayDateAsStr } from '$lib/util';
+	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
+	import Scale from '$lib/assets/icons/scale-outline.svg?component';
+	import EditPencil from '$lib/assets/icons/lead-pencil.svg?component';
+	import NewSection from '$lib/assets/icons/new-section.svg?component';
 
 	let filter = DataViews.Month;
 
@@ -18,7 +22,9 @@
 
 	let entries: Array<WeightTrackerEntry> = [];
 
-	onMount(async () => { await loadEntries() });
+	onMount(async () => {
+		await loadEntries()
+	});
 
     const loadEntries = async () => {
         if (filter === DataViews.Today) {
@@ -44,7 +50,11 @@
 				dateFrom: getDateAsStr(fromDate),
 				dateTo: getDateAsStr(toDate)
 			}).then((result: Array<WeightTrackerEntry>) => {
-				entries = result;
+				if (result.length > 0) {
+					entries = result;
+				} else {
+
+				}
 			}).catch(console.log)
 		}
     }
@@ -56,26 +66,41 @@
 
 <section>
 	<div class="container mx-auto p-8 space-y-10">
-		<RadioGroup>
-			{#each enumKeys(DataViews) as dataView}
-				<RadioItem bind:group={filter} name="justify" value={DataViews[dataView]} on:change={loadEntries}
+		<div class="flex flex-col gap-4">
+			<RadioGroup>
+				{#each enumKeys(DataViews) as dataView}
+					<RadioItem bind:group={filter} name="justify" value={DataViews[dataView]} on:change={loadEntries}
 					>{dataView}</RadioItem
-				>
+					>
+				{/each}
+			</RadioGroup>
+
+
+			{#if entries.length <= 0}
+				<div class="flex flex-row gap-2">
+					<NoScale width={200} height={200} />
+					<div>
+						<p>
+							Seems like you have not tracked anything so far. Today is the best day to start!
+						</p>
+						<button class="btn">
+							<span>
+								<NewSection class="w-32 h-32" />
+							</span>
+						</button>
+					</div>
+				</div>
+			{/if}
+
+			{#each entries as entry}
+				<div class="flex flex-row gap-2">
+					<Scale width={200} height={200} />
+					<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
+						<div class="input-group-shim">kg</div>
+						<input type="number" placeholder="Amount..." bind:value={entry.amount} />
+					</div>
+				</div>
 			{/each}
-		</RadioGroup>
+		</div>
 	</div>
-
-	{#if entries.length <= 0}
-		<div class="container mx-auto p-8 space-y-10">
-			<NoScale width={200} height={200} />
-			<p>No data.</p>
-		</div>
-	{/if}
-
-	{#each entries as entry}
-		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-			<div class="input-group-shim">kg</div>
-			<input type="number" placeholder="Amount..." bind:value={entry.amount} />
-		</div>
-	{/each}
 </section>

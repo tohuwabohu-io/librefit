@@ -176,4 +176,28 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
             .onItem().transform { list -> Response.ok(list).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+
+    @GET
+    @Path("/last/{userId:\\d+}")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = WeightTrackerEntry::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+        operationId = "findLastWeightTrackerEntry"
+    )
+    fun findLast(userId: Long): Uni<Response> = weightTrackerRepository.findLastEntry(userId)
+        .onItem().transform { entry -> Response.ok(entry).build() }
+        .onFailure().invoke { e -> Log.error(e) }
+        .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 }

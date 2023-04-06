@@ -244,6 +244,51 @@ class WeightTrackerResourceTest {
         assert(!range2Keys.contains(entry1.getPrimaryKey()))
     }
 
+    @Test
+    fun `should fail on finding last entry`() {
+        val userId = 72L
+
+        RestAssured
+            .given()
+            .get("/tracker/weight/last/$userId")
+            .then().assertThat().statusCode(404)
+    }
+
+    @Test
+    fun `should create three entries and find max added and id`() {
+        val userId = 99L
+
+        val lastWeek = LocalDate.now().minusWeeks(1)
+        val lastMonth = LocalDate.now().minusMonths(1)
+
+        val entry1 = entry(1, userId)
+        entry1.added = lastWeek
+
+        val entry2 = entry(2, userId)
+        entry2.added = lastWeek
+
+        val entry3 = entry(1, userId)
+        entry3.added = lastMonth
+
+        listOf(entry1, entry2, entry3).forEach { entry ->
+            RestAssured.given()
+                .header("Content-Type", ContentType.JSON)
+                .body(entry)
+                .post("/tracker/weight/create")
+                .then()
+                .assertThat()
+                .statusCode(201)
+        }
+
+        val assured = RestAssured.given().get("/tracker/weight/last/$userId").then()
+
+        assured.assertThat().statusCode(200)
+
+        val lastEntry = assured.extract().body().`as`(WeightTrackerEntry::class.java)
+
+        assert(lastEntry.getPrimaryKey() == entry2.getPrimaryKey())
+    }
+
     private fun entry(id: Long, userId: Long): WeightTrackerEntry {
         val entry = WeightTrackerEntry(
             amount = 100f
