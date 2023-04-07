@@ -129,7 +129,7 @@
 
 			<div class="flex flex-col grow gap-4">
 				<TrackerInput
-					{categories}
+					categories={categories}
 					bind:value={addValue}
 					dateStr={date}
 					bind:id={sequence}
@@ -141,7 +141,7 @@
 						disabled={true}
 						existing={true}
 						value={trackerInput.amount}
-						{categories}
+						categories={categories}
 						category={trackerInput.category}
 						dateStr={date}
 						id={trackerInput.id}
