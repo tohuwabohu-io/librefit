@@ -24,9 +24,14 @@ tasks.openApiValidate {
 tasks.openApiGenerate {
     dependsOn(tasks.openApiValidate)
 
+    doFirst {
+        delete("${project.projectDir}/rest")
+    }
+
     inputSpec.set("openapi.yaml")
     outputDir.set("${project.projectDir}/rest")
     generatorName.set("typescript-fetch")
+    // generatorName.set("typescript")
     typeMappings.put("Date", "String") // see https://github.com/OpenAPITools/openapi-generator/issues/926
     additionalProperties.put("supportsES6", "true")
 }
