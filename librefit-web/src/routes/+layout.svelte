@@ -20,4 +20,4 @@
 	</svelte:fragment>
 </AppShell>
 
-<Toast />
+<Toast position={'tr'}/>
