@@ -8,12 +8,13 @@
 	import Check from '$lib/assets/icons/check.svg?component';
 	import CancelDelete from '$lib/assets/icons/trash-off.svg?component';
 	import CancelEdit from '$lib/assets/icons/pencil-off.svg?component';
+	import {Category} from 'librefit-api/rest';
 
 	export let value, dateStr, id;
 	export let existing = false;
 	export let disabled = false;
-	export let categories;
-	export let category;
+	export let categories = null;
+	export let category = Category.Unset;
 	export let unit;
 
 	const dispatch = createEventDispatcher();
