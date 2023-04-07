@@ -6,9 +6,10 @@
 	import { onMount } from 'svelte';
 	import { getDisplayDateAsStr } from '$lib/util';
 	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
-	import Scale from '$lib/assets/icons/scale-outline.svg?component';
-	import EditPencil from '$lib/assets/icons/lead-pencil.svg?component';
 	import NewSection from '$lib/assets/icons/new-section.svg?component';
+	import { toastStore } from '@skeletonlabs/skeleton';
+	import TrackerInput from '$lib/components/TrackerInput.svelte';
+	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 
 	let filter = DataViews.Month;
 
@@ -53,11 +54,29 @@
 				if (result.length > 0) {
 					entries = result;
 				} else {
-
+					api.findLastWeightTrackerEntry({
+						userId : 2
+					}).then((entry) => {
+						if (entry) {
+							entries = [ entry ];
+						}
+					}).catch((error) => {
+						if (!error.response || error.response.status !== 404) {
+							handleLoadError();
+						}
+					})
 				}
-			}).catch(console.log)
+			}).catch(handleLoadError)
 		}
     }
+
+	const handleLoadError = () => {
+		toastStore.trigger({
+			message: 'An error occured. Please try again later.',
+			background: 'variant-filled-warning',
+			autohide: false
+		})
+	}
 </script>
 
 <svelte:head>
@@ -75,7 +94,6 @@
 				{/each}
 			</RadioGroup>
 
-
 			{#if entries.length <= 0}
 				<div class="flex flex-row gap-2">
 					<NoScale width={200} height={200} />
@@ -92,6 +110,8 @@
 				</div>
 			{/if}
 
+			<WeightTracker bind:trackerEntries={entries} />
+<!--
 			{#each entries as entry}
 				<div class="flex flex-row gap-2">
 					<Scale width={200} height={200} />
@@ -102,5 +122,6 @@
 				</div>
 			{/each}
 		</div>
+-->
 	</div>
 </section>
