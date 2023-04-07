@@ -134,6 +134,7 @@
 					dateStr={date}
 					bind:id={sequence}
 					on:add={addEntry}
+					unit={'kcal'}
 				/>
 				{#each trackerEntries as trackerInput}
 					<TrackerInput
@@ -147,6 +148,7 @@
 						on:add={addEntry}
 						on:update={updateEntry}
 						on:remove={deleteEntry}
+						unit={'kcal'}
 					/>
 				{/each}
 			</div>
