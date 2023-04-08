@@ -47,3 +47,7 @@ export const getDisplayDateAsStr = (d: Date, locale?: string): string => {
 		return dateUtil.format(d, display_date_format);
 	}
 }
+
+export function weakEntityEquals(a: {id: number, added: string,  userId: number}, b: {id: number, added: string,  userId: number}) {
+	return a.id === b.id && a.added === b.added && a.userId === b.userId;
+}
