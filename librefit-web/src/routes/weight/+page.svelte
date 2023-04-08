@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-	import { Configuration, WeightTrackerResourceApi, WeightTrackerEntry } from 'librefit-api/rest';
-	import { DataViews, enumKeys, getDateAsStr } from '$lib/util';
-	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
-	import { onMount } from 'svelte';
-	import { getDisplayDateAsStr } from '$lib/util';
-	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
-	import NewSection from '$lib/assets/icons/new-section.svg?component';
-	import { toastStore } from '@skeletonlabs/skeleton';
-	import TrackerInput from '$lib/components/TrackerInput.svelte';
+	import {RadioGroup, RadioItem, toastStore} from '@skeletonlabs/skeleton';
+	import {DataViews, enumKeys, getDateAsStr} from '$lib/util';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
+	import {Configuration, WeightTrackerEntry, WeightTrackerResourceApi} from 'librefit-api/rest';
+	import {PUBLIC_API_BASE_PATH} from '$env/static/public';
+	import {onMount} from 'svelte';
 
 	let filter = DataViews.Month;
+	const today = new Date();
+
+	let entries: Array<WeightTrackerEntry> = [];
+	let firstTime = false;
 
 	const api = new WeightTrackerResourceApi(
 		new Configuration({
@@ -19,23 +18,15 @@
 		})
 	);
 
-	const today = new Date();
-
-	let entries: Array<WeightTrackerEntry> = [];
-
-	onMount(async () => {
-		await loadEntries()
-	});
-
-    const loadEntries = async () => {
-        if (filter === DataViews.Today) {
-            return await api.listWeightTrackerEntries({
-				userId: 2,
+	const loadEntries = async () => {
+		if (filter === DataViews.Today) {
+			return await api.listWeightTrackerEntries({
+				userId: 1,
 				date: getDateAsStr(today)
 			}).then((result: Array<WeightTrackerEntry>) => {
 				entries = result;
 			}).catch(console.log);
-        } else {
+		} else {
 			const toDate = today;
 			const fromDate = new Date();
 
@@ -47,7 +38,7 @@
 			}
 
 			return await api.listWeightTrackerEntriesRange({
-				userId: 2,
+				userId: 1,
 				dateFrom: getDateAsStr(fromDate),
 				dateTo: getDateAsStr(toDate)
 			}).then((result: Array<WeightTrackerEntry>) => {
@@ -63,12 +54,14 @@
 					}).catch((error) => {
 						if (!error.response || error.response.status !== 404) {
 							handleLoadError();
+						} else {
+							firstTime = true;
 						}
 					})
 				}
 			}).catch(handleLoadError)
 		}
-    }
+	}
 
 	const handleLoadError = () => {
 		toastStore.trigger({
@@ -77,6 +70,10 @@
 			autohide: false
 		})
 	}
+
+	onMount(async () => {
+		await loadEntries()
+	});
 </script>
 
 <svelte:head>
@@ -94,34 +91,7 @@
 				{/each}
 			</RadioGroup>
 
-			{#if entries.length <= 0}
-				<div class="flex flex-row gap-2">
-					<NoScale width={200} height={200} />
-					<div>
-						<p>
-							Seems like you have not tracked anything so far. Today is the best day to start!
-						</p>
-						<button class="btn">
-							<span>
-								<NewSection class="w-32 h-32" />
-							</span>
-						</button>
-					</div>
-				</div>
-			{/if}
-
-			<WeightTracker bind:trackerEntries={entries} />
-<!--
-			{#each entries as entry}
-				<div class="flex flex-row gap-2">
-					<Scale width={200} height={200} />
-					<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-						<div class="input-group-shim">kg</div>
-						<input type="number" placeholder="Amount..." bind:value={entry.amount} />
-					</div>
-				</div>
-			{/each}
+			<WeightTracker bind:entries={entries} bind:firstTime={firstTime} />
 		</div>
--->
 	</div>
 </section>
