@@ -3,7 +3,6 @@ import * as dateLocales from 'date-fns/locale'
 import type {WeightTrackerEntry} from 'librefit-api/rest';
 
 export enum DataViews {
-	Today = 'TODAY',
 	Week = 'WEEK',
 	Month = 'MONTH',
 	Year = 'YEAR'
@@ -61,8 +60,10 @@ export function createWeightChart(view: DataViews, start: Date, entries: WeightT
 			if (sum) {
 				data[j] = sum / values.length;
 			} else {
-				data[j] = 0;
+				data[j] = NaN;
 			}
+		} else {
+			data[j] = NaN;
 		}
 
 		legend[j] = dateUtil.format(tmpDate, format.valueOf(), { locale: dateLocales.enGB });
@@ -76,26 +77,27 @@ export function createWeightChart(view: DataViews, start: Date, entries: WeightT
 export function createWeightChartDataset(weight: number[]) {
 	return {
 		label: 'Weight',
-		fill: true,
-		lineTension: 0.3,
-		backgroundColor: 'rgba(225, 204,230, .3)',
-		borderColor: 'rgb(205, 130, 158)',
-		borderCapStyle: 'butt',
-		borderDash: [],
-		borderDashOffset: 0.0,
-		borderJoinStyle: 'miter',
-		pointBorderColor: 'rgb(205, 130,1 58)',
-		pointBackgroundColor: 'rgb(255, 255, 255)',
-		pointBorderWidth: 10,
-		pointHoverRadius: 5,
-		pointHoverBackgroundColor: 'rgb(0, 0, 0)',
-		pointHoverBorderColor: 'rgba(220, 220, 220,1)',
-		pointHoverBorderWidth: 2,
 		pointRadius: 1,
 		pointHitRadius: 10,
+		segment: {
+			borderColor: (ctx: any) => skipped(ctx, 'rgb(0,0,0,0.2)') || down(ctx, 'rgb(204 217 77)') || up(ctx, 'rgb(165 29 45)'),
+			borderDash: (ctx: any) => skipped(ctx, [6, 6]),
+		},
+		options: {
+			fill: false,
+			interaction: {
+				intersect: false
+			},
+			radius: 0,
+		},
+		spanGaps: true,
 		data: weight
 	}
 }
+
+const skipped = (ctx: any, value: any) => ctx.p0.skip || ctx.p1.skip ? value : undefined;
+const down = (ctx: any, value: any) => ctx.p0.parsed.y > ctx.p1.parsed.y ? value : undefined;
+const up = (ctx: any, value: any) => ctx.p0.parsed.y < ctx.p1.parsed.y ? value: undefined;
 
 export function getDateAsStr(d: Date, format?: String): String {
 	if (!format) {
