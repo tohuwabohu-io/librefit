@@ -2,28 +2,30 @@
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
-    import {getDateAsStr} from '$lib/util.js';
+    import { getDateAsStr } from '$lib/util.js';
     import { createEventDispatcher } from 'svelte';
 
     export let entries;
     export let firstTime = false;
-
-    let addValue = 0;
-    let sequence = 1;
+    export let initialAmount = 0;
 
     const todayDateStr = getDateAsStr(new Date());
+
     const dispatch = createEventDispatcher();
+    let sequence = 1;
 
     const addWeight = (e) => {
         dispatch('addWeight', {
-            sequence, addValue, todayDateStr
+            sequence: getLastSequence(),
+            date: todayDateStr,
+            value: e.detail.value
         });
     }
 
     const updateWeight = (e) => {
         dispatch('updateWeight', {
             sequence: e.detail.id,
-            date: e.detail.dateStr,
+            date: e.detail.date,
             value: e.detail.value
         });
     }
@@ -31,10 +33,13 @@
     const deleteWeight = (e) => {
         dispatch('deleteWeight', {
             sequence: e.detail.id,
-            date: e.detail.dateStr
+            date: e.detail.date
         });
     }
 
+    const getLastSequence = () => {
+        return Math.max(...entries.filter(entry => entry.added === todayDateStr).map(entry => entry.id)) + 1;
+    }
 
 </script>
 
@@ -56,7 +61,7 @@
             {/if}
 
             <TrackerInput
-                    bind:value={addValue}
+                    bind:value={initialAmount}
                     dateStr={todayDateStr}
                     bind:id={sequence}
                     on:add={addWeight}
