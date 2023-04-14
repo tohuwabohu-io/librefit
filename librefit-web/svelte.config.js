@@ -13,6 +13,10 @@ const config = {
 		})
 	],
 
+	ssr: {
+		noExternal: ['chart.js']
+	},
+
 	kit: {
 		adapter: adapter()
 	}
