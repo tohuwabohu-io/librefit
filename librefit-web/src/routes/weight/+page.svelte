@@ -1,16 +1,22 @@
 <script lang="ts">
 	import {RadioGroup, RadioItem, toastStore} from '@skeletonlabs/skeleton';
-	import {DataViews, enumKeys, getDateAsStr} from '$lib/util';
+	import {DataViews, enumKeys, getDateAsStr, weakEntityEquals, createWeightChart, createWeightChartDataset} from '$lib/util';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {Configuration, WeightTrackerEntry, WeightTrackerResourceApi} from 'librefit-api/rest';
 	import {PUBLIC_API_BASE_PATH} from '$env/static/public';
 	import {onMount} from 'svelte';
+	import {Line} from 'svelte-chartjs';
+	import { Chart, registerables } from 'chart.js';
 
-	let filter = DataViews.Month;
+	Chart.register(...registerables);
+
+	let filter = DataViews.Year;
 	const today = new Date();
 
 	let entries: Array<WeightTrackerEntry> = [];
 	let firstTime = false;
+	let initialAmount = 0;
+	let chartData;
 
 	const api = new WeightTrackerResourceApi(
 		new Configuration({
@@ -25,7 +31,8 @@
 				date: getDateAsStr(today)
 			}).then((result: Array<WeightTrackerEntry>) => {
 				entries = result;
-			}).catch(console.log);
+				paint();
+			}).catch(handleLoadError);
 		} else {
 			const toDate = today;
 			const fromDate = new Date();
@@ -44,16 +51,18 @@
 			}).then((result: Array<WeightTrackerEntry>) => {
 				if (result.length > 0) {
 					entries = result;
+
+					paint();
 				} else {
 					api.findLastWeightTrackerEntry({
-						userId : 2
+						userId : 1
 					}).then((entry) => {
 						if (entry) {
 							entries = [ entry ];
 						}
 					}).catch((error) => {
 						if (!error.response || error.response.status !== 404) {
-							handleLoadError();
+							handleLoadError(error);
 						} else {
 							firstTime = true;
 						}
@@ -63,7 +72,80 @@
 		}
 	}
 
-	const handleLoadError = () => {
+	const paint = () => {
+		const chart = createWeightChart(filter, today, entries);
+		const dataset = createWeightChartDataset(chart.data);
+
+		console.log(chart.legend);
+		console.log(dataset);
+
+		chartData = {
+			labels: chart.legend,
+			datasets: [dataset]
+		}
+	}
+
+	const add = (e) => {
+		const newEntry: WeightTrackerEntry = {
+			userId: 1,
+			id: e.detail.sequence,
+			added: e.detail.todayDateStr,
+			amount: e.detail.value
+		}
+
+		api.createWeightTrackerEntry({
+			weightTrackerEntry: newEntry
+		}).then((result: WeightTrackerEntry) => {
+			entries.push(result);
+			entries = entries;
+
+			initialAmount = 0;
+
+			toastStore.trigger({
+				message: 'Weight added successfully!',
+				background: 'variant-filled-primary',
+				autohide: true
+			})
+		}).catch(handleLoadError)
+	}
+
+	const update = (e) => {
+		api.readWeightTrackerEntry({
+			userId: 1,
+			id: e.detail.sequence,
+			date: e.detail.date
+		}).then((entry: WeightTrackerEntry) => {
+			entry.amount = e.detail.value;
+
+			api.updateWeightTrackerEntry({
+				weightTrackerEntry: entry
+			}).then(_ => {
+				toastStore.trigger({
+					message: 'Update successful.',
+					background: 'variant-filled-primary',
+					autohide: true
+				})
+			}).catch(handleLoadError)
+		}).catch(handleLoadError)
+	}
+
+	const remove = (e) => {
+		api.deleteWeightTrackerEntry({
+			userId: 1,
+			id: e.detail.sequence,
+			date: e.detail.date
+		}).then(_ => {
+			entries = entries.filter((entry: WeightTrackerEntry) => !weakEntityEquals(entry, {
+				id: e.detail.id,
+				added: e.detail.date,
+				userId: 1
+			}));
+		}).catch(handleLoadError)
+	}
+
+	const handleLoadError = (err) => {
+		console.error(err);
+
 		toastStore.trigger({
 			message: 'An error occured. Please try again later.',
 			background: 'variant-filled-warning',
@@ -91,7 +173,10 @@
 				{/each}
 			</RadioGroup>
 
-			<WeightTracker bind:entries={entries} bind:firstTime={firstTime} />
+			<Line data={chartData} options={{responsive: true}} />
+
+			<WeightTracker bind:entries={entries} bind:firstTime={firstTime} bind:initialAmount={initialAmount}
+				on:addWeight={add} on:updateWeight={update} on:deleteWeight={remove}/>
 		</div>
 	</div>
 </section>
