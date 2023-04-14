@@ -26,10 +26,10 @@
 
 	const add = () => {
 		dispatch('add', {
-			value,
-			id,
-			category,
-			dateStr
+			sequence: id,
+			date: dateStr,
+			value: value,
+			category: category
 		});
 	};
 
@@ -51,10 +51,10 @@
 
 		if (value != previous.value || category != previous.category) {
 			dispatch('update', {
-				id,
-				dateStr,
-				value,
-				category
+				sequence: id,
+				date: dateStr,
+				value: value,
+				category: category
 			});
 		}
 
@@ -66,7 +66,8 @@
 		e.preventDefault();
 
 		dispatch('remove', {
-			id
+			sequence: id,
+			date: dateStr
 		});
 
 		disabled = true;
