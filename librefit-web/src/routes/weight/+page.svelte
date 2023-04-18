@@ -10,7 +10,7 @@
 
 	Chart.register(...registerables);
 
-	let filter = DataViews.Year;
+	let filter = DataViews.Month;
 	const today = new Date();
 
 	let entries: Array<WeightTrackerEntry> = [];
