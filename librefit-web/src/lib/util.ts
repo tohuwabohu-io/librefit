@@ -76,11 +76,8 @@ export function createWeightChart(view: DataViews, start: Date, entries: WeightT
 
 export function createWeightChartDataset(weight: number[]) {
 	return {
-		label: 'Weight',
-		segment: {
-			borderColor: (ctx: any) => skipped(ctx, 'rgb(0,0,0,0.2)') || down(ctx, 'rgb(204 217 77)') || up(ctx, 'rgb(165 29 45)'),
-			borderDash: (ctx: any) => skipped(ctx, [6, 6]),
-		},
+		label: 'Weight (kg)',
+		borderColor: 'rgb(14 165 233)',
 		options: {
 			fill: false,
 			interaction: {
