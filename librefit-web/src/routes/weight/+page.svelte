@@ -14,7 +14,7 @@
 	const today = new Date();
 
 	let entries: Array<WeightTrackerEntry> = [];
-	let firstTime = false;
+	let lastEntry;
 	let initialAmount = 0;
 	let chartData, chartOptions;
 
@@ -25,78 +25,71 @@
 	);
 
 	const loadEntries = async () => {
-		if (filter === DataViews.Today) {
-			return await api.listWeightTrackerEntries({
-				userId: 1,
-				date: getDateAsStr(today)
-			}).then((result: Array<WeightTrackerEntry>) => {
-				entries = result;
-				paint();
-			}).catch(handleLoadError);
-		} else {
-			const toDate = today;
-			const fromDate = new Date();
-
-			switch (filter) {
-				case DataViews.Week: fromDate.setDate(fromDate.getDate() -7); break;
-				case DataViews.Month: fromDate.setMonth(fromDate.getMonth() - 1); break;
-				case DataViews.Year: fromDate.setFullYear(fromDate.getFullYear() - 1); break;
-				default: break;
+		await api.findLastWeightTrackerEntry({
+			userId: 1
+		}).catch((error) => {
+			if (!error.response || error.response.status !== 404) {
+				handleLoadError(error);
 			}
+		}).then((entry) => {
+			lastEntry = entry;
 
-			return await api.listWeightTrackerEntriesRange({
-				userId: 1,
-				dateFrom: getDateAsStr(fromDate),
-				dateTo: getDateAsStr(toDate)
-			}).then((result: Array<WeightTrackerEntry>) => {
-				if (result.length > 0) {
+			if (filter === DataViews.Today) {
+				api.listWeightTrackerEntries({
+					userId: 1,
+					date: getDateAsStr(today)
+				}).then((result: Array<WeightTrackerEntry>) => {
 					entries = result;
 
 					paint();
-				} else {
-					api.findLastWeightTrackerEntry({
-						userId : 1
-					}).then((entry) => {
-						if (entry) {
-							// entries = [ entry ];
-						}
-					}).catch((error) => {
-						if (!error.response || error.response.status !== 404) {
-							handleLoadError(error);
-						} else {
-							firstTime = true;
-						}
-					})
+				}).catch(handleLoadError);
+			} else {
+				const toDate = today;
+				const fromDate = new Date();
+
+				switch (filter) {
+					case DataViews.Week: fromDate.setDate(fromDate.getDate() -7); break;
+					case DataViews.Month: fromDate.setMonth(fromDate.getMonth() - 1); break;
+					case DataViews.Year: fromDate.setFullYear(fromDate.getFullYear() - 1); break;
+					default: break;
 				}
-			}).catch(handleLoadError)
-		}
+
+				api.listWeightTrackerEntriesRange({
+					userId: 1,
+					dateFrom: getDateAsStr(fromDate),
+					dateTo: getDateAsStr(toDate)
+				}).then((result: Array<WeightTrackerEntry>) => {
+					entries = result;
+
+					paint();
+				}).catch(handleLoadError)
+			}
+		})
 	}
 
 	const paint = () => {
-		if (filter != DataViews.Today) {
+		const noNaN = entries.map(entry => entry.amount);
+
+		if (filter !== DataViews.Today) {
 			const chart = createWeightChart(filter, today, entries);
 			const dataset = createWeightChartDataset(chart.data);
-			const noNaN = chart.data.filter(weight => !Number.isNaN(weight));
-
-			console.log(chart.legend);
-			console.log(dataset);
 
 			chartData = {
 				labels: chart.legend,
 				datasets: [dataset]
 			}
+		} else {
+			chartData = null;
+		}
 
-			chartOptions = {
-				responsive: true,
-				scales: {
-					y: {
-						suggestedMin: Math.min(...noNaN) - 2.5,
-						suggestedMax: Math.max(...noNaN) + 2.5
-					}
+		chartOptions = {
+			responsive: true,
+			scales: {
+				y: {
+					suggestedMin: Math.min(...noNaN) - 2.5,
+					suggestedMax: Math.max(...noNaN) + 2.5
 				}
 			}
-
-			console.log(chartOptions);
 		}
 	}
 
@@ -155,7 +148,7 @@
 			date: e.detail.date
 		}).then(_ => {
 			entries = entries.filter((entry: WeightTrackerEntry) => !weakEntityEquals(entry, {
-				id: e.detail.id,
+				id: e.detail.sequence,
 				added: e.detail.date,
 				userId: 1
 			}));
@@ -194,9 +187,11 @@
 				{/each}
 			</RadioGroup>
 
-			<Line data={chartData} options={chartOptions} />
+			{#if chartData}
+				<Line data={chartData} options={chartOptions} />
+			{/if}
 
-			<WeightTracker bind:entries={entries} bind:initialAmount={initialAmount}
+			<WeightTracker bind:entries={entries} {lastEntry} bind:initialAmount={initialAmount}
 				on:addWeight={add} on:updateWeight={update} on:deleteWeight={remove}/>
 		</div>
 	</div>
