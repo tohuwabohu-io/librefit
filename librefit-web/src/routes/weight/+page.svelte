@@ -16,7 +16,7 @@
 	let entries: Array<WeightTrackerEntry> = [];
 	let firstTime = false;
 	let initialAmount = 0;
-	let chartData;
+	let chartData, chartOptions;
 
 	const api = new WeightTrackerResourceApi(
 		new Configuration({
@@ -58,7 +58,7 @@
 						userId : 1
 					}).then((entry) => {
 						if (entry) {
-							entries = [ entry ];
+							// entries = [ entry ];
 						}
 					}).catch((error) => {
 						if (!error.response || error.response.status !== 404) {
@@ -73,15 +73,30 @@
 	}
 
 	const paint = () => {
-		const chart = createWeightChart(filter, today, entries);
-		const dataset = createWeightChartDataset(chart.data);
+		if (filter != DataViews.Today) {
+			const chart = createWeightChart(filter, today, entries);
+			const dataset = createWeightChartDataset(chart.data);
+			const noNaN = chart.data.filter(weight => !Number.isNaN(weight));
 
-		console.log(chart.legend);
-		console.log(dataset);
+			console.log(chart.legend);
+			console.log(dataset);
 
-		chartData = {
-			labels: chart.legend,
-			datasets: [dataset]
+			chartData = {
+				labels: chart.legend,
+				datasets: [dataset]
+			}
+
+			chartOptions = {
+				responsive: true,
+				scales: {
+					y: {
+						suggestedMin: Math.min(...noNaN) - 2.5,
+						suggestedMax: Math.max(...noNaN) + 2.5
+					}
+				}
+			}
+
+			console.log(chartOptions);
 		}
 	}
 
@@ -105,7 +120,9 @@
 				message: 'Weight added successfully!',
 				background: 'variant-filled-primary',
 				autohide: true
-			})
+			});
+
+			paint();
 		}).catch(handleLoadError)
 	}
 
@@ -125,6 +142,8 @@
 					background: 'variant-filled-primary',
 					autohide: true
 				})
+
+				paint();
 			}).catch(handleLoadError)
 		}).catch(handleLoadError)
 	}
@@ -140,6 +159,8 @@
 				added: e.detail.date,
 				userId: 1
 			}));
+
+			paint();
 		}).catch(handleLoadError)
 	}
 
@@ -173,9 +194,9 @@
 				{/each}
 			</RadioGroup>
 
-			<Line data={chartData} options={{responsive: true}} />
+			<Line data={chartData} options={chartOptions} />
 
-			<WeightTracker bind:entries={entries} bind:firstTime={firstTime} bind:initialAmount={initialAmount}
+			<WeightTracker bind:entries={entries} bind:initialAmount={initialAmount}
 				on:addWeight={add} on:updateWeight={update} on:deleteWeight={remove}/>
 		</div>
 	</div>
