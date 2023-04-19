@@ -3,6 +3,7 @@ import * as dateLocales from 'date-fns/locale'
 import type {WeightTrackerEntry} from 'librefit-api/rest';
 
 export enum DataViews {
+	Today = 'TODAY',
 	Week = 'WEEK',
 	Month = 'MONTH',
 	Year = 'YEAR'
