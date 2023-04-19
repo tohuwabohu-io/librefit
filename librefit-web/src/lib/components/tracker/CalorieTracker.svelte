@@ -41,7 +41,7 @@
 	const addEntry = (e) => {
 		const newEntry: CalorieTrackerEntry = {
 			userId: 1,
-			id: e.detail.id,
+			id: e.detail.sequence,
 			added: today,
 			amount: e.detail.value,
 			category: e.detail.category
@@ -64,8 +64,8 @@
 		api
 			.trackerCaloriesReadUserIdDateIdGet({
 				userId: 1,
-				id: e.detail.id,
-				date: e.detail.dateStr
+				id: e.detail.sequence,
+				date: e.detail.date
 			})
 			.then((entry: CalorieTrackerEntry) => {
 				entry.amount = e.detail.value;
@@ -82,11 +82,11 @@
 		api
 			.trackerCaloriesDeleteUserIdDateIdDelete({
 				userId: 1,
-				id: e.detail.id,
-				date: e.detail.dateStr
+				id: e.detail.sequence,
+				date: e.detail.date
 			})
 			.then((_) => {
-				trackerEntries = trackerEntries.filter((entry) => entry.id !== e.detail.id);
+				trackerEntries = trackerEntries.filter((entry) => entry.id !== e.detail.sequence);
 			})
 			.catch(console.error);
 	};
