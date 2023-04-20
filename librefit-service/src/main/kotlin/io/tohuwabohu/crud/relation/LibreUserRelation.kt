@@ -105,7 +105,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     }
 
     @ReactiveTransactional
-    fun deleteTrackingEntry(userId: Long, date: LocalDate, id: Long): Uni<Boolean> {
+    fun deleteEntry(userId: Long, date: LocalDate, id: Long): Uni<Boolean> {
         val key = LibreUserCompositeKey(
             userId = userId,
             added = date,

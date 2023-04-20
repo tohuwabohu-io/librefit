@@ -95,7 +95,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     fun delete(userId: Long, date: LocalDate, id: Long): Uni<Response> {
          Log.info("Delete weight tracker entry with userId=$userId added=$date id=$id")
 
-        return weightTrackerRepository.deleteTrackingEntry(userId, date, id)
+        return weightTrackerRepository.deleteEntry(userId, date, id)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }

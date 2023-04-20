@@ -1,7 +1,6 @@
 package io.tohuwabohu
 
 import io.quarkus.logging.Log
-import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.CalorieTrackerRepository
 import io.tohuwabohu.crud.CalorieTrackerEntry
@@ -12,12 +11,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.enterprise.context.RequestScoped
-import javax.inject.Inject
-import javax.persistence.EntityNotFoundException
 import javax.validation.Valid
-import javax.validation.Validator
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
@@ -113,7 +108,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     fun delete(userId: Long, date: LocalDate, id: Long): Uni<Response> {
         Log.info("Delete calorie tracker entry with id $id")
 
-        return calorieTrackerRepository.deleteTrackingEntry(userId, date, id)
+        return calorieTrackerRepository.deleteEntry(userId, date, id)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
