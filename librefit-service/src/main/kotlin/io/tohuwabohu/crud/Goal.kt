@@ -20,12 +20,8 @@ data class Goal (
     var endAmount: Float,
     var startDate: LocalDateTime,
     var endDate: LocalDateTime,
-    var updated: LocalDateTime
+    var updated: LocalDateTime? = null
 ) : LibreUserWeakEntity() {
-    @PreUpdate
-    fun setUpdatedFlag() {
-        updated = LocalDateTime.now()
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -56,7 +52,7 @@ class GoalsRepository : LibreUserRelatedRepository<Goal>() {
 
                 update(
                     "startAmount = ?1, endAmount = ?2, startDate = ?3, endDate = ?4, updated = ?5 where user_id = ?6 and added = ?7 and id = ?8",
-                    goal.startAmount, goal.endAmount, goal.startDate, goal.endDate, goal.updated, key.userId, key.added, key.id
+                    goal.startAmount, goal.endAmount, goal.startDate, goal.endDate, LocalDateTime.now(), key.userId, key.added, key.id
                 )
             }.onItem().ifNull().failWith{ UnmodifiedError(goal.toString()) }
     }
