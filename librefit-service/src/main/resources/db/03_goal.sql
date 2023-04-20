@@ -9,6 +9,7 @@ create table public.goal
     end_date     timestamp,
     start_amount real,
     start_date   timestamp,
+    updated timestamp,
     primary key (added, id, user_id)
 );
 
