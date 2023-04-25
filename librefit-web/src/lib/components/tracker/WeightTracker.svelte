@@ -4,9 +4,12 @@
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util.js';
     import { createEventDispatcher } from 'svelte';
+    import Add from '$lib/assets/icons/plus.svg?component';
+    import Edit from '$lib/assets/icons/pencil.svg?component';
 
     export let entries;
     export let lastEntry;
+    export let goal;
     export let initialAmount = 0;
 
     const todayDateStr = getDateAsStr(new Date());
@@ -52,19 +55,35 @@
                 <p>
                     Nothing tracked yet. Today is a good day to start!
                 </p>
-                <p>
-                    Goal: 75kg
-                </p>
             {:else}
                 <Scale width={100} height={100} />
 
                 <p>
                     Current weight: {lastEntry.amount}kg ({convertDateStrToDisplayDateStr(lastEntry.added)})
                 </p>
-                <p>
-                    Goal: 75kg
-                </p>
             {/if}
+
+            <div class="flex flex-row items-center gap-2">
+                {#if !goal}
+                    <p>
+                        No goal set up.
+                    </p>
+                    <button class="btn-icon variant-filled-secondary" on:click|preventDefault={console.log('add')}>
+                        <span>
+                            <Add/>
+                        </span>
+                    </button>
+                {:else}
+                    <p>
+                        Goal: {goal.endAmount}kg @ ({convertDateStrToDisplayDateStr(goal.endDate)})
+                    </p>
+                    <button class="btn-icon variant-filled-secondary" on:click|preventDefault={console.log('edit')}>
+                        <span>
+                            <Edit/>
+                        </span>
+                    </button>
+                {/if}
+            </div>
         </div>
 
         <div class="flex flex-col grow gap-4">
