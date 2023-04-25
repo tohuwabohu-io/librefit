@@ -15,7 +15,6 @@
 
 	let entries: Array<WeightTrackerEntry> = [];
 	let lastEntry;
-	let initialAmount = 0;
 	let chartData, chartOptions;
 
 	const api = new WeightTrackerResourceApi(
@@ -107,8 +106,6 @@
 			entries.push(result);
 			entries = entries;
 
-			initialAmount = 0;
-
 			toastStore.trigger({
 				message: 'Weight added successfully!',
 				background: 'variant-filled-primary',
@@ -187,12 +184,13 @@
 				{/each}
 			</RadioGroup>
 
+
+
 			{#if chartData}
 				<Line data={chartData} options={chartOptions} />
 			{/if}
-
-			<WeightTracker bind:entries={entries} {lastEntry} bind:initialAmount={initialAmount}
-				on:addWeight={add} on:updateWeight={update} on:deleteWeight={remove}/>
+			<WeightTracker bind:entries={entries} {lastEntry}
+						   on:addWeight={add} on:updateWeight={update} on:deleteWeight={remove}/>
 		</div>
 	</div>
 </section>

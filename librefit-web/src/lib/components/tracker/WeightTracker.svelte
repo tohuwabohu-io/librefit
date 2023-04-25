@@ -9,7 +9,6 @@
     export let entries;
     export let lastEntry;
     export let goal;
-    export let initialAmount = 0;
 
     const todayDateStr = getDateAsStr(new Date());
 
@@ -84,7 +83,7 @@
 
         {#if entries}
             <div class="flex flex-col grow gap-4">
-                <Accordion>
+                <Accordion class="variant-ghost-surface rounded-xl">
                     <AccordionItem>
                         <svelte:fragment slot="summary">History</svelte:fragment>
                         <svelte:fragment slot="content">
