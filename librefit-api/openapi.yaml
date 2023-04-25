@@ -13,24 +13,45 @@ paths:
     post:
       tags:
       - Goals Resource
+      operationId: createGoal
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Goal'
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Goal'
-  /goals/delete/{id}:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /goals/delete/{userId}/{date}/{id}:
     delete:
       tags:
       - Goals Resource
+      operationId: deleteGoal
       parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
       - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - name: userId
         in: path
         required: true
         schema:
@@ -40,13 +61,24 @@ paths:
         "200":
           description: OK
           content:
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
             application/json:
               schema:
-                type: boolean
-  /goals/latest/{userId}:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /goals/last/{userId}:
     get:
       tags:
       - Goals Resource
+      operationId: findLastGoal
       parameters:
       - name: userId
         in: path
@@ -61,11 +93,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Goal'
-  /goals/list/{userId}:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /goals/read/{userId}/{date}/{id}:
     get:
       tags:
       - Goals Resource
+      operationId: readGoal
       parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
       - name: userId
         in: path
         required: true
@@ -78,39 +130,44 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Goal'
-  /goals/read/{id}:
-    get:
-      tags:
-      - Goals Resource
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      responses:
-        "200":
-          description: OK
+                $ref: '#/components/schemas/Goal'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Goal'
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /goals/update:
     put:
       tags:
       - Goals Resource
+      operationId: updateGoal
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Goal'
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{diff}/{gain}:
     get:
       tags:
@@ -689,6 +746,8 @@ components:
     Goal:
       required:
       - added
+      - startAmount
+      - endAmount
       - startDate
       - endDate
       type: object
@@ -703,14 +762,21 @@ components:
           type: integer
         startAmount:
           format: float
+          minimum: 0
           type: number
         endAmount:
           format: float
+          minimum: 0
           type: number
         startDate:
-          $ref: '#/components/schemas/LocalDateTime'
+          $ref: '#/components/schemas/LocalDate'
         endDate:
-          $ref: '#/components/schemas/LocalDateTime'
+          $ref: '#/components/schemas/LocalDate'
+        updated:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
     LibreUser:
       required:
       - email
