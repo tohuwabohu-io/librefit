@@ -30,7 +30,7 @@ export function createWeightChart(view: DataViews, start: Date, entries: WeightT
 		case DataViews.Month: end = new Date(start.getFullYear(), start.getMonth(), 0).getDate();
 				format = 'dd.LL'; duration = { days: 1 }; break;
 		case DataViews.Week: end = 7; format = 'EEEEEE'; duration = { days: 1 }; break;
-		default: end = 1; format = ''; duration = {}; break;
+		default: end = 1; format = 'dd'; duration = {}; break;
 	}
 
 	let tmpDate = start;
