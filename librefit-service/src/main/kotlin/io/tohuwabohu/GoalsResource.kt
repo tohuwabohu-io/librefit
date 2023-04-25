@@ -133,12 +133,26 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     }
 
     @GET
-    @Path("/list/{userId:\\d+}")
+    @Path("/last/{userId:\\d+}")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = Goal::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
     @Produces(MediaType.APPLICATION_JSON)
-    fun list(userId: Long): Uni<List<Goal>> = goalsRepository.listByUser(userId)
-
-    @GET
-    @Path("/latest/{userId:\\d+}")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun latest(userId: Long): Uni<Goal> = goalsRepository.findLatestForUser(userId).onItem().transform { it.first() }
+    @Operation(
+        operationId = "findLastGoal"
+    )
+    fun latest(userId: Long): Uni<Response> = goalsRepository.findLastGoal(userId)
+        .onItem().transform { entry -> Response.ok(entry).build() }
+        .onFailure().invoke { e -> Log.error(e) }
+        .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 }

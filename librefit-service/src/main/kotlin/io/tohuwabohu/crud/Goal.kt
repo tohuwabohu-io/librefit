@@ -47,8 +47,10 @@ data class Goal(
 
 @ApplicationScoped
 class GoalsRepository : LibreUserRelatedRepository<Goal>() {
-    fun listByUser(userId: Number) = find("userId", userId).list()
-    fun findLatestForUser(userId: Number) = find("userId", userId).list() //..minByOrNull { it.startDate }!!
+    fun findLastGoal(userId: Number): Uni<Goal?> {
+        return find("user_id = ?1 order by added desc, id desc", userId).firstResult()
+            .onItem().ifNull().failWith { EntityNotFoundException() }
+    }
 
     @ReactiveTransactional
     fun updateGoal(goal: Goal): Uni<Int> {
