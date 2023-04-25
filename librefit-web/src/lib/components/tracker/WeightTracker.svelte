@@ -4,8 +4,7 @@
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util.js';
     import { createEventDispatcher } from 'svelte';
-    import Add from '$lib/assets/icons/plus.svg?component';
-    import Edit from '$lib/assets/icons/pencil.svg?component';
+    import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
 
     export let entries;
     export let lastEntry;
@@ -48,7 +47,7 @@
 
 <div class="flex flex-col grow gap-4">
     <div class="flex flex-col gap-4 justify-between">
-        <div class="flex flex-col gap-2 text-center items-center">
+        <div class="flex flex-col gap-4 text-center items-center">
             {#if !lastEntry}
                 <NoScale width={100} height={100} />
 
@@ -63,51 +62,50 @@
                 </p>
             {/if}
 
-            <div class="flex flex-row items-center gap-2">
-                {#if !goal}
-                    <p>
-                        No goal set up.
-                    </p>
-                    <button class="btn-icon variant-filled-secondary" on:click|preventDefault={console.log('add')}>
-                        <span>
-                            <Add/>
-                        </span>
-                    </button>
-                {:else}
-                    <p>
-                        Goal: {goal.endAmount}kg @ ({convertDateStrToDisplayDateStr(goal.endDate)})
-                    </p>
-                    <button class="btn-icon variant-filled-secondary" on:click|preventDefault={console.log('edit')}>
-                        <span>
-                            <Edit/>
-                        </span>
-                    </button>
-                {/if}
+            {#if !goal}
+                <p>
+                    No goal set up.
+                </p>
+            {:else}
+                <p>
+                    Goal: {goal.endAmount}kg @ ({convertDateStrToDisplayDateStr(goal.endDate)})
+                </p>
+            {/if}
+
+            <div class="btn-group variant-filled-primary">
+                <button>
+                    Update weight
+                </button>
+                <button>
+                    Update goal
+                </button>
             </div>
         </div>
 
-        <div class="flex flex-col grow gap-4">
-            <TrackerInput
-                    bind:value={initialAmount}
-                    dateStr={todayDateStr}
-                    bind:id={sequence}
-                    on:add={addWeight}
-                    unit={'kg'}
-            />
-            {#each entries as trackerInput}
-                <TrackerInput
-                        disabled={true}
-                        existing={true}
-                        value={trackerInput.amount}
-                        category={trackerInput.category}
-                        dateStr={trackerInput.added}
-                        id={trackerInput.id}
-                        on:add={addWeight}
-                        on:update={updateWeight}
-                        on:remove={deleteWeight}
-                        unit= {'kg'}
-                />
-            {/each}
-        </div>
+        {#if entries}
+            <div class="flex flex-col grow gap-4">
+                <Accordion>
+                    <AccordionItem>
+                        <svelte:fragment slot="summary">History</svelte:fragment>
+                        <svelte:fragment slot="content">
+                        {#each entries as trackerInput}
+                            <TrackerInput
+                                    disabled={true}
+                                    existing={true}
+                                    value={trackerInput.amount}
+                                    category={trackerInput.category}
+                                    dateStr={trackerInput.added}
+                                    id={trackerInput.id}
+                                    on:add={addWeight}
+                                    on:update={updateWeight}
+                                    on:remove={deleteWeight}
+                                    unit= {'kg'}
+                            />
+                        {/each}
+                        </svelte:fragment>
+                    </AccordionItem>
+                </Accordion>
+            </div>
+        {/if}
     </div>
 </div>
