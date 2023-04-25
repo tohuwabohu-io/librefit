@@ -6,9 +6,9 @@ create table public.goal
         constraint fk_user
             references public.libre_user,
     end_amount   real,
-    end_date     timestamp,
+    end_date     date,
     start_amount real,
-    start_date   timestamp,
+    start_date   date,
     updated timestamp,
     primary key (added, id, user_id)
 );

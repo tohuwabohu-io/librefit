@@ -1,25 +1,31 @@
 package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import org.hibernate.Hibernate
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.enterprise.context.ApplicationScoped
 import javax.persistence.Entity
 import javax.persistence.EntityNotFoundException
-import javax.persistence.PreUpdate
-import javax.transaction.Transactional
+import javax.validation.constraints.Min
+import javax.validation.constraints.NotNull
 
 @Entity
-data class Goal (
+data class Goal(
+    @field:NotNull(message = "The initial amount of your goal must not be empty.")
+    @field:Min(value = 0, message = "The initial amount of your goal must not be less than zero.")
     var startAmount: Float,
+    @field:NotNull(message = "The target amount of your goal must not be empty.")
+    @field:Min(value = 0, message = "The target amount of your goal must not be less than zero.")
     var endAmount: Float,
-    var startDate: LocalDateTime,
-    var endDate: LocalDateTime,
+    @field:NotNull(message = "The starting date of your goal must not be empty.")
+    var startDate: LocalDate,
+    @field:NotNull(message = "The end date of your goal must not be empty.")
+    var endDate: LocalDate,
     var updated: LocalDateTime? = null
 ) : LibreUserWeakEntity() {
 
