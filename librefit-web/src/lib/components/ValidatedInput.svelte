@@ -3,10 +3,11 @@
 <script lang="ts">
 	export let value = '';
 	export let name = 'control';
-	export let label = 'Input';
+	export let label = '';
 	export let type = 'text';
 	export let styling = 'input';
 	export let placeholder = '';
+	export let unit = '';
 	export let validateDetail: () => {
 		valid: boolean;
 		errorMessage?: string;
@@ -64,23 +65,30 @@
 <label class="label">
 	{#if type !== 'checkbox'}
 		<span class="flex justify-between">
-			<span class="self-center">
-				{label}
-			</span>
+			{#if label}
+				<span class="self-center">
+					{label}
+				</span>
+			{/if}
 			<span bind:this={error} class="text-sm invisible validation-error-text self-center">
 				{errorMessage}
 			</span>
 		</span>
-		<input
-			{name}
-			class={styling}
-			use:getType
-			{placeholder}
-			{required}
-			bind:this={control}
-			bind:value
-			on:focusout={validate}
-		/>
+		<div class={!unit ? '' : 'input-group input-group-divider grid-cols-[auto_1fr_auto]'}>
+			{#if unit}
+				<div class="input-group-shim">kg</div>
+			{/if}
+			<input
+				{name}
+				class={styling + !unit ? '' : 'rounded-none'}
+				use:getType
+				{placeholder}
+				{required}
+				bind:this={control}
+				bind:value
+				on:focusout={validate}
+			/>
+		</div>
 	{:else}
 		<span class="flex justify-between">
 			<span>
