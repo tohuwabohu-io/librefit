@@ -2,9 +2,10 @@
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
-    import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util.js';
+    import { convertDateStrToDisplayDateStr, getDateAsStr } from '$lib/util.js';
     import { createEventDispatcher } from 'svelte';
     import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
+    import { modalStore } from '@skeletonlabs/skeleton';
 
     export let entries;
     export let lastEntry;
@@ -38,8 +39,34 @@
         });
     }
 
+    const updateGoal = (e) => {
+
+    }
+
     const getLastSequence = () => {
         return Math.max(...entries.filter(entry => entry.added === todayDateStr).map(entry => entry.id)) + 1;
+    }
+
+    const showWeightModal = () => {
+        modalStore.trigger({
+            type: 'component',
+            component: 'weightModal',
+            response: (e) => {
+                if (e) {
+                    addWeight(e);
+                }
+
+                modalStore.close();
+            }
+        });
+    }
+
+    const showGoalModal = () => {
+        modalStore.trigger({
+            type: 'component',
+            component: 'goalModal',
+            response: (e) => updateGoal(e)
+        });
     }
 
 </script>
@@ -72,10 +99,10 @@
             {/if}
 
             <div class="btn-group variant-filled-primary">
-                <button>
+                <button on:click|preventDefault={showWeightModal}>
                     Update weight
                 </button>
-                <button>
+                <button on:click|preventDefault={showGoalModal}>
                     Update goal
                 </button>
             </div>
