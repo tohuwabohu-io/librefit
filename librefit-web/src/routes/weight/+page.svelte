@@ -2,7 +2,13 @@
 	import {RadioGroup, RadioItem, toastStore} from '@skeletonlabs/skeleton';
 	import {DataViews, enumKeys, getDateAsStr, weakEntityEquals, createWeightChart, createWeightChartDataset} from '$lib/util';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-	import {Configuration, WeightTrackerEntry, WeightTrackerResourceApi} from 'librefit-api/rest';
+	import {
+		Configuration,
+		WeightTrackerEntry,
+		WeightTrackerResourceApi,
+		GoalsResourceApi,
+		Goal
+	} from 'librefit-api/rest';
 	import {PUBLIC_API_BASE_PATH} from '$env/static/public';
 	import {onMount} from 'svelte';
 	import {Line} from 'svelte-chartjs';
@@ -16,8 +22,15 @@
 	let entries: Array<WeightTrackerEntry> = [];
 	let lastEntry;
 	let chartData, chartOptions;
+	let currentGoal;
 
 	const api = new WeightTrackerResourceApi(
+		new Configuration({
+			basePath: PUBLIC_API_BASE_PATH
+		})
+	);
+
+	const goalApi = new GoalsResourceApi(
 		new Configuration({
 			basePath: PUBLIC_API_BASE_PATH
 		})
@@ -63,7 +76,16 @@
 					paint();
 				}).catch(handleLoadError)
 			}
-		})
+		});
+
+		await goalApi.findLastGoal({
+			userId: 1
+		}).then((result: Goal) => currentGoal = result).catch((error) => {
+				if (!error.response || error.response.status !== 404) {
+					handleLoadError(error);
+				}
+			}
+		)
 	}
 
 	const paint = () => {
@@ -154,6 +176,20 @@
 		}).catch(handleLoadError)
 	}
 
+	const updateGoal = (e) => {
+		console.log(e);
+
+		if (!currentGoal) {
+			goalApi.createGoal(e.detail).then((response) => {
+				console.log(response)
+			}).catch(handleLoadError)
+		} else {
+			goalApi.updateGoal(e.detail).then((response) => {
+				console.log(response)
+			}).catch(handleLoadError)
+		}
+	}
+
 	const handleLoadError = (err) => {
 		console.error(err);
 
@@ -185,12 +221,17 @@
 			</RadioGroup>
 
 
-
 			{#if chartData}
 				<Line data={chartData} options={chartOptions} />
 			{/if}
-			<WeightTracker bind:entries={entries} {lastEntry}
-						   on:addWeight={add} on:updateWeight={update} on:deleteWeight={remove}/>
+			<WeightTracker bind:entries={entries}
+						   {lastEntry}
+						   bind:goal={currentGoal}
+						   on:addWeight={add}
+						   on:updateWeight={update}
+						   on:deleteWeight={remove}
+						   on:updateGoal={updateGoal}
+			/>
 		</div>
 	</div>
 </section>

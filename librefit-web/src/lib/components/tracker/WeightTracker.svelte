@@ -40,7 +40,11 @@
     }
 
     const updateGoal = (e) => {
+        console.log(e);
 
+        dispatch('updateGoal', {
+            goal: e.detail.goal
+        })
     }
 
     const getLastSequence = () => {
@@ -65,7 +69,13 @@
         modalStore.trigger({
             type: 'component',
             component: 'goalModal',
-            response: (e) => updateGoal(e)
+            response: (e) => {
+                if (e) {
+                    updateGoal(e)
+                }
+
+                modalStore.close();
+            }
         });
     }
 

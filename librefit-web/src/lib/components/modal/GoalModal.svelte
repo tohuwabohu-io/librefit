@@ -4,13 +4,11 @@
     import { Goal } from 'librefit-api/rest'
     import { getDateAsStr } from '$lib/util';
 
-    let value;
-
     const today = new Date();
 
     let goal: Goal = {
         added: getDateAsStr(today),
-        endDate: getDateAsStr(new Date(today.getDate(), today.getMonth(), today.getFullYear() + 1)),
+        endDate: getDateAsStr(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())),
         startDate: getDateAsStr(today),
         startAmount: 0,
         endAmount: 0
@@ -22,7 +20,7 @@
         if ($modalStore[0].response) {
             $modalStore[0].response({
                 detail: {
-                    value: value
+                    goal: goal
                 }
             });
         }
