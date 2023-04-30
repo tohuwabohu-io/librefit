@@ -11,7 +11,8 @@
         endDate: getDateAsStr(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())),
         startDate: getDateAsStr(today),
         startAmount: 0,
-        endAmount: 0
+        endAmount: 0,
+        id: 1
     }
 
     let startDateInput, endDateInput, startAmountInput, endAmountInput;

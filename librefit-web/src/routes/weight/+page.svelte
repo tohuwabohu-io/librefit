@@ -179,12 +179,15 @@
 	const updateGoal = (e) => {
 		console.log(e);
 
+		let goal: Goal = e.detail.goal as Goal;
+		goal.userId = 1;
+
 		if (!currentGoal) {
-			goalApi.createGoal(e.detail).then((response) => {
+			goalApi.createGoal({goal}).then((response) => {
 				console.log(response)
 			}).catch(handleLoadError)
 		} else {
-			goalApi.updateGoal(e.detail).then((response) => {
+			goalApi.updateGoal({goal}).then((response) => {
 				console.log(response)
 			}).catch(handleLoadError)
 		}
