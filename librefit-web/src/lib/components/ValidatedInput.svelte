@@ -89,7 +89,7 @@
 			{/if}
 			<input
 				{name}
-				class={styling + !unit ? '' : 'rounded-none'}
+				class={styling + (!unit ? '' : 'rounded-none')}
 				use:getType
 				{placeholder}
 				{required}
