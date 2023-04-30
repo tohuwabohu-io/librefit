@@ -118,7 +118,7 @@
             </div>
         </div>
 
-        {#if entries}
+        {#if entries && entries.length > 0}
             <div class="flex flex-col grow gap-4">
                 <Accordion class="variant-ghost-surface rounded-xl">
                     <AccordionItem>
