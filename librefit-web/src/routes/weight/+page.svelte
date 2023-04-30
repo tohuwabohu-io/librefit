@@ -184,11 +184,15 @@
 
 		if (!currentGoal) {
 			goalApi.createGoal({goal}).then((response) => {
-				console.log(response)
+				currentGoal = response;
 			}).catch(handleLoadError)
 		} else {
-			goalApi.updateGoal({goal}).then((response) => {
-				console.log(response)
+			goalApi.updateGoal({goal}).then(_ => {
+				goalApi.readGoal({
+					date: currentGoal.added,
+					userId: currentGoal.userId,
+					id: currentGoal.id
+				}).then((response) => currentGoal = response).catch(handleLoadError)
 			}).catch(handleLoadError)
 		}
 	}
