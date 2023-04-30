@@ -41,7 +41,7 @@
 			userId: 1
 		}).catch((error) => {
 			if (!error.response || error.response.status !== 404) {
-				handleLoadError(error);
+				handleApiError(error);
 			}
 		}).then((entry) => {
 			lastEntry = entry;
@@ -54,7 +54,7 @@
 					entries = result;
 
 					paint();
-				}).catch(handleLoadError);
+				}).catch(handleApiError);
 			} else {
 				const toDate = today;
 				const fromDate = new Date();
@@ -74,7 +74,7 @@
 					entries = result;
 
 					paint();
-				}).catch(handleLoadError)
+				}).catch(handleApiError)
 			}
 		});
 
@@ -82,7 +82,7 @@
 			userId: 1
 		}).then((result: Goal) => currentGoal = result).catch((error) => {
 				if (!error.response || error.response.status !== 404) {
-					handleLoadError(error);
+					handleApiError(error);
 				}
 			}
 		)
@@ -135,7 +135,7 @@
 			});
 
 			paint();
-		}).catch(handleLoadError)
+		}).catch(handleApiError)
 	}
 
 	const update = (e) => {
@@ -156,8 +156,8 @@
 				})
 
 				paint();
-			}).catch(handleLoadError)
-		}).catch(handleLoadError)
+			}).catch(handleApiError)
+		}).catch(handleApiError)
 	}
 
 	const remove = (e) => {
@@ -173,7 +173,7 @@
 			}));
 
 			paint();
-		}).catch(handleLoadError)
+		}).catch(handleApiError)
 	}
 
 	const updateGoal = (e) => {
@@ -185,19 +185,19 @@
 		if (!currentGoal) {
 			goalApi.createGoal({goal}).then((response) => {
 				currentGoal = response;
-			}).catch(handleLoadError)
+			}).catch(handleApiError)
 		} else {
 			goalApi.updateGoal({goal}).then(_ => {
 				goalApi.readGoal({
 					date: currentGoal.added,
 					userId: currentGoal.userId,
 					id: currentGoal.id
-				}).then((response) => currentGoal = response).catch(handleLoadError)
-			}).catch(handleLoadError)
+				}).then((response) => currentGoal = response).catch(handleApiError)
+			}).catch(handleApiError)
 		}
 	}
 
-	const handleLoadError = (err) => {
+	const handleApiError = (err) => {
 		console.error(err);
 
 		toastStore.trigger({
