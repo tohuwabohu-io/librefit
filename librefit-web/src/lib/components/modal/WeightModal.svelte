@@ -1,8 +1,6 @@
 <script lang="ts">
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import { modalStore } from '@skeletonlabs/skeleton';
-
-    export let parent: any;
+    import {modalStore} from '@skeletonlabs/skeleton';
 
     let value;
 
@@ -32,8 +30,14 @@
         <ValidatedInput bind:value type="number" unit="kg" required/>
     </div>
 
-    <footer>
-        <button on:click|preventDefault={onSubmit}>Submit</button>
-        <button on:click|preventDefault={onCancel}>Close</button>
+    <footer class="modal-footer flex justify-end space-x-2">
+
+        <button on:click|preventDefault={onCancel} class="btn variant-ringed">
+            Cancel
+        </button>
+
+        <button on:click|preventDefault={onSubmit} class="btn variant-filled">
+            Submit
+        </button>
     </footer>
 </div>
