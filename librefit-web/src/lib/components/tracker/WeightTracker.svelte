@@ -125,18 +125,28 @@
                         <svelte:fragment slot="summary">History</svelte:fragment>
                         <svelte:fragment slot="content">
                         {#each entries as trackerInput}
-                            <TrackerInput
-                                    disabled={true}
-                                    existing={true}
-                                    value={trackerInput.amount}
-                                    category={trackerInput.category}
-                                    dateStr={trackerInput.added}
-                                    id={trackerInput.id}
-                                    on:add={addWeight}
-                                    on:update={updateWeight}
-                                    on:remove={deleteWeight}
-                                    unit= {'kg'}
-                            />
+                            <div class="flex flex-row gap-4 items-center">
+                                <div>
+                                    <p>
+                                        { convertDateStrToDisplayDateStr(trackerInput.added) }
+                                    </p>
+                                </div>
+
+                                <div class="grow">
+                                    <TrackerInput
+                                            disabled={true}
+                                            existing={true}
+                                            value={trackerInput.amount}
+                                            category={trackerInput.category}
+                                            dateStr={trackerInput.added}
+                                            id={trackerInput.id}
+                                            on:add={addWeight}
+                                            on:update={updateWeight}
+                                            on:remove={deleteWeight}
+                                            unit= {'kg'}
+                                    />
+                                </div>
+                            </div>
                         {/each}
                         </svelte:fragment>
                     </AccordionItem>
