@@ -12,7 +12,7 @@
 			ref: WeightModal,
 		},
 
-		goalsModal: {
+		goalModal: {
 			ref: GoalModal,
 		}
 	};
