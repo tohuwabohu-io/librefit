@@ -18,10 +18,11 @@
 			skip: true
 		};
 	};
-	export let emptyMessage = `${label} is empty.`;
+
+	export let emptyMessage = `${label ? label : 'Field'} is empty.`;
 	export let required = false;
 
-	let control, error; // bound UI elements
+	let control, error, unitDisplay; // bound UI elements
 	let errorMessage = emptyMessage;
 
 	const getType = (node) => {
@@ -44,9 +45,17 @@
 		if (!valid) {
 			control.classList.add('input-error');
 			error.classList.remove('invisible');
+
+			if (unitDisplay) {
+				unitDisplay.classList.add('input-error');
+			}
 		} else {
 			error.classList.add('invisible');
 			control.classList.remove('input-error');
+
+			if (unitDisplay) {
+				unitDisplay.classList.remove('input-error');
+			}
 		}
 
 		return valid;
@@ -76,7 +85,7 @@
 		</span>
 		<div class={!unit ? '' : 'input-group input-group-divider grid-cols-[auto_1fr_auto]'}>
 			{#if unit}
-				<div class="input-group-shim">kg</div>
+				<div class="input-group-shim" bind:this={unitDisplay}>{unit}</div>
 			{/if}
 			<input
 				{name}
