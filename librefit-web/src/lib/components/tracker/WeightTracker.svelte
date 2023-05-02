@@ -2,19 +2,29 @@
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
-    import { convertDateStrToDisplayDateStr, getDateAsStr } from '$lib/util.js';
+    import {convertDateStrToDisplayDateStr, getDateAsStr, parseStringAsDate} from '$lib/util.js';
     import { createEventDispatcher } from 'svelte';
     import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
     import { modalStore } from '@skeletonlabs/skeleton';
+    import ValidatedInput from '$lib/components/ValidatedInput.svelte';
+    import * as dateUtil from 'date-fns';
+    import {onMount} from 'svelte';
 
     export let entries;
     export let lastEntry;
     export let goal;
 
+    const today = new Date();
     const todayDateStr = getDateAsStr(new Date());
+
+    let dateFilterRange = {
+        from: getDateAsStr(dateUtil.sub(today, { months: 1})),
+        to: getDateAsStr(today)
+    }
 
     const dispatch = createEventDispatcher();
     let sequence = 1;
+    let entriesFiltered = [];
 
     const addWeight = (e) => {
         dispatch('addWeight', {
@@ -79,6 +89,20 @@
         });
     }
 
+    const filterEntries = (e) => {
+        console.log("filter")
+
+        entriesFiltered = entries.filter((entry) => {
+            const addedDate = parseStringAsDate(entry.added);
+            const fromDate = parseStringAsDate(dateFilterRange.from);
+            const toDate = parseStringAsDate(dateFilterRange.to);
+
+            return toDate >= addedDate <= fromDate;
+        })
+    }
+
+    onMount(async () => filterEntries())
+
 </script>
 
 <div class="flex flex-col grow gap-4">
@@ -124,30 +148,43 @@
                     <AccordionItem>
                         <svelte:fragment slot="summary">History</svelte:fragment>
                         <svelte:fragment slot="content">
-                        {#each entries as trackerInput}
-                            <div class="flex flex-row gap-4 items-center">
-                                <div>
-                                    <p>
-                                        { convertDateStrToDisplayDateStr(trackerInput.added) }
-                                    </p>
-                                </div>
+                            {#if dateFilterRange}
+                                <div class="flex gap-4">
+                                    <ValidatedInput type="date" name="filterFrom" label="From" bind:value={dateFilterRange.from} />
+                                    <ValidatedInput type="date" name="filterTo" label="To" bind:value={dateFilterRange.to} />
 
-                                <div class="grow">
-                                    <TrackerInput
-                                            disabled={true}
-                                            existing={true}
-                                            value={trackerInput.amount}
-                                            category={trackerInput.category}
-                                            dateStr={trackerInput.added}
-                                            id={trackerInput.id}
-                                            on:add={addWeight}
-                                            on:update={updateWeight}
-                                            on:remove={deleteWeight}
-                                            unit= {'kg'}
-                                    />
+                                    <div class="self-center">
+                                        <button class="btn variant-filled" on:click={filterEntries}>
+                                            Filter
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        {/each}
+                            {/if}
+
+                            {#each entriesFiltered as trackerInput}
+                                <div class="flex flex-row gap-4 items-center">
+                                    <div>
+                                        <p>
+                                            { convertDateStrToDisplayDateStr(trackerInput.added) }
+                                        </p>
+                                    </div>
+
+                                    <div class="grow">
+                                        <TrackerInput
+                                                disabled={true}
+                                                existing={true}
+                                                value={trackerInput.amount}
+                                                category={trackerInput.category}
+                                                dateStr={trackerInput.added}
+                                                id={trackerInput.id}
+                                                on:add={addWeight}
+                                                on:update={updateWeight}
+                                                on:remove={deleteWeight}
+                                                unit= {'kg'}
+                                        />
+                                    </div>
+                                </div>
+                            {/each}
                         </svelte:fragment>
                     </AccordionItem>
                 </Accordion>
