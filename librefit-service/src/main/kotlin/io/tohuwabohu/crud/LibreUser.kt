@@ -6,8 +6,12 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.ValidationError
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
+import java.util.Arrays.asList
 import javax.enterprise.context.ApplicationScoped
+import javax.inject.Inject
 import javax.persistence.*
+import javax.validation.Validator
+import javax.validation.constraints.NotNull
 
 @Entity
 @Cacheable
@@ -21,6 +25,7 @@ data class LibreUser (
     var email: String,
 
     @Column(nullable = false)
+    @field:NotNull(message = "The provided password is empty.")
     var password: String,
 
     var name: String? = null,
@@ -44,30 +49,20 @@ data class LibreUser (
 }
 
 @ApplicationScoped
-class LibreUserRepository(val validation: LibreUserValidation) : PanacheRepository<LibreUser> {
+class LibreUserRepository : PanacheRepository<LibreUser> {
+    @Inject
+    private lateinit var validator: Validator
 
     fun findByEmail(email: String): Uni<LibreUser?> = find("email = ?1", email).firstResult()
 
     fun createUser(user: LibreUser): Uni<LibreUser?> {
         return findByEmail(user.email)
-            .onItem().ifNotNull().failWith(ValidationError("A User with this E-Mail already exists."))
+            .onItem().ifNotNull().failWith(ValidationError(listOf("A User with this E-Mail already exists.")))
             .onItem().ifNull().continueWith(user)
-                .invoke{ new -> validation.checkPassword(new!!) }
+                .invoke{ new -> validator.validate(new) }
                 .chain { new -> persistAndFlush(new!!) }
     }
 
     fun findByEmailAndPassword(email: String, password: String): Uni<LibreUser?> =
         find("email = ?1 and password = crypt(?2, password)", email, password).firstResult()
-}
-
-@ApplicationScoped
-class LibreUserValidation {
-
-    fun checkPassword(user: LibreUser) {
-        if (user.password.isEmpty()) {
-            throw ValidationError("The provided password is empty.")
-        } else if (!user.password.contains('b')) {
-            throw ValidationError("The password must contain at least one 'b' letter.")
-        }
-    }
 }

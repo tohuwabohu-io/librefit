@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --force",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "playwright test",
@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"@iconify/svelte": "^3.1.0",
 		"@playwright/test": "^1.28.1",
+		"@poppanator/sveltekit-svg": "^3.0.0",
 		"@rollup/plugin-typescript": "^11.0.0",
 		"@skeletonlabs/skeleton": "^1.0.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
@@ -43,6 +44,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"dayjs": "^1.11.7"
+		"chart.js": "^4.2.1",
+		"dayjs": "^1.11.7",
+		"svelte-chartjs": "^3.1.2"
 	}
 }

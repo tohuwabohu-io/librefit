@@ -13,24 +13,45 @@ paths:
     post:
       tags:
       - Goals Resource
+      operationId: createGoal
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Goal'
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Goal'
-  /goals/delete/{id}:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /goals/delete/{userId}/{date}/{id}:
     delete:
       tags:
       - Goals Resource
+      operationId: deleteGoal
       parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
       - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - name: userId
         in: path
         required: true
         schema:
@@ -40,13 +61,24 @@ paths:
         "200":
           description: OK
           content:
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
             application/json:
               schema:
-                type: boolean
-  /goals/latest/{userId}:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /goals/last/{userId}:
     get:
       tags:
       - Goals Resource
+      operationId: findLastGoal
       parameters:
       - name: userId
         in: path
@@ -61,11 +93,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Goal'
-  /goals/list/{userId}:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /goals/read/{userId}/{date}/{id}:
     get:
       tags:
       - Goals Resource
+      operationId: readGoal
       parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
       - name: userId
         in: path
         required: true
@@ -78,39 +130,44 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Goal'
-  /goals/read/{id}:
-    get:
-      tags:
-      - Goals Resource
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      responses:
-        "200":
-          description: OK
+                $ref: '#/components/schemas/Goal'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Goal'
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /goals/update:
     put:
       tags:
       - Goals Resource
+      operationId: updateGoal
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Goal'
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{diff}/{gain}:
     get:
       tags:
@@ -356,6 +413,7 @@ paths:
     post:
       tags:
       - Weight Tracker Resource
+      operationId: createWeightTrackerEntry
       requestBody:
         content:
           application/json:
@@ -364,12 +422,65 @@ paths:
       responses:
         "201":
           description: Created
-  /tracker/weight/delete/{id}:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /tracker/weight/delete/{userId}/{date}/{id}:
     delete:
       tags:
       - Weight Tracker Resource
+      operationId: deleteWeightTrackerEntry
       parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
       - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /tracker/weight/last/{userId}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      operationId: findLastWeightTrackerEntry
+      parameters:
+      - name: userId
         in: path
         required: true
         schema:
@@ -381,12 +492,31 @@ paths:
           content:
             application/json:
               schema:
-                type: boolean
-  /tracker/weight/list/{userId}:
+                $ref: '#/components/schemas/WeightTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /tracker/weight/list/{userId}/{dateFrom}/{dateTo}:
     get:
       tags:
       - Weight Tracker Resource
+      operationId: listWeightTrackerEntriesRange
       parameters:
+      - name: dateFrom
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: dateTo
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
       - name: userId
         in: path
         required: true
@@ -402,12 +532,66 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WeightTrackerEntry'
-  /tracker/weight/read/{id}:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /tracker/weight/list/{userId}/{date}:
     get:
       tags:
       - Weight Tracker Resource
+      operationId: listWeightTrackerEntries
       parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeightTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /tracker/weight/read/{userId}/{date}/{id}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      operationId: readWeightTrackerEntry
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
       - name: id
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - name: userId
         in: path
         required: true
         schema:
@@ -420,18 +604,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WeightTrackerEntry'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /tracker/weight/update:
     put:
       tags:
       - Weight Tracker Resource
+      operationId: updateWeightTrackerEntry
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/WeightTrackerEntry'
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "304":
+          description: Not Modified
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
   /user/login:
     post:
       tags:
@@ -491,6 +700,7 @@ components:
     CalorieTrackerEntry:
       required:
       - added
+      - amount
       - category
       type: object
       properties:
@@ -504,6 +714,7 @@ components:
           type: integer
         amount:
           format: float
+          minimum: 0
           type: number
         category:
           $ref: '#/components/schemas/Category'
@@ -525,14 +736,18 @@ components:
       type: string
     ErrorResponse:
       required:
-      - message
+      - messages
       type: object
       properties:
-        message:
-          type: string
+        messages:
+          type: array
+          items:
+            type: string
     Goal:
       required:
       - added
+      - startAmount
+      - endAmount
       - startDate
       - endDate
       type: object
@@ -547,14 +762,21 @@ components:
           type: integer
         startAmount:
           format: float
+          minimum: 0
           type: number
         endAmount:
           format: float
+          minimum: 0
           type: number
         startDate:
-          $ref: '#/components/schemas/LocalDateTime'
+          $ref: '#/components/schemas/LocalDate'
         endDate:
-          $ref: '#/components/schemas/LocalDateTime'
+          $ref: '#/components/schemas/LocalDate'
+        updated:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
     LibreUser:
       required:
       - email
@@ -629,7 +851,6 @@ components:
     WeightTrackerEntry:
       required:
       - added
-      - updated
       type: object
       properties:
         userId:
@@ -642,6 +863,10 @@ components:
           type: integer
         amount:
           format: float
+          minimum: 0
           type: number
         updated:
-          $ref: '#/components/schemas/LocalDateTime'
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
