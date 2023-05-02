@@ -128,12 +128,7 @@
 			entries.push(result);
 			entries = entries;
 
-			toastStore.trigger({
-				message: 'Weight added successfully!',
-				background: 'variant-filled-primary',
-				autohide: true
-			});
-
+			showToastSuccess('Update successful.');
 			paint();
 		}).catch(handleApiError)
 	}
@@ -149,11 +144,7 @@
 			api.updateWeightTrackerEntry({
 				weightTrackerEntry: entry
 			}).then(_ => {
-				toastStore.trigger({
-					message: 'Update successful.',
-					background: 'variant-filled-primary',
-					autohide: true
-				})
+				showToastSuccess('Update successful.');
 
 				paint();
 			}).catch(handleApiError)
@@ -171,6 +162,8 @@
 				added: e.detail.date,
 				userId: 1
 			}));
+
+			showToastSuccess('Deletion successful.');
 
 			paint();
 		}).catch(handleApiError)
@@ -204,6 +197,14 @@
 			message: 'An error occured. Please try again later.',
 			background: 'variant-filled-warning',
 			autohide: false
+		})
+	}
+
+	const showToastSuccess = (toastMessage: String) => {
+		toastStore.trigger({
+			message: toastMessage,
+			background: 'variant-filled-primary',
+			autohide: true
 		})
 	}
 
