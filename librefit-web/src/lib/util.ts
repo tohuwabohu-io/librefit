@@ -103,7 +103,7 @@ export function getDateAsStr(d: Date, format?: String): String {
 	return dateUtil.format(d, format.valueOf());
 }
 
-export function parseStringAsDate(str: String, format?: String) {
+export function parseStringAsDate(str: String, format?: String): Date {
 	if (!format) {
 		format = default_date_format;
 	}
