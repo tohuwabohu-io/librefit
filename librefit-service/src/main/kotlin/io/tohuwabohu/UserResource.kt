@@ -6,12 +6,15 @@ import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
+import org.eclipse.microprofile.jwt.JsonWebToken
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDateTime
+import javax.annotation.security.PermitAll
 import javax.enterprise.context.RequestScoped
+import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
@@ -19,9 +22,12 @@ import javax.ws.rs.core.Response
 @Path("/user")
 @RequestScoped
 class UserResource(val userRepository: LibreUserRepository) {
+    @Inject
+    lateinit var jwt: JsonWebToken
 
     @POST
     @Path("/register")
+    @PermitAll
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
@@ -45,6 +51,7 @@ class UserResource(val userRepository: LibreUserRepository) {
 
     @POST
     @Path("/login")
+    @PermitAll
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
