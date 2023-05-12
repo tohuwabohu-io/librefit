@@ -244,6 +244,17 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
   /tracker/calories/delete/{userId}/{date}/{id}:
     delete:
       tags:
@@ -311,6 +322,17 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
   /tracker/calories/list/{userId}/{date}:
     get:
       tags:
