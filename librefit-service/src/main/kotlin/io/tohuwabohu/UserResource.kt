@@ -6,6 +6,8 @@ import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
+import io.tohuwabohu.security.AuthenticationResponse
+import io.tohuwabohu.security.generateToken
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
@@ -55,7 +57,12 @@ class UserResource(val userRepository: LibreUserRepository) {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = AuthenticationResponse::class)
+            )
+        ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class),
@@ -64,7 +71,7 @@ class UserResource(val userRepository: LibreUserRepository) {
     )
     fun login(libreUser: LibreUser): Uni<Response> {
         return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password)
-            .onItem().ifNotNull().transform { user -> Response.ok(user).build() }
+            .onItem().ifNotNull().transform { user -> Response.ok(AuthenticationResponse(generateToken(user!!))).build() }
             .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
             .onFailure().invoke{ e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
