@@ -65,7 +65,6 @@ class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>
 
     @ReactiveTransactional
     fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<Int> {
-        // TODO verify that entry belongs to logged in user -> return 404
         return findById(calorieTrackerEntry.getPrimaryKey()).onItem().ifNull()
             .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni { entry ->
                 val key = entry.getPrimaryKey()
