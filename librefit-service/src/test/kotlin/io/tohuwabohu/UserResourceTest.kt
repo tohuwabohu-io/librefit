@@ -1,5 +1,7 @@
 package io.tohuwabohu
 
+import io.quarkus.test.common.QuarkusTestResource
+import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
 @TestMethodOrder(OrderAnnotation::class)
 @QuarkusTest
+@TestHTTPEndpoint(UserResource::class)
 class UserResourceTest {
     @Test
     @Order(1)
@@ -18,7 +21,7 @@ class UserResourceTest {
         given()
             .header("Content-Type", ContentType.JSON)
             .body(user())
-            .post("/user/register")
+            .post("/register")
             .then()
             .assertThat()
             .statusCode(201)
@@ -30,7 +33,7 @@ class UserResourceTest {
         given()
             .header("Content-Type", "application/json")
             .body(failingUser())
-            .post("/user/register")
+            .post("/register")
             .then()
             .assertThat()
             .statusCode(400)
@@ -42,7 +45,7 @@ class UserResourceTest {
         given()
             .header("Content-Type", "application/json")
             .body(user())
-            .post("/user/login")
+            .post("/login")
             .then()
             .assertThat()
             .statusCode(200)
@@ -54,7 +57,7 @@ class UserResourceTest {
         given()
             .header("Content-Type", "application/json")
             .body(failingUser())
-            .post("/user/login")
+            .post("/login")
             .then()
             .assertThat()
             .statusCode(404)
