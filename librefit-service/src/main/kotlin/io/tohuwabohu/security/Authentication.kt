@@ -4,7 +4,7 @@ import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
 import io.smallrye.jwt.build.Jwt
 import io.tohuwabohu.crud.LibreUser
-import org.eclipse.microprofile.jwt.Claim
+import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import org.eclipse.microprofile.jwt.Claims
 import org.eclipse.microprofile.jwt.JsonWebToken
 import javax.ws.rs.core.SecurityContext
@@ -20,15 +20,25 @@ fun printAuthenticationInfo(jwt: JsonWebToken, ctx: SecurityContext) {
         ctx.userPrincipal.name
     }
 
-    Log.info("Auth info: userPrincipal.name=$name isHttps=${ctx.isSecure} authScheme=${ctx.authenticationScheme} hasJwt=${jwt.claimNames != null}")
+    Log.info("Auth info: userPrincipal.name=$name isHttps=${ctx.isSecure} authScheme=${ctx.authenticationScheme} hasJwt=${jwt.claimNames != null} userId=${jwt.name}")
+}
+
+/**
+ * Check if currently logged-in user's id equals the user id for the data object to manipulate
+ */
+fun validateToken(jwt: JsonWebToken, data: LibreUserWeakEntity) {
+    if (!jwt.name.equals(data.userId.toString())) {
+        Log.info("Trying to manipulate object belonging to userId=${data.userId}")
+
+        throw UnauthorizedException("Trying to access unrelated user data")
+    }
 }
 
 fun generateToken(user: LibreUser): String =
     Jwt.issuer("https://libre.fitness/")
-        .upn(user.email)
+        .upn(user.id.toString())
         .claim(Claims.email, user.email)
         .claim(Claims.nickname, user.name)
-        .claim("id", user.id)
         .groups(setOf("User"))
         .sign()
 
