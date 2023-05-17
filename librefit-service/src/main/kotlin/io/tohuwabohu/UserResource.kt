@@ -24,9 +24,6 @@ import javax.ws.rs.core.Response
 @Path("/user")
 @RequestScoped
 class UserResource(val userRepository: LibreUserRepository) {
-    @Inject
-    lateinit var jwt: JsonWebToken
-
     @POST
     @Path("/register")
     @PermitAll
