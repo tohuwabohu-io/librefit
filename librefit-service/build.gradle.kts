@@ -30,6 +30,7 @@ dependencies {
     implementation("io.quarkus:quarkus-resteasy-reactive")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
+    testImplementation("io.quarkus:quarkus-test-security-jwt")
 }
 
 group = "io.tohuwabohu"
