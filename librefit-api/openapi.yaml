@@ -32,9 +32,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/delete/{userId}/{date}/{id}:
+  /goals/delete/{date}/{id}:
     delete:
       tags:
       - Goals Resource
@@ -46,12 +48,6 @@ paths:
         schema:
           $ref: '#/components/schemas/LocalDate'
       - name: id
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      - name: userId
         in: path
         required: true
         schema:
@@ -72,20 +68,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/last/{userId}:
+  /goals/last:
     get:
       tags:
       - Goals Resource
       operationId: findLastGoal
-      parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
       responses:
         "200":
           description: OK
@@ -99,9 +90,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/read/{userId}/{date}/{id}:
+  /goals/read/{date}/{id}:
     get:
       tags:
       - Goals Resource
@@ -113,12 +106,6 @@ paths:
         schema:
           $ref: '#/components/schemas/LocalDate'
       - name: id
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      - name: userId
         in: path
         required: true
         schema:
@@ -139,6 +126,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
   /goals/update:
@@ -166,6 +155,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
   /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{diff}/{gain}:
@@ -224,6 +215,7 @@ paths:
     post:
       tags:
       - Calorie Tracker Resource
+      operationId: createCalorieTrackerEntry
       requestBody:
         content:
           application/json:
@@ -259,6 +251,7 @@ paths:
     delete:
       tags:
       - Calorie Tracker Resource
+      operationId: deleteCalorieTrackerEntry
       parameters:
       - name: date
         in: path
@@ -303,6 +296,7 @@ paths:
     get:
       tags:
       - Calorie Tracker Resource
+      operationId: listCalorieTrackerDates
       responses:
         "200":
           description: OK
@@ -335,6 +329,7 @@ paths:
     get:
       tags:
       - Calorie Tracker Resource
+      operationId: listCalorieTrackerEntriesForDate
       parameters:
       - name: date
         in: path
@@ -373,6 +368,7 @@ paths:
     get:
       tags:
       - Calorie Tracker Resource
+      operationId: readCalorieTrackerEntry
       parameters:
       - name: date
         in: path
@@ -417,6 +413,7 @@ paths:
     put:
       tags:
       - Calorie Tracker Resource
+      operationId: updateCalorieTrackerEntry
       requestBody:
         content:
           application/json:
@@ -473,9 +470,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
-  /tracker/weight/delete/{userId}/{date}/{id}:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
+  /tracker/weight/delete/{date}/{id}:
     delete:
       tags:
       - Weight Tracker Resource
@@ -487,12 +495,6 @@ paths:
         schema:
           $ref: '#/components/schemas/LocalDate'
       - name: id
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      - name: userId
         in: path
         required: true
         schema:
@@ -513,20 +515,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
-  /tracker/weight/last/{userId}:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
+  /tracker/weight/last:
     get:
       tags:
       - Weight Tracker Resource
       operationId: findLastWeightTrackerEntry
-      parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
       responses:
         "200":
           description: OK
@@ -540,9 +546,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
-  /tracker/weight/list/{userId}/{dateFrom}/{dateTo}:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
+  /tracker/weight/list/{dateFrom}/{dateTo}:
     get:
       tags:
       - Weight Tracker Resource
@@ -558,12 +575,6 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: userId
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
       responses:
         "200":
           description: OK
@@ -579,9 +590,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
-  /tracker/weight/list/{userId}/{date}:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
+  /tracker/weight/list/{date}:
     get:
       tags:
       - Weight Tracker Resource
@@ -592,12 +614,6 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: userId
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
       responses:
         "200":
           description: OK
@@ -613,9 +629,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
-  /tracker/weight/read/{userId}/{date}/{id}:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
+  /tracker/weight/read/{date}/{id}:
     get:
       tags:
       - Weight Tracker Resource
@@ -627,12 +654,6 @@ paths:
         schema:
           $ref: '#/components/schemas/LocalDate'
       - name: id
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      - name: userId
         in: path
         required: true
         schema:
@@ -653,8 +674,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
   /tracker/weight/update:
     put:
       tags:
@@ -680,8 +712,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
         "500":
           description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme:
+        - User
+        - Admin
+      - SecurityScheme:
+        - User
+        - Admin
   /user/login:
     post:
       tags:
