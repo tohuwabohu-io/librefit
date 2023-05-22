@@ -20,7 +20,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "1")
         ]
     )
     fun `should create an entry`() {
@@ -38,7 +37,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "1")
         ]
     )
     fun `should create two entries`() {
@@ -70,7 +68,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "1")
         ]
     )
     fun `should fail on creation`() {
@@ -91,7 +88,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "1")
         ]
     )
     fun `should create and read an entry`() {
@@ -124,7 +120,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "4")
         ]
     )
     fun `should create, update and read an entry`() {
@@ -167,7 +162,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "1")
         ]
     )
     fun `should fail on update`() {
@@ -185,7 +179,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "1")
         ]
     )
     fun `should create and delete an entry`() {
@@ -207,7 +200,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "1")
         ]
     )
     fun `should fail on delete`() {
@@ -221,7 +213,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "1")
         ]
     )
     fun `should create and delete an entry and fail on read`() {
@@ -252,7 +243,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "42")
         ]
     )
     fun `should create three entries and return two dates`() {
@@ -298,7 +288,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "17")
         ]
     )
     fun `should create two entries and list them`() {
@@ -332,7 +321,6 @@ class CalorieTrackerResourceTest {
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
-            Claim(key = "id", value = "17")
         ]
     )
     fun `should fail with 401`() {
