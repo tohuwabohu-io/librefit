@@ -9,6 +9,7 @@ import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.printAuthenticationInfo
 import io.tohuwabohu.security.validateToken
 import org.eclipse.microprofile.jwt.JsonWebToken
+import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
@@ -49,6 +50,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "createCalorieTrackerEntry")
     fun create(@Context securityContext: SecurityContext, @Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
 
@@ -77,6 +79,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "updateCalorieTrackerEntry")
     fun update(@Context securityContext: SecurityContext, @Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
         Log.info("Updating calorie tracker entry $calorieTracker")
 
@@ -89,6 +92,11 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
 
+
+    @GET
+    @Path("/read/{date}/{id:\\d+}")
+    @RolesAllowed("User", "Admin")
+    @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
@@ -104,10 +112,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @GET
-    @Path("/read/{date}/{id:\\d+}")
-    @RolesAllowed("User", "Admin")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "readCalorieTrackerEntry")
     fun read(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
@@ -117,6 +122,11 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
+
+    @DELETE
+    @Path("/delete/{date}/{id:\\d+}")
+    @RolesAllowed("User", "Admin")
+    @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
         APIResponse(responseCode = "304", description = "Not Modified"),
@@ -128,12 +138,9 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @DELETE
-    @Path("/delete/{date}/{id:\\d+}")
-    @RolesAllowed("User", "Admin")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "deleteCalorieTrackerEntry")
     fun delete(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> {
-        Log.info("Delete calorie tracker entry with id $id")
+        Log.info("Delete calorie tracker entry with added=$date id=$id")
         printAuthenticationInfo(jwt, securityContext)
 
         return calorieTrackerRepository.deleteEntry(jwt.name.toLong(), date, id)
@@ -160,6 +167,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "listCalorieTrackerDates")
     fun listDates(@Context securityContext: SecurityContext): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
@@ -172,6 +180,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     @GET
     @Path("/list/{date}")
     @RolesAllowed("User", "Admin")
+    @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
@@ -186,7 +195,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(operationId = "listCalorieTrackerEntriesForDate")
     fun listEntries(@Context securityContext: SecurityContext, date: LocalDate): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
