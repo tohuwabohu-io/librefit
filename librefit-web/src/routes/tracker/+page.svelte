@@ -1,16 +1,12 @@
 <script type="ts">
-	import { Configuration, CalorieTrackerResourceApi } from 'librefit-api/rest';
-	import { onMount } from 'svelte';
-	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
+	import {CalorieTrackerResourceApi} from 'librefit-api/rest';
+	import {onMount} from 'svelte';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
-	import { Accordion } from '@skeletonlabs/skeleton';
+	import {Accordion} from '@skeletonlabs/skeleton';
 	import {getDateAsStr} from '$lib/util';
+	import {DEFAULT_CONFIG} from '$lib/api/Config';
 
-	const api = new CalorieTrackerResourceApi(
-		new Configuration({
-			basePath: PUBLIC_API_BASE_PATH
-		})
-	);
+	const api = new CalorieTrackerResourceApi(DEFAULT_CONFIG);
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today)
