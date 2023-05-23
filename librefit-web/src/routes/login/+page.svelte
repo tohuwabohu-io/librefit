@@ -2,7 +2,7 @@
 	import {UserResourceApi} from 'librefit-api/rest';
 
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-	import {DEFAULT_CONFIG} from '$lib/api/Config.js';
+	import {AUTH_TOKEN_KEY, DEFAULT_CONFIG} from '$lib/api/Config.js';
 
 	let loginButton, emailInput, passwordInput;
 	let success, error, errorText;
@@ -26,6 +26,8 @@
 					error.classList.add('hidden');
 
 					console.log(response);
+
+					localStorage.setItem(AUTH_TOKEN_KEY, response.token);
 				})
 				.catch((e) => {
 					errorText = 'Error during login';
