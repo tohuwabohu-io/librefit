@@ -1,7 +1,7 @@
 <script>
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-	import { Configuration, UserResourceApi } from 'librefit-api/rest';
-	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
+	import {UserResourceApi} from 'librefit-api/rest';
+	import {DEFAULT_CONFIG} from '$lib/api/Config.js';
 
 	let emailInput, passwordInput, passwordConfirmationInput, tosInput, registrationButton;
 	let success, error, errorText;
@@ -15,11 +15,7 @@
 	let passwordConfirmation;
 	let tosAccepted = false;
 
-	const userApi = new UserResourceApi(
-		new Configuration({
-			basePath: PUBLIC_API_BASE_PATH
-		})
-	);
+	const userApi = new UserResourceApi(DEFAULT_CONFIG);
 
 	const register = async () => {
 		if (

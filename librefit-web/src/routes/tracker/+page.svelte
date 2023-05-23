@@ -19,15 +19,11 @@
 	availableDates.add(todayStr);
 
 	onMount(async () => {
-		await api
-			.trackerCaloriesListUserIdDatesGet({
-				userId: 1
-			})
+		await api.listCalorieTrackerDates()
 			.then((dates: Array<String>) => {
 				dates.forEach((d) => availableDates.add(d));
 				availableDates = availableDates;
-			})
-			.catch((e) => console.error(e));
+			}).catch((e) => console.error(e));
 	});
 </script>
 

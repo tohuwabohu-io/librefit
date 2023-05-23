@@ -1,8 +1,8 @@
 <script>
-	import { Configuration, UserResourceApi } from 'librefit-api/rest';
+	import {UserResourceApi} from 'librefit-api/rest';
 
-	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
+	import {DEFAULT_CONFIG} from '$lib/api/Config.js';
 
 	let loginButton, emailInput, passwordInput;
 	let success, error, errorText;
@@ -12,11 +12,7 @@
 		password: ''
 	};
 
-	const userApi = new UserResourceApi(
-		new Configuration({
-			basePath: PUBLIC_API_BASE_PATH
-		})
-	);
+	const userApi = new UserResourceApi(DEFAULT_CONFIG);
 
 	const login = async () => {
 		if (![emailInput, passwordInput].map((control) => control.validate()).includes(false)) {
@@ -24,10 +20,12 @@
 
 			await userApi
 				.userLoginPost({ libreUser: loginData })
-				.then(() => {
+				.then((response) => {
 					// TODO redirect
 					success.classList.remove('hidden');
 					error.classList.add('hidden');
+
+					console.log(response);
 				})
 				.catch((e) => {
 					errorText = 'Error during login';

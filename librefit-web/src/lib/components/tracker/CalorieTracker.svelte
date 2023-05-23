@@ -1,16 +1,11 @@
 <script lang="ts">
-	import {
-		CalorieTrackerEntry,
-		CalorieTrackerResourceApi,
-		Category,
-		Configuration
-	} from 'librefit-api/rest';
-	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
-	import { onMount } from 'svelte';
+	import {CalorieTrackerEntry, CalorieTrackerResourceApi, Category} from 'librefit-api/rest';
+	import {onMount} from 'svelte';
 	import TrackerInput from '$lib/components/TrackerInput.svelte';
-	import { AccordionItem } from '@skeletonlabs/skeleton';
+	import {AccordionItem} from '@skeletonlabs/skeleton';
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
-	import { convertDateStrToDisplayDateStr } from '$lib/util.js';
+	import {convertDateStrToDisplayDateStr} from '$lib/util.js';
+	import {DEFAULT_CONFIG} from '../../api/Config';
 
 	export let date: String;
 	export let today: String;
@@ -32,63 +27,47 @@
 		};
 	});
 
-	const api = new CalorieTrackerResourceApi(
-		new Configuration({
-			basePath: PUBLIC_API_BASE_PATH
-		})
-	);
+	const api = new CalorieTrackerResourceApi(DEFAULT_CONFIG);
 
 	const addEntry = (e) => {
 		const newEntry: CalorieTrackerEntry = {
-			userId: 1,
 			id: e.detail.sequence,
 			added: today,
 			amount: e.detail.value,
 			category: e.detail.category
 		};
 
-		api
-			.trackerCaloriesCreatePost({
-				calorieTrackerEntry: newEntry
-			})
-			.then((result: CalorieTrackerEntry) => {
-				trackerEntries.push(result);
-				trackerEntries = trackerEntries;
+		api.createCalorieTrackerEntry({
+			calorieTrackerEntry: newEntry
+		}).then((result: CalorieTrackerEntry) => {
+			trackerEntries.push(result);
+			trackerEntries = trackerEntries;
 
-				addValue = 0;
-			})
-			.catch(console.error);
+			addValue = 0;
+		}).catch(console.error);
 	};
 
 	const updateEntry = (e) => {
-		api
-			.trackerCaloriesReadUserIdDateIdGet({
-				userId: 1,
-				id: e.detail.sequence,
-				date: e.detail.date
-			})
-			.then((entry: CalorieTrackerEntry) => {
-				entry.amount = e.detail.value;
-				entry.category = e.detail.category;
+		api.readCalorieTrackerEntry({
+			id: e.detail.sequence,
+			date: e.detail.date
+		}).then((entry: CalorieTrackerEntry) => {
+			entry.amount = e.detail.value;
+			entry.category = e.detail.category;
 
-				api
-					.trackerCaloriesUpdatePut({ calorieTrackerEntry: entry })
-					.then((_) => console.log('updated!'))
-					.catch(console.error);
-			});
+			api.updateCalorieTrackerEntry({ calorieTrackerEntry: entry })
+				.then((_) => console.log('updated!'))
+				.catch(console.error);
+		});
 	};
 
 	const deleteEntry = (e) => {
-		api
-			.trackerCaloriesDeleteUserIdDateIdDelete({
-				userId: 1,
-				id: e.detail.sequence,
-				date: e.detail.date
-			})
-			.then((_) => {
-				trackerEntries = trackerEntries.filter((entry) => entry.id !== e.detail.sequence);
-			})
-			.catch(console.error);
+		api.deleteCalorieTrackerEntry({
+			id: e.detail.sequence,
+			date: e.detail.date
+		}).then((_) => {
+			trackerEntries = trackerEntries.filter((entry) => entry.id !== e.detail.sequence);
+		}).catch(console.error);
 	};
 
 	const initialLoad = async () => {
@@ -98,20 +77,16 @@
 	};
 
 	const loadEntry = async () => {
-		await api
-			.trackerCaloriesListUserIdDateGet({
-				date: date,
-				userId: 1
-			})
-			.then((entries: Array<CalorieTrackerEntry>) => {
-				if (entries.length > 0) {
-					total = entries.map((entry) => entry.amount).reduce((a, b) => a + b);
+		await api.listCalorieTrackerEntriesForDate({
+			date: date,
+		}).then((entries: Array<CalorieTrackerEntry>) => {
+			if (entries.length > 0) {
+				total = entries.map((entry) => entry.amount).reduce((a, b) => a + b);
 
-					trackerEntries.push(...entries);
-					trackerEntries = trackerEntries;
-				}
-			})
-			.catch(console.error);
+				trackerEntries.push(...entries);
+				trackerEntries = trackerEntries;
+			}
+		}).catch(console.error);
 	};
 
 	onMount(async () => {
