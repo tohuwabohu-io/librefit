@@ -5,8 +5,6 @@ export const AUTH_TOKEN_KEY = 'AUTH_TOKEN';
 
 export class JWTMiddleware implements Middleware {
     pre(context: RequestContext): Promise<FetchParams | void> {
-        console.log('hello from the middleware');
-
         const token = localStorage.getItem(AUTH_TOKEN_KEY);
 
         if (token) {
