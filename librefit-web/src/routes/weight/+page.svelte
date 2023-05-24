@@ -3,16 +3,15 @@
 	import {DataViews, enumKeys, getDateAsStr, weakEntityEquals, createWeightChart, createWeightChartDataset} from '$lib/util';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {
-		Configuration,
 		WeightTrackerEntry,
 		WeightTrackerResourceApi,
 		GoalsResourceApi,
 		Goal
 	} from 'librefit-api/rest';
-	import {PUBLIC_API_BASE_PATH} from '$env/static/public';
 	import {onMount} from 'svelte';
 	import {Line} from 'svelte-chartjs';
 	import { Chart, registerables } from 'chart.js';
+	import {JWT_CONFIG} from '../../lib/api/Config';
 
 	Chart.register(...registerables);
 
@@ -24,22 +23,11 @@
 	let chartData, chartOptions;
 	let currentGoal;
 
-	const api = new WeightTrackerResourceApi(
-		new Configuration({
-			basePath: PUBLIC_API_BASE_PATH
-		})
-	);
-
-	const goalApi = new GoalsResourceApi(
-		new Configuration({
-			basePath: PUBLIC_API_BASE_PATH
-		})
-	);
+	const weightApi = new WeightTrackerResourceApi(JWT_CONFIG);
+	const goalApi = new GoalsResourceApi(JWT_CONFIG);
 
 	const loadEntries = async () => {
-		await api.findLastWeightTrackerEntry({
-			userId: 1
-		}).catch((error) => {
+		await weightApi.findLastWeightTrackerEntry().catch((error) => {
 			if (!error.response || error.response.status !== 404) {
 				handleApiError(error);
 			}
@@ -47,8 +35,7 @@
 			lastEntry = entry;
 
 			if (filter === DataViews.Today) {
-				api.listWeightTrackerEntries({
-					userId: 1,
+				weightApi.listWeightTrackerEntries({
 					date: getDateAsStr(today)
 				}).then((result: Array<WeightTrackerEntry>) => {
 					entries = result;
@@ -66,8 +53,7 @@
 					default: break;
 				}
 
-				api.listWeightTrackerEntriesRange({
-					userId: 1,
+				weightApi.listWeightTrackerEntriesRange({
 					dateFrom: getDateAsStr(fromDate),
 					dateTo: getDateAsStr(toDate)
 				}).then((result: Array<WeightTrackerEntry>) => {
@@ -78,9 +64,7 @@
 			}
 		});
 
-		await goalApi.findLastGoal({
-			userId: 1
-		}).then((result: Goal) => currentGoal = result).catch((error) => {
+		await goalApi.findLastGoal().then((result: Goal) => currentGoal = result).catch((error) => {
 				if (!error.response || error.response.status !== 404) {
 					handleApiError(error);
 				}
@@ -116,13 +100,12 @@
 
 	const add = (e) => {
 		const newEntry: WeightTrackerEntry = {
-			userId: 1,
 			id: e.detail.sequence,
 			added: e.detail.todayDateStr,
 			amount: e.detail.value
 		}
 
-		api.createWeightTrackerEntry({
+		weightApi.createWeightTrackerEntry({
 			weightTrackerEntry: newEntry
 		}).then((result: WeightTrackerEntry) => {
 			entries.push(result);
@@ -134,14 +117,13 @@
 	}
 
 	const update = (e) => {
-		api.readWeightTrackerEntry({
-			userId: 1,
+		weightApi.readWeightTrackerEntry({
 			id: e.detail.sequence,
 			date: e.detail.date
 		}).then((entry: WeightTrackerEntry) => {
 			entry.amount = e.detail.value;
 
-			api.updateWeightTrackerEntry({
+			weightApi.updateWeightTrackerEntry({
 				weightTrackerEntry: entry
 			}).then(_ => {
 				showToastSuccess('Update successful.');
@@ -152,15 +134,13 @@
 	}
 
 	const remove = (e) => {
-		api.deleteWeightTrackerEntry({
-			userId: 1,
+		weightApi.deleteWeightTrackerEntry({
 			id: e.detail.sequence,
 			date: e.detail.date
 		}).then(_ => {
 			entries = entries.filter((entry: WeightTrackerEntry) => !weakEntityEquals(entry, {
 				id: e.detail.sequence,
 				added: e.detail.date,
-				userId: 1
 			}));
 
 			showToastSuccess('Deletion successful.');
@@ -173,7 +153,6 @@
 		console.log(e);
 
 		let goal: Goal = e.detail.goal as Goal;
-		goal.userId = 1;
 
 		if (!currentGoal) {
 			goalApi.createGoal({goal}).then((response) => {
@@ -183,7 +162,6 @@
 			goalApi.updateGoal({goal}).then(_ => {
 				goalApi.readGoal({
 					date: currentGoal.added,
-					userId: currentGoal.userId,
 					id: currentGoal.id
 				}).then((response) => currentGoal = response).catch(handleApiError)
 			}).catch(handleApiError)

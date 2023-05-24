@@ -1,16 +1,13 @@
 <script type="ts">
-	import { Configuration, CalorieTrackerResourceApi } from 'librefit-api/rest';
-	import { onMount } from 'svelte';
-	import { PUBLIC_API_BASE_PATH } from '$env/static/public';
+	import {CalorieTrackerResourceApi} from 'librefit-api/rest';
+	import {onMount} from 'svelte';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
-	import { Accordion } from '@skeletonlabs/skeleton';
+	import {Accordion} from '@skeletonlabs/skeleton';
 	import {getDateAsStr} from '$lib/util';
+	import {JWT_CONFIG} from '$lib/api/Config';
+	import {redirect} from '@sveltejs/kit';
 
-	const api = new CalorieTrackerResourceApi(
-		new Configuration({
-			basePath: PUBLIC_API_BASE_PATH
-		})
-	);
+	const api = new CalorieTrackerResourceApi(JWT_CONFIG);
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today)
@@ -19,15 +16,13 @@
 	availableDates.add(todayStr);
 
 	onMount(async () => {
-		await api
-			.trackerCaloriesListUserIdDatesGet({
-				userId: 1
-			})
+		await api.listCalorieTrackerDates()
 			.then((dates: Array<String>) => {
 				dates.forEach((d) => availableDates.add(d));
 				availableDates = availableDates;
-			})
-			.catch((e) => console.error(e));
+			}).catch((e) => {
+				console.error(e);
+			});
 	});
 </script>
 

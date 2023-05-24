@@ -1,13 +1,9 @@
-import { Configuration, TdeeResourceApi } from 'librefit-api/rest';
-import { PUBLIC_API_BASE_PATH } from '$env/static/public';
+import {TdeeResourceApi} from 'librefit-api/rest';
+import {DEFAULT_CONFIG} from '$lib/api/Config';
 
 export const actions = {
 	default: async ({ cookies, request }) => {
-		const tdeeApi = new TdeeResourceApi(
-			new Configuration({
-				basePath: PUBLIC_API_BASE_PATH
-			})
-		);
+		const tdeeApi = new TdeeResourceApi(DEFAULT_CONFIG);
 
 		const data = await request.formData();
 

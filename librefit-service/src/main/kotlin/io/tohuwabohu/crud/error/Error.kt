@@ -1,5 +1,6 @@
 package io.tohuwabohu.crud.error
 
+import io.quarkus.security.UnauthorizedException
 import org.jboss.logging.Logger
 import javax.persistence.EntityNotFoundException
 import javax.persistence.NoResultException
@@ -24,6 +25,10 @@ fun createErrorResponse(throwable: Throwable): Response {
 
         is UnmodifiedError -> {
             UnmodifiedErrorMapper().toResponse(throwable)
+        }
+
+        is UnauthorizedException -> {
+            UnauthorizedExceptionMapper().toResponse(throwable)
         }
 
         else -> {
@@ -56,5 +61,16 @@ class UnmodifiedErrorMapper : ExceptionMapper<UnmodifiedError> {
         log.error("Update statement has been issued but no data updated", exception)
 
         return Response.status(Response.Status.NOT_MODIFIED).build()
+    }
+}
+
+@Provider
+class UnauthorizedExceptionMapper: ExceptionMapper<UnauthorizedException> {
+    private val log: Logger = Logger.getLogger(javaClass)
+
+    override fun toResponse(exception: UnauthorizedException): Response {
+        log.error("Authentication error", exception)
+
+        return Response.status(Response.Status.UNAUTHORIZED).build()
     }
 }
