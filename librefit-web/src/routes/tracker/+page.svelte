@@ -4,9 +4,10 @@
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import {Accordion} from '@skeletonlabs/skeleton';
 	import {getDateAsStr} from '$lib/util';
-	import {DEFAULT_CONFIG} from '$lib/api/Config';
+	import {JWT_CONFIG} from '$lib/api/Config';
+	import {redirect} from '@sveltejs/kit';
 
-	const api = new CalorieTrackerResourceApi(DEFAULT_CONFIG);
+	const api = new CalorieTrackerResourceApi(JWT_CONFIG);
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today)
@@ -19,7 +20,9 @@
 			.then((dates: Array<String>) => {
 				dates.forEach((d) => availableDates.add(d));
 				availableDates = availableDates;
-			}).catch((e) => console.error(e));
+			}).catch((e) => {
+				console.error(e);
+			});
 	});
 </script>
 

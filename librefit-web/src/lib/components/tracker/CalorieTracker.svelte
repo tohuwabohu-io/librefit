@@ -5,7 +5,7 @@
 	import {AccordionItem} from '@skeletonlabs/skeleton';
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
 	import {convertDateStrToDisplayDateStr} from '$lib/util.js';
-	import {DEFAULT_CONFIG} from '../../api/Config';
+	import {JWT_CONFIG} from '$lib/api/Config';
 
 	export let date: String;
 	export let today: String;
@@ -27,7 +27,7 @@
 		};
 	});
 
-	const api = new CalorieTrackerResourceApi(DEFAULT_CONFIG);
+	const api = new CalorieTrackerResourceApi(JWT_CONFIG);
 
 	const addEntry = (e) => {
 		const newEntry: CalorieTrackerEntry = {

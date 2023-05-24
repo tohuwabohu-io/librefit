@@ -3,17 +3,15 @@
 	import {DataViews, enumKeys, getDateAsStr, weakEntityEquals, createWeightChart, createWeightChartDataset} from '$lib/util';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {
-		Configuration,
 		WeightTrackerEntry,
 		WeightTrackerResourceApi,
 		GoalsResourceApi,
 		Goal
 	} from 'librefit-api/rest';
-	import {PUBLIC_API_BASE_PATH} from '$env/static/public';
 	import {onMount} from 'svelte';
 	import {Line} from 'svelte-chartjs';
 	import { Chart, registerables } from 'chart.js';
-	import {DEFAULT_CONFIG} from '../../lib/api/Config';
+	import {JWT_CONFIG} from '../../lib/api/Config';
 
 	Chart.register(...registerables);
 
@@ -25,11 +23,11 @@
 	let chartData, chartOptions;
 	let currentGoal;
 
-	const api = new WeightTrackerResourceApi(DEFAULT_CONFIG);
-	const goalApi = new GoalsResourceApi(DEFAULT_CONFIG);
+	const weightApi = new WeightTrackerResourceApi(JWT_CONFIG);
+	const goalApi = new GoalsResourceApi(JWT_CONFIG);
 
 	const loadEntries = async () => {
-		await api.findLastWeightTrackerEntry().catch((error) => {
+		await weightApi.findLastWeightTrackerEntry().catch((error) => {
 			if (!error.response || error.response.status !== 404) {
 				handleApiError(error);
 			}
@@ -37,7 +35,7 @@
 			lastEntry = entry;
 
 			if (filter === DataViews.Today) {
-				api.listWeightTrackerEntries({
+				weightApi.listWeightTrackerEntries({
 					date: getDateAsStr(today)
 				}).then((result: Array<WeightTrackerEntry>) => {
 					entries = result;
@@ -55,7 +53,7 @@
 					default: break;
 				}
 
-				api.listWeightTrackerEntriesRange({
+				weightApi.listWeightTrackerEntriesRange({
 					dateFrom: getDateAsStr(fromDate),
 					dateTo: getDateAsStr(toDate)
 				}).then((result: Array<WeightTrackerEntry>) => {
@@ -107,7 +105,7 @@
 			amount: e.detail.value
 		}
 
-		api.createWeightTrackerEntry({
+		weightApi.createWeightTrackerEntry({
 			weightTrackerEntry: newEntry
 		}).then((result: WeightTrackerEntry) => {
 			entries.push(result);
@@ -119,13 +117,13 @@
 	}
 
 	const update = (e) => {
-		api.readWeightTrackerEntry({
+		weightApi.readWeightTrackerEntry({
 			id: e.detail.sequence,
 			date: e.detail.date
 		}).then((entry: WeightTrackerEntry) => {
 			entry.amount = e.detail.value;
 
-			api.updateWeightTrackerEntry({
+			weightApi.updateWeightTrackerEntry({
 				weightTrackerEntry: entry
 			}).then(_ => {
 				showToastSuccess('Update successful.');
@@ -136,7 +134,7 @@
 	}
 
 	const remove = (e) => {
-		api.deleteWeightTrackerEntry({
+		weightApi.deleteWeightTrackerEntry({
 			id: e.detail.sequence,
 			date: e.detail.date
 		}).then(_ => {
