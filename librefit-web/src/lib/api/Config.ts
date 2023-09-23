@@ -8,9 +8,10 @@ export class JWTMiddleware implements Middleware {
         const token = localStorage.getItem(AUTH_TOKEN_KEY);
 
         if (token) {
-            context.init.headers = {
-                'Authorization': `Bearer ${token}`
-            }
+            let requestHeaders: Headers = new Headers(context.init.headers);
+            requestHeaders.set('Authorization', `Bearer ${token}`)
+
+            context.init.headers = requestHeaders;
         }
 
         return Promise.resolve({
