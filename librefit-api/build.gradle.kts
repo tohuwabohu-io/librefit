@@ -26,26 +26,18 @@ tasks.openApiValidate {
     inputSpec.set("openapi.yaml")
 }
 
-tasks.openApiGenerate {
+tasks.register<JavaExec>("ApiCodegen") {
     dependsOn(tasks.openApiValidate)
 
-    doFirst {
-        delete("${project.projectDir}/rest")
+    classpath = sourceSets.test.get().runtimeClasspath
+    main = "io.tohuwabohu.librefit.api.codegen.ApiCodegen"
+    args = listOf("${project.projectDir}/openapi.json", "${project.projectDir}/rest/index.js")
+
+    doLast {
+        copy{
+            from("${project.projectDir}/rest/index.js")
+            into("../librefit-web/src/lib/api/")
+        }
     }
-
-    inputSpec.set("openapi.yaml")
-    outputDir.set("${project.projectDir}/rest")
-    generatorName.set("typescript-fetch")
-    // generatorName.set("typescript")
-    typeMappings.put("Date", "String") // see https://github.com/OpenAPITools/openapi-generator/issues/926
-    additionalProperties.put("supportsES6", "true")
 }
 
-tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_link") {
-    dependsOn(tasks.npmInstall)
-}
-
-tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_build") {
-    dependsOn(tasks.npmInstall)
-    dependsOn(tasks.openApiGenerate)
-}

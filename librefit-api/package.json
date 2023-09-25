@@ -4,15 +4,11 @@
   "description": "Package containing the librefit-api OpenAPI specification",
   "main": "rest/index.js",
   "scripts": {
-    "link": "npm link && cd ../librefit-web && npm link ../librefit-api && npm install ../librefit-api --save-dev",
-    "build": "tsc"
+    "link": "npm link && cd ../librefit-web && npm link ../librefit-api && npm install ../librefit-api --save-dev"
   },
   "author": "Stefan Poindl",
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.1"
-  },
-  "dependencies": {
-    "openapi-fetch": "^0.7.6"
   }
 }

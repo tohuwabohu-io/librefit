@@ -1,3 +1,6 @@
+@file:JvmName("ApiCodegen")
+package io.tohuwabohu.librefit.api.codegen
+
 import kotlinx.serialization.json.*
 import java.io.BufferedWriter
 import java.io.File
