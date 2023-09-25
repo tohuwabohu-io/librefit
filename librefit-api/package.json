@@ -10,7 +10,9 @@
   "author": "Stefan Poindl",
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^24.0.1",
-    "typescript": "^5.0.0"
+    "@rollup/plugin-commonjs": "^24.0.1"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.7.6"
   }
 }
