@@ -1,8 +1,6 @@
-import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 import { api } from '$lib/api';
 import { redirect } from '@sveltejs/kit';
 import { proxyFetch } from '$lib/api/util.js';
-import { goto } from '$app/navigation';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
