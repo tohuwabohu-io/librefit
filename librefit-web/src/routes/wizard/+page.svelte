@@ -1,11 +1,16 @@
-<script lang="ts">
-	import { CalculationGoal, CalculationSex, Tdee } from 'librefit-api/rest';
+<script>
 	import { RadioGroup, RadioItem, RangeSlider, Step, Stepper } from '@skeletonlabs/skeleton';
+	import {CalculationGoal, CalculationSex} from '$lib/api';
 
-	/** @type {import('./$types').ActionData} */ export let form;
+	/** @type {import('$lib/api').Tdee} */
+	let calculationResult;
+
+	let calculationError;
 
 	let step = 1;
-	const exampleTdee: Tdee = {
+
+	/** @type {import('$lib/api').Tdee} */
+	const exampleTdee = {
 		age: 30,
 		height: 160,
 		sex: CalculationSex.Female,
@@ -16,10 +21,6 @@
 	};
 
 	let tdee = exampleTdee;
-
-	if (form) {
-		tdee = form;
-	}
 
 	const activityLevels = [
 		{ label: 'Mostly Sedentary', value: 1 },
@@ -39,20 +40,17 @@
 		{ label: 'Weight Gain', value: CalculationGoal.Gain }
 	];
 
-	const nextStep = (e: Event) => {
-		e.preventDefault();
-
-		if (step < 3) {
-			step++;
-		}
-	};
-	const previousStep = (e: Event) => {
-		e.preventDefault();
-
-		if (step > 1) {
-			step--;
-		}
-	};
+	async function calculate() {
+		await fetch('/wizard', {
+			method: 'POST',
+			body: JSON.stringify(tdee),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}).then(async (response) => {
+			calculationResult = await response.json()
+		}).catch((_ => calculationError = true));
+	}
 </script>
 
 <svelte:head>
@@ -62,8 +60,10 @@
 <section>
 	<div class="container mx-auto p-8 space-y-8">
 		<h1>TDEE Calculator</h1>
+
+		{#if !calculationResult && !calculationError}
 		<form method="POST">
-			<Stepper>
+			<Stepper on:complete={calculate}>
 				<Step>
 					<svelte:fragment slot="header">Step 1: Body Metrics</svelte:fragment>
 					<p>
@@ -233,13 +233,16 @@
 				</Step>
 			</Stepper>
 		</form>
-
-		{#if form}
+		{:else if !calculationError}
 			<h2>Your result</h2>
 
 			<p>
-				Based on your input, your basic metabolic rate is {tdee.bmr}kcal. Your daily calorie
-				consumption to hold your weight should be around {tdee.tdee}kcal.
+				Based on your input, your basic metabolic rate is {calculationResult.bmr}kcal. Your daily calorie
+				consumption to hold your weight should be around {calculationResult.tdee}kcal.
+			</p>
+		{:else}
+			<p>
+				An error occured. Please try again later.
 			</p>
 		{/if}
 	</div>
