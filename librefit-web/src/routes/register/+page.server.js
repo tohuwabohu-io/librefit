@@ -13,12 +13,12 @@ export const actions = {
 		/** @type {any} */
 		let result = validateFields(user);
 
-		console.log(`validation errors=${JSON.stringify(result)}`);
+		console.log(`register validation errors=${JSON.stringify(result)}`);
 
 		if (!result) {
 			const response = await proxyFetch(event.fetch, userApi, user, null);
 
-			console.log(response);
+			console.log(`register statusCode=${response.status} message=${response.statusText}`);
 
 			if (response.status === 201) {
 				result = {
@@ -33,7 +33,7 @@ export const actions = {
 			}
 		}
 
-		console.log(`returning value=${JSON.stringify(result)}`);
+		console.log(`register returning value=${JSON.stringify(result)}`);
 
 		return result;
 	}
