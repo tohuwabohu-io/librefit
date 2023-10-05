@@ -1,62 +1,15 @@
 <script>
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-	import {UserResourceApi} from 'librefit-api/rest';
-	import {DEFAULT_CONFIG} from '$lib/api/Config.js';
+	import { enhance } from '$app/forms';
 
-	let emailInput, passwordInput, passwordConfirmationInput, tosInput, registrationButton;
-	let success, error, errorText;
+	/** @type {import('./$types/').ActionData} */
+	export let form;
 
-	let registrationData = {
-		name: '',
-		email: '',
-		password: ''
-	};
+	let pwdInput;
 
-	let passwordConfirmation;
-	let tosAccepted = false;
-
-	const userApi = new UserResourceApi(DEFAULT_CONFIG);
-
-	const register = async () => {
-		if (
-			![emailInput, passwordInput, passwordConfirmationInput, tosInput]
-				.map((control) => control.validate())
-				.includes(false)
-		) {
-			success.classList.add('hidden');
-			error.classList.add('hidden');
-
-			await userApi
-				.userRegisterPost({
-					libreUser: registrationData
-				})
-				.then(() => {
-					success.classList.remove('hidden');
-					error.classList.add('hidden');
-					errorText = '';
-				})
-				.catch((e) => {
-					console.log(e);
-
-					if (e.response.status === 500 || e.response.status !== 400) {
-						errorText = 'An error occurred. Please try again later.';
-					} else {
-						e.response.json().then((e) => {
-							console.log(e);
-
-							errorText = e.message;
-						});
-					}
-
-					success.classList.add('hidden');
-					error.classList.remove('hidden');
-				});
-		}
-	};
-
-	const passwordValidation = () => {
+	const passwordValidation = (e) => {
 		// some arbitrary rules
-		if (passwordInput.value.indexOf('a') < 0) {
+		if (e.value.indexOf('a') < 0) {
 			return {
 				valid: false,
 				errorMessage: "Chosen password must contain at least one 'a' letter."
@@ -66,8 +19,8 @@
 		return { valid: true };
 	};
 
-	const passwordConfirmationValidation = () => {
-		if (passwordInput.value !== passwordConfirmation) {
+	const passwordConfirmationValidation = (e) => {
+		if (e.value !== pwdInput.value) {
 			return {
 				valid: false,
 				errorMessage: 'Passwords do not match.'
@@ -77,8 +30,8 @@
 		return { valid: true };
 	};
 
-	const tosValidation = () => {
-		if (!tosAccepted) {
+	const tosValidation = (e) => {
+		if (!e.value) {
 			return {
 				valid: false,
 				errorMessage: 'Please accept our terms and conditions.'
@@ -100,37 +53,62 @@
 			<span class="text-secondary-500">Up</span>
 		</h1>
 
-		<form class="variant-ringed p-4 space-y-4 rounded-container-token">
+		<form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" use:enhance={() => {
+			return async ({ update }) => {
+			  update({ reset: false });
+			};
+		  }}>
 			<ValidatedInput
 				name="email"
 				type="email"
 				placeholder="Enter E-Mail"
 				label="E-Mail"
 				required
-				bind:this={emailInput}
-				bind:value={registrationData.email}
 			/>
 
-			<ValidatedInput
-				name="password"
-				type="password"
-				placeholder="Enter Password"
-				label="Password"
-				required
-				bind:this={passwordInput}
-				validateDetail={passwordValidation}
-				bind:value={registrationData.password}
-			/>
-			<ValidatedInput
-				name="passwordConfirmation"
-				type="password"
-				placeholder="Confirm Password"
-				validateDetail={passwordConfirmationValidation}
-				label="Confirm Password"
-				required
-				bind:this={passwordConfirmationInput}
-				bind:value={passwordConfirmation}
-			/>
+			{#if !form?.errors}
+				<ValidatedInput
+					name="password"
+					type="password"
+					placeholder="Enter Password"
+					label="Password"
+					bind:this={pwdInput}
+					required
+					validateDetail={passwordValidation}
+				/>
+			{:else}
+				<ValidatedInput
+						name="password"
+						type="password"
+						placeholder="Enter Password"
+						label="Password"
+						bind:this={pwdInput}
+						required
+						validateDetail={passwordValidation}
+						errorMessage={form.errors['password']}
+				/>
+			{/if}
+
+			{#if !form?.errors}
+				<ValidatedInput
+					name="passwordConfirmation"
+					type="password"
+					placeholder="Confirm Password"
+					validateDetail={passwordConfirmationValidation}
+					label="Confirm Password"
+					required
+				/>
+			{:else}
+				<ValidatedInput
+						name="passwordConfirmation"
+						type="password"
+						placeholder="Confirm Password"
+						validateDetail={passwordConfirmationValidation}
+						label="Confirm Password"
+						required
+						errorMessage={form.errors['passwordConfirmation']}
+				/>
+			{/if}
 
 			<label class="label">
 				<span>Nickname</span>
@@ -139,42 +117,44 @@
 					class="input"
 					type="text"
 					placeholder="Enter Nickname (optional)"
-					bind:value={registrationData.name}
 				/>
 			</label>
 
-			<ValidatedInput
-				name="confirmation"
-				type="checkbox"
-				styling="checkbox self-center"
-				bind:this={tosInput}
-				bind:value={tosAccepted}
-				validateDetail={tosValidation}
-			>
-				I agree to LibreFit's terms and conditions.
-			</ValidatedInput>
+			{#if !form?.errors}
+				<ValidatedInput
+					name="confirmation"
+					type="checkbox"
+					styling="checkbox self-center"
+					validateDetail={tosValidation}
+				>
+					I agree to LibreFit's terms and conditions.
+				</ValidatedInput>
+			{:else}
+				<ValidatedInput
+						name="confirmation"
+						type="checkbox"
+						styling="checkbox self-center"
+						validateDetail={tosValidation}
+						errorMessage={form.errors['confirmation']}
+				>
+					I agree to LibreFit's terms and conditions.
+				</ValidatedInput>
+			{/if}
 
 			<div>
-				<p
-					bind:this={success}
-					class="variant-glass-success variant-ringed-success p-4 rounded-full hidden"
-				>
-					Successfully signed up! Please proceed to the <a href="/login">Login</a>.
-				</p>
-				<p
-					bind:this={error}
-					class="variant-glass-error variant-ringed-error p-4 rounded-full hidden"
-				>
-					{errorText}
-				</p>
+				{#if form?.success}
+					<p class="variant-glass-success variant-ringed-success p-4 rounded-full hidden" >
+						Successfully signed up! Please proceed to the <a href="/login">Login</a>.
+					</p>
+				{:else if form?.error}
+					<p class="variant-glass-error variant-ringed-error p-4 rounded-full hidden">
+						{form.error}
+					</p>
+				{/if}
 			</div>
 
 			<div class="flex justify-between">
-				<button
-					bind:this={registrationButton}
-					on:click|preventDefault={register}
-					class="btn variant-filled-primary">Register</button
-				>
+				<button class="btn variant-filled-primary">Register</button>
 
 				<div class="flex flex-row gap-4">
 					<p class="self-center text-sm unstyled">Already registered?</p>
