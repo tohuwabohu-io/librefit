@@ -1,8 +1,6 @@
 <script src="+page.server.ts">
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
 
-	let loginButton, emailInput, passwordInput;
-
 	/** @type {import('./$types/').ActionData} */
 	export let form;
 </script>
@@ -25,7 +23,6 @@
 				name="email"
 				placeholder="Your E-Mail"
 				required
-				bind:this={emailInput}
 			/>
 			<ValidatedInput
 				label="Password"
@@ -33,7 +30,6 @@
 				name="password"
 				placeholder="Your Password"
 				required
-				bind:this={passwordInput}
 			/>
 
 			<div>
@@ -45,9 +41,7 @@
 			</div>
 
 			<div>
-				<button
-					bind:this={loginButton}
-					class="btn variant-filled-primary">Login</button>
+				<button class="btn variant-filled-primary">Login</button>
 			</div>
 		</form>
 	</div>
