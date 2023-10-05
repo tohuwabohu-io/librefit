@@ -65,4 +65,10 @@ export const replaceGetParamsJson = (path, json) => {
 /**
  * @param {FormData} formData
  */
-export const convertFormDataToJson = (formData) => {};
+export const convertFormDataToJson = (formData) => {
+	/** @type {any} */
+	const json = {};
+	formData.forEach((value, key) => (json[key] = value));
+
+	return json;
+};

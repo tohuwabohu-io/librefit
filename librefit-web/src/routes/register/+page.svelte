@@ -1,6 +1,7 @@
 <script>
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
 	import { enhance } from '$app/forms';
+	import {validatePassword, validatePasswordConfirmation, validateTos} from '$lib/validation.js';
 
 	/** @type {import('./$types/').ActionData} */
 	export let form;
@@ -8,37 +9,30 @@
 	let pwdInput;
 
 	const passwordValidation = (e) => {
-		// some arbitrary rules
-		if (e.value.indexOf('a') < 0) {
-			return {
-				valid: false,
-				errorMessage: "Chosen password must contain at least one 'a' letter."
-			};
-		}
+		const msg = validatePassword(e.value);
 
-		return { valid: true };
+		return {
+			valid: msg === null,
+			errorMessage: msg
+		};
 	};
 
 	const passwordConfirmationValidation = (e) => {
-		if (e.value !== pwdInput.value) {
-			return {
-				valid: false,
-				errorMessage: 'Passwords do not match.'
-			};
-		}
+		const msg = validatePasswordConfirmation(e.value, pwdInput.value);
 
-		return { valid: true };
+		return {
+			valid: msg === null,
+			errorMessage: msg
+		};
 	};
 
 	const tosValidation = (e) => {
-		if (!e.value) {
-			return {
-				valid: false,
-				errorMessage: 'Please accept our terms and conditions.'
-			};
-		}
+		const msg = validateTos(e.value);
 
-		return { valid: true };
+		return {
+			valid: msg === null,
+			errorMessage: msg
+		};
 	};
 </script>
 
@@ -143,11 +137,11 @@
 
 			<div>
 				{#if form?.success}
-					<p class="variant-glass-success variant-ringed-success p-4 rounded-full hidden" >
+					<p class="variant-glass-success variant-ringed-success p-4 rounded-full" >
 						Successfully signed up! Please proceed to the <a href="/login">Login</a>.
 					</p>
 				{:else if form?.error}
-					<p class="variant-glass-error variant-ringed-error p-4 rounded-full hidden">
+					<p class="variant-glass-error variant-ringed-error p-4 rounded-full">
 						{form.error}
 					</p>
 				{/if}
