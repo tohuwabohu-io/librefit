@@ -38,7 +38,7 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 			headers,
 			body: JSON.stringify(data)
 		});
-	} else if (method === 'GET') {
+	} else if (method === 'GET' || method === 'DELETE') {
 		path = replaceGetParamsJson(path, data);
 
 		call = fetchApi(PUBLIC_API_BASE_PATH + path, {
