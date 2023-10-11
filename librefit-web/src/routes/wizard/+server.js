@@ -12,7 +12,7 @@ export async function POST({ request, fetch }) {
 	let response;
 
 	try {
-		response = await proxyFetch(fetch, tdeeApi, tdee, null);
+		response = await proxyFetch(fetch, tdeeApi, undefined, tdee);
 	} catch (e) {
 		console.log(e);
 		response = new Response();

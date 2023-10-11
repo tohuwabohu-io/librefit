@@ -16,7 +16,7 @@ export const actions = {
 		console.log(`register validation errors=${JSON.stringify(result)}`);
 
 		if (!result) {
-			const response = await proxyFetch(event.fetch, userApi, user, null);
+			const response = await proxyFetch(event.fetch, userApi, undefined, user);
 
 			console.log(`register statusCode=${response.status} message=${response.statusText}`);
 
