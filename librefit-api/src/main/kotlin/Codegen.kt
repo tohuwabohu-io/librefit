@@ -142,6 +142,10 @@ fun collectSchemas(schemas: JsonObject): List<Schema> {
                 typeOrRef = ref.substringAfterLast("/")
             }
 
+            if (typeOrRef == "array") {
+                typeOrRef = "array<${typeOrRefElement.jsonObject["items"]!!.jsonObject["type"]!!.jsonPrimitive.content}>"
+            }
+
             typeMap[typeOrRef] ?: typeOrRef
         }
 
