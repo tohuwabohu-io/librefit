@@ -49,11 +49,17 @@ fun writeJs(out: String, enums: List<Enum>, refs: List<Ref>, schemas: List<Schem
     val writer: BufferedWriter = outFile.bufferedWriter()
 
     enums.forEach { enum ->
-        val enumValues = enum.allowedValues.joinToString("|") { it }
+        val enumValues = enum.allowedValues.joinToString(",\n") { value ->
+            "\t${value.lowercase().capitalize()}: '${value.uppercase()}'"
+        }
 
         writer.write("/**\n")
-        writer.write(" * @typedef {$enumValues} ${enum.name}\n")
-        writer.write("*/\n\n")
+        writer.write(" * @readonly\n")
+        writer.write(" * @enum {String}\n")
+        writer.write(" */\n")
+        writer.write("export const ${enum.name} = {\n")
+        writer.write(enumValues)
+        writer.write("\n}\n\n")
     }
 
     refs.forEach { ref ->
@@ -107,7 +113,7 @@ fun collectEnums(schemas: JsonObject): List<Enum> {
 
         val enumElement = element["enum"]
 
-        val enum = enumElement!!.jsonArray.map { it.toString() }
+        val enum = enumElement!!.jsonArray.map { it.toString().replace("\"", "") }
 
         Enum(schemaName, enum)
     }.toList()
@@ -143,7 +149,9 @@ fun collectSchemas(schemas: JsonObject): List<Schema> {
             }
 
             if (typeOrRef == "array") {
-                typeOrRef = "array<${typeOrRefElement.jsonObject["items"]!!.jsonObject["type"]!!.jsonPrimitive.content}>"
+                val arrayType = typeOrRefElement.jsonObject["items"]!!.jsonObject["type"]!!.jsonPrimitive.content
+
+                typeOrRef = "Array<${typeMap[arrayType] ?: arrayType}>"
             }
 
             typeMap[typeOrRef] ?: typeOrRef
@@ -202,6 +210,10 @@ fun readJsonFromDisk(path: String): JsonObject {
 fun String.pathToCamelCase(): String {
     val pattern = "/\\{?[a-z]".toRegex()
     return replace(pattern) { it.value.last().uppercase() }.replace("}", "")
+}
+
+fun String.capitalize(): String {
+    return replaceFirstChar(Char::titlecase)
 }
 
 data class Schema(val name: String, val properties: Map<String, String>, val mandatory: List<String>?)
