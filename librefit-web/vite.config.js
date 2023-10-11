@@ -18,8 +18,5 @@ export default defineConfig({
 				]
 			}
 		})
-	],
-	optimizeDeps: {
-		include: ['./node_modules/librefit-api', 'librefit-api/']
-	}
+	]
 });
