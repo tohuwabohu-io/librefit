@@ -15,11 +15,24 @@ export const actions = {
 			password: String(formData.get('password'))
 		};
 
-		const response = await proxyFetch(event.fetch, userApi, libreUser, null);
+		const response = await proxyFetch(event.fetch, userApi, undefined, libreUser);
 
 		console.log(`login statusCode=${response.status} message=${response.statusText}`);
 
+		console.log(response.headers);
+
 		if (response.status === 200) {
+			/** @type {import('$lib/api').AuthenticationResponse} */
+			const auth = await response.json();
+
+			event.cookies.set('auth', auth.token, {
+				httpOnly: true,
+				path: '/',
+				secure: true,
+				sameSite: 'strict',
+				maxAge: 60 * 60 * 24 // 1 day
+			});
+
 			throw redirect(303, '/');
 		}
 
