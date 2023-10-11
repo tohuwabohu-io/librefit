@@ -2,36 +2,46 @@ import { PUBLIC_API_BASE_PATH } from '$env/static/public';
 import { error } from '@sveltejs/kit';
 
 /**
- * This is to be used in +server.js files.
+ * This is to be used in +server.js/+page.server.js files.
  */
 
 /**
  * @param {function} fetchApi
- * @param {{path: String; method: String; contentType: String;}} api
- * @param {any} data
- * @param {String | null} jwt
+ * @param {{path: String; method: String; contentType: String; guarded: boolean}} api
+ * @param {String} [jwt]
+ * @param {any} [data]
  */
-export const proxyFetch = async (fetchApi, api, data, jwt) => {
+export const proxyFetch = async (fetchApi, api, jwt, data) => {
 	let response;
 	let call;
+
+	const method = api.method.toUpperCase();
+	let path = api.path;
 
 	/** @type {any} */
 	const headers = {
 		'content-type': api.contentType
 	};
 
-	if (jwt) {
-		headers['Authorization'] = `Bearer ${jwt}`;
+	if (api.guarded === true) {
+		if (jwt) {
+			headers['Authorization'] = `Bearer ${jwt}`;
+		} else {
+			console.error(`${method} ${api.path} requires authentication, no JWT provided!`);
+			throw error(405);
+		}
 	}
 
-	if (api.method.toUpperCase() === 'POST') {
-		call = fetchApi(PUBLIC_API_BASE_PATH + api.path, {
+	if (method === 'POST') {
+		call = fetchApi(PUBLIC_API_BASE_PATH + path, {
 			method: api.method,
 			headers,
 			body: JSON.stringify(data)
 		});
-	} else if (api.method.toUpperCase() === 'GET') {
-		call = fetchApi(PUBLIC_API_BASE_PATH + replaceGetParamsJson(api.path, data), {
+	} else if (method === 'GET') {
+		path = replaceGetParamsJson(path, data);
+
+		call = fetchApi(PUBLIC_API_BASE_PATH + path, {
 			method: api.method,
 			headers
 		});
@@ -42,8 +52,17 @@ export const proxyFetch = async (fetchApi, api, data, jwt) => {
 
 	try {
 		response = await call;
+
+		console.log(
+			`${method} ${path} statusCode=${response.status} statusText=${response.statusText}`
+		);
 	} catch (e) {
+		console.error(
+			`${method} ${path} statusCode=${response.status} statusText=${response.statusText}`
+		);
+
 		console.log(e);
+
 		response = new Response();
 	}
 
@@ -55,9 +74,11 @@ export const proxyFetch = async (fetchApi, api, data, jwt) => {
  * @param {any} json
  */
 export const replaceGetParamsJson = (path, json) => {
-	Object.entries(json).forEach(([key, value]) => {
-		path = path.replace(`{${key}}`, String(value));
-	});
+	if (json) {
+		Object.entries(json).forEach(([key, value]) => {
+			path = path.replace(`{${key}}`, String(value));
+		});
+	}
 
 	return path;
 };
