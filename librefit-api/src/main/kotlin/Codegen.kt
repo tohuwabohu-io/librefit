@@ -66,7 +66,7 @@ fun writeJs(out: String, enums: List<Enum>, refs: List<Ref>, schemas: List<Schem
         val properties = schema.properties
         val mandatory = schema.mandatory
         val declaration = properties.entries.joinToString("\n") { (k, v) ->
-            if (mandatory?.contains(k) == true) " * @property {$v} $k" else " * @property [$v] $k"
+            if (mandatory?.contains(k) == true) " * @property {$v} $k" else " * @property {$v} [$k]"
         }
 
         writer.write("/**\n")
@@ -89,7 +89,8 @@ fun writeJs(out: String, enums: List<Enum>, refs: List<Ref>, schemas: List<Schem
         }
 
         writer.write("\t\tcontentType: '${operation.content}',\n")
-        writer.write("\t\tmethod: '${operation.method}'\n")
+        writer.write("\t\tmethod: '${operation.method}',\n")
+        writer.write("\t\tguarded: ${operation.guarded}\n")
         writer.write("\t},\n")
     }
 
@@ -169,14 +170,17 @@ fun collectOperations(paths: JsonObject): Map<String, Operation> {
                 contentElement?.get(contentType)?.jsonObject?.get("schema")
                     ?.jsonObject?.get("\$ref")?.jsonPrimitive?.content?.substringAfterLast("/")
 
-            listOf(operation, method, contentType, schema)
+            val responsesElement = methodElement["responses"]
+            val guarded = if(responsesElement?.jsonObject?.keys?.contains("401") == true) "y" else "n"
+
+            listOf(operation, method, contentType, guarded, schema)
         }
 
-        val schema = if (scraped[3] != null) {
-            Schema(scraped[3]!!, mapOf(), listOf())
+        val schema = if (scraped[4] != null) {
+            Schema(scraped[4]!!, mapOf(), listOf())
         } else null
 
-        val operation = Operation(scraped[0]!!, path, scraped[1]!!, scraped[2]!!, schema)
+        val operation = Operation(scraped[0]!!, path, scraped[1]!!, scraped[2]!!, scraped[3]!! == "y", schema)
 
         operation.id to operation
     }
@@ -199,4 +203,4 @@ fun String.pathToCamelCase(): String {
 data class Schema(val name: String, val properties: Map<String, String>, val mandatory: List<String>?)
 data class Enum(val name: String, val allowedValues: List<String>)
 data class Ref(val name: String, val type: String, val format: String?)
-data class Operation(val id: String, val path: String, val method: String, val content: String, val schema: Schema?)
+data class Operation(val id: String, val path: String, val method: String, val content: String, val guarded: Boolean, val schema: Schema?)
