@@ -96,18 +96,20 @@
 	const remove = (e) => {
 		fetch(`/weight?sequence=${e.detail.sequence}&date=${e.detail.date}`, {
 			method: 'DELETE'
-		}).then(async (result) => {
-			entries = await result.json();
-			paint()
-		}).then(_ => {
-			entries = entries.filter((entry) => !weakEntityEquals(entry, {
-				id: e.detail.sequence,
-				added: e.detail.date,
-			}));
+		}).then(result => {
+			if (result.status === 200) {
+				fetch(`/weight?filter=${filter}`, {
+					method: 'GET'
+				}).then(async (response) => {
+					entries = await response.json();
+					paint();
 
-			showToastSuccess('Deletion successful.');
+					showToastSuccess('Deletion successful.');
+				}).catch(handleApiError)
 
-			paint();
+			} else {
+				throw Error(result.status)
+			}
 		}).catch(handleApiError)
 	}
 
@@ -172,7 +174,6 @@
 					>
 				{/each}
 			</RadioGroup>
-
 
 			{#if chartData}
 				<Line data={chartData} options={chartOptions} />
