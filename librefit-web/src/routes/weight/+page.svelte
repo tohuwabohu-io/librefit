@@ -4,6 +4,7 @@
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
+	import {handleApiError, showToastSuccess} from "$lib/toast.js";
 
 	Chart.register(...registerables);
 
@@ -139,24 +140,6 @@
 			}).then(async (response) => currentGoal = await response.json())
 			.catch(handleApiError)
 		}
-	}
-
-	export const handleApiError = (err) => {
-		console.error(err);
-
-		toastStore.trigger({
-			message: 'An error occured. Please try again later.',
-			background: 'variant-filled-warning',
-			autohide: false
-		})
-	}
-
-	export const showToastSuccess = (toastMessage) => {
-		toastStore.trigger({
-			message: toastMessage,
-			background: 'variant-filled-primary',
-			autohide: true
-		})
 	}
 </script>
 
