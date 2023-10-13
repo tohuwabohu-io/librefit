@@ -52,6 +52,10 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     )
     @Operation(operationId = "createCalorieTrackerEntry")
     fun create(@Context securityContext: SecurityContext, @Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
+        if (calorieTracker.userId == 0L) {
+            calorieTracker.userId = jwt.name.toLong();
+        }
+
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
 
         printAuthenticationInfo(jwt, securityContext)
