@@ -94,7 +94,7 @@ export const DELETE = async ({ fetch, url, cookies }) => {
 	try {
 		response = await proxyFetch(fetch, api.deleteCalorieTrackerEntry, cookies.get('auth'), {
 			id: url.searchParams.get('sequence'),
-			date: url.searchParams.get('date')
+			date: url.searchParams.get('added')
 		});
 	} catch (e) {
 		console.error(e);

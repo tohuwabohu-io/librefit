@@ -22,13 +22,11 @@
 		};
 	});
 
-	const addEntry = (e) => {
-		console.log(e);
-
+	const addEntry = async (e) => {
 		/** @type {CalorieTrackerEntry} */
 		const newEntry = {
-			id: e.detail.sequence,
-			added: today,
+			id: Math.max(...(await datesToEntries[todayStr]).map(entry => entry.id).filter(id => id)) + 1,
+			added: todayStr,
 			amount: e.detail.value,
 			category: e.detail.category
 		};
@@ -36,11 +34,8 @@
 		fetch('/tracker', {
 			method: 'POST',
 			body: JSON.stringify(newEntry)
-		}).then(async (response) => {
-			/*trackerEntries.push(await response.json());
-			trackerEntries = trackerEntries;
-
-			addValue = 0;*/
+		}).then(_ => {
+			loadEntries(newEntry.added);
 		}).catch(handleApiError);
 	};
 
@@ -56,15 +51,20 @@
 		fetch('/tracker', {
 			method: 'PUT',
 			body: JSON.stringify(entry)
-		}).then(_ => showToastSuccess('Entry updated successfully!')).catch(handleApiError)
+		}).then(_ => {
+			loadEntries(entry.added);
+			showToastSuccess('Entry updated successfully!')
+		}).catch(handleApiError)
 	};
 
 	const deleteEntry = (e) => {
-		fetch(`/tracker?id=${e.detail.sequence}&added=${e.detail.date}`, {
+		console.log(e);
+
+		fetch(`/tracker?sequence=${e.detail.sequence}&added=${e.detail.date}`, {
 			method: 'DELETE',
 		}).then((response) => {
 			if (response.status === 200) {
-				// loadEntries(e.detail.date);
+				loadEntries(e.detail.date);
 			} else {
 				throw Error(response.status);
 			}
@@ -82,11 +82,6 @@
 		} else {
 			throw new Error(result);
 		}
-	}
-
-	/** @param {Array<CalorieTrackerEntry>} entries */
-	const calculateTotal = async (entries) => {
-		return entries.map((entry) => entry.amount).reduce((a, b) => a + b);
 	}
 </script>
 
