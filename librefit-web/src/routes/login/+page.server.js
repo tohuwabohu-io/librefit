@@ -17,10 +17,6 @@ export const actions = {
 
 		const response = await proxyFetch(event.fetch, userApi, undefined, libreUser);
 
-		console.log(`login statusCode=${response.status} message=${response.statusText}`);
-
-		console.log(response.headers);
-
 		if (response.status === 200) {
 			/** @type {import('$lib/api').AuthenticationResponse} */
 			const auth = await response.json();
