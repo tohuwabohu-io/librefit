@@ -32,7 +32,7 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 		}
 	}
 
-	if (method === 'POST') {
+	if (method === 'POST' || method === 'PUT') {
 		call = fetchApi(PUBLIC_API_BASE_PATH + path, {
 			method: api.method,
 			headers,
