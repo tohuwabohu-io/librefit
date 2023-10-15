@@ -26,7 +26,7 @@ export const actions = {
 				path: '/',
 				secure: true,
 				sameSite: 'strict',
-				maxAge: 60 * 60 * 24 // 1 day
+				maxAge: 1000 * 60 * 15 // 15 mins
 			});
 
 			throw redirect(303, '/');
