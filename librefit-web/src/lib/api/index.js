@@ -5,7 +5,7 @@
 export const CalculationGoal = {
 	Gain: 'GAIN',
 	Loss: 'LOSS'
-};
+}
 
 /**
  * @readonly
@@ -14,7 +14,7 @@ export const CalculationGoal = {
 export const CalculationSex = {
 	Male: 'MALE',
 	Female: 'FEMALE'
-};
+}
 
 /**
  * @readonly
@@ -26,7 +26,7 @@ export const Category = {
 	Dinner: 'DINNER',
 	Snack: 'SNACK',
 	Unset: 'UNSET'
-};
+}
 
 /**
  * @typedef {Object} LocalDate
@@ -136,8 +136,8 @@ export const api = {
 		method: 'put',
 		guarded: true
 	},
-	getTdeeCalculateAgeSexWeightHeightActivityLevelDiffGain: {
-		path: '/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{diff}/{gain}',
+	calculateTdee: {
+		path: '/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}',
 		contentType: 'text/plain',
 		method: 'get',
 		guarded: false
@@ -237,5 +237,5 @@ export const api = {
 		contentType: 'application/json',
 		method: 'post',
 		guarded: false
-	}
-};
+	},
+}

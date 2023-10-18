@@ -6,7 +6,7 @@ import { proxyFetch } from '$lib/api/util.js';
  */
 export async function POST({ request, fetch }) {
 	const tdee = await request.json();
-	const tdeeApi = api.getTdeeCalculateAgeSexWeightHeightActivityLevelDiffGain;
+	const tdeeApi = api.calculateTdee;
 
 	/** @type {Response} */
 	let response;
