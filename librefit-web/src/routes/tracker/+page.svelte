@@ -14,6 +14,9 @@
 	let datesToEntries = {};
 
 	$: datesToEntries;
+	$: if (data && data.entryToday) {
+		datesToEntries[todayStr] = data.entryToday;
+	}
 
 	const categories = Object.keys(Category).map((key) => {
 		return {
@@ -23,10 +26,18 @@
 	});
 
 	const addEntry = async (e) => {
+		let id;
+
+		if (await datesToEntries[todayStr]) {
+			id = Math.max(...(await datesToEntries[todayStr]).map(entry => entry.id).filter(id => id !== undefined)) + 1;
+		} else {
+			id = Math.max(...data.entryToday.map(entry => entry.id).filter(id => id !== undefined)) + 1;
+		}
+
 		/** @type {CalorieTrackerEntry} */
 		const newEntry = {
-			id: Math.max(...(await datesToEntries[todayStr]).map(entry => entry.id).filter(id => id)) + 1,
-			added: todayStr,
+			id: id,
+			added: e.detail.date,
 			amount: e.detail.value,
 			category: e.detail.category
 		};
@@ -100,30 +111,48 @@
 					</svelte:fragment>
 					<svelte:fragment slot="content">
 						<div class="flex gap-4 justify-between">
-							{#await datesToEntries[dateStr]}
-								<p>... loading</p>
-							{:then entries}
-								{#if entries}
-								<TrackerRadial entries={entries.map(e => e.amount)} />
+							{#if dateStr === todayStr && data.entryToday && !datesToEntries[dateStr]}
+								<TrackerRadial entries={data.entryToday.map(e => e.amount)} />
 								<div class="flex flex-col grow gap-4">
-									{#each entries as entry}
-										<TrackerInput
-												categories={categories}
+									{#each data.entryToday as entry}
+										<TrackerInput {categories}
 												value={entry.amount}
-												dateStr={dateStr}
+												{dateStr}
 												id={entry.id}
 												on:add={addEntry}
 												on:update={updateEntry}
 												on:remove={deleteEntry}
-												existing={entry.id !== undefined}
 												unit={'kcal'}
 										/>
 									{/each}
 								</div>
-								{/if}
-							{:catch error}
-								<p>{error}</p>
-							{/await}
+							{:else}
+								{#await datesToEntries[dateStr]}
+									<p>... loading</p>
+								{:then entries}
+									{#if entries}
+									<TrackerRadial entries={entries.map(e => e.amount)} />
+									<div class="flex flex-col grow gap-4">
+										{#each entries as entry}
+											<TrackerInput {categories}
+													value={entry.amount}
+													dateStr={entry.added}
+													id={entry.id}
+												    category={entry.category}
+													on:add={addEntry}
+													on:update={updateEntry}
+													on:remove={deleteEntry}
+												    existing={entry.id !== undefined}
+													disabled={entry.id !== undefined}
+													unit={'kcal'}
+											/>
+										{/each}
+									</div>
+									{/if}
+								{:catch error}
+									<p>{error}</p>
+								{/await}
+							{/if}
 						</div>
 					</svelte:fragment>
 				</AccordionItem>
