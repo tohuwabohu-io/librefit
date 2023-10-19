@@ -13,15 +13,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 }
 
-node {
-    version.set("19.6.0")
-    npmVersion.set("9.4.0")
-    npmInstallCommand.set("install")
-    npmWorkDir.set(file("${project.projectDir}/.cache/npm"))
-    distBaseUrl.set("https://nodejs.org/dist")
-    download.set(true)
-}
-
 tasks.openApiValidate {
     inputSpec.set("openapi.yaml")
 }
