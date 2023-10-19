@@ -1,5 +1,5 @@
-import { api } from '$lib/api';
-import { proxyFetch } from '$lib/api/util.js';
+import { api } from '$lib/server/api/index.js';
+import { proxyFetch } from '$lib/server/api/util.js';
 import { getDateAsStr } from '$lib/util.js';
 
 /** @type {import('./$types').PageServerLoad} */

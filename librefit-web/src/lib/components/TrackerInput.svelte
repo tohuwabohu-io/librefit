@@ -8,7 +8,7 @@
 	import Check from '$lib/assets/icons/check.svg?component';
 	import CancelDelete from '$lib/assets/icons/trash-off.svg?component';
 	import CancelEdit from '$lib/assets/icons/pencil-off.svg?component';
-	import {Category} from '$lib/api/index.js';
+	import {Category} from '$lib/api/model.js';
 
 	export let value, dateStr, id;
 	export let existing = false;

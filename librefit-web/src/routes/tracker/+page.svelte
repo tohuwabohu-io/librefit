@@ -4,7 +4,7 @@
 	import {handleApiError, showToastSuccess} from '$lib/toast.js';
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
 	import TrackerInput from '$lib/components/TrackerInput.svelte';
-	import {Category} from '$lib/api/index.js';
+	import {Category} from '$lib/api/model.js';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);

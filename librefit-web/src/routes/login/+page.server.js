@@ -1,6 +1,6 @@
-import { api } from '$lib/api';
+import { api } from '$lib/server/api/index.js';
 import { redirect } from '@sveltejs/kit';
-import { proxyFetch } from '$lib/api/util.js';
+import { proxyFetch } from '$lib/server/api/util.js';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -9,7 +9,7 @@ export const actions = {
 
 		const formData = await event.request.formData();
 
-		/** @type import('$lib/api').LibreUser */
+		/** @type import('$lib/server/api/index.js').LibreUser */
 		const libreUser = {
 			email: String(formData.get('email')),
 			password: String(formData.get('password'))
@@ -18,7 +18,7 @@ export const actions = {
 		const response = await proxyFetch(event.fetch, userApi, undefined, libreUser);
 
 		if (response.status === 200) {
-			/** @type {import('$lib/api').AuthenticationResponse} */
+			/** @type {import('$lib/server/api/index.js').AuthenticationResponse} */
 			const auth = await response.json();
 
 			event.cookies.set('auth', auth.token, {

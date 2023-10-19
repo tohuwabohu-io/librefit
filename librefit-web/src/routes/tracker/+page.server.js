@@ -1,6 +1,7 @@
-import { api, Category } from '$lib/api/index.js';
-import { proxyFetch } from '$lib/api/util.js';
+import { api } from '$lib/server/api/index.js';
+import { proxyFetch } from '$lib/server/api/util.js';
 import { getDateAsStr } from '$lib/util.js';
+import { Category } from '$lib/api/model.js';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ fetch, cookies }) => {

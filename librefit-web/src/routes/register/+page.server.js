@@ -1,5 +1,5 @@
-import { api } from '$lib/api';
-import { convertFormDataToJson, proxyFetch } from '$lib/api/util.js';
+import { api } from '$lib/server/api/index.js';
+import { convertFormDataToJson, proxyFetch } from '$lib/server/api/util.js';
 import { validateFields } from '$lib/validation.js';
 
 /** @type {import('./$types').Actions} */

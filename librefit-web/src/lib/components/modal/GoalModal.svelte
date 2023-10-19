@@ -5,7 +5,7 @@
 
     const today = new Date();
 
-    /** @type {import('$lib/api').Goal} */
+    /** @type Goal */
     let goal = {
         added: getDateAsStr(today),
         endDate: getDateAsStr(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())),

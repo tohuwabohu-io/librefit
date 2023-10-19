@@ -1,15 +1,15 @@
 <script>
 	import { RadioGroup, RadioItem, RangeSlider, Step, Stepper } from '@skeletonlabs/skeleton';
-	import {CalculationGoal, CalculationSex} from '$lib/api';
+	import {CalculationGoal, CalculationSex} from '$lib/api/model.js';
 
-	/** @type {import('$lib/api').Tdee} */
+	/** @type Tdee} */
 	let calculationResult;
 
 	let calculationError;
 
 	let step = 1;
 
-	/** @type {import('$lib/api').Tdee} */
+	/** @type Tdee} */
 	const exampleTdee = {
 		age: 30,
 		height: 160,

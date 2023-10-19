@@ -1,5 +1,5 @@
-import { api } from '$lib/api/index.js';
-import { proxyFetch } from '$lib/api/util.js';
+import { api } from '$lib/server/api/index.js';
+import { proxyFetch } from '$lib/server/api/util.js';
 import { DataViews, getDateAsStr } from '$lib/util.js';
 
 /**
@@ -93,7 +93,7 @@ export const PUT = async ({ request, fetch, cookies }) => {
 				id: params['id'],
 				date: params['date']
 			}).then(async (result) => {
-				/** @type {import('$lib/api').WeightTrackerEntry} */
+				/** @type {import('$lib/server/api/index.js').WeightTrackerEntry} */
 				const entry = await result.json();
 				entry.amount = params['amount'];
 
