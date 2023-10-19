@@ -38,34 +38,42 @@ fun main(args: Array<String>) {
 }
 
 fun writeJs(out: String, enums: List<Enum>, refs: List<Ref>, schemas: List<Schema>, operations: Map<String, Operation>) {
-    val outFile = File(out)
+    val modelOut = File("$out/api/model.js")
+    val apiOut = File("$out/server/api/index.js")
 
-    if (outFile.exists()) {
-        outFile.delete()
+    if (modelOut.exists()) {
+        modelOut.delete()
     }
 
-    outFile.createNewFile()
+    modelOut.createNewFile()
 
-    val writer: BufferedWriter = outFile.bufferedWriter()
+    if (apiOut.exists()) {
+        apiOut.delete()
+    }
+
+    apiOut.createNewFile()
+
+    val modelWriter: BufferedWriter = modelOut.bufferedWriter()
+    val apiWriter: BufferedWriter = apiOut.bufferedWriter()
 
     enums.forEach { enum ->
         val enumValues = enum.allowedValues.joinToString(",\n") { value ->
             "\t${value.lowercase().capitalize()}: '${value.uppercase()}'"
         }
 
-        writer.write("/**\n")
-        writer.write(" * @readonly\n")
-        writer.write(" * @enum {String}\n")
-        writer.write(" */\n")
-        writer.write("export const ${enum.name} = {\n")
-        writer.write(enumValues)
-        writer.write("\n}\n\n")
+        modelWriter.write("/**\n")
+        modelWriter.write(" * @readonly\n")
+        modelWriter.write(" * @enum {String}\n")
+        modelWriter.write(" */\n")
+        modelWriter.write("export const ${enum.name} = {\n")
+        modelWriter.write(enumValues)
+        modelWriter.write("\n}\n\n")
     }
 
     refs.forEach { ref ->
-        writer.write("/**\n")
-        writer.write(" * @typedef {Object} ${ref.name}\n")
-        writer.write(" */\n\n")
+        modelWriter.write("/**\n")
+        modelWriter.write(" * @typedef {Object} ${ref.name}\n")
+        modelWriter.write(" */\n\n")
     }
 
     schemas.forEach{ schema ->
@@ -75,34 +83,35 @@ fun writeJs(out: String, enums: List<Enum>, refs: List<Ref>, schemas: List<Schem
             if (mandatory?.contains(k) == true) " * @property {$v} $k" else " * @property {$v} [$k]"
         }
 
-        writer.write("/**\n")
-        writer.write(" * @typedef {Object} ${schema.name}\n")
-        writer.write(declaration)
-        writer.write("\n")
-        writer.write(" */\n\n")
+        modelWriter.write("/**\n")
+        modelWriter.write(" * @typedef {Object} ${schema.name}\n")
+        modelWriter.write(declaration)
+        modelWriter.write("\n")
+        modelWriter.write(" */\n\n")
     }
 
-    writer.write("export const api = {\n")
+    apiWriter.write("export const api = {\n")
 
     operations.keys.forEach { operationId ->
         val operation = operations[operationId]!!
 
-        writer.write("\t$operationId: {\n")
-        writer.write("\t\tpath: '${operation.path}',\n")
+        apiWriter.write("\t$operationId: {\n")
+        apiWriter.write("\t\tpath: '${operation.path}',\n")
 
         if (operation.schema?.name != null) {
-            writer.write("\t\t/** @see ${operation.schema.name} */\n")
+            apiWriter.write("\t\t/** @see ${operation.schema.name} */\n")
         }
 
-        writer.write("\t\tcontentType: '${operation.content}',\n")
-        writer.write("\t\tmethod: '${operation.method}',\n")
-        writer.write("\t\tguarded: ${operation.guarded}\n")
-        writer.write("\t},\n")
+        apiWriter.write("\t\tcontentType: '${operation.content}',\n")
+        apiWriter.write("\t\tmethod: '${operation.method}',\n")
+        apiWriter.write("\t\tguarded: ${operation.guarded}\n")
+        apiWriter.write("\t},\n")
     }
 
-    writer.write("}\n")
+    apiWriter.write("}\n")
 
-    writer.close()
+    modelWriter.close()
+    apiWriter.close()
 }
 
 fun collectEnums(schemas: JsonObject): List<Enum> {
@@ -124,7 +133,7 @@ fun collectRefs(schemas: JsonObject): List<Ref> {
         schemas[schemaName]!!.jsonObject["format"] != null
     }.map {schemaName ->
         val element = schemas[schemaName]!!.jsonObject
-
+        
         Ref(schemaName, element["type"]!!.jsonPrimitive.content, element["format"]?.jsonPrimitive?.content)
     }
 }

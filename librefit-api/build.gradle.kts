@@ -31,12 +31,17 @@ tasks.register<JavaExec>("ApiCodegen") {
 
     classpath = sourceSets.test.get().runtimeClasspath
     main = "io.tohuwabohu.librefit.api.codegen.ApiCodegen"
-    args = listOf("${project.projectDir}/openapi.json", "${project.projectDir}/rest/index.js")
+    args = listOf("${project.projectDir}/openapi.json", "${project.projectDir}/rest/lib")
+
+    doFirst {
+        project.mkdir("${project.projectDir}/rest/lib/api")
+        project.mkdir("${project.projectDir}/rest/lib/server/api")
+    }
 
     doLast {
         copy{
-            from("${project.projectDir}/rest/index.js")
-            into("../librefit-web/src/lib/api/")
+            from("${project.projectDir}/rest/lib")
+            into("../librefit-web/src/lib")
         }
     }
 }
