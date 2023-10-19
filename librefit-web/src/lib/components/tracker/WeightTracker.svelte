@@ -90,8 +90,6 @@
     }
 
     const filterEntries = (e) => {
-        console.log("filter")
-
         entriesFiltered = entries.filter((entry) => {
             const addedDate = parseStringAsDate(entry.added);
             const fromDate = parseStringAsDate(dateFilterRange.from);

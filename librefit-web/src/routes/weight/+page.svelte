@@ -15,8 +15,7 @@
 
 	const today = new Date();
 
-	let entries = [];
-	let lastEntry;
+	let lastEntry, entries;
 	let chartData, chartOptions;
 	let currentGoal;
 
@@ -24,12 +23,11 @@
 		await fetch(`/weight?filter=${filter}`, {
 			method: 'GET'
 		}).then(async (result) => {
-			entries = await result.json();
-			paint()
+			paint(await result.json());
 		});
 	}
 
-	const paint = () => {
+	const paint = (entries) => {
 		const noNaN = entries.map(entry => entry.amount);
 
 		if (filter !== DataViews.Today) {
@@ -55,6 +53,12 @@
 		}
 	}
 
+	$: if (data && data.entries) {
+		entries = data.entries;
+
+		paint(data.entries);
+	}
+
 	const add = (e) => {
 		fetch('/weight', {
 			method: 'POST',
@@ -68,13 +72,7 @@
 			headers: {
 				'Content-Type': 'application/json'
 			}
-		}).then(async (response) => {
-			entries.push(await response.json());
-			entries = entries;
-
-			showToastSuccess('Update successful.');
-			paint();
-		}).catch(handleApiError);
+		}).then(reload).catch(handleApiError);
 	}
 
 	const update = (e) => {
@@ -87,31 +85,27 @@
 					amount: e.detail.value
 				}
 			})
-		}).then(_ => {
-			showToastSuccess('Update successful.');
-
-			paint();
-		}).catch(handleApiError);
+		}).then(reload).catch(handleApiError);
 	}
 
 	const remove = (e) => {
 		fetch(`/weight?sequence=${e.detail.sequence}&date=${e.detail.date}`, {
 			method: 'DELETE'
-		}).then(result => {
-			if (result.status === 200) {
-				fetch(`/weight?filter=${filter}`, {
-					method: 'GET'
-				}).then(async (response) => {
-					entries = await response.json();
-					paint();
+		}).then(reload).catch(handleApiError)
+	}
 
-					showToastSuccess('Deletion successful.');
-				}).catch(handleApiError)
+	const reload = (result) => {
+		if (result.status === 200 || result.status === 201) {
+			fetch(`/weight?filter=${filter}`, {
+				method: 'GET'
+			}).then(async (response) => {
+				paint(await response.json());
 
-			} else {
-				throw Error(result.status)
-			}
-		}).catch(handleApiError)
+				showToastSuccess('Update successful.');
+			}).catch(handleApiError)
+		} else {
+			throw Error(result.status)
+		}
 	}
 
 	const updateGoal = (e) => {
@@ -162,15 +156,17 @@
 				<Line data={chartData} options={chartOptions} />
 			{/if}
 
-			{#if data.entries}
-				<WeightTracker bind:entries={data.entries}
-							   bind:lastEntry={data.lastEntry}
+			{#if entries}
+				<WeightTracker bind:entries={entries}
+							   bind:lastEntry={lastEntry}
 							   bind:goal={data.goal}
 							   on:addWeight={add}
 							   on:updateWeight={update}
 							   on:deleteWeight={remove}
 							   on:updateGoal={updateGoal}
 				/>
+			{:else}
+				<p>Loading...</p>
 			{/if}
 		</div>
 	</div>

@@ -5,7 +5,7 @@ import { getDateAsStr } from '$lib/util.js';
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ fetch, cookies }) => {
 	const findLastWeightApi = api.findLastWeightTrackerEntry;
-	const listWeightApi = api.listWeightTrackerEntries;
+	const listWeightApi = api.listWeightTrackerEntriesRange;
 	const goalApi = api.findLastGoal;
 
 	const jwt = cookies.get('auth');
@@ -15,9 +15,12 @@ export const load = async ({ fetch, cookies }) => {
 
 	if (lastWeightResponse.status === 200) {
 		const today = new Date();
+		const fromDate = new Date();
+		fromDate.setMonth(fromDate.getMonth() - 1);
 
 		const listWeightResponse = await proxyFetch(fetch, listWeightApi, jwt, {
-			date: getDateAsStr(today)
+			dateFrom: getDateAsStr(fromDate),
+			dateTo: getDateAsStr(today)
 		});
 
 		return {
