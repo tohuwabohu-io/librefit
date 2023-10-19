@@ -1,5 +1,5 @@
 import * as dateUtil from 'date-fns';
-import * as dateLocales from 'date-fns/locale';
+import * as dateLocales from 'date-fns/locale/index.js';
 
 /**
  * @readonly

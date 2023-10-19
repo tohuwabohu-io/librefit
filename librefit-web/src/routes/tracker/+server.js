@@ -1,5 +1,6 @@
-import { api, Category } from '$lib/server/api/index.js';
+import { api } from '$lib/server/api/index.js';
 import { proxyFetch } from '$lib/server/api/util.js';
+import { Category } from '$lib/api/model.js';
 
 /**
  * @type {import('@sveltejs/kit').RequestHandler}
