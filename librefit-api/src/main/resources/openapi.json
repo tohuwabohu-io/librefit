@@ -239,10 +239,9 @@
         }
       }
     },
-    "/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}" : {
+    "/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{diff}/{gain}" : {
       "get" : {
         "tags" : [ "Tdee Resource" ],
-        "operationId" : "calculateTdee",
         "parameters" : [ {
           "name" : "activityLevel",
           "in" : "path",
@@ -260,7 +259,15 @@
             "type" : "integer"
           }
         }, {
-          "name" : "calculationGoal",
+          "name" : "diff",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "float",
+            "type" : "number"
+          }
+        }, {
+          "name" : "gain",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -282,14 +289,6 @@
             "$ref" : "#/components/schemas/CalculationSex"
           }
         }, {
-          "name" : "weeklyDifference",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "float",
-            "type" : "number"
-          }
-        }, {
           "name" : "weight",
           "in" : "path",
           "required" : true,
@@ -308,9 +307,6 @@
                 }
               }
             }
-          },
-          "500" : {
-            "description" : "Internal Server Error"
           }
         }
       }
@@ -1052,7 +1048,10 @@
             }
           },
           "500" : {
-            "description" : "Internal Server Error"
+            "description" : "Internal Server Error",
+            "content" : {
+              "text/plain" : { }
+            }
           }
         }
       }

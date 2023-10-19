@@ -1,78 +1,33 @@
-<script lang="ts">
+<script>
 	import {RadioGroup, RadioItem, toastStore} from '@skeletonlabs/skeleton';
-	import {DataViews, enumKeys, getDateAsStr, weakEntityEquals, createWeightChart, createWeightChartDataset} from '$lib/util';
+	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys, weakEntityEquals} from '$lib/util';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-	import {
-		WeightTrackerEntry,
-		WeightTrackerResourceApi,
-		GoalsResourceApi,
-		Goal
-	} from 'librefit-api/rest';
-	import {onMount} from 'svelte';
 	import {Line} from 'svelte-chartjs';
-	import { Chart, registerables } from 'chart.js';
-	import {JWT_CONFIG} from '../../lib/api/Config';
+	import {Chart, registerables} from 'chart.js';
+	import {handleApiError, showToastSuccess} from "$lib/toast.js";
 
 	Chart.register(...registerables);
 
-	let filter = DataViews.Month;
+	export let filter = DataViews.Month;
+
+	/** @type import('./$types').PageData */
+	export let data;
+
 	const today = new Date();
 
-	let entries: Array<WeightTrackerEntry> = [];
-	let lastEntry;
+	let lastEntry, entries;
 	let chartData, chartOptions;
 	let currentGoal;
 
-	const weightApi = new WeightTrackerResourceApi(JWT_CONFIG);
-	const goalApi = new GoalsResourceApi(JWT_CONFIG);
-
-	const loadEntries = async () => {
-		await weightApi.findLastWeightTrackerEntry().catch((error) => {
-			if (!error.response || error.response.status !== 404) {
-				handleApiError(error);
-			}
-		}).then((entry) => {
-			lastEntry = entry;
-
-			if (filter === DataViews.Today) {
-				weightApi.listWeightTrackerEntries({
-					date: getDateAsStr(today)
-				}).then((result: Array<WeightTrackerEntry>) => {
-					entries = result;
-
-					paint();
-				}).catch(handleApiError);
-			} else {
-				const toDate = today;
-				const fromDate = new Date();
-
-				switch (filter) {
-					case DataViews.Week: fromDate.setDate(fromDate.getDate() -7); break;
-					case DataViews.Month: fromDate.setMonth(fromDate.getMonth() - 1); break;
-					case DataViews.Year: fromDate.setFullYear(fromDate.getFullYear() - 1); break;
-					default: break;
-				}
-
-				weightApi.listWeightTrackerEntriesRange({
-					dateFrom: getDateAsStr(fromDate),
-					dateTo: getDateAsStr(toDate)
-				}).then((result: Array<WeightTrackerEntry>) => {
-					entries = result;
-
-					paint();
-				}).catch(handleApiError)
-			}
+	const loadEntriesFiltered = async () => {
+		await fetch(`/weight?filter=${filter}`, {
+			method: 'GET'
+		}).then(async (result) => {
+			paint(await result.json());
 		});
-
-		await goalApi.findLastGoal().then((result: Goal) => currentGoal = result).catch((error) => {
-				if (!error.response || error.response.status !== 404) {
-					handleApiError(error);
-				}
-			}
-		)
 	}
 
-	const paint = () => {
+	const paint = (entries) => {
 		const noNaN = entries.map(entry => entry.amount);
 
 		if (filter !== DataViews.Today) {
@@ -98,97 +53,89 @@
 		}
 	}
 
+	$: if (data && data.entries) {
+		entries = data.entries;
+		lastEntry = data.lastEntry;
+
+		paint(data.entries);
+	}
+
 	const add = (e) => {
-		const newEntry: WeightTrackerEntry = {
-			id: e.detail.sequence,
-			added: e.detail.todayDateStr,
-			amount: e.detail.value
-		}
-
-		weightApi.createWeightTrackerEntry({
-			weightTrackerEntry: newEntry
-		}).then((result: WeightTrackerEntry) => {
-			entries.push(result);
-			entries = entries;
-
-			showToastSuccess('Update successful.');
-			paint();
-		}).catch(handleApiError)
+		fetch('/weight', {
+			method: 'POST',
+			body: JSON.stringify({
+				weight: {
+					id: e.detail.sequence,
+					added: e.detail.todayDateStr,
+					amount: e.detail.value
+				}
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}).then(reload).catch(handleApiError);
 	}
 
 	const update = (e) => {
-		weightApi.readWeightTrackerEntry({
-			id: e.detail.sequence,
-			date: e.detail.date
-		}).then((entry: WeightTrackerEntry) => {
-			entry.amount = e.detail.value;
-
-			weightApi.updateWeightTrackerEntry({
-				weightTrackerEntry: entry
-			}).then(_ => {
-				showToastSuccess('Update successful.');
-
-				paint();
-			}).catch(handleApiError)
-		}).catch(handleApiError)
+		fetch('/weight', {
+			method: 'PUT',
+			body: JSON.stringify({
+				weight: {
+					id: e.detail.sequence,
+					date: e.detail.date,
+					amount: e.detail.value
+				}
+			})
+		}).then(reload).catch(handleApiError);
 	}
 
 	const remove = (e) => {
-		weightApi.deleteWeightTrackerEntry({
-			id: e.detail.sequence,
-			date: e.detail.date
-		}).then(_ => {
-			entries = entries.filter((entry: WeightTrackerEntry) => !weakEntityEquals(entry, {
-				id: e.detail.sequence,
-				added: e.detail.date,
-			}));
+		fetch(`/weight?sequence=${e.detail.sequence}&date=${e.detail.date}`, {
+			method: 'DELETE'
+		}).then(reload).catch(handleApiError)
+	}
 
-			showToastSuccess('Deletion successful.');
+	const reload = (result) => {
+		if (result.status === 200 || result.status === 201) {
+			fetch(`/weight?filter=${filter}`, {
+				method: 'GET'
+			}).then(async (response) => {
+				paint(await response.json());
 
-			paint();
-		}).catch(handleApiError)
+				showToastSuccess('Update successful.');
+			}).catch(handleApiError)
+		} else {
+			throw Error(result.status)
+		}
 	}
 
 	const updateGoal = (e) => {
 		console.log(e);
 
-		let goal: Goal = e.detail.goal as Goal;
+		let goal = e.detail.goal;
 
 		if (!currentGoal) {
-			goalApi.createGoal({goal}).then((response) => {
-				currentGoal = response;
-			}).catch(handleApiError)
+			fetch('/weight', {
+				method: 'POST',
+				body: JSON.stringify({
+					goal: goal
+				}),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}).then(async (response) => {
+				currentGoal = response.json();
+			}).catch(handleApiError);
 		} else {
-			goalApi.updateGoal({goal}).then(_ => {
-				goalApi.readGoal({
-					date: currentGoal.added,
-					id: currentGoal.id
-				}).then((response) => currentGoal = response).catch(handleApiError)
-			}).catch(handleApiError)
+			fetch('/weight', {
+				method: 'PUT',
+				body: JSON.stringify({
+					goal: goal
+				})
+			}).then(async (response) => currentGoal = await response.json())
+			.catch(handleApiError)
 		}
 	}
-
-	const handleApiError = (err) => {
-		console.error(err);
-
-		toastStore.trigger({
-			message: 'An error occured. Please try again later.',
-			background: 'variant-filled-warning',
-			autohide: false
-		})
-	}
-
-	const showToastSuccess = (toastMessage: String) => {
-		toastStore.trigger({
-			message: toastMessage,
-			background: 'variant-filled-primary',
-			autohide: true
-		})
-	}
-
-	onMount(async () => {
-		await loadEntries()
-	});
 </script>
 
 <svelte:head>
@@ -200,24 +147,28 @@
 		<div class="flex flex-col gap-4">
 			<RadioGroup>
 				{#each enumKeys(DataViews) as dataView}
-					<RadioItem bind:group={filter} name="justify" value={DataViews[dataView]} on:change={loadEntries}
+					<RadioItem bind:group={filter} name="justify" value={DataViews[dataView]} on:change={loadEntriesFiltered}
 					>{dataView}</RadioItem
 					>
 				{/each}
 			</RadioGroup>
 
-
 			{#if chartData}
 				<Line data={chartData} options={chartOptions} />
 			{/if}
-			<WeightTracker bind:entries={entries}
-						   {lastEntry}
-						   bind:goal={currentGoal}
-						   on:addWeight={add}
-						   on:updateWeight={update}
-						   on:deleteWeight={remove}
-						   on:updateGoal={updateGoal}
-			/>
+
+			{#if entries}
+				<WeightTracker bind:entries={entries}
+							   bind:lastEntry={lastEntry}
+							   bind:goal={data.goal}
+							   on:addWeight={add}
+							   on:updateWeight={update}
+							   on:deleteWeight={remove}
+							   on:updateGoal={updateGoal}
+				/>
+			{:else}
+				<p>Loading...</p>
+			{/if}
 		</div>
 	</div>
 </section>

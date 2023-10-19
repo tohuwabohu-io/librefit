@@ -1,12 +1,12 @@
-<script lang="ts">
+<script>
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {modalStore} from '@skeletonlabs/skeleton';
-    import { Goal } from 'librefit-api/rest'
     import { getDateAsStr } from '$lib/util';
 
     const today = new Date();
 
-    let goal: Goal = {
+    /** @type Goal */
+    let goal = {
         added: getDateAsStr(today),
         endDate: getDateAsStr(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())),
         startDate: getDateAsStr(today),

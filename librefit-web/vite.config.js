@@ -1,7 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import svg from '@poppanator/sveltekit-svg'
-
+import svg from '@poppanator/sveltekit-svg';
 export default defineConfig({
 	plugins: [
 		sveltekit(),
@@ -14,13 +13,10 @@ export default defineConfig({
 						name: 'preset-default',
 						// by default svgo removes the viewBox which prevents svg icons from scaling
 						// not a good idea! https://github.com/svg/svgo/pull/1461
-						params: { overrides: { removeViewBox: false } },
-					},
-				],
-			},
+						params: { overrides: { removeViewBox: false } }
+					}
+				]
+			}
 		})
-	],
-	optimizeDeps: {
-		include: ['./node_modules/librefit-api', 'librefit-api/']
-	}
+	]
 });

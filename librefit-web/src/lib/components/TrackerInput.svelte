@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import { createEventDispatcher } from 'svelte';
 	import Trash from '$lib/assets/icons/trash.svg?component';
 	import AddKcal from '$lib/assets/icons/hamburger-plus.svg?component';
@@ -8,7 +8,7 @@
 	import Check from '$lib/assets/icons/check.svg?component';
 	import CancelDelete from '$lib/assets/icons/trash-off.svg?component';
 	import CancelEdit from '$lib/assets/icons/pencil-off.svg?component';
-	import {Category} from 'librefit-api/rest';
+	import {Category} from '$lib/api/model.js';
 
 	export let value, dateStr, id;
 	export let existing = false;
@@ -21,7 +21,7 @@
 
 	let editing = false;
 
-	let previous: { category; value };
+	let previous;
 	let changeAction;
 
 	const add = () => {
@@ -33,7 +33,7 @@
 		});
 	};
 
-	const change = (action: String) => {
+	const change = (action) => {
 		return () => {
 			disabled = false;
 			editing = true;
@@ -46,10 +46,10 @@
 		};
 	};
 
-	const update = (e: Event) => {
+	const update = (e) => {
 		e.preventDefault();
 
-		if (value != previous.value || category != previous.category) {
+		if (value !== previous.value || category !== previous.category) {
 			dispatch('update', {
 				sequence: id,
 				date: dateStr,
@@ -62,7 +62,7 @@
 		editing = false;
 	};
 
-	const remove = (e: Event) => {
+	const remove = (e) => {
 		e.preventDefault();
 
 		dispatch('remove', {

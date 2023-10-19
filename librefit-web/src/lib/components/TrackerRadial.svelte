@@ -1,25 +1,23 @@
 <script>
 	export let limit = 1900,
 		maximum = 2500,
-		current = 0;
+		total = 0;
 	export let width = 512,
 		height = 512;
+
+	/** @type {Array<number>} */
+	export let entries = [];
+
+	$: if (entries.length > 0) {
+		total = entries.reduce((a, b) => a + b);
+	}
+
+	let innerEnd, outerEnd;
 
 	const stroke = 40;
 
 	const outerRadius = (width - stroke) / 2;
 	const innerRadius = outerRadius - stroke;
-
-	$: outerEnd = calculateEnd(current, limit);
-	$: innerEnd = calculateEnd(current, maximum);
-
-	$: calculateEnd = (value, max) => {
-		if (value >= max) {
-			return 359;
-		} else {
-			return (359 * value) / max;
-		}
-	};
 
 	const polarToCartesian = (cx, cy, radius, angleDeg) => {
 		const angleInRadians = ((angleDeg - 90) * Math.PI) / 180.0;
@@ -38,6 +36,19 @@
 
 		return ['M', start.x, start.y, 'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(' ');
 	};
+
+	const calculateEnd = (value, max) => {
+		if (value >= max) {
+			return 359;
+		} else {
+			return (359 * value) / max;
+		}
+	};
+
+	$: outerEnd = calculateEnd(total, limit);
+	$: innerEnd = calculateEnd(total, maximum);
+
+	$: calculateEnd;
 </script>
 
 <figure class="progress-radial relative overflow-hidden w-64 " data-testid="progress-radial">
@@ -54,7 +65,7 @@
 				class="progress-radial-track fill-transparent stroke-primary-500"
 			/>
 
-			{#if current > 0}
+			{#if total > 0}
 				<path
 					d={arc(width / 2, height / 2, outerRadius, outerEnd, outerEnd)}
 					class="progress-radial-track fill-transparent stroke-primary-500"
@@ -75,7 +86,7 @@
 				class="progress-radial-track fill-transparent stroke-secondary-500"
 			/>
 
-			{#if current > 0}
+			{#if total > 0}
 				<path
 					d={arc(width / 2, height / 2, innerRadius, innerEnd, innerEnd)}
 					class="progress-radial-track fill-transparent stroke-secondary-500"
@@ -92,7 +103,7 @@
 			font-size="56"
 			class="progress-radial-text fill-token"
 		>
-			{current} / {limit}
+			{total} / {limit}
 		</text>
 		<text
 			x={width / 2}
@@ -103,7 +114,7 @@
 			font-size="34"
 			class="progress-radial-text fill-token"
 		>
-			{current} / {maximum}
+			{total} / {maximum}
 		</text>
 	</svg>
 </figure>

@@ -2,45 +2,38 @@ plugins {
     kotlin("jvm") version "1.7.22"
     id("org.openapi.generator") version "6.3.0"
     id("com.github.node-gradle.node") version "3.5.1"
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 repositories {
     mavenCentral()
 }
 
-node {
-    version.set("19.6.0")
-    npmVersion.set("9.4.0")
-    npmInstallCommand.set("install")
-    npmWorkDir.set(file("${project.projectDir}/.cache/npm"))
-    distBaseUrl.set("https://nodejs.org/dist")
-    download.set(true)
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 }
 
 tasks.openApiValidate {
     inputSpec.set("openapi.yaml")
 }
 
-tasks.openApiGenerate {
+tasks.register<JavaExec>("ApiCodegen") {
     dependsOn(tasks.openApiValidate)
 
+    classpath = sourceSets.test.get().runtimeClasspath
+    main = "io.tohuwabohu.librefit.api.codegen.ApiCodegen"
+    args = listOf("${project.projectDir}/openapi.json", "${project.projectDir}/rest/lib")
+
     doFirst {
-        delete("${project.projectDir}/rest")
+        project.mkdir("${project.projectDir}/rest/lib/api")
+        project.mkdir("${project.projectDir}/rest/lib/server/api")
     }
 
-    inputSpec.set("openapi.yaml")
-    outputDir.set("${project.projectDir}/rest")
-    generatorName.set("typescript-fetch")
-    // generatorName.set("typescript")
-    typeMappings.put("Date", "String") // see https://github.com/OpenAPITools/openapi-generator/issues/926
-    additionalProperties.put("supportsES6", "true")
+    doLast {
+        copy{
+            from("${project.projectDir}/rest/lib")
+            into("../librefit-web/src/lib")
+        }
+    }
 }
 
-tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_link") {
-    dependsOn(tasks.npmInstall)
-}
-
-tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_build") {
-    dependsOn(tasks.npmInstall)
-    dependsOn(tasks.openApiGenerate)
-}

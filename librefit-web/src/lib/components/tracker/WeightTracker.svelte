@@ -90,8 +90,6 @@
     }
 
     const filterEntries = (e) => {
-        console.log("filter")
-
         entriesFiltered = entries.filter((entry) => {
             const addedDate = parseStringAsDate(entry.added);
             const fromDate = parseStringAsDate(dateFilterRange.from);
@@ -141,54 +139,5 @@
                 </button>
             </div>
         </div>
-
-        {#if entries && entries.length > 0}
-            <div class="flex flex-col grow gap-4">
-                <Accordion class="variant-ghost-surface rounded-xl">
-                    <AccordionItem>
-                        <svelte:fragment slot="summary">History</svelte:fragment>
-                        <svelte:fragment slot="content">
-                            {#if dateFilterRange}
-                                <div class="flex gap-4">
-                                    <ValidatedInput type="date" name="filterFrom" label="From" bind:value={dateFilterRange.from} />
-                                    <ValidatedInput type="date" name="filterTo" label="To" bind:value={dateFilterRange.to} />
-
-                                    <div class="self-center">
-                                        <button class="btn variant-filled" on:click={filterEntries}>
-                                            Filter
-                                        </button>
-                                    </div>
-                                </div>
-                            {/if}
-
-                            {#each entriesFiltered as trackerInput}
-                                <div class="flex flex-row gap-4 items-center">
-                                    <div>
-                                        <p>
-                                            { convertDateStrToDisplayDateStr(trackerInput.added) }
-                                        </p>
-                                    </div>
-
-                                    <div class="grow">
-                                        <TrackerInput
-                                                disabled={true}
-                                                existing={true}
-                                                value={trackerInput.amount}
-                                                category={trackerInput.category}
-                                                dateStr={trackerInput.added}
-                                                id={trackerInput.id}
-                                                on:add={addWeight}
-                                                on:update={updateWeight}
-                                                on:remove={deleteWeight}
-                                                unit= {'kg'}
-                                        />
-                                    </div>
-                                </div>
-                            {/each}
-                        </svelte:fragment>
-                    </AccordionItem>
-                </Accordion>
-            </div>
-        {/if}
     </div>
 </div>

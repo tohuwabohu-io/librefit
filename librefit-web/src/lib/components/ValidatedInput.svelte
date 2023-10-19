@@ -1,6 +1,6 @@
 <svelte:options accessors={true} />
 
-<script lang="ts">
+<script>
 	export let value = '';
 	export let name = 'control';
 	export let label = '';
@@ -8,11 +8,8 @@
 	export let styling = 'input';
 	export let placeholder = '';
 	export let unit = '';
-	export let validateDetail: () => {
-		valid: boolean;
-		errorMessage?: string;
-		skip?: boolean;
-	} = () => {
+
+	export let validateDetail = (e) => {
 		return {
 			valid: false,
 			skip: true
@@ -21,9 +18,7 @@
 
 	export let emptyMessage = `${label ? label : 'Field'} is empty.`;
 	export let required = false;
-
-	let control, error, unitDisplay; // bound UI elements
-	let errorMessage = emptyMessage;
+	export let errorMessage = undefined;
 
 	const getType = (node) => {
 		node.type = type;
@@ -31,7 +26,9 @@
 
 	export let validate = () => {
 		let valid = false;
-		let detail = validateDetail();
+		let detail = validateDetail({
+			value: value
+		});
 
 		if (required && isEmpty()) {
 			errorMessage = emptyMessage;
@@ -39,23 +36,8 @@
 			valid = detail.valid;
 			errorMessage = detail.errorMessage;
 		} else {
+			errorMessage = undefined;
 			valid = true;
-		}
-
-		if (!valid) {
-			control.classList.add('input-error');
-			error.classList.remove('invisible');
-
-			if (unitDisplay) {
-				unitDisplay.classList.add('input-error');
-			}
-		} else {
-			error.classList.add('invisible');
-			control.classList.remove('input-error');
-
-			if (unitDisplay) {
-				unitDisplay.classList.remove('input-error');
-			}
 		}
 
 		return valid;
@@ -68,6 +50,7 @@
 	$: value;
 	$: label;
 	$: type;
+	$: errorMessage;
 	$: validateDetail;
 </script>
 
@@ -79,21 +62,25 @@
 					{label}
 				</span>
 			{/if}
-			<span bind:this={error} class="text-sm invisible validation-error-text self-center">
-				{errorMessage}
-			</span>
+
+			{#if errorMessage}
+				<span class="text-sm validation-error-text self-center">
+					{errorMessage}
+				</span>
+			{:else}
+				<span class="text-sm self-center"></span>
+			{/if}
 		</span>
 		<div class={!unit ? '' : 'input-group input-group-divider grid-cols-[auto_1fr_auto]'}>
 			{#if unit}
-				<div class="input-group-shim" bind:this={unitDisplay}>{unit}</div>
+				<div class={'input-group-shim' + (!errorMessage ? '' : ' input-error')}>{unit}</div>
 			{/if}
 			<input
 				{name}
-				class={styling + (!unit ? '' : 'rounded-none')}
+				class={styling + (!unit ? '' : 'rounded-none') + (!errorMessage ? '' : ' input-error' )}
 				use:getType
 				{placeholder}
 				{required}
-				bind:this={control}
 				bind:value
 				on:focusout={validate}
 			/>
@@ -106,17 +93,21 @@
 				</span>
 				<input
 					{name}
-					class={styling}
+					class={styling + (!errorMessage ? '' : ' input-error')}
 					use:getType
 					bind:value
-					bind:this={control}
 					on:change={(e) => (value = e.target.checked)}
 					on:focusout={validate}
 				/>
 			</span>
-			<span class="text-sm invisible validation-error-text self-center" bind:this={error}>
-				{errorMessage}
-			</span>
+
+			{#if errorMessage}
+				<span class="text-sm validation-error-text self-center">
+					{errorMessage}
+				</span>
+			{:else}
+				<span class="text-sm self-center"></span>
+			{/if}
 		</span>
 	{/if}
 </label>

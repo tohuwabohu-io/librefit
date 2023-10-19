@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {modalStore} from '@skeletonlabs/skeleton';
 

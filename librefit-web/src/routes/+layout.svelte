@@ -1,13 +1,13 @@
-<script lang="ts">
+<script>
 	import '../theme.pcss';
 	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.pcss';
-	import {AppShell, Modal, type ModalComponent, Toast} from '@skeletonlabs/skeleton';
+	import {AppShell, Modal, Toast} from '@skeletonlabs/skeleton';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import WeightModal from '$lib/components/modal/WeightModal.svelte';
 	import GoalModal from '$lib/components/modal/GoalModal.svelte';
 
-	const modalComponentRegistry: Record<string, ModalComponent> = {
+	const modalComponentRegistry = {
 		weightModal: {
 			ref: WeightModal,
 		},

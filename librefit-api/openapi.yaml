@@ -159,10 +159,11 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{diff}/{gain}:
+  /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}:
     get:
       tags:
       - Tdee Resource
+      operationId: calculateTdee
       parameters:
       - name: activityLevel
         in: path
@@ -176,13 +177,7 @@ paths:
         schema:
           format: int32
           type: integer
-      - name: diff
-        in: path
-        required: true
-        schema:
-          format: float
-          type: number
-      - name: gain
+      - name: calculationGoal
         in: path
         required: true
         schema:
@@ -198,6 +193,12 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/CalculationSex'
+      - name: weeklyDifference
+        in: path
+        required: true
+        schema:
+          format: float
+          type: number
       - name: weight
         in: path
         required: true
@@ -211,6 +212,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tdee'
+        "500":
+          description: Internal Server Error
   /tracker/calories/create:
     post:
       tags:

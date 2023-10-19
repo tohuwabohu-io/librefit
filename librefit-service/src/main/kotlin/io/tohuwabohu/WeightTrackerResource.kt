@@ -56,6 +56,8 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     fun create(@Context securityContext: SecurityContext, @Valid weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
         Log.info("Creating a new weight tracker entry=$weightTrackerEntry")
 
+        weightTrackerEntry.userId = jwt.name.toLong()
+
         printAuthenticationInfo(jwt, securityContext)
         validateToken(jwt, weightTrackerEntry)
 
