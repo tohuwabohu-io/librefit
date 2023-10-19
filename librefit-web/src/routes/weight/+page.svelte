@@ -55,6 +55,7 @@
 
 	$: if (data && data.entries) {
 		entries = data.entries;
+		lastEntry = data.lastEntry;
 
 		paint(data.entries);
 	}
