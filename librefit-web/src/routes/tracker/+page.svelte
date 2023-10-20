@@ -1,5 +1,5 @@
 <script>
-	import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
+	import {Accordion, AccordionItem, getToastStore} from '@skeletonlabs/skeleton';
 	import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util';
 	import {handleApiError, showToastSuccess} from '$lib/toast.js';
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
@@ -8,6 +8,8 @@
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
+
+	const toastStore = getToastStore();
 
 	export let data;
 
@@ -47,7 +49,7 @@
 			body: JSON.stringify(newEntry)
 		}).then(_ => {
 			loadEntries(newEntry.added);
-		}).catch(handleApiError);
+		}).catch(e => handleApiError(toastStore, e));
 	};
 
 	const updateEntry = (e) => {
@@ -64,8 +66,8 @@
 			body: JSON.stringify(entry)
 		}).then(_ => {
 			loadEntries(entry.added);
-			showToastSuccess('Entry updated successfully!')
-		}).catch(handleApiError)
+			showToastSuccess(toastStore, 'Entry updated successfully!')
+		}).catch(e => handleApiError(toastStore, e))
 	};
 
 	const deleteEntry = (e) => {
@@ -79,7 +81,7 @@
 			} else {
 				throw Error(response.status);
 			}
-		}).catch(handleApiError)
+		}).catch(e => handleApiError(toastStore, e))
 	};
 
 	const loadEntries = async (added) => {

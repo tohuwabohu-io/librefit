@@ -1,18 +1,16 @@
 <script>
-    import TrackerInput from '$lib/components/TrackerInput.svelte';
     import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
     import {convertDateStrToDisplayDateStr, getDateAsStr, parseStringAsDate} from '$lib/util.js';
-    import { createEventDispatcher } from 'svelte';
-    import {Accordion, AccordionItem} from '@skeletonlabs/skeleton';
-    import { modalStore } from '@skeletonlabs/skeleton';
-    import ValidatedInput from '$lib/components/ValidatedInput.svelte';
+    import {createEventDispatcher, onMount} from 'svelte';
+    import {getModalStore} from '@skeletonlabs/skeleton';
     import * as dateUtil from 'date-fns';
-    import {onMount} from 'svelte';
 
     export let entries;
     export let lastEntry;
     export let goal;
+
+    const modalStore = getModalStore();
 
     const today = new Date();
     const todayDateStr = getDateAsStr(new Date());

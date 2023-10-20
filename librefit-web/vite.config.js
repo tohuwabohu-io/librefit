@@ -1,9 +1,11 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import svg from '@poppanator/sveltekit-svg';
+import purgeCss from 'vite-plugin-tailwind-purgecss';
 export default defineConfig({
 	plugins: [
 		sveltekit(),
+		purgeCss(),
 		svg({
 			includePaths: ['./src/lib/assets/icons/'],
 			svgoOptions: {
