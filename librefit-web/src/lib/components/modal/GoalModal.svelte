@@ -1,6 +1,6 @@
 <script>
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {modalStore} from '@skeletonlabs/skeleton';
+    import {getModalStore} from '@skeletonlabs/skeleton';
     import { getDateAsStr } from '$lib/util';
 
     const today = new Date();
@@ -18,8 +18,8 @@
     let startDateInput, endDateInput, startAmountInput, endAmountInput;
 
     const onSubmit = () => {
-        if ($modalStore[0].response) {
-            $modalStore[0].response({
+        if (getModalStore()[0].response) {
+            getModalStore()[0].response({
                 detail: {
                     goal: goal
                 }
@@ -28,8 +28,8 @@
     }
 
     const onCancel = () => {
-        if ($modalStore[0].response) {
-            $modalStore[0].response(undefined);
+        if (getModalStore()[0].response) {
+            getModalStore()[0].response(undefined);
         }
     }
 </script>

@@ -1,12 +1,14 @@
 <script>
-	import {RadioGroup, RadioItem, toastStore} from '@skeletonlabs/skeleton';
-	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys, weakEntityEquals} from '$lib/util';
+	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
+	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
-	import {handleApiError, showToastSuccess} from "$lib/toast.js";
+	import {handleApiError, showToastSuccess} from '$lib/toast.js';
 
 	Chart.register(...registerables);
+
+	const toastStore = getToastStore();
 
 	export let filter = DataViews.Month;
 
@@ -73,7 +75,7 @@
 			headers: {
 				'Content-Type': 'application/json'
 			}
-		}).then(reload).catch(handleApiError);
+		}).then(reload).catch(e => handleApiError(toastStore, e));
 	}
 
 	const update = (e) => {
@@ -86,13 +88,13 @@
 					amount: e.detail.value
 				}
 			})
-		}).then(reload).catch(handleApiError);
+		}).then(reload).catch(e => handleApiError(toastStore, e));
 	}
 
 	const remove = (e) => {
 		fetch(`/weight?sequence=${e.detail.sequence}&date=${e.detail.date}`, {
 			method: 'DELETE'
-		}).then(reload).catch(handleApiError)
+		}).then(reload).catch(e => handleApiError(toastStore, e))
 	}
 
 	const reload = (result) => {
@@ -102,8 +104,8 @@
 			}).then(async (response) => {
 				paint(await response.json());
 
-				showToastSuccess('Update successful.');
-			}).catch(handleApiError)
+				showToastSuccess(toastStore, 'Update successful.');
+			}).catch(e => handleApiError(toastStore, e))
 		} else {
 			throw Error(result.status)
 		}
@@ -125,7 +127,7 @@
 				}
 			}).then(async (response) => {
 				currentGoal = response.json();
-			}).catch(handleApiError);
+			}).catch(e => handleApiError(toastStore, e));
 		} else {
 			fetch('/weight', {
 				method: 'PUT',
@@ -133,7 +135,7 @@
 					goal: goal
 				})
 			}).then(async (response) => currentGoal = await response.json())
-			.catch(handleApiError)
+			.catch(e => handleApiError(toastStore, e))
 		}
 	}
 </script>

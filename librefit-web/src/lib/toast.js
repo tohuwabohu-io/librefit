@@ -1,6 +1,4 @@
-import { toastStore } from '@skeletonlabs/skeleton';
-
-export const handleApiError = (err) => {
+export const handleApiError = (toastStore, err) => {
 	console.error(err);
 
 	toastStore.trigger({
@@ -10,7 +8,7 @@ export const handleApiError = (err) => {
 	});
 };
 
-export const showToastSuccess = (toastMessage) => {
+export const showToastSuccess = (toastStore, toastMessage) => {
 	toastStore.trigger({
 		message: toastMessage,
 		background: 'variant-filled-primary',

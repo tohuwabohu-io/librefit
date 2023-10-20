@@ -1,8 +1,10 @@
 <script>
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {modalStore} from '@skeletonlabs/skeleton';
+    import {getModalStore} from '@skeletonlabs/skeleton';
 
     let value;
+
+    const modalStore = getModalStore();
 
     const onSubmit = () => {
         if ($modalStore[0].response) {
