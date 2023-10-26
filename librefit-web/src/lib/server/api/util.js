@@ -1,5 +1,5 @@
 import { PUBLIC_API_BASE_PATH } from '$env/static/public';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 /**
  * This is to be used in +server.js/+page.server.js files.
@@ -28,7 +28,8 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 			headers['Authorization'] = `Bearer ${jwt}`;
 		} else {
 			console.error(`${method} ${api.path} requires authentication, no JWT provided!`);
-			throw error(405);
+
+			throw redirect(302, '/');
 		}
 	}
 
