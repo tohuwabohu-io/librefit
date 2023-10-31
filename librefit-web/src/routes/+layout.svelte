@@ -17,11 +17,15 @@
 			ref: GoalModal,
 		}
 	};
+
+	export let data;
 </script>
 
 <AppShell>
 	<svelte:fragment slot="header">
-		<TopBar />
+		{#if data.authenticated === true}
+			<TopBar />
+		{/if}
 	</svelte:fragment>
 	<!-- Router Slot -->
 	<slot />
