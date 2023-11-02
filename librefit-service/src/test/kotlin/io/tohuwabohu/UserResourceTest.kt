@@ -3,6 +3,9 @@ package io.tohuwabohu
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.security.TestSecurity
+import io.quarkus.test.security.jwt.Claim
+import io.quarkus.test.security.jwt.JwtSecurity
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.tohuwabohu.crud.LibreUser
@@ -61,6 +64,37 @@ class UserResourceTest {
             .then()
             .assertThat()
             .statusCode(404)
+    }
+
+    @Test
+    @TestSecurity(user = "1", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test1@test.dev"),
+        ]
+    )
+    @Order(5)
+    fun `should return user data`() {
+        val userData = given().get("/user").then()
+
+        userData.assertThat().statusCode(200)
+
+        val user = userData.extract().body().`as`(LibreUser::class.java)
+
+        assert(user.email == "test1@test.dev")
+        assert(user.password == "")
+    }
+
+    @Test
+    @TestSecurity(user = "2", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test2@test.dev")
+        ]
+    )
+    @Order(6)
+    fun `should fail on reading user data`() {
+        given().get("/user").then().assertThat().statusCode(404)
     }
 
     private fun user(): LibreUser {
