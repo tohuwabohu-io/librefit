@@ -5,6 +5,7 @@
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
 	import TrackerInput from '$lib/components/TrackerInput.svelte';
 	import {Category} from '$lib/api/model.js';
+	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
@@ -114,42 +115,21 @@
 					<svelte:fragment slot="content">
 						<div class="flex gap-4 justify-between">
 							{#if dateStr === todayStr && data.entryToday && !datesToEntries[dateStr]}
-								<TrackerRadial entries={data.entryToday.map(e => e.amount)} />
-								<div class="flex flex-col grow gap-4">
-									{#each data.entryToday as entry}
-										<TrackerInput {categories}
-												value={entry.amount}
-												{dateStr}
-												id={entry.id}
-												on:add={addEntry}
-												on:update={updateEntry}
-												on:remove={deleteEntry}
-												unit={'kcal'}
-										/>
-									{/each}
-								</div>
+								<CalorieTracker entries={data.entryToday} {categories}
+									on:addCalories={addEntry}
+									on:updateCalories={updateEntry}
+									on:deleteCalories={deleteEntry}
+								/>
 							{:else}
 								{#await datesToEntries[dateStr]}
 									<p>... loading</p>
 								{:then entries}
 									{#if entries}
-									<TrackerRadial entries={entries.map(e => e.amount)} />
-									<div class="flex flex-col grow gap-4">
-										{#each entries as entry}
-											<TrackerInput {categories}
-													value={entry.amount}
-													dateStr={entry.added}
-													id={entry.id}
-												    category={entry.category}
-													on:add={addEntry}
-													on:update={updateEntry}
-													on:remove={deleteEntry}
-												    existing={entry.id !== undefined}
-													disabled={entry.id !== undefined}
-													unit={'kcal'}
-											/>
-										{/each}
-									</div>
+										<CalorieTracker {entries} {categories}
+											on:addCalories={addEntry}
+											on:updateCalories={updateEntry}
+											on:deleteCalories={deleteEntry}
+										/>
 									{/if}
 								{:catch error}
 									<p>{error}</p>
