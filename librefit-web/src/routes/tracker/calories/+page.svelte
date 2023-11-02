@@ -1,6 +1,6 @@
 <script>
 	import {Accordion, AccordionItem, getToastStore} from '@skeletonlabs/skeleton';
-	import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util';
+	import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util.js';
 	import {handleApiError, showToastSuccess} from '$lib/toast.js';
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
 	import TrackerInput from '$lib/components/TrackerInput.svelte';
@@ -44,7 +44,7 @@
 			category: e.detail.category
 		};
 
-		fetch('/tracker', {
+		fetch('/tracker/calories', {
 			method: 'POST',
 			body: JSON.stringify(newEntry)
 		}).then(_ => {
@@ -61,7 +61,7 @@
 			category: e.detail.category
 		};
 
-		fetch('/tracker', {
+		fetch('/tracker/calories', {
 			method: 'PUT',
 			body: JSON.stringify(entry)
 		}).then(_ => {
@@ -73,7 +73,7 @@
 	const deleteEntry = (e) => {
 		console.log(e);
 
-		fetch(`/tracker?sequence=${e.detail.sequence}&added=${e.detail.date}`, {
+		fetch(`/tracker/calories?sequence=${e.detail.sequence}&added=${e.detail.date}`, {
 			method: 'DELETE',
 		}).then((response) => {
 			if (response.status === 200) {
@@ -85,7 +85,7 @@
 	};
 
 	const loadEntries = async (added) => {
-		const response = await fetch(`/tracker?added=${added}`, {method: 'GET'});
+		const response = await fetch(`/tracker/calories?added=${added}`, {method: 'GET'});
 		const result = response.json();
 
 		datesToEntries[added] = await result;

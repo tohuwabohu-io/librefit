@@ -1,6 +1,6 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util';
+	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util.js';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
@@ -22,7 +22,7 @@
 	let currentGoal;
 
 	const loadEntriesFiltered = async () => {
-		await fetch(`/weight?filter=${filter}`, {
+		await fetch(`/tracker/weight?filter=${filter}`, {
 			method: 'GET'
 		}).then(async (result) => {
 			paint(await result.json());
@@ -63,7 +63,7 @@
 	}
 
 	const add = (e) => {
-		fetch('/weight', {
+		fetch('/tracker/weight', {
 			method: 'POST',
 			body: JSON.stringify({
 				weight: {
@@ -79,7 +79,7 @@
 	}
 
 	const update = (e) => {
-		fetch('/weight', {
+		fetch('/tracker/weight', {
 			method: 'PUT',
 			body: JSON.stringify({
 				weight: {
@@ -92,14 +92,14 @@
 	}
 
 	const remove = (e) => {
-		fetch(`/weight?sequence=${e.detail.sequence}&date=${e.detail.date}`, {
+		fetch(`/tracker/weight?sequence=${e.detail.sequence}&date=${e.detail.date}`, {
 			method: 'DELETE'
 		}).then(reload).catch(e => handleApiError(toastStore, e))
 	}
 
 	const reload = (result) => {
 		if (result.status === 200 || result.status === 201) {
-			fetch(`/weight?filter=${filter}`, {
+			fetch(`/tracker/weight?filter=${filter}`, {
 				method: 'GET'
 			}).then(async (response) => {
 				paint(await response.json());
@@ -117,7 +117,7 @@
 		let goal = e.detail.goal;
 
 		if (!currentGoal) {
-			fetch('/weight', {
+			fetch('/tracker/weight', {
 				method: 'POST',
 				body: JSON.stringify({
 					goal: goal
@@ -129,7 +129,7 @@
 				currentGoal = response.json();
 			}).catch(e => handleApiError(toastStore, e));
 		} else {
-			fetch('/weight', {
+			fetch('/tracker/weight', {
 				method: 'PUT',
 				body: JSON.stringify({
 					goal: goal
