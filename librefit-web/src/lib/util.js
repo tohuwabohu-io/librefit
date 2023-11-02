@@ -3,7 +3,7 @@ import * as dateLocales from 'date-fns/locale/index.js';
 
 /**
  * @readonly
- * @enum {String}
+ * @enum {string}
  */
 export const DataViews = {
 	Today: 'TODAY',
@@ -11,6 +11,19 @@ export const DataViews = {
 	Month: 'MONTH',
 	Year: 'YEAR'
 };
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const Daytime = {
+	Morning: 'morning',
+	Day: 'day',
+	Afternoon: 'afternoon',
+	Evening: 'evening',
+	Night: 'night'
+};
+
 export const default_date_format = 'yyyy-MM-dd'; // used for internal storage and fetch requests
 export const display_date_format = 'dd.MM.yyyy'; // used for display only
 /**
@@ -176,3 +189,24 @@ export const getDisplayDateAsStr = (
 export function weakEntityEquals(a, b) {
 	return a.id === b.id && a.added === b.added && a.userId === b.userId;
 }
+
+/**
+ * @param date {Date}
+ */
+export const getDaytimeGreeting = (date) => {
+	const hours = dateUtil.getHours(date);
+
+	if (hours >= 0 && hours <= 4) {
+		return Daytime.Night;
+	} else if (hours >= 5 && hours <= 11) {
+		return Daytime.Morning;
+	} else if (hours >= 12 && hours <= 14) {
+		return Daytime.Day;
+	} else if (hours >= 15 && hours <= 18) {
+		return Daytime.Afternoon;
+	} else if (hours >= 19 && hours <= 24) {
+		return Daytime.Night;
+	} else {
+		return Daytime.Day;
+	}
+};
