@@ -1,5 +1,6 @@
 import * as dateUtil from 'date-fns';
 import * as dateLocales from 'date-fns/locale/index.js';
+import { Category } from '$lib/api/model.js';
 
 /**
  * @readonly
@@ -210,3 +211,10 @@ export const getDaytimeGreeting = (date) => {
 		return Daytime.Day;
 	}
 };
+
+export const categoriesAsKeyValue = Object.keys(Category).map((key) => {
+	return {
+		label: key,
+		value: Category[key]
+	};
+});
