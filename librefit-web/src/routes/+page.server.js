@@ -20,15 +20,18 @@ export const load = async ({ fetch, cookies }) => {
 	const lastWeightApi = api.findLastWeightTrackerEntry;
 	const goalApi = api.findLastGoal;
 	const ctTodayApi = api.listCalorieTrackerEntriesForDate;
+	const userApi = api.readUserInfo;
 
 	const lastWeightResponse = await proxyFetch(fetch, lastWeightApi, jwt);
 	const lastGoalResponse = await proxyFetch(fetch, goalApi, jwt);
 	const lastCtResponse = await proxyFetch(fetch, ctTodayApi, jwt, { date: getDateAsStr(today) });
+	const userData = await proxyFetch(fetch, userApi, jwt);
 
 	return {
 		authenticated: true,
 		lastWeight: await lastWeightResponse.json(),
 		lastGoal: await lastGoalResponse.json(),
-		lastCt: await lastCtResponse.json()
+		lastCt: await lastCtResponse.json(),
+		user: await userData.json()
 	};
 };

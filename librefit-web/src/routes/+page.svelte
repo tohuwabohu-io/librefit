@@ -1,17 +1,26 @@
 <script>
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-	import {getDaytimeGreeting} from '$lib/util.js';
-	import {page} from '$app/stores';
+	import {categoriesAsKeyValue, getDaytimeGreeting} from '$lib/util.js';
+	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 
 	export let data;
 </script>
 
 <section>
 	{#if data.authenticated === true}
-	<h1>Good {getDaytimeGreeting(new Date())}!</h1>
-	<div class="container mx-auto p-8 space-y-8 text-center">
+	<div class="container mx-auto p-8 space-y-8">
 
-		<WeightTracker entries={[]} lastEntry={data.lastWeight} goal={data.lastGoal}/>
+		<h1>Good {getDaytimeGreeting(new Date())}, {data.user.name}!</h1>
+		<h2>This is your daily summary.</h2>
+
+		<div class="flex flex-row gap-8">
+			<div class="flex flex-row gap-4 variant-ghost-surface rounded-xl p-4">
+				<CalorieTracker entries={data.lastCt} categories={categoriesAsKeyValue} />
+			</div>
+			<div class="variant-ghost-surface rounded-xl p-4">
+				<WeightTracker entries={[]} lastEntry={data.lastWeight} goal={data.lastGoal}/>
+			</div>
+		</div>
 	</div>
 	{:else}
 	<div class="container mx-auto p-8 space-y-8 text-center">
