@@ -1,19 +1,31 @@
 <script>
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-	import {categoriesAsKeyValue, getDaytimeGreeting} from '$lib/util.js';
+	import {categoriesAsKeyValue, DataViews, getDaytimeGreeting} from '$lib/util.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import {handleApiError, showToastSuccess} from '$lib/toast.js';
 	import {getToastStore} from '@skeletonlabs/skeleton';
 	import * as ct_crud from '$lib/api/calories-rest.js';
+	import * as weight_crud from '$lib/api/weight-rest.js';
 
 	export let data;
 
 	/** @type {Array<CalorieTrackerEntry>} */
 	let calorieTrackerEntries = [];
 
+	/** @type {WeightTrackerEntry} */
+	let weightTrackerEntry;
+
+	/** @type {Goal} */
+	let goal;
+
 	$: calorieTrackerEntries;
-	$: if (data && data.lastCt) {
+	$: weightTrackerEntry
+	$: goal;
+
+	$: if (data) {
 		calorieTrackerEntries = data.lastCt;
+		weightTrackerEntry = data.lastWeight;
+		goal = data.lastGoal;
 	}
 
 	const toastStore = getToastStore();
@@ -32,8 +44,12 @@
 		ct_crud.deleteEntry(e, loadCalorieTrackerEntries, toastStore, '/', 'type=ct');
 	};
 
-	const setWeight = (e) => {
+	const addWeight = (e) => {
+		weight_crud.add(e, loadWeightTracker, toastStore, '/');
+	}
 
+	const updateWeight = (e) => {
+		weight_crud.update(e, loadWeightTracker, toastStore, '/');
 	};
 
 	const setGoal = (e) => {
@@ -52,6 +68,24 @@
 			throw new Error(result);
 		}
 	}
+
+	const loadWeightTracker = async (update) => {
+		if (update.status === 200 || update.status === 201) {
+			fetch(`/?type=weight&filter=${DataViews.Today}`, {
+				method: 'GET'
+			}).then(async response => {
+				weightTrackerEntry = (await response.json())[0];
+
+				if (response.ok) {
+					showToastSuccess(toastStore, 'Successfully updated weight.');
+				} else {
+					throw Error(response.status);
+				}
+			}).catch(e => handleApiError(toastStore, e));
+		} else {
+			throw Error(update.status)
+		}
+	}
 </script>
 
 <section>
@@ -62,7 +96,7 @@
 		<h2>This is your daily summary.</h2>
 
 		<div class="flex flex-row gap-8">
-			<div class="flex flex-row gap-4 variant-ghost-surface rounded-xl p-4">
+			<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4">
 				<CalorieTracker entries={calorieTrackerEntries} categories={categoriesAsKeyValue}
 					on:addCalories={addCalories}
 					on:updateCalories={updateCalories}
@@ -70,8 +104,9 @@
 				/>
 			</div>
 			<div class="variant-ghost-surface rounded-xl p-4">
-				<WeightTracker entries={[]} lastEntry={data.lastWeight} goal={data.lastGoal}
-					on:updateWeight={setWeight}
+				<WeightTracker entries={[]} lastEntry={weightTrackerEntry} {goal}
+					on:addWeight={addWeight}
+					on:updateWeight={updateWeight}
 				   	on:updateGoal={setGoal}
 				/>
 			</div>
