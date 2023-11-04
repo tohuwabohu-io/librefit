@@ -2,7 +2,6 @@
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {categoriesAsKeyValue, DataViews, getDaytimeGreeting} from '$lib/util.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
-	import {handleApiError, showToastSuccess} from '$lib/toast.js';
 	import {getToastStore} from '@skeletonlabs/skeleton';
 	import * as ct_crud from '$lib/api/calories-rest.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
@@ -71,17 +70,19 @@
 
 	const loadWeightTracker = async (update) => {
 		if (update.status === 200 || update.status === 201) {
-			fetch(`/?type=weight&filter=${DataViews.Today}`, {
+			const response = await fetch(`/?type=weight&filter=${DataViews.Today}`, {
 				method: 'GET'
-			}).then(async response => {
-				weightTrackerEntry = (await response.json())[0];
+			});
 
-				if (response.ok) {
-					showToastSuccess(toastStore, 'Successfully updated weight.');
-				} else {
-					throw Error(response.status);
-				}
-			}).catch(e => handleApiError(toastStore, e));
+			const result = response.json();
+
+			weightTrackerEntry = (await result)[0];
+
+			if (response.ok) {
+				return result;
+			} else {
+				throw Error(result);
+			}
 		} else {
 			throw Error(update.status)
 		}

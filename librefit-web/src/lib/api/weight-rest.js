@@ -1,4 +1,4 @@
-import { handleApiError } from '$lib/toast.js';
+import { handleApiError, showToastSuccess } from '$lib/toast.js';
 
 /**
  * @param e
@@ -20,7 +20,11 @@ export const add = (e, callback, toastStore, route) => {
 			'Content-Type': 'application/json'
 		}
 	})
-		.then(callback)
+		.then((response) => {
+			callback(response);
+
+			showToastSuccess(toastStore, 'Successfully added weight.');
+		})
 		.catch((e) => handleApiError(toastStore, e));
 };
 
@@ -41,7 +45,11 @@ export const update = (e, callback, toastStore, route) => {
 			}
 		})
 	})
-		.then(callback)
+		.then((response) => {
+			callback(response);
+
+			showToastSuccess(toastStore, 'Successfully updated weight.');
+		})
 		.catch((e) => handleApiError(toastStore, e));
 };
 
@@ -64,6 +72,10 @@ export const remove = (e, callback, toastStore, route, params) => {
 	fetch(query, {
 		method: 'DELETE'
 	})
-		.then(callback)
+		.then((response) => {
+			callback(response);
+
+			showToastSuccess(toastStore, 'Successfully removed weight.');
+		})
 		.catch((e) => handleApiError(toastStore, e));
 };
