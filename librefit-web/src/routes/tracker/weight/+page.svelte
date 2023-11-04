@@ -5,6 +5,7 @@
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
 	import {handleApiError, showToastSuccess} from '$lib/toast.js';
+	import * as weight_crud from '$lib/api/weight-rest.js';
 
 	Chart.register(...registerables);
 
@@ -63,38 +64,15 @@
 	}
 
 	const add = (e) => {
-		fetch('/tracker/weight', {
-			method: 'POST',
-			body: JSON.stringify({
-				weight: {
-					id: e.detail.sequence,
-					added: e.detail.todayDateStr,
-					amount: e.detail.value
-				}
-			}),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}).then(reload).catch(e => handleApiError(toastStore, e));
+		weight_crud.add(e, reload, toastStore, '/tracker/weight');
 	}
 
 	const update = (e) => {
-		fetch('/tracker/weight', {
-			method: 'PUT',
-			body: JSON.stringify({
-				weight: {
-					id: e.detail.sequence,
-					date: e.detail.date,
-					amount: e.detail.value
-				}
-			})
-		}).then(reload).catch(e => handleApiError(toastStore, e));
+		weight_crud.update(e, reload, toastStore, '/tracker/weight');
 	}
 
 	const remove = (e) => {
-		fetch(`/tracker/weight?sequence=${e.detail.sequence}&date=${e.detail.date}`, {
-			method: 'DELETE'
-		}).then(reload).catch(e => handleApiError(toastStore, e))
+		weight_crud.remove(e, reload, toastStore, '/tracker/weight');
 	}
 
 	const reload = (result) => {
