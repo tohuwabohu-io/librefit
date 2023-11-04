@@ -81,8 +81,6 @@ export const POST = async ({ request, fetch, cookies }) => {
 export const PUT = async ({ request, fetch, cookies }) => {
 	const payload = await request.json();
 
-	console.log(payload);
-
 	/** @type {Response} */
 	let response = new Response();
 
