@@ -2,8 +2,6 @@ import { handleApiError, showToastSuccess } from '$lib/toast.js';
 import { Category } from '$lib/api/model.js';
 import { categoriesAsKeyValue, getCategoryValueAsKey } from '$lib/util.js';
 
-const categories = categoriesAsKeyValue;
-
 /**
  * @param e
  * @param {Function} callback
