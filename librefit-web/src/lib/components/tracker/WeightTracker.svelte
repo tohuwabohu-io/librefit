@@ -6,8 +6,13 @@
     import {getModalStore} from '@skeletonlabs/skeleton';
     import * as dateUtil from 'date-fns';
 
+    /** @type {Array<WeightTrackerEntry>} */
     export let entries;
+
+    /** @type {WeightTrackerEntry} */
     export let lastEntry;
+
+    /** @type {Goal} */
     export let goal;
 
     const modalStore = getModalStore();
@@ -34,8 +39,8 @@
 
     const updateWeight = (e) => {
         dispatch('updateWeight', {
-            sequence: e.detail.sequence,
-            date: e.detail.date,
+            sequence: lastEntry.id,
+            date: lastEntry.added,
             value: e.detail.value
         });
     }
@@ -65,7 +70,11 @@
             component: 'weightModal',
             response: (e) => {
                 if (e) {
-                    addWeight(e);
+                    if (lastEntry && lastEntry.added === todayDateStr) {
+                        updateWeight(e);
+                    } else {
+                        addWeight(e);
+                    }
                 }
 
                 modalStore.close();
