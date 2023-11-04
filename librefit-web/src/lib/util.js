@@ -213,7 +213,7 @@ export const getDaytimeGreeting = (date) => {
 };
 
 /**
- * @type {{label: *, value: *}[]}
+ * @type {{label: String, value: String}[]}
  */
 export const categoriesAsKeyValue = Object.keys(Category).map((key) => {
 	return {
@@ -222,6 +222,10 @@ export const categoriesAsKeyValue = Object.keys(Category).map((key) => {
 	};
 });
 
+/**
+ * @param {Category} category
+ * @returns {String}
+ */
 export const getCategoryValueAsKey = (category) => {
-	return categoriesAsKeyValue.filter((cat) => cat.value === category).map((cat) => cat.label);
+	return categoriesAsKeyValue.filter((cat) => cat.value === category).map((cat) => cat.label)[0];
 };
