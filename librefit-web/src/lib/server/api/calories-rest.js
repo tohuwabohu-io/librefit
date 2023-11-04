@@ -61,20 +61,20 @@ export const POST = async ({ request, fetch, cookies }) => {
  */
 export const PUT = async ({ request, fetch, cookies }) => {
 	/** @type {CalorieTrackerEntry} */
-	const params = await request.json();
+	const payload = await request.json();
 
 	/** @type {Response} */
 	let response = new Response();
 
 	try {
 		response = await proxyFetch(fetch, api.readCalorieTrackerEntry, cookies.get('auth'), {
-			id: params.id,
-			date: params.added
+			id: payload.id,
+			date: payload.added
 		}).then(async (result) => {
 			/** @type {CalorieTrackerEntry} */
 			const entry = await result.json();
-			entry.amount = params.amount;
-			entry.category = params.category;
+			entry.amount = payload.amount;
+			entry.category = payload.category;
 
 			return proxyFetch(fetch, api.updateCalorieTrackerEntry, cookies.get('auth'), entry);
 		});

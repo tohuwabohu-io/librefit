@@ -129,7 +129,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
 
     @GET
     @Path("/read/{date}/{id:\\d+}")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("User", "Admin")
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [

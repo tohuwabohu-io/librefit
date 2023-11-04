@@ -5,6 +5,8 @@
 
     const today = new Date();
 
+    const modalStore = getModalStore();
+
     /** @type Goal */
     let goal = {
         added: getDateAsStr(today),
@@ -18,8 +20,8 @@
     let startDateInput, endDateInput, startAmountInput, endAmountInput;
 
     const onSubmit = () => {
-        if (getModalStore()[0].response) {
-            getModalStore()[0].response({
+        if ($modalStore[0].response) {
+            $modalStore[0].response({
                 detail: {
                     goal: goal
                 }
@@ -28,8 +30,8 @@
     }
 
     const onCancel = () => {
-        if (getModalStore()[0].response) {
-            getModalStore()[0].response(undefined);
+        if ($modalStore[0].response) {
+            $modalStore[0].response(undefined);
         }
     }
 </script>

@@ -1,5 +1,12 @@
 <script>
-	import { AppBar } from '@skeletonlabs/skeleton';
+	import {AppBar, Avatar, getDrawerStore} from '@skeletonlabs/skeleton';
+	const drawerStore = getDrawerStore();
+
+	export const showDrawer = (e) => {
+		drawerStore.open({
+			width: 'w-1/3'
+		});
+	}
 </script>
 
 <AppBar shadow="drop-shadow">
@@ -10,11 +17,10 @@
 		</a>
 	</svelte:fragment>
 	<svelte:fragment slot="trail">
-		<a href="/login">Login</a>
-		<a href="/register">Registration</a>
-		<a href="/wizard">Wizard</a>
-		<a href="/dashboard">Dashboard</a>
-		<a href="/tracker">Tracker</a>
-		<a href="/weight">Weight</a>
+		<Avatar initials="LU" width="w-12"
+				border="border-4 border-surface-300-600-token hover:!border-primary-500"
+				cursor="cursor-pointer"
+				on:click={showDrawer}
+		/>
 	</svelte:fragment>
 </AppBar>

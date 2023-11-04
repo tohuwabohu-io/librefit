@@ -1,3 +1,7 @@
+/**
+ * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
+ * @param {String} err
+ */
 export const handleApiError = (toastStore, err) => {
 	console.error(err);
 
@@ -8,6 +12,10 @@ export const handleApiError = (toastStore, err) => {
 	});
 };
 
+/**
+ * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
+ * @param {String} toastMessage
+ */
 export const showToastSuccess = (toastStore, toastMessage) => {
 	toastStore.trigger({
 		message: toastMessage,

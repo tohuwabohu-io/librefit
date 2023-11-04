@@ -79,30 +79,32 @@ export const POST = async ({ request, fetch, cookies }) => {
  * @type {import('@sveltejs/kit').RequestHandler}
  */
 export const PUT = async ({ request, fetch, cookies }) => {
-	const params = await request.json();
+	const payload = await request.json();
 
 	/** @type {Response} */
 	let response = new Response();
 
 	try {
-		if (params['weight']) {
+		if (payload['weight']) {
 			const readApi = api.readWeightTrackerEntry;
 			const updateApi = api.updateWeightTrackerEntry;
 
+			const weight = payload['weight'];
+
 			response = await proxyFetch(fetch, readApi, cookies.get('auth'), {
-				id: params['id'],
-				date: params['date']
+				id: weight['id'],
+				date: weight['date']
 			}).then(async (result) => {
 				/** @type {import('$lib/server/api/index.js').WeightTrackerEntry} */
 				const entry = await result.json();
-				entry.amount = params['amount'];
+				entry.amount = weight['amount'];
 
 				return proxyFetch(fetch, updateApi, cookies.get('auth'), entry);
 			});
-		} else if (params['goal']) {
+		} else if (payload['goal']) {
 			const updateApi = api.updateGoal;
 
-			response = await proxyFetch(fetch, updateApi, cookies.get('auth'), params['goal']);
+			response = await proxyFetch(fetch, updateApi, cookies.get('auth'), payload['goal']);
 		} else {
 			response = new Response(null, {
 				status: 422,

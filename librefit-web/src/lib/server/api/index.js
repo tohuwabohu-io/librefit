@@ -133,4 +133,10 @@ export const api = {
 		method: 'post',
 		guarded: false
 	},
+	readUserInfo: {
+		path: '/user/user',
+		contentType: 'text/plain',
+		method: 'get',
+		guarded: true
+	},
 }

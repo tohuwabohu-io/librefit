@@ -1,10 +1,11 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util';
+	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util.js';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
 	import {handleApiError, showToastSuccess} from '$lib/toast.js';
+	import * as weight_crud from '$lib/api/weight-rest.js';
 
 	Chart.register(...registerables);
 
@@ -22,7 +23,7 @@
 	let currentGoal;
 
 	const loadEntriesFiltered = async () => {
-		await fetch(`/weight?filter=${filter}`, {
+		await fetch(`/tracker/weight?filter=${filter}`, {
 			method: 'GET'
 		}).then(async (result) => {
 			paint(await result.json());
@@ -63,43 +64,20 @@
 	}
 
 	const add = (e) => {
-		fetch('/weight', {
-			method: 'POST',
-			body: JSON.stringify({
-				weight: {
-					id: e.detail.sequence,
-					added: e.detail.todayDateStr,
-					amount: e.detail.value
-				}
-			}),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}).then(reload).catch(e => handleApiError(toastStore, e));
+		weight_crud.add(e, reload, toastStore, '/tracker/weight');
 	}
 
 	const update = (e) => {
-		fetch('/weight', {
-			method: 'PUT',
-			body: JSON.stringify({
-				weight: {
-					id: e.detail.sequence,
-					date: e.detail.date,
-					amount: e.detail.value
-				}
-			})
-		}).then(reload).catch(e => handleApiError(toastStore, e));
+		weight_crud.update(e, reload, toastStore, '/tracker/weight');
 	}
 
 	const remove = (e) => {
-		fetch(`/weight?sequence=${e.detail.sequence}&date=${e.detail.date}`, {
-			method: 'DELETE'
-		}).then(reload).catch(e => handleApiError(toastStore, e))
+		weight_crud.remove(e, reload, toastStore, '/tracker/weight');
 	}
 
 	const reload = (result) => {
 		if (result.status === 200 || result.status === 201) {
-			fetch(`/weight?filter=${filter}`, {
+			fetch(`/tracker/weight?filter=${filter}`, {
 				method: 'GET'
 			}).then(async (response) => {
 				paint(await response.json());
@@ -117,7 +95,7 @@
 		let goal = e.detail.goal;
 
 		if (!currentGoal) {
-			fetch('/weight', {
+			fetch('/tracker/weight', {
 				method: 'POST',
 				body: JSON.stringify({
 					goal: goal
@@ -129,7 +107,7 @@
 				currentGoal = response.json();
 			}).catch(e => handleApiError(toastStore, e));
 		} else {
-			fetch('/weight', {
+			fetch('/tracker/weight', {
 				method: 'PUT',
 				body: JSON.stringify({
 					goal: goal

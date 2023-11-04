@@ -8,13 +8,17 @@ import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.AuthenticationResponse
 import io.tohuwabohu.security.generateToken
+import org.eclipse.microprofile.jwt.JsonWebToken
+import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDateTime
 import javax.annotation.security.PermitAll
+import javax.annotation.security.RolesAllowed
 import javax.enterprise.context.RequestScoped
+import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
@@ -22,6 +26,9 @@ import javax.ws.rs.core.Response
 @Path("/user")
 @RequestScoped
 class UserResource(val userRepository: LibreUserRepository) {
+    @Inject
+    lateinit var jwt: JsonWebToken
+
     @POST
     @Path("/register")
     @PermitAll
@@ -67,6 +74,39 @@ class UserResource(val userRepository: LibreUserRepository) {
     fun login(libreUser: LibreUser): Uni<Response> {
         return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password)
             .onItem().ifNotNull().transform { user -> Response.ok(AuthenticationResponse(generateToken(user!!))).build() }
+            .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
+            .onFailure().invoke{ e -> Log.error(e) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    }
+
+    @GET
+    @Path("/user")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("User", "Admin")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = LibreUser::class)
+            )
+        ]),
+        APIResponse(responseCode = "404", description = "Not Found"),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "401", description = "Unauthorized"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    @Operation(
+        operationId = "readUserInfo"
+    )
+    fun readUserInfo(): Uni<Response> {
+        return userRepository.findById(jwt.name.toLong())
+            .onItem().ifNotNull().transform { user ->
+                user.password = ""
+                Response.ok(user).build()
+            }
             .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
             .onFailure().invoke{ e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

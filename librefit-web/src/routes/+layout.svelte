@@ -1,10 +1,11 @@
 <script>
 	import '../app.pcss';
-	import {AppShell, Modal, Toast} from '@skeletonlabs/skeleton';
+	import {AppShell, Drawer, Modal, Toast} from '@skeletonlabs/skeleton';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import WeightModal from '$lib/components/modal/WeightModal.svelte';
 	import GoalModal from '$lib/components/modal/GoalModal.svelte';
 	import { initializeStores } from '@skeletonlabs/skeleton';
+	import UserPanel from '$lib/components/UserPanel.svelte';
 
 	initializeStores();
 
@@ -17,11 +18,21 @@
 			ref: GoalModal,
 		}
 	};
+
+	export let data;
 </script>
+
+<Toast position={'tr'}/>
+<Modal components={modalComponentRegistry} />
+<Drawer position={'right'}>
+	<UserPanel userData={data.userData}/>
+</Drawer>
 
 <AppShell>
 	<svelte:fragment slot="header">
-		<TopBar />
+		{#if data.authenticated === true}
+			<TopBar />
+		{/if}
 	</svelte:fragment>
 	<!-- Router Slot -->
 	<slot />
@@ -33,5 +44,3 @@
 	</svelte:fragment>
 </AppShell>
 
-<Toast position={'tr'}/>
-<Modal components={modalComponentRegistry} />

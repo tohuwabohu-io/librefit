@@ -1,9 +1,10 @@
 import * as dateUtil from 'date-fns';
 import * as dateLocales from 'date-fns/locale/index.js';
+import { Category } from '$lib/api/model.js';
 
 /**
  * @readonly
- * @enum {String}
+ * @enum {string}
  */
 export const DataViews = {
 	Today: 'TODAY',
@@ -11,6 +12,19 @@ export const DataViews = {
 	Month: 'MONTH',
 	Year: 'YEAR'
 };
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const Daytime = {
+	Morning: 'morning',
+	Day: 'day',
+	Afternoon: 'afternoon',
+	Evening: 'evening',
+	Night: 'night'
+};
+
 export const default_date_format = 'yyyy-MM-dd'; // used for internal storage and fetch requests
 export const display_date_format = 'dd.MM.yyyy'; // used for display only
 /**
@@ -148,8 +162,8 @@ export function parseStringAsDate(str, format) {
 }
 
 /**
- * @param {string} str
- * @param {string | undefined} [format]
+ * @param {String} str
+ * @param {String | undefined} [format]
  */
 export function convertDateStrToDisplayDateStr(str, format) {
 	const date = parseStringAsDate(str, format);
@@ -176,3 +190,42 @@ export const getDisplayDateAsStr = (
 export function weakEntityEquals(a, b) {
 	return a.id === b.id && a.added === b.added && a.userId === b.userId;
 }
+
+/**
+ * @param date {Date}
+ */
+export const getDaytimeGreeting = (date) => {
+	const hours = dateUtil.getHours(date);
+
+	if (hours >= 0 && hours <= 4) {
+		return Daytime.Night;
+	} else if (hours >= 5 && hours <= 11) {
+		return Daytime.Morning;
+	} else if (hours >= 12 && hours <= 14) {
+		return Daytime.Day;
+	} else if (hours >= 15 && hours <= 18) {
+		return Daytime.Afternoon;
+	} else if (hours >= 19 && hours <= 24) {
+		return Daytime.Night;
+	} else {
+		return Daytime.Day;
+	}
+};
+
+/**
+ * @type {{label: String, value: String}[]}
+ */
+export const categoriesAsKeyValue = Object.keys(Category).map((key) => {
+	return {
+		label: key,
+		value: Category[key]
+	};
+});
+
+/**
+ * @param {Category} category
+ * @returns {String}
+ */
+export const getCategoryValueAsKey = (category) => {
+	return categoriesAsKeyValue.filter((cat) => cat.value === category).map((cat) => cat.label)[0];
+};

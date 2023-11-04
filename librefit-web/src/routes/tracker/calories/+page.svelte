@@ -1,10 +1,12 @@
 <script>
 	import {Accordion, AccordionItem, getToastStore} from '@skeletonlabs/skeleton';
-	import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util';
+	import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util.js';
 	import {handleApiError, showToastSuccess} from '$lib/toast.js';
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
 	import TrackerInput from '$lib/components/TrackerInput.svelte';
 	import {Category} from '$lib/api/model.js';
+	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
+	import * as ct_crud from '$lib/api/calories-rest.js';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
@@ -36,56 +38,19 @@
 			id = Math.max(...data.entryToday.map(entry => entry.id).filter(id => id !== undefined)) + 1;
 		}
 
-		/** @type {CalorieTrackerEntry} */
-		const newEntry = {
-			id: id,
-			added: e.detail.date,
-			amount: e.detail.value,
-			category: e.detail.category
-		};
-
-		fetch('/tracker', {
-			method: 'POST',
-			body: JSON.stringify(newEntry)
-		}).then(_ => {
-			loadEntries(newEntry.added);
-		}).catch(e => handleApiError(toastStore, e));
+		ct_crud.addEntry(e, loadEntries, toastStore, '/tracker/calories', id);
 	};
 
 	const updateEntry = (e) => {
-		/** @type {CalorieTrackerEntry} */
-		const entry = {
-			id: e.detail.sequence,
-			added: e.detail.date,
-			amount: e.detail.value,
-			category: e.detail.category
-		};
-
-		fetch('/tracker', {
-			method: 'PUT',
-			body: JSON.stringify(entry)
-		}).then(_ => {
-			loadEntries(entry.added);
-			showToastSuccess(toastStore, 'Entry updated successfully!')
-		}).catch(e => handleApiError(toastStore, e))
+		ct_crud.updateEntry(e, loadEntries, toastStore, '/tracker/calories');
 	};
 
 	const deleteEntry = (e) => {
-		console.log(e);
-
-		fetch(`/tracker?sequence=${e.detail.sequence}&added=${e.detail.date}`, {
-			method: 'DELETE',
-		}).then((response) => {
-			if (response.status === 200) {
-				loadEntries(e.detail.date);
-			} else {
-				throw Error(response.status);
-			}
-		}).catch(e => handleApiError(toastStore, e))
+		ct_crud.deleteEntry(e, loadEntries, toastStore, '/tracker/calories');
 	};
 
 	const loadEntries = async (added) => {
-		const response = await fetch(`/tracker?added=${added}`, {method: 'GET'});
+		const response = await fetch(`/tracker/calories?added=${added}`, {method: 'GET'});
 		const result = response.json();
 
 		datesToEntries[added] = await result;
@@ -114,42 +79,21 @@
 					<svelte:fragment slot="content">
 						<div class="flex gap-4 justify-between">
 							{#if dateStr === todayStr && data.entryToday && !datesToEntries[dateStr]}
-								<TrackerRadial entries={data.entryToday.map(e => e.amount)} />
-								<div class="flex flex-col grow gap-4">
-									{#each data.entryToday as entry}
-										<TrackerInput {categories}
-												value={entry.amount}
-												{dateStr}
-												id={entry.id}
-												on:add={addEntry}
-												on:update={updateEntry}
-												on:remove={deleteEntry}
-												unit={'kcal'}
-										/>
-									{/each}
-								</div>
+								<CalorieTracker entries={data.entryToday} {categories}
+									on:addCalories={addEntry}
+									on:updateCalories={updateEntry}
+									on:deleteCalories={deleteEntry}
+								/>
 							{:else}
 								{#await datesToEntries[dateStr]}
 									<p>... loading</p>
 								{:then entries}
 									{#if entries}
-									<TrackerRadial entries={entries.map(e => e.amount)} />
-									<div class="flex flex-col grow gap-4">
-										{#each entries as entry}
-											<TrackerInput {categories}
-													value={entry.amount}
-													dateStr={entry.added}
-													id={entry.id}
-												    category={entry.category}
-													on:add={addEntry}
-													on:update={updateEntry}
-													on:remove={deleteEntry}
-												    existing={entry.id !== undefined}
-													disabled={entry.id !== undefined}
-													unit={'kcal'}
-											/>
-										{/each}
-									</div>
+										<CalorieTracker {entries} {categories}
+											on:addCalories={addEntry}
+											on:updateCalories={updateEntry}
+											on:deleteCalories={deleteEntry}
+										/>
 									{/if}
 								{:catch error}
 									<p>{error}</p>
