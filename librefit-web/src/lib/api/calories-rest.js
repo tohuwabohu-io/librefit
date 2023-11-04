@@ -1,4 +1,8 @@
 import { handleApiError, showToastSuccess } from '$lib/toast.js';
+import { Category } from '$lib/api/model.js';
+import { categoriesAsKeyValue, getCategoryValueAsKey } from '$lib/util.js';
+
+const categories = categoriesAsKeyValue;
 
 /**
  * @param e
@@ -22,6 +26,14 @@ export const addEntry = (e, callback, toastStore, route, id) => {
 	})
 		.then((_) => {
 			callback(newEntry.added);
+			showToastSuccess(
+				toastStore,
+				`Successfully added ${
+					newEntry.category !== Category.Unset
+						? getCategoryValueAsKey(newEntry.category)
+						: 'calories'
+				}.`
+			);
 		})
 		.catch((e) => handleApiError(toastStore, e));
 };
@@ -47,7 +59,12 @@ export const updateEntry = (e, callback, toastStore, route) => {
 	})
 		.then((_) => {
 			callback(entry.added);
-			showToastSuccess(toastStore, 'Entry updated successfully!');
+			showToastSuccess(
+				toastStore,
+				`Successfully updated ${
+					entry.category !== Category.Unset ? getCategoryValueAsKey(entry.category) : 'calories'
+				}`
+			);
 		})
 		.catch((e) => handleApiError(toastStore, e));
 };
@@ -62,7 +79,7 @@ export const updateEntry = (e, callback, toastStore, route) => {
 export const deleteEntry = (e, callback, toastStore, route, params) => {
 	let query = route;
 
-	if (params !== undefined) {
+	if (params === undefined) {
 		query += `?sequence=${e.detail.sequence}&added=${e.detail.date}`;
 	} else {
 		query += `?${params}&sequence=${e.detail.sequence}&added=${e.detail.date}`;
@@ -73,6 +90,7 @@ export const deleteEntry = (e, callback, toastStore, route, params) => {
 	})
 		.then((response) => {
 			if (response.status === 200) {
+				showToastSuccess(toastStore, 'Deletion successful.');
 				callback(e.detail.date);
 			} else {
 				throw Error(response.status);
