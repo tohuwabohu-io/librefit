@@ -1,4 +1,4 @@
-import * as ct_crud from '$lib/server/calories-rest.js';
+import * as ct_crud from '$lib/server/api/calories-rest.js';
 
 /**
  * @type {import('@sveltejs/kit').RequestHandler}

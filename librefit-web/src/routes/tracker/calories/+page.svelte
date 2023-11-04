@@ -6,6 +6,7 @@
 	import TrackerInput from '$lib/components/TrackerInput.svelte';
 	import {Category} from '$lib/api/model.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
+	import * as ct_crud from '$lib/api/calories-rest.js';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
@@ -37,52 +38,15 @@
 			id = Math.max(...data.entryToday.map(entry => entry.id).filter(id => id !== undefined)) + 1;
 		}
 
-		/** @type {CalorieTrackerEntry} */
-		const newEntry = {
-			id: id,
-			added: e.detail.date,
-			amount: e.detail.value,
-			category: e.detail.category
-		};
-
-		fetch('/tracker/calories', {
-			method: 'POST',
-			body: JSON.stringify(newEntry)
-		}).then(_ => {
-			loadEntries(newEntry.added);
-		}).catch(e => handleApiError(toastStore, e));
+		ct_crud.addEntry(e, loadEntries, toastStore, '/tracker/calories', id);
 	};
 
 	const updateEntry = (e) => {
-		/** @type {CalorieTrackerEntry} */
-		const entry = {
-			id: e.detail.sequence,
-			added: e.detail.date,
-			amount: e.detail.value,
-			category: e.detail.category
-		};
-
-		fetch('/tracker/calories', {
-			method: 'PUT',
-			body: JSON.stringify(entry)
-		}).then(_ => {
-			loadEntries(entry.added);
-			showToastSuccess(toastStore, 'Entry updated successfully!')
-		}).catch(e => handleApiError(toastStore, e))
+		ct_crud.updateEntry(e, loadEntries, toastStore, '/tracker/calories');
 	};
 
 	const deleteEntry = (e) => {
-		console.log(e);
-
-		fetch(`/tracker/calories?sequence=${e.detail.sequence}&added=${e.detail.date}`, {
-			method: 'DELETE',
-		}).then((response) => {
-			if (response.status === 200) {
-				loadEntries(e.detail.date);
-			} else {
-				throw Error(response.status);
-			}
-		}).catch(e => handleApiError(toastStore, e))
+		ct_crud.deleteEntry(e, loadEntries, toastStore, '/tracker/calories');
 	};
 
 	const loadEntries = async (added) => {

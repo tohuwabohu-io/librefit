@@ -1,4 +1,4 @@
-import * as weight_crud from '$lib/server/weight-rest.js';
+import * as weight_crud from '$lib/server/api/weight-rest.js';
 
 /**
  * @type {import('@sveltejs/kit').RequestHandler}
