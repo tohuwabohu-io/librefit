@@ -162,8 +162,8 @@ export function parseStringAsDate(str, format) {
 }
 
 /**
- * @param {string} str
- * @param {string | undefined} [format]
+ * @param {String} str
+ * @param {String | undefined} [format]
  */
 export function convertDateStrToDisplayDateStr(str, format) {
 	const date = parseStringAsDate(str, format);
