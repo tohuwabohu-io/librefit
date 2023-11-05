@@ -6,7 +6,6 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.ValidationError
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
-import java.util.Arrays.asList
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 import javax.persistence.*
@@ -30,7 +29,8 @@ data class LibreUser (
 
     var name: String? = null,
     var registered: LocalDateTime? = null,
-    var lastLogin: LocalDateTime? = null
+    var lastLogin: LocalDateTime? = null,
+    var avatar: String? = null
 ): PanacheEntityBase {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -44,7 +44,7 @@ data class LibreUser (
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(id = $id , email = $email , password = $password , name = $name , registered = $registered , lastLogin = $lastLogin )"
+        return this::class.simpleName + "(id = $id , email = $email , password = $password , name = $name , registered = $registered , lastLogin = $lastLogin , avatar = $avatar )"
     }
 }
 

@@ -19,7 +19,8 @@ create table public.libre_user
     last_login timestamp,
     name       varchar(255),
     password   varchar(255) not null,
-    registered timestamp default CURRENT_TIMESTAMP
+    registered timestamp default CURRENT_TIMESTAMP,
+    avatar     varchar(255)
 );
 
 alter table public.libre_user
