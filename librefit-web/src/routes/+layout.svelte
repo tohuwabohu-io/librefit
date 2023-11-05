@@ -36,7 +36,7 @@
 <Toast position={'tr'}/>
 <Modal components={modalComponentRegistry} />
 <Drawer position={'right'}>
-	<UserPanel userData={data.userData} on:logout={logout}/>
+	<UserPanel on:logout={logout}/>
 </Drawer>
 
 <AppShell>
