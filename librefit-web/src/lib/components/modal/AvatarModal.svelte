@@ -13,17 +13,19 @@
 
     let selected;
 
-    const onSubmit = () => {
+    const onSubmit = (unset) => {
         if ($modalStore[0].response) {
             $modalStore[0].response({
-                avatar: selected
+                avatar: unset === true ? null : selected
             });
         }
     }
 
     const onCancel = () => {
         if ($modalStore[0].response) {
-            $modalStore[0].response(undefined);
+            $modalStore[0].response({
+                cancelled: true
+            });
         }
     }
 </script>
@@ -35,13 +37,21 @@
 
     <AvatarPicker on:chooseAvatar={(e) => selected = e.detail.avatar} />
 
-    <footer class="modal-footer flex justify-end space-x-2">
-        <button on:click|preventDefault={onCancel} class="btn variant-ringed">
-            Cancel
-        </button>
+    <footer class="modal-footer flex justify-between space-x-2">
+        <div>
+            <button on:click|preventDefault={() => onSubmit(true)} class="btn variant-ringed">
+                Unset
+            </button>
+        </div>
 
-        <button on:click|preventDefault={onSubmit} class="btn variant-filled">
-            Submit
-        </button>
+        <div>
+            <button on:click|preventDefault={onCancel} class="btn variant-ringed">
+                Cancel
+            </button>
+
+            <button on:click|preventDefault={onSubmit} class="btn variant-filled">
+                Submit
+            </button>
+        </div>
     </footer>
 </div>
