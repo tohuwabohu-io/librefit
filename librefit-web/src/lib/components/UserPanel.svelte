@@ -1,8 +1,8 @@
 <script>
     import {page} from '$app/stores';
     import {Avatar, getDrawerStore} from '@skeletonlabs/skeleton';
-    import {goto, invalidateAll} from '$app/navigation';
-    import User from '$lib/assets/icons/user-square-rounded.svg?component';
+    import {goto} from '$app/navigation';
+    import {createEventDispatcher} from 'svelte';
 
     /** @type {LibreUser} */
     export let userData;
@@ -11,9 +11,13 @@
 
     $: classesActive = (href) => (href === $page.url.pathname ? '!bg-primary-500' : '');
 
+    const dispatch = createEventDispatcher();
+
     export const logout = (e) => {
-        invalidateAll();
         goto('/logout');
+        dispatch('logout');
+
+        drawerStore.close();
     }
 </script>
 

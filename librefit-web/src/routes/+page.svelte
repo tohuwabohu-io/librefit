@@ -5,6 +5,7 @@
 	import {getToastStore} from '@skeletonlabs/skeleton';
 	import * as ct_crud from '$lib/api/calories-rest.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
+	import {getContext} from 'svelte';
 
 	export let data;
 
@@ -26,6 +27,9 @@
 		weightTrackerEntry = data.lastWeight;
 		goal = data.lastGoal;
 	}
+
+	const user = getContext('user');
+	$: user;
 
 	const toastStore = getToastStore();
 
@@ -90,10 +94,10 @@
 </script>
 
 <section>
-	{#if data.authenticated === true}
+	{#if $user}
 	<div class="container mx-auto p-8 space-y-8">
 
-		<h1>Good {getDaytimeGreeting(new Date())}, {data.user.name}!</h1>
+		<h1>Good {getDaytimeGreeting(new Date())}, {$user.name}!</h1>
 		<h2>This is your daily summary.</h2>
 
 		<div class="flex flex-row gap-8">
