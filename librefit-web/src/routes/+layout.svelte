@@ -8,6 +8,7 @@
 	import UserPanel from '$lib/components/UserPanel.svelte';
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
+	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
 
 	initializeStores();
 
@@ -18,6 +19,10 @@
 
 		goalModal: {
 			ref: GoalModal,
+		},
+
+		avatarModal: {
+			ref: AvatarModal
 		}
 	};
 
