@@ -77,6 +77,7 @@ export const Category = {
  * @property {String} [name]
  * @property {String} [registered]
  * @property {String} [lastLogin]
+ * @property {String} [avatar]
  */
 
 /**

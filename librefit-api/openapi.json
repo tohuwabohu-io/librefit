@@ -1280,6 +1280,10 @@
               "$ref" : "#/components/schemas/LocalDateTime"
             } ],
             "nullable" : true
+          },
+          "avatar" : {
+            "type" : "string",
+            "nullable" : true
           }
         }
       },

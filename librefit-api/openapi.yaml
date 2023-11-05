@@ -932,6 +932,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalDateTime'
           nullable: true
+        avatar:
+          type: string
+          nullable: true
     LocalDate:
       format: date
       type: string
