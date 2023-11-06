@@ -97,6 +97,65 @@ class UserResourceTest {
         given().get("/user").then().assertThat().statusCode(404)
     }
 
+    @Test
+    @TestSecurity(user = "1", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test1@test.dev"),
+        ]
+    )
+    @Order(7)
+    fun `should update user data`() {
+        val user = user()
+        user.avatar = "/path"
+
+        given()
+            .header("Content-Type", "application/json")
+            .body(user)
+            .post("/update")
+            .then()
+            .assertThat()
+            .statusCode(200)
+
+        val updatedUser = given().get("/user").then().extract().body().`as`(LibreUser::class.java)
+
+        assert(user.email == updatedUser.email)
+        assert(user.avatar == updatedUser.avatar)
+    }
+
+    @Test
+    @TestSecurity(user = "3", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test3@test.dev"),
+        ]
+    )
+    @Order(8)
+    fun `should fail on updating user data` () {
+        val user = user()
+        user.avatar = "/path"
+
+        given()
+            .header("Content-Type", "application/json")
+            .body(user)
+            .post("/update")
+            .then()
+            .assertThat()
+            .statusCode(404)
+    }
+
+    @Test
+    @Order(9)
+    fun `should fail registration validation`() {
+        given()
+            .header("Content-Type", ContentType.JSON)
+            .body(invalidUser())
+            .post("/register")
+            .then()
+            .assertThat()
+            .statusCode(400)
+    }
+
     private fun user(): LibreUser {
         return LibreUser(
             email = "test1@test.dev",
@@ -110,6 +169,13 @@ class UserResourceTest {
             email = "test1@test.dev",
             password = "otherpasswordthanuser2b",
             name = "nottestname"
+        )
+    }
+
+    private fun invalidUser(): LibreUser {
+        return LibreUser(
+            email = "invalid@test.dev",
+            password = ""
         )
     }
 }
