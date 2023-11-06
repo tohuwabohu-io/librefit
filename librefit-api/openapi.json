@@ -1140,7 +1140,7 @@
     "/user/update" : {
       "post" : {
         "tags" : [ "User Resource" ],
-        "operationId" : "readUserInfo",
+        "operationId" : "updateUserInfo",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1304,7 +1304,7 @@
         }
       },
       "LibreUser" : {
-        "required" : [ "email", "password", "name", "avatar" ],
+        "required" : [ "email", "password" ],
         "type" : "object",
         "properties" : {
           "id" : {
@@ -1319,7 +1319,8 @@
             "type" : "string"
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "registered" : {
             "type" : "string",
@@ -1336,7 +1337,8 @@
             "nullable" : true
           },
           "avatar" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         }
       },

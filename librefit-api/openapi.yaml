@@ -811,7 +811,7 @@ paths:
     post:
       tags:
       - User Resource
-      operationId: readUserInfo
+      operationId: updateUserInfo
       requestBody:
         content:
           application/json:
@@ -948,8 +948,6 @@ components:
       required:
       - email
       - password
-      - name
-      - avatar
       type: object
       properties:
         id:
@@ -962,6 +960,7 @@ components:
           type: string
         name:
           type: string
+          nullable: true
         registered:
           type: string
           allOf:
@@ -974,6 +973,7 @@ components:
           nullable: true
         avatar:
           type: string
+          nullable: true
     LocalDate:
       format: date
       type: string
