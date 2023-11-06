@@ -75,7 +75,7 @@ class UserResourceTest {
     )
     @Order(5)
     fun `should return user data`() {
-        val userData = given().get("/user").then()
+        val userData = given().get("/read").then()
 
         userData.assertThat().statusCode(200)
 
@@ -94,7 +94,7 @@ class UserResourceTest {
     )
     @Order(6)
     fun `should fail on reading user data`() {
-        given().get("/user").then().assertThat().statusCode(404)
+        given().get("/read").then().assertThat().statusCode(404)
     }
 
     @Test
@@ -117,7 +117,7 @@ class UserResourceTest {
             .assertThat()
             .statusCode(200)
 
-        val updatedUser = given().get("/user").then().extract().body().`as`(LibreUser::class.java)
+        val updatedUser = given().get("/read").then().extract().body().`as`(LibreUser::class.java)
 
         assert(user.email == updatedUser.email)
         assert(user.avatar == updatedUser.avatar)

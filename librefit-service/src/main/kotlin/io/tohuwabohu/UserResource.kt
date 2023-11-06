@@ -9,7 +9,6 @@ import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.AuthenticationResponse
 import io.tohuwabohu.security.generateToken
 import io.tohuwabohu.security.printAuthenticationInfo
-import io.tohuwabohu.security.validateToken
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
@@ -86,7 +85,7 @@ class UserResource(val userRepository: LibreUserRepository) {
     }
 
     @GET
-    @Path("/user")
+    @Path("/read")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("User", "Admin")
     @APIResponses(
@@ -139,7 +138,7 @@ class UserResource(val userRepository: LibreUserRepository) {
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "readUserInfo"
+        operationId = "updateUserInfo"
     )
     fun updateUserInfo(@Context securityContext: SecurityContext, @Valid libreUser: LibreUser): Uni<Response> {
         Log.info("Update user profile $libreUser")
@@ -148,8 +147,8 @@ class UserResource(val userRepository: LibreUserRepository) {
 
         libreUser.id = jwt.name.toLong()
 
-        return userRepository.updateLibreUser(libreUser)
-            .onItem().transform { rowCount -> if (rowCount > 0) Response.ok().build() else Response.serverError().build() }
+        return userRepository.updateUser(libreUser)
+            .onItem().transform { updated -> Response.ok(updated).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
