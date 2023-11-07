@@ -5,7 +5,7 @@
     const dispatch = createEventDispatcher();
 
     const files = [];
-    const fileList = ['buffdude-1.png', 'buffdude-2.png', 'lady-1.png', 'lady-2.png', 'panda-1.png', 'tiger-1.png'];
+    const fileList = ['buffdude-1.png', 'buffdude-2.png', 'cat-1.png', 'dog-1.png', 'lady-1.png', 'lady-2.png', 'skull-1.png', 'panda-1.png', 'tiger-1.png'];
 
     fileList.forEach(fileName => {
         files.push(`/assets/images/avatars/${fileName}`);
