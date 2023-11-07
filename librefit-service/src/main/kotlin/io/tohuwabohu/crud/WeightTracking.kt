@@ -51,14 +51,14 @@ class WeightTrackerRepository : LibreUserRelatedRepository<WeightTrackerEntry>()
                 val key = entry.getPrimaryKey()
 
                 update(
-                    "amount = ?1, updated = ?2 where user_id = ?3 and added = ?4 and id = ?5",
+                    "amount = ?1, updated = ?2 where userId = ?3 and added = ?4 and id = ?5",
                     weightTrackerEntry.amount, LocalDateTime.now(), key.userId, key.added, key.id
                 )
             }.onItem().ifNull().failWith{ UnmodifiedError(weightTrackerEntry.toString()) }
     }
 
     fun findLastEntry(userId: Long): Uni<WeightTrackerEntry?> {
-        return find("user_id = ?1 order by added desc, id desc", userId).firstResult()
+        return find("userId = ?1 order by added desc, id desc", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 

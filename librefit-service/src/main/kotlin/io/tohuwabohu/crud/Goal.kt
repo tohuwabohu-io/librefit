@@ -48,7 +48,7 @@ data class Goal(
 @ApplicationScoped
 class GoalsRepository : LibreUserRelatedRepository<Goal>() {
     fun findLastGoal(userId: Number): Uni<Goal?> {
-        return find("user_id = ?1 order by added desc, id desc", userId).firstResult()
+        return find("userId = ?1 order by added desc, id desc", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 
@@ -59,7 +59,7 @@ class GoalsRepository : LibreUserRelatedRepository<Goal>() {
                 val key = entry.getPrimaryKey()
 
                 update(
-                    "startAmount = ?1, endAmount = ?2, startDate = ?3, endDate = ?4, updated = ?5 where user_id = ?6 and added = ?7 and id = ?8",
+                    "startAmount = ?1, endAmount = ?2, startDate = ?3, endDate = ?4, updated = ?5 where userId = ?6 and added = ?7 and id = ?8",
                     goal.startAmount, goal.endAmount, goal.startDate, goal.endDate, LocalDateTime.now(), key.userId, key.added, key.id
                 )
             }.onItem().ifNull().failWith{ UnmodifiedError(goal.toString()) }
