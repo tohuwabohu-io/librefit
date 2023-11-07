@@ -1,6 +1,6 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
@@ -10,18 +10,17 @@ import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import io.vertx.mutiny.pgclient.PgPool
 import io.vertx.mutiny.sqlclient.Tuple
+import jakarta.enterprise.context.ApplicationScoped
+import jakarta.inject.Inject
+import jakarta.persistence.Column
+import jakarta.persistence.Convert
+import jakarta.persistence.Entity
+import jakarta.persistence.EntityNotFoundException
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import javax.enterprise.context.ApplicationScoped
-import javax.inject.Inject
-import javax.persistence.Column
-import javax.persistence.Convert
-import javax.persistence.Entity
-import javax.persistence.EntityNotFoundException
-import javax.persistence.PreUpdate
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotNull
 
 @Entity
 data class CalorieTrackerEntry (
@@ -63,7 +62,7 @@ class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>
     @Inject
     lateinit var client: PgPool
 
-    @ReactiveTransactional
+    @WithTransaction
     fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<Int> {
         return findById(calorieTrackerEntry.getPrimaryKey()).onItem().ifNull()
             .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni { entry ->

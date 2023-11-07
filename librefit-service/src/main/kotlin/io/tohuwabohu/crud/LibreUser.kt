@@ -1,19 +1,19 @@
 package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.Panache
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.unchecked.Unchecked
 import io.tohuwabohu.crud.error.ValidationError
+import jakarta.enterprise.context.ApplicationScoped
+import jakarta.inject.Inject
+import jakarta.persistence.*
+import jakarta.validation.Validator
+import jakarta.validation.constraints.NotEmpty
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
-import javax.enterprise.context.ApplicationScoped
-import javax.inject.Inject
-import javax.persistence.*
-import javax.validation.Validator
-import javax.validation.constraints.NotEmpty
 
 @Entity
 @Cacheable
@@ -77,7 +77,7 @@ class LibreUserRepository : PanacheRepository<LibreUser> {
     fun findByEmailAndPassword(email: String, password: String): Uni<LibreUser?> =
         find("email = ?1 and password = crypt(?2, password)", email, password).firstResult()
 
-    @ReactiveTransactional
+    @WithTransaction
     fun updateUser(libreUser: LibreUser): Uni<LibreUser> {
         return Panache.getSession()
             .call { s -> s.find(LibreUser::class.java, libreUser.id)

@@ -244,12 +244,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/calories/delete/{date}/{id}:
     delete:
       tags:
@@ -289,12 +284,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/calories/list/dates:
     get:
       tags:
@@ -322,12 +312,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/calories/list/{date}:
     get:
       tags:
@@ -361,12 +346,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/calories/read/{date}/{id}:
     get:
       tags:
@@ -406,12 +386,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/calories/update:
     put:
       tags:
@@ -444,12 +419,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/create:
     post:
       tags:
@@ -480,12 +450,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/delete/{date}/{id}:
     delete:
       tags:
@@ -525,12 +490,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/last:
     get:
       tags:
@@ -556,12 +516,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/list/{dateFrom}/{dateTo}:
     get:
       tags:
@@ -600,12 +555,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/list/{date}:
     get:
       tags:
@@ -639,12 +589,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/read/{date}/{id}:
     get:
       tags:
@@ -684,12 +629,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/update:
     put:
       tags:
@@ -722,12 +662,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /user/login:
     post:
       tags:
@@ -779,12 +714,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /user/register:
     post:
       tags:
@@ -839,12 +769,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
 components:
   schemas:
     AuthenticationResponse:
@@ -1041,3 +966,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalDateTime'
           nullable: true
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      description: Authentication
+      scheme: bearer
+      bearerFormat: JWT

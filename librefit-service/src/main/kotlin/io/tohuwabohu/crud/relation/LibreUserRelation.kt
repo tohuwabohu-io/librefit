@@ -1,16 +1,16 @@
 package io.tohuwabohu.crud.relation
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.ValidationError
+import jakarta.inject.Inject
+import jakarta.persistence.*
+import jakarta.validation.Validator
 import java.io.Serializable
 import java.time.LocalDate
-import javax.inject.Inject
-import javax.persistence.*
-import javax.validation.Validator
 
 class LibreUserCompositeKey(
     var userId: Long = 0L,
@@ -57,7 +57,6 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
     @Column(nullable = false)
     var id: Long = 0L
 
-    @Transient
     @JsonIgnore
     fun getPrimaryKey(): LibreUserCompositeKey {
         return LibreUserCompositeKey(
@@ -77,7 +76,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         }
     }
 
-    @ReactiveTransactional
+    @WithTransaction
     fun validateAndPersist(entity: Entity): Uni<Entity> {
         validate(entity)
 
@@ -104,7 +103,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         return list("userId = ?1 and added between ?2 and ?3", userId, dateFrom, dateTo)
     }
 
-    @ReactiveTransactional
+    @WithTransaction
     fun deleteEntry(userId: Long, date: LocalDate, id: Long): Uni<Boolean> {
         val key = LibreUserCompositeKey(
             userId = userId,

@@ -360,9 +360,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -420,9 +418,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -465,9 +461,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -518,9 +512,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -579,9 +571,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -632,9 +622,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -683,9 +671,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -743,9 +729,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -785,9 +769,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -845,9 +827,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -898,9 +878,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -959,9 +937,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -1012,9 +988,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -1096,9 +1070,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -1185,9 +1157,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     }
@@ -1423,6 +1393,14 @@
             "nullable" : true
           }
         }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }

@@ -1,19 +1,17 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
-import io.vertx.mutiny.pgclient.PgPool
+import jakarta.enterprise.context.ApplicationScoped
+import jakarta.persistence.Entity
+import jakarta.persistence.EntityNotFoundException
+import jakarta.persistence.PreUpdate
+import jakarta.validation.constraints.Min
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
-import javax.enterprise.context.ApplicationScoped
-import javax.inject.Inject
-import javax.persistence.Entity
-import javax.persistence.EntityNotFoundException
-import javax.persistence.PreUpdate
-import javax.validation.constraints.Min
 
 @Entity
 data class WeightTrackerEntry (
@@ -44,7 +42,7 @@ data class WeightTrackerEntry (
 
 @ApplicationScoped
 class WeightTrackerRepository : LibreUserRelatedRepository<WeightTrackerEntry>() {
-    @ReactiveTransactional
+    @WithTransaction
     fun updateTrackingEntry(weightTrackerEntry: WeightTrackerEntry): Uni<Int> {
         // TODO verify that entry belongs to logged in user -> return 404
 

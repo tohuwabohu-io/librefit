@@ -1,18 +1,18 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
+import jakarta.enterprise.context.ApplicationScoped
+import jakarta.persistence.Entity
+import jakarta.persistence.EntityNotFoundException
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import javax.enterprise.context.ApplicationScoped
-import javax.persistence.Entity
-import javax.persistence.EntityNotFoundException
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotNull
 
 @Entity
 data class Goal(
@@ -52,7 +52,7 @@ class GoalsRepository : LibreUserRelatedRepository<Goal>() {
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 
-    @ReactiveTransactional
+    @WithTransaction
     fun updateGoal(goal: Goal): Uni<Int> {
         return findById(goal.getPrimaryKey()).onItem().ifNull()
             .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni{ entry ->

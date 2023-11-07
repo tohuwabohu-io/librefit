@@ -9,6 +9,16 @@ import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.AuthenticationResponse
 import io.tohuwabohu.security.generateToken
 import io.tohuwabohu.security.printAuthenticationInfo
+import jakarta.annotation.security.PermitAll
+import jakarta.annotation.security.RolesAllowed
+import jakarta.enterprise.context.RequestScoped
+import jakarta.inject.Inject
+import jakarta.validation.Valid
+import jakarta.ws.rs.*
+import jakarta.ws.rs.core.Context
+import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.core.Response
+import jakarta.ws.rs.core.SecurityContext
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
@@ -16,16 +26,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDateTime
-import javax.annotation.security.PermitAll
-import javax.annotation.security.RolesAllowed
-import javax.enterprise.context.RequestScoped
-import javax.inject.Inject
-import javax.validation.Valid
-import javax.ws.rs.*
-import javax.ws.rs.core.Context
-import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
-import javax.ws.rs.core.SecurityContext
 
 @Path("/user")
 @RequestScoped
