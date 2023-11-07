@@ -156,6 +156,28 @@ class UserResourceTest {
             .statusCode(400)
     }
 
+    @Test
+    @TestSecurity(user = "1", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test1@test.dev"),
+        ]
+    )
+    @Order(10)
+    fun `should fail on updating user data with wrong password`() {
+        val user = user()
+        user.avatar = "/path"
+        user.password = "notquiteright"
+
+        given()
+            .header("Content-Type", "application/json")
+            .body(user)
+            .post("/update")
+            .then()
+            .assertThat()
+            .statusCode(400)
+    }
+
     private fun user(): LibreUser {
         return LibreUser(
             email = "test1@test.dev",

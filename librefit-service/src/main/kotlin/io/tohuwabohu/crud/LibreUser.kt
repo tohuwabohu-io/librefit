@@ -82,14 +82,14 @@ class LibreUserRepository : PanacheRepository<LibreUser> {
         return Panache.getSession()
             .call { s -> s.find(LibreUser::class.java, libreUser.id)
                 .onItem().ifNull().failWith(EntityNotFoundException())
-                .onItem().ifNotNull().invoke(Unchecked.consumer { old ->
+                .replaceWith(findByEmailAndPassword(libreUser.email, libreUser.password))
+                .onItem().ifNull().failWith(ValidationError(listOf("Invalid password.")))
+                .onItem().ifNotNull().invoke(Unchecked.consumer { _ ->
                     val violations = validator.validate(libreUser)
 
                     if (violations.isNotEmpty()) {
                         throw ValidationError(violations.map { violation -> violation.message })
                     }
-
-                    libreUser.password = old.password
                 })}
             .chain{ s -> s.merge(libreUser)}
     }
