@@ -20,7 +20,7 @@
 	export let required = false;
 	export let errorMessage = undefined;
 
-	export let disabled = false;
+	export let readOnly = false;
 
 	const getType = (node) => {
 		node.type = type;
@@ -85,7 +85,7 @@
 				{required}
 				bind:value
 				on:focusout={validate}
-				{disabled}
+				{readOnly}
 			/>
 		</div>
 	{:else}
@@ -101,7 +101,7 @@
 					bind:value
 					on:change={(e) => (value = e.target.checked)}
 					on:focusout={validate}
-					{disabled}
+					{readOnly}
 				/>
 			</span>
 
