@@ -2,12 +2,12 @@
     import {page} from '$app/stores';
     import {Avatar, getDrawerStore} from '@skeletonlabs/skeleton';
     import {goto} from '$app/navigation';
-    import {createEventDispatcher} from 'svelte';
-
-    /** @type {LibreUser} */
-    export let userData;
+    import {createEventDispatcher, getContext} from 'svelte';
 
     const drawerStore = getDrawerStore();
+
+    const user = getContext('user');
+    $: user;
 
     $: classesActive = (href) => (href === $page.url.pathname ? '!bg-primary-500' : '');
 
@@ -24,14 +24,14 @@
 <div class="container mx-auto p-8 space-y-10">
     <div class="flex flex-row gap-6">
         <span>
-            <Avatar initials="LU" width="w-16"/>
+            <Avatar src={$user.avatar} initials="LU" width="w-16"/>
         </span>
         <div class="flex flex-col justify-evenly">
             <p>
-                {userData.email}
+                {$user.email}
             </p>
             <p>
-                {userData.name}
+                {$user.name}
             </p>
         </div>
     </div>

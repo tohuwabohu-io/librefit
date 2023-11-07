@@ -75,7 +75,7 @@ class UserResourceTest {
     )
     @Order(5)
     fun `should return user data`() {
-        val userData = given().get("/user").then()
+        val userData = given().get("/read").then()
 
         userData.assertThat().statusCode(200)
 
@@ -94,7 +94,88 @@ class UserResourceTest {
     )
     @Order(6)
     fun `should fail on reading user data`() {
-        given().get("/user").then().assertThat().statusCode(404)
+        given().get("/read").then().assertThat().statusCode(404)
+    }
+
+    @Test
+    @TestSecurity(user = "1", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test1@test.dev"),
+        ]
+    )
+    @Order(7)
+    fun `should update user data`() {
+        val user = user()
+        user.avatar = "/path"
+
+        given()
+            .header("Content-Type", "application/json")
+            .body(user)
+            .post("/update")
+            .then()
+            .assertThat()
+            .statusCode(200)
+
+        val updatedUser = given().get("/read").then().extract().body().`as`(LibreUser::class.java)
+
+        assert(user.email == updatedUser.email)
+        assert(user.avatar == updatedUser.avatar)
+    }
+
+    @Test
+    @TestSecurity(user = "3", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test3@test.dev"),
+        ]
+    )
+    @Order(8)
+    fun `should fail on updating user data` () {
+        val user = user()
+        user.avatar = "/path"
+
+        given()
+            .header("Content-Type", "application/json")
+            .body(user)
+            .post("/update")
+            .then()
+            .assertThat()
+            .statusCode(404)
+    }
+
+    @Test
+    @Order(9)
+    fun `should fail registration validation`() {
+        given()
+            .header("Content-Type", ContentType.JSON)
+            .body(invalidUser())
+            .post("/register")
+            .then()
+            .assertThat()
+            .statusCode(400)
+    }
+
+    @Test
+    @TestSecurity(user = "1", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test1@test.dev"),
+        ]
+    )
+    @Order(10)
+    fun `should fail on updating user data with wrong password`() {
+        val user = user()
+        user.avatar = "/path"
+        user.password = "notquiteright"
+
+        given()
+            .header("Content-Type", "application/json")
+            .body(user)
+            .post("/update")
+            .then()
+            .assertThat()
+            .statusCode(400)
     }
 
     private fun user(): LibreUser {
@@ -110,6 +191,13 @@ class UserResourceTest {
             email = "test1@test.dev",
             password = "otherpasswordthanuser2b",
             name = "nottestname"
+        )
+    }
+
+    private fun invalidUser(): LibreUser {
+        return LibreUser(
+            email = "invalid@test.dev",
+            password = ""
         )
     }
 }

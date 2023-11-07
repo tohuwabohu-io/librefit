@@ -1,6 +1,10 @@
 <script>
 	import {AppBar, Avatar, getDrawerStore} from '@skeletonlabs/skeleton';
+	import {getContext} from 'svelte';
 	const drawerStore = getDrawerStore();
+
+	const user = getContext('user');
+	$: user;
 
 	export const showDrawer = (e) => {
 		drawerStore.open({
@@ -17,7 +21,7 @@
 		</a>
 	</svelte:fragment>
 	<svelte:fragment slot="trail">
-		<Avatar initials="LU" width="w-12"
+		<Avatar src={$user.avatar} initials="LU" width="w-12"
 				border="border-4 border-surface-300-600-token hover:!border-primary-500"
 				cursor="cursor-pointer"
 				on:click={showDrawer}

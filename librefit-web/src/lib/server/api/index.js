@@ -126,6 +126,12 @@ export const api = {
 		method: 'post',
 		guarded: false
 	},
+	readUserInfo: {
+		path: '/user/read',
+		contentType: 'text/plain',
+		method: 'get',
+		guarded: true
+	},
 	postUserRegister: {
 		path: '/user/register',
 		/** @see LibreUser */
@@ -133,10 +139,11 @@ export const api = {
 		method: 'post',
 		guarded: false
 	},
-	readUserInfo: {
-		path: '/user/user',
-		contentType: 'text/plain',
-		method: 'get',
+	updateUserInfo: {
+		path: '/user/update',
+		/** @see LibreUser */
+		contentType: 'application/json',
+		method: 'post',
 		guarded: true
 	},
 }
