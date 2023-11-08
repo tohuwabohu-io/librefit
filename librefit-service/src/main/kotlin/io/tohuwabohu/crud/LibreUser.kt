@@ -4,6 +4,8 @@ import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
+import io.quarkus.security.jpa.Password
+import io.quarkus.security.jpa.Username
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.unchecked.Unchecked
 import io.tohuwabohu.crud.error.ValidationError
@@ -23,9 +25,11 @@ data class LibreUser (
     @Column(unique = true, nullable = false)
     var id: Long = 0L,
 
+    @Username
     @Column(unique = true, nullable = false)
     var email: String,
 
+    @Password
     @Column(nullable = false)
     @field:NotEmpty(message = "The provided password is empty.")
     var password: String,
