@@ -65,8 +65,9 @@ data class LibreUser (
     }
 
     @PrePersist
-    fun saltPwd() {
+    fun onInsert() {
         password = BcryptUtil.bcryptHash(password)
+        registered = LocalDateTime.now()
     }
 }
 
