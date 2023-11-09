@@ -1,6 +1,5 @@
 package io.tohuwabohu
 
-import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
@@ -9,10 +8,10 @@ import io.quarkus.test.security.jwt.JwtSecurity
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.tohuwabohu.crud.LibreUser
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
 @TestMethodOrder(OrderAnnotation::class)
 @QuarkusTest
@@ -175,7 +174,7 @@ class UserResourceTest {
             .post("/update")
             .then()
             .assertThat()
-            .statusCode(400)
+            .statusCode(404)
     }
 
     private fun user(): LibreUser {
