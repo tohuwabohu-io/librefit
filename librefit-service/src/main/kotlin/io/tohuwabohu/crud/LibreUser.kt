@@ -1,10 +1,13 @@
 package io.tohuwabohu.crud
 
+import io.quarkus.elytron.security.common.BcryptUtil
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.quarkus.security.jpa.Password
+import io.quarkus.security.jpa.Roles
+import io.quarkus.security.jpa.UserDefinition
 import io.quarkus.security.jpa.Username
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.unchecked.Unchecked
@@ -19,6 +22,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Cacheable
+@UserDefinition
 data class LibreUser (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +37,9 @@ data class LibreUser (
     @Column(nullable = false)
     @field:NotEmpty(message = "The provided password is empty.")
     var password: String,
+
+    @Roles
+    var role: String = "User",
 
     @Column(nullable = true)
     var name: String? = null,
@@ -55,6 +62,11 @@ data class LibreUser (
     @Override
     override fun toString(): String {
         return this::class.simpleName + "(id = $id , email = $email , password = $password , name = $name , registered = $registered , lastLogin = $lastLogin , avatar = $avatar )"
+    }
+
+    @PrePersist
+    fun saltPwd() {
+        password = BcryptUtil.bcryptHash(password)
     }
 }
 
