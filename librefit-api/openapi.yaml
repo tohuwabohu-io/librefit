@@ -873,6 +873,7 @@ components:
       required:
       - email
       - password
+      - role
       type: object
       properties:
         id:
@@ -882,6 +883,8 @@ components:
           type: string
         password:
           minLength: 1
+          type: string
+        role:
           type: string
         name:
           type: string

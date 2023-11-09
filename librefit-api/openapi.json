@@ -1274,7 +1274,7 @@
         }
       },
       "LibreUser" : {
-        "required" : [ "email", "password" ],
+        "required" : [ "email", "password", "role" ],
         "type" : "object",
         "properties" : {
           "id" : {
@@ -1286,6 +1286,9 @@
           },
           "password" : {
             "minLength" : 1,
+            "type" : "string"
+          },
+          "role" : {
             "type" : "string"
           },
           "name" : {
