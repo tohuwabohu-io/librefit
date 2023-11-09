@@ -70,6 +70,7 @@ class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>
 
     fun listDatesForUser(userId: Long): Uni<Set<LocalDate>?> =
         find("#CalorieTrackerEntry.listDates", userId).list()
-            .onItem().transform { list -> list.map { entry -> entry.added }.toSet() }
+            .onItem().ifNotNull().transform { list -> list.map { entry -> entry.added }.toSet() }
+            .onItem().ifNull().failWith(EntityNotFoundException())
 
 }
