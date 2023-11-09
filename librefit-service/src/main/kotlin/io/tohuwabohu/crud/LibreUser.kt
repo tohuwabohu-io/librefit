@@ -92,7 +92,11 @@ class LibreUserRepository : PanacheRepository<LibreUser> {
     }
 
     fun findByEmailAndPassword(email: String, password: String): Uni<LibreUser?> =
-        find("email = ?1 and password = crypt(?2, password)", email, password).firstResult()
+        findByEmail(email).onItem().ifNotNull().invoke (Unchecked.consumer { user ->
+            if (!BcryptUtil.matches(password, user!!.password)) {
+                throw EntityNotFoundException()
+            }
+        }).onItem().ifNull().failWith(EntityNotFoundException())
 
     @WithTransaction
     fun updateUser(libreUser: LibreUser): Uni<LibreUser> {
@@ -101,12 +105,15 @@ class LibreUserRepository : PanacheRepository<LibreUser> {
                 .onItem().ifNull().failWith(EntityNotFoundException())
                 .replaceWith(findByEmailAndPassword(libreUser.email, libreUser.password))
                 .onItem().ifNull().failWith(ValidationError(listOf("Invalid password.")))
-                .onItem().ifNotNull().invoke(Unchecked.consumer { _ ->
+                .onItem().ifNotNull().invoke(Unchecked.consumer { user ->
                     val violations = validator.validate(libreUser)
 
                     if (violations.isNotEmpty()) {
                         throw ValidationError(violations.map { violation -> violation.message })
                     }
+
+                    // preserve password on update
+                    libreUser.password = user!!.password
                 })}
             .chain{ s -> s.merge(libreUser)}
     }
