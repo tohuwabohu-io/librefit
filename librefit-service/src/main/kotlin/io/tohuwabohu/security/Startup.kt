@@ -21,21 +21,24 @@ class Startup {
                             "test1@test.dev",
                             "test1",
                             "User",
-                            "Testuser 1"
+                            "Testuser 1",
+                            avatar = "/assets/images/avatars/dog-1.png"
                         ),
                         LibreUser(
                             0L,
                             "test2@test.dev",
                             "test2",
                             "User",
-                            "Testuser 2"
+                            "Testuser 2",
+                            avatar = "/assets/images/avatars/buffdude-1.png"
                         ),
                         LibreUser(
                             0L,
                             "test3@test.dev",
                             "test3",
                             "User",
-                            "Testuser 3"
+                            "Testuser 3",
+                            avatar = "/assets/images/avatars/lady-1.png"
                         )
                     )
                 }
