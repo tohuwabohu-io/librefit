@@ -1,21 +1,13 @@
 package io.tohuwabohu.crud
 
+import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
-import io.quarkus.logging.Log
-import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
-import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
-import io.vertx.mutiny.pgclient.PgPool
-import io.vertx.mutiny.sqlclient.Tuple
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.inject.Inject
-import jakarta.persistence.Column
-import jakarta.persistence.Convert
-import jakarta.persistence.Entity
-import jakarta.persistence.EntityNotFoundException
+import jakarta.persistence.*
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -23,6 +15,10 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity
+@NamedQueries(
+    NamedQuery(name = "CalorieTrackerEntry.listDates",
+        query = "from CalorieTrackerEntry where userId = ?1 group by added, userId, id order by added, userId, id")
+)
 data class CalorieTrackerEntry (
     @Column(nullable = false)
     @field:NotNull(message = "The amount of calories must not be empty.")
@@ -50,6 +46,11 @@ data class CalorieTrackerEntry (
     override fun toString(): String {
         return this::class.simpleName + "(userId = $userId , amount = $amount , category = $category , updated = $updated , description = $description , added = $added , id = $id )"
     }
+
+    @PreUpdate
+    fun onUpdate() {
+        updated = LocalDateTime.now()
+    }
 }
 
 
@@ -59,33 +60,16 @@ enum class Category {
 
 @ApplicationScoped
 class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>() {
-    @Inject
-    lateinit var client: PgPool
-
     @WithTransaction
-    fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<Int> {
-        return findById(calorieTrackerEntry.getPrimaryKey()).onItem().ifNull()
-            .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni { entry ->
-                val key = entry.getPrimaryKey()
-
-                update(
-                    "amount = ?1, category = ?2, description = ?3, updated = ?4 where userId = ?5 and added = ?6 and id = ?7",
-                    calorieTrackerEntry.amount,
-                    calorieTrackerEntry.category,
-                    calorieTrackerEntry.description.let { "" },
-                    LocalDateTime.now(),
-                    key.userId,
-                    key.added,
-                    key.id
-                )
-            }.onItem().ifNull().failWith { UnmodifiedError(calorieTrackerEntry.toString()) }
+    fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<CalorieTrackerEntry> {
+        return Panache.getSession().call { s ->
+            s.find(CalorieTrackerEntry::class.java, calorieTrackerEntry.getPrimaryKey())
+                .onItem().ifNull().failWith(EntityNotFoundException())
+        }.chain { s -> s.merge(calorieTrackerEntry) }
     }
 
-    fun listDatesForUser(userId: Long): Uni<List<LocalDate>?> {
-        return client.preparedQuery("select added from calorie_tracker_entry where user_id = $1 group by added")
-            .execute(Tuple.of(userId)).onItem().ifNotNull()
-            .transformToMulti { rowSet -> Multi.createFrom().iterable(rowSet) }.onItem()
-            .transform { row -> row.getLocalDate("added") }.collect().asList().onItem()
-            .invoke { list -> list.sortDescending() }.onFailure().invoke { throwable -> Log.error(throwable) }
-    }
+    fun listDatesForUser(userId: Long): Uni<Set<LocalDate>?> =
+        find("#CalorieTrackerEntry.listDates", userId).list()
+            .onItem().transform { list -> list.map { entry -> entry.added }.toSet() }
+
 }

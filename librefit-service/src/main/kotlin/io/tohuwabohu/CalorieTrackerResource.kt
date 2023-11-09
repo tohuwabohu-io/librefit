@@ -91,7 +91,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         validateToken(jwt, calorieTracker)
 
         return calorieTrackerRepository.updateTrackingEntry(calorieTracker)
-            .onItem().transform { rowCount -> if (rowCount > 0) Response.ok().build() else Response.notModified().build() }
+            .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
