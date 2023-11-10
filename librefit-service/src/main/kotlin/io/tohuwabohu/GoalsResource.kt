@@ -22,6 +22,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
+import java.util.*
 
 @Path("/goals")
 class GoalsResource(val goalsRepository: GoalsRepository) {
@@ -114,7 +115,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
         operationId = "readGoal"
     )
     fun read(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> =
-        goalsRepository.readEntry(jwt.name.toLong(), date, id)
+        goalsRepository.readEntry(UUID.fromString(jwt.name), date, id)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
@@ -141,7 +142,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
 
         printAuthenticationInfo(jwt, securityContext)
 
-        return goalsRepository.deleteEntry(jwt.name.toLong(), date, id)
+        return goalsRepository.deleteEntry(UUID.fromString(jwt.name), date, id)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
@@ -167,7 +168,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Operation(
         operationId = "findLastGoal"
     )
-    fun latest(@Context securityContext: SecurityContext): Uni<Response> = goalsRepository.findLastGoal(jwt.name.toLong())
+    fun latest(@Context securityContext: SecurityContext): Uni<Response> = goalsRepository.findLastGoal(UUID.fromString(jwt.name))
         .onItem().transform { entry -> Response.ok(entry).build() }
         .onFailure().invoke { e -> Log.error(e) }
         .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

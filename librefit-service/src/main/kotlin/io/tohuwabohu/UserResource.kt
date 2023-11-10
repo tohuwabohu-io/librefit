@@ -26,6 +26,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDateTime
+import java.util.*
 
 @Path("/user")
 @RequestScoped
@@ -107,7 +108,7 @@ class UserResource(val userRepository: LibreUserRepository) {
         operationId = "readUserInfo"
     )
     fun readUserInfo(): Uni<Response> {
-        return userRepository.findById(jwt.name.toLong())
+        return userRepository.findById(UUID.fromString(jwt.name))
             .onItem().ifNotNull().transform { user ->
                 user.password = ""
                 Response.ok(user).build()
@@ -145,7 +146,7 @@ class UserResource(val userRepository: LibreUserRepository) {
 
         printAuthenticationInfo(jwt, securityContext)
 
-        libreUser.id = jwt.name.toLong()
+        libreUser.id = UUID.fromString(jwt.name)
 
         return userRepository.updateUser(libreUser)
             .onItem().transform { updated -> Response.ok(updated).build() }

@@ -10,12 +10,13 @@ import io.restassured.http.ContentType
 import io.tohuwabohu.crud.WeightTrackerEntry
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.*
 
 @QuarkusTest
 @TestHTTPEndpoint(WeightTrackerResource::class)
 class WeightTrackerResourceTest {
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -24,7 +25,7 @@ class WeightTrackerResourceTest {
     fun `should create an entry`() {
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 1, userId = 1))
+            .body(entry(id = 1, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
             .assertThat()
@@ -32,7 +33,7 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -41,7 +42,7 @@ class WeightTrackerResourceTest {
     fun `should create two entries`() {
         val created1 = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 4, userId = 1))
+            .body(entry(id = 4, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -51,7 +52,7 @@ class WeightTrackerResourceTest {
 
         val created2 = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(5, 1))
+            .body(entry(5, UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -63,14 +64,14 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail on creation`() {
-        val faultyEntry = entry(id = 1, userId = 1)
+        val faultyEntry = entry(id = 1, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002"))
         faultyEntry.amount = -100f
 
         RestAssured.given()
@@ -83,7 +84,7 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -92,7 +93,7 @@ class WeightTrackerResourceTest {
     fun `should create and read an entry`() {
         val created = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 2, userId = 1))
+            .body(entry(id = 2, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -114,14 +115,14 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "4", roles = ["User"])
+    @TestSecurity(user = "c9593830-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create, update and read an entry`() {
-        val entry = entry(id = 1, userId = 4)
+        val entry = entry(id = 1, userId = UUID.fromString("c9593830-7fb4-11ee-b962-0242ac120002"))
 
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
@@ -154,7 +155,7 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -163,7 +164,7 @@ class WeightTrackerResourceTest {
     fun `should fail on update`() {
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 43L, userId = 1))
+            .body(entry(id = 43L, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .put("/update")
             .then()
             .assertThat()
@@ -171,7 +172,7 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -180,7 +181,7 @@ class WeightTrackerResourceTest {
     fun `should create and delete an entry`() {
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 1, userId = 1))
+            .body(entry(id = 1, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -192,7 +193,7 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -205,7 +206,7 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -214,7 +215,7 @@ class WeightTrackerResourceTest {
     fun `should create and delete an entry and fail on read`() {
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 3, userId = 1))
+            .body(entry(id = 3, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
             .assertThat().statusCode(201)
@@ -235,14 +236,14 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "17", roles = ["User"])
+    @TestSecurity(user = "d6d8be4a-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create two entries and list them`() {
-        val userId = 17L
+        val userId = UUID.fromString("d6d8be4a-7fb4-11ee-b962-0242ac120002")
 
         val entry1 = entry(id = 1, userId)
         entry1.userId = userId
@@ -271,14 +272,14 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "18", roles = ["User"])
+    @TestSecurity(user = "e12d806a-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create three entries and list 2 in two date ranges`() {
-        val userId = 18L
+        val userId = UUID.fromString("e12d806a-7fb4-11ee-b962-0242ac120002")
         val today = LocalDate.now()
         val lastWeek = today.minusWeeks(1)
         val lastMonth = today.minusMonths(1)
@@ -316,7 +317,7 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "72", roles = ["User"])
+    @TestSecurity(user = "410a1496-7fc7-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -330,14 +331,14 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "99", roles = ["User"])
+    @TestSecurity(user = "ea56419a-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create three entries and find max added and id`() {
-        val userId = 99L
+        val userId = UUID.fromString("ea56419a-7fb4-11ee-b962-0242ac120002")
 
         val lastWeek = LocalDate.now().minusWeeks(1)
         val lastMonth = LocalDate.now().minusMonths(1)
@@ -371,14 +372,14 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail with 401`() {
-        val userId = 2L // unrelated user's data
+        val userId = UUID.fromString("f1baf2a0-7fb4-11ee-b962-0242ac120002") // unrelated user's data
 
         val entry = entry(id = 1, userId)
 
@@ -391,7 +392,7 @@ class WeightTrackerResourceTest {
             .statusCode(401)
     }
 
-    private fun entry(id: Long, userId: Long): WeightTrackerEntry {
+    private fun entry(id: Long, userId: UUID): WeightTrackerEntry {
         val entry = WeightTrackerEntry(
             amount = 100f
         )

@@ -10,12 +10,13 @@ import io.restassured.http.ContentType
 import io.tohuwabohu.crud.Goal
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.*
 
 @QuarkusTest
 @TestHTTPEndpoint(GoalsResource::class)
 class GoalsTest {
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -24,7 +25,7 @@ class GoalsTest {
     fun `should create an entry`() {
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 1, userId = 1))
+            .body(goal(id = 1, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
             .assertThat()
@@ -32,7 +33,7 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -41,7 +42,7 @@ class GoalsTest {
     fun `should create two entries`() {
         val created1 = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 4, userId = 1))
+            .body(goal(id = 4, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -51,7 +52,7 @@ class GoalsTest {
 
         val created2 = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(5, 1))
+            .body(goal(5, UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -63,14 +64,14 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail on creation`() {
-        var faultyEntry = goal(id = 1, userId = 1)
+        var faultyEntry = goal(id = 1, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
 
         faultyEntry.startAmount = -100f
 
@@ -82,7 +83,7 @@ class GoalsTest {
             .assertThat()
             .statusCode(400)
 
-        faultyEntry = goal(id = 1, userId = 1)
+        faultyEntry = goal(id = 1, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
         faultyEntry.endAmount = -200f
 
         RestAssured.given()
@@ -95,7 +96,7 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -104,7 +105,7 @@ class GoalsTest {
     fun `should create and read an entry`() {
         val created = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 2, userId = 1))
+            .body(goal(id = 2, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -129,14 +130,14 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "4", roles = ["User"])
+    @TestSecurity(user = "410a1496-7fc7-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create, update and read an entry`() {
-        val entry = goal(id = 1, userId = 4)
+        val entry = goal(id = 1, userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
 
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
@@ -169,7 +170,7 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -178,7 +179,7 @@ class GoalsTest {
     fun `should fail on update`() {
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 43L, userId = 1))
+            .body(goal(id = 43L, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .put("/update")
             .then()
             .assertThat()
@@ -186,7 +187,7 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -195,7 +196,7 @@ class GoalsTest {
     fun `should create and delete an entry`() {
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 1, userId = 1))
+            .body(goal(id = 1, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -207,7 +208,7 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -220,7 +221,7 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -229,7 +230,7 @@ class GoalsTest {
     fun `should create and delete an entry and fail on read`() {
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 3, userId = 1))
+            .body(goal(id = 3, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
             .assertThat().statusCode(201)
@@ -250,7 +251,7 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "72", roles = ["User"])
+    @TestSecurity(user = "1171b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -264,18 +265,18 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "73", roles = ["User"])
+    @TestSecurity(user = "07225bfc-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create two entries and find the last`() {
-        val goal = goal(id = 1, 73L)
+        val goal = goal(id = 1, UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
         goal.startAmount = 100f
         goal.endAmount = 200f
 
-        val lastGoal = goal(id = 2, 73L)
+        val lastGoal = goal(id = 2, UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
         lastGoal.startAmount = 50f
         lastGoal.endAmount = 250f
 
@@ -300,14 +301,14 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail with 401`() {
-        val userId = 2L // unrelated user's data
+        val userId = UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002") // unrelated user's data
 
         val entry = goal(id = 1, userId)
 
@@ -320,7 +321,7 @@ class GoalsTest {
             .statusCode(401)
     }
 
-    private fun goal(id: Long, userId: Long): Goal {
+    private fun goal(id: Long, userId: UUID): Goal {
         val goal = Goal(
             startDate = LocalDate.now(),
             endDate = LocalDate.now().plusYears(1),

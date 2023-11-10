@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @NamedQueries(
@@ -52,7 +53,7 @@ data class Goal(
 
 @ApplicationScoped
 class GoalsRepository : LibreUserRelatedRepository<Goal>() {
-    fun findLastGoal(userId: Number): Uni<Goal?> {
+    fun findLastGoal(userId: UUID): Uni<Goal?> {
         return find("#Goal.findLast", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }

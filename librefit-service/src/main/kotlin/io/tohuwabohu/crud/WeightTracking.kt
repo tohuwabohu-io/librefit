@@ -8,6 +8,7 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Min
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @NamedQueries(
@@ -41,7 +42,7 @@ data class WeightTrackerEntry (
 
 @ApplicationScoped
 class WeightTrackerRepository : LibreUserRelatedRepository<WeightTrackerEntry>() {
-    fun findLastEntry(userId: Long): Uni<WeightTrackerEntry?> {
+    fun findLastEntry(userId: UUID): Uni<WeightTrackerEntry?> {
         return find("#WeightTrackerEntry.findLast", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }

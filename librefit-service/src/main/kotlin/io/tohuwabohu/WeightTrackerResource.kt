@@ -23,6 +23,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
+import java.util.*
 
 @Path("/tracker/weight")
 class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository) {
@@ -56,7 +57,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     fun create(@Context securityContext: SecurityContext, @Valid weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
         Log.info("Creating a new weight tracker entry=$weightTrackerEntry")
 
-        weightTrackerEntry.userId = jwt.name.toLong()
+        weightTrackerEntry.userId = UUID.fromString(jwt.name)
 
         printAuthenticationInfo(jwt, securityContext)
         validateToken(jwt, weightTrackerEntry)
@@ -121,7 +122,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
 
         printAuthenticationInfo(jwt, securityContext)
 
-        return weightTrackerRepository.deleteEntry(jwt.name.toLong(), date, id)
+        return weightTrackerRepository.deleteEntry(UUID.fromString(jwt.name), date, id)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
@@ -150,7 +151,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
         operationId = "readWeightTrackerEntry"
     )
     fun read(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> =
-        weightTrackerRepository.readEntry(jwt.name.toLong(), date, id)
+        weightTrackerRepository.readEntry(UUID.fromString(jwt.name), date, id)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
@@ -179,7 +180,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     fun listEntries(@Context securityContext: SecurityContext, date: LocalDate): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
-        return weightTrackerRepository.listEntriesForUserAndDate(jwt.name.toLong(), date)
+        return weightTrackerRepository.listEntriesForUserAndDate(UUID.fromString(jwt.name), date)
             .onItem().transform { list -> Response.ok(list).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
@@ -209,7 +210,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     fun listEntries(@Context securityContext: SecurityContext, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
-        return weightTrackerRepository.listEntriesForUserAndDateRange(jwt.name.toLong(), dateFrom, dateTo)
+        return weightTrackerRepository.listEntriesForUserAndDateRange(UUID.fromString(jwt.name), dateFrom, dateTo)
             .onItem().transform { list -> Response.ok(list).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
@@ -236,7 +237,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     @Operation(
         operationId = "findLastWeightTrackerEntry"
     )
-    fun findLast(@Context securityContext: SecurityContext): Uni<Response> = weightTrackerRepository.findLastEntry(jwt.name.toLong())
+    fun findLast(@Context securityContext: SecurityContext): Uni<Response> = weightTrackerRepository.findLastEntry(UUID.fromString(jwt.name))
         .onItem().transform { entry -> Response.ok(entry).build() }
         .onFailure().invoke { e -> Log.error(e) }
         .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

@@ -797,8 +797,10 @@ components:
       type: object
       properties:
         userId:
-          format: int64
-          type: integer
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
         id:
@@ -845,8 +847,10 @@ components:
       type: object
       properties:
         userId:
-          format: int64
-          type: integer
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
         id:
@@ -877,8 +881,10 @@ components:
       type: object
       properties:
         id:
-          format: int64
-          type: integer
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
         email:
           type: string
         password:
@@ -947,14 +953,20 @@ components:
         target:
           format: float
           type: number
+    UUID:
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+      type: string
     WeightTrackerEntry:
       required:
       - added
       type: object
       properties:
         userId:
-          format: int64
-          type: integer
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
         id:

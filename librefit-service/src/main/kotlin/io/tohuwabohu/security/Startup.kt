@@ -12,12 +12,12 @@ import org.hibernate.reactive.mutiny.Mutiny
 @Singleton
 class Startup {
     fun loadUsers(@Observes event: StartupEvent, sf: Mutiny.SessionFactory) {
-        if (ConfigUtils.getProfiles().contains("dev")) {
+        if (ConfigUtils.getProfiles().contains("dev")){
             VertxContextSupport.subscribeAndAwait {
                 sf.withTransaction { session ->
                     session.persistAll(
                         LibreUser(
-                            0L,
+                            null,
                             "test1@test.dev",
                             "test1",
                             "User",
@@ -25,7 +25,7 @@ class Startup {
                             avatar = "/assets/images/avatars/dog-1.png"
                         ),
                         LibreUser(
-                            0L,
+                            null,
                             "test2@test.dev",
                             "test2",
                             "User",
@@ -33,7 +33,7 @@ class Startup {
                             avatar = "/assets/images/avatars/buffdude-1.png"
                         ),
                         LibreUser(
-                            0L,
+                            null,
                             "test3@test.dev",
                             "test3",
                             "User",

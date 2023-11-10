@@ -2,9 +2,9 @@ package io.tohuwabohu.crud
 
 import io.quarkus.elytron.security.common.BcryptUtil
 import io.quarkus.hibernate.reactive.panache.Panache
+import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
 import io.quarkus.security.jpa.Password
 import io.quarkus.security.jpa.Roles
 import io.quarkus.security.jpa.UserDefinition
@@ -19,15 +19,16 @@ import jakarta.validation.Validator
 import jakarta.validation.constraints.NotEmpty
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @Cacheable
 @UserDefinition
 data class LibreUser (
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(unique = true, nullable = false)
-    var id: Long = 0L,
+    var id: UUID? = null,
 
     @Username
     @Column(unique = true, nullable = false)
@@ -72,7 +73,7 @@ data class LibreUser (
 }
 
 @ApplicationScoped
-class LibreUserRepository : PanacheRepository<LibreUser> {
+class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
     @Inject
     private lateinit var validator: Validator
 

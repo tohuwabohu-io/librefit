@@ -12,9 +12,10 @@ import jakarta.persistence.*
 import jakarta.validation.Validator
 import java.io.Serializable
 import java.time.LocalDate
+import java.util.*
 
 class LibreUserCompositeKey(
-    var userId: Long = 0L,
+    var userId: UUID? = null,
     var added: LocalDate = LocalDate.now(),
     var id: Long = 0L
 ): Serializable {
@@ -48,7 +49,7 @@ class LibreUserCompositeKey(
 abstract class LibreUserWeakEntity : PanacheEntityBase {
     @Id
     @Column(nullable = false)
-    var userId: Long = 0L
+    var userId: UUID? = null
 
     @Id
     @Column(nullable = false)
@@ -61,7 +62,7 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
     @JsonIgnore
     fun getPrimaryKey(): LibreUserCompositeKey {
         return LibreUserCompositeKey(
-            userId, added, id
+            userId!!, added, id
         )
     }
 }
@@ -93,7 +94,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         }.chain { s -> s.merge(entity) }
     }
 
-    fun readEntry(userId: Long, date: LocalDate, id: Long): Uni<Entity> {
+    fun readEntry(userId: UUID, date: LocalDate, id: Long): Uni<Entity> {
         val key = LibreUserCompositeKey(
             userId = userId,
             added = date,
@@ -103,16 +104,16 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         return findById(key).onItem().ifNull().failWith(EntityNotFoundException())
     }
 
-    fun listEntriesForUserAndDate(userId: Long, date: LocalDate): Uni<List<Entity>> {
+    fun listEntriesForUserAndDate(userId: UUID, date: LocalDate): Uni<List<Entity>> {
         return list("userId = ?1 and added = ?2", userId, date)
     }
 
-    fun listEntriesForUserAndDateRange(userId: Long, dateFrom: LocalDate, dateTo: LocalDate): Uni<List<Entity>> {
+    fun listEntriesForUserAndDateRange(userId: UUID, dateFrom: LocalDate, dateTo: LocalDate): Uni<List<Entity>> {
         return list("userId = ?1 and added between ?2 and ?3", userId, dateFrom, dateTo)
     }
 
     @WithTransaction
-    fun deleteEntry(userId: Long, date: LocalDate, id: Long): Uni<Boolean> {
+    fun deleteEntry(userId: UUID, date: LocalDate, id: Long): Uni<Boolean> {
         val key = LibreUserCompositeKey(
             userId = userId,
             added = date,

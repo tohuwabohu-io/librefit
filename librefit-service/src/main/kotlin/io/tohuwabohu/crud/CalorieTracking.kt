@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @NamedQueries(
@@ -68,7 +69,7 @@ class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>
         }.chain { s -> s.merge(calorieTrackerEntry) }
     }
 
-    fun listDatesForUser(userId: Long): Uni<Set<LocalDate>?> =
+    fun listDatesForUser(userId: UUID): Uni<Set<LocalDate>?> =
         find("#CalorieTrackerEntry.listDates", userId).list()
             .onItem().ifNotNull().transform { list -> list.map { entry -> entry.added }.toSet() }
             .onItem().ifNull().failWith(EntityNotFoundException())

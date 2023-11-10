@@ -12,6 +12,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import java.util.*
 
 @TestMethodOrder(OrderAnnotation::class)
 @QuarkusTest
@@ -20,6 +21,9 @@ class UserResourceTest {
     @Test
     @Order(1)
     fun `should register user`() {
+        val user = user()
+        user.id = UUID.fromString("1171b08c-7fb5-11ee-b962-0242ac120002")
+
         given()
             .header("Content-Type", ContentType.JSON)
             .body(user())
@@ -66,29 +70,31 @@ class UserResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "1171b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
-            Claim(key = "email", value = "test1@test.dev"),
+            Claim(key = "email", value = "unit-test1@test.dev")
         ]
     )
     @Order(5)
     fun `should return user data`() {
-        val userData = given().get("/read").then()
+        val userData = given()
+            .get("/read")
+            .then()
 
         userData.assertThat().statusCode(200)
 
         val user = userData.extract().body().`as`(LibreUser::class.java)
 
-        assert(user.email == "test1@test.dev")
+        assert(user.email == "unit-test1@test.dev")
         assert(user.password == "")
     }
 
     @Test
-    @TestSecurity(user = "2", roles = ["User"])
+    @TestSecurity(user = "2271b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
-            Claim(key = "email", value = "test2@test.dev")
+            Claim(key = "email", value = "unit-test2@test.dev")
         ]
     )
     @Order(6)
@@ -97,16 +103,19 @@ class UserResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "1171b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
-            Claim(key = "email", value = "test1@test.dev"),
+            Claim(key = "email", value = "unit-test1@test.dev"),
         ]
     )
     @Order(7)
     fun `should update user data`() {
-        val user = user()
-        user.avatar = "/path"
+        val user = LibreUser(
+            email = "unit-test1@test.dev",
+            password = "test1",
+            avatar = "/path"
+        )
 
         given()
             .header("Content-Type", "application/json")
@@ -123,7 +132,7 @@ class UserResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "3", roles = ["User"])
+    @TestSecurity(user = "330ff8f4-7fb5-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test3@test.dev"),
@@ -156,7 +165,7 @@ class UserResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "11e45d14-7fb5-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test1@test.dev"),

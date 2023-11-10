@@ -24,6 +24,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
+import java.util.*
 
 @Path("/tracker/calories")
 @RequestScoped
@@ -52,9 +53,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     )
     @Operation(operationId = "createCalorieTrackerEntry")
     fun create(@Context securityContext: SecurityContext, @Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
-        if (calorieTracker.userId == 0L) {
-            calorieTracker.userId = jwt.name.toLong();
-        }
+        calorieTracker.userId = UUID.fromString(jwt.name)
 
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
 
@@ -120,7 +119,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     fun read(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
-        return calorieTrackerRepository.readEntry(jwt.name.toLong(), date, id)
+        return calorieTrackerRepository.readEntry(UUID.fromString(jwt.name), date, id)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
@@ -147,7 +146,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         Log.info("Delete calorie tracker entry with added=$date id=$id")
         printAuthenticationInfo(jwt, securityContext)
 
-        return calorieTrackerRepository.deleteEntry(jwt.name.toLong(), date, id)
+        return calorieTrackerRepository.deleteEntry(UUID.fromString(jwt.name), date, id)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
@@ -175,7 +174,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     fun listDates(@Context securityContext: SecurityContext): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
-        return calorieTrackerRepository.listDatesForUser(jwt.name.toLong())
+        return calorieTrackerRepository.listDatesForUser(UUID.fromString(jwt.name))
             .onItem().transform { Response.ok(it).build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
@@ -203,7 +202,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     fun listEntries(@Context securityContext: SecurityContext, date: LocalDate): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
-        return calorieTrackerRepository.listEntriesForUserAndDate(jwt.name.toLong(), date)
+        return calorieTrackerRepository.listEntriesForUserAndDate(UUID.fromString(jwt.name), date)
             .onItem().transform { Response.ok(it).build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
