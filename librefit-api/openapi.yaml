@@ -36,7 +36,7 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/delete/{date}/{id}:
+  /goals/delete/{date}/{sequence}:
     delete:
       tags:
       - Goals Resource
@@ -47,7 +47,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -58,8 +58,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -94,7 +92,7 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/read/{date}/{id}:
+  /goals/read/{date}/{sequence}:
     get:
       tags:
       - Goals Resource
@@ -105,7 +103,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -145,8 +143,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -244,13 +240,8 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
-  /tracker/calories/delete/{date}/{id}:
+      - SecurityScheme: []
+  /tracker/calories/delete/{date}/{sequence}:
     delete:
       tags:
       - Calorie Tracker Resource
@@ -261,7 +252,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -272,8 +263,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -289,12 +278,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/calories/list/dates:
     get:
       tags:
@@ -322,12 +306,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/calories/list/{date}:
     get:
       tags:
@@ -361,13 +340,8 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
-  /tracker/calories/read/{date}/{id}:
+      - SecurityScheme: []
+  /tracker/calories/read/{date}/{sequence}:
     get:
       tags:
       - Calorie Tracker Resource
@@ -378,7 +352,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -406,12 +380,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/calories/update:
     put:
       tags:
@@ -427,8 +396,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -444,12 +411,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/create:
     post:
       tags:
@@ -480,13 +442,8 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
-  /tracker/weight/delete/{date}/{id}:
+      - SecurityScheme: []
+  /tracker/weight/delete/{date}/{sequence}:
     delete:
       tags:
       - Weight Tracker Resource
@@ -497,7 +454,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -508,8 +465,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -525,12 +480,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/last:
     get:
       tags:
@@ -556,12 +506,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/list/{dateFrom}/{dateTo}:
     get:
       tags:
@@ -600,12 +545,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/list/{date}:
     get:
       tags:
@@ -639,13 +579,8 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
-  /tracker/weight/read/{date}/{id}:
+      - SecurityScheme: []
+  /tracker/weight/read/{date}/{sequence}:
     get:
       tags:
       - Weight Tracker Resource
@@ -656,7 +591,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -684,12 +619,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /tracker/weight/update:
     put:
       tags:
@@ -705,8 +635,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -722,12 +650,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /user/login:
     post:
       tags:
@@ -779,12 +702,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
   /user/register:
     post:
       tags:
@@ -839,12 +757,7 @@ paths:
         "403":
           description: Not Allowed
       security:
-      - SecurityScheme:
-        - User
-        - Admin
-      - SecurityScheme:
-        - User
-        - Admin
+      - SecurityScheme: []
 components:
   schemas:
     AuthenticationResponse:
@@ -872,13 +785,16 @@ components:
       type: object
       properties:
         userId:
-          format: int64
-          type: integer
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
-        id:
+        sequence:
           format: int64
           type: integer
+          nullable: true
         amount:
           format: float
           minimum: 0
@@ -920,13 +836,16 @@ components:
       type: object
       properties:
         userId:
-          format: int64
-          type: integer
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
-        id:
+        sequence:
           format: int64
           type: integer
+          nullable: true
         startAmount:
           format: float
           minimum: 0
@@ -948,15 +867,20 @@ components:
       required:
       - email
       - password
+      - role
       type: object
       properties:
         id:
-          format: int64
-          type: integer
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
         email:
           type: string
         password:
           minLength: 1
+          type: string
+        role:
           type: string
         name:
           type: string
@@ -1019,19 +943,26 @@ components:
         target:
           format: float
           type: number
+    UUID:
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+      type: string
     WeightTrackerEntry:
       required:
       - added
       type: object
       properties:
         userId:
-          format: int64
-          type: integer
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
-        id:
+        sequence:
           format: int64
           type: integer
+          nullable: true
         amount:
           format: float
           minimum: 0
@@ -1041,3 +972,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalDateTime'
           nullable: true
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      description: Authentication
+      scheme: bearer
+      bearerFormat: JWT

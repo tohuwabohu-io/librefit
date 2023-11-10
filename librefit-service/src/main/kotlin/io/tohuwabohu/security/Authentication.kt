@@ -5,9 +5,10 @@ import io.quarkus.security.UnauthorizedException
 import io.smallrye.jwt.build.Jwt
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
+import jakarta.ws.rs.core.SecurityContext
 import org.eclipse.microprofile.jwt.Claims
 import org.eclipse.microprofile.jwt.JsonWebToken
-import javax.ws.rs.core.SecurityContext
+import java.util.*
 
 class AuthenticationResponse (val token: String)
 
@@ -45,7 +46,7 @@ fun generateToken(user: LibreUser): String =
 
 fun main() {
     println(generateToken(LibreUser(
-        id = 1,
+        id = UUID.randomUUID(),
         email = "test@libre.fitness",
         name = "testuser",
         password = "1234"

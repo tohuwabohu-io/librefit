@@ -1,20 +1,21 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
+import jakarta.enterprise.context.ApplicationScoped
+import jakarta.persistence.*
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import java.time.LocalDate
 import java.time.LocalDateTime
-import javax.enterprise.context.ApplicationScoped
-import javax.persistence.Entity
-import javax.persistence.EntityNotFoundException
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotNull
+import java.util.*
 
 @Entity
+@NamedQueries(
+    NamedQuery(name = "Goal.findLast", query = "from Goal where userId = ?1 order by added desc, sequence desc, userId limit 1")
+)
 data class Goal(
     @field:NotNull(message = "The initial amount of your goal must not be empty.")
     @field:Min(value = 0, message = "The initial amount of your goal must not be less than zero.")
@@ -41,27 +42,19 @@ data class Goal(
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(userId = $userId , startAmount = $startAmount , endAmount = $endAmount , startDate = $startDate , endDate = $endDate , added = $added , id = $id )"
+        return this::class.simpleName + "(userId = $userId , startAmount = $startAmount , endAmount = $endAmount , startDate = $startDate , endDate = $endDate , added = $added , id = $sequence )"
+    }
+
+    @PreUpdate
+    fun onUpdate() {
+        updated = LocalDateTime.now()
     }
 }
 
 @ApplicationScoped
 class GoalsRepository : LibreUserRelatedRepository<Goal>() {
-    fun findLastGoal(userId: Number): Uni<Goal?> {
-        return find("user_id = ?1 order by added desc, id desc", userId).firstResult()
+    fun findLastGoal(userId: UUID): Uni<Goal?> {
+        return find("#Goal.findLast", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
-    }
-
-    @ReactiveTransactional
-    fun updateGoal(goal: Goal): Uni<Int> {
-        return findById(goal.getPrimaryKey()).onItem().ifNull()
-            .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni{ entry ->
-                val key = entry.getPrimaryKey()
-
-                update(
-                    "startAmount = ?1, endAmount = ?2, startDate = ?3, endDate = ?4, updated = ?5 where user_id = ?6 and added = ?7 and id = ?8",
-                    goal.startAmount, goal.endAmount, goal.startDate, goal.endDate, LocalDateTime.now(), key.userId, key.added, key.id
-                )
-            }.onItem().ifNull().failWith{ UnmodifiedError(goal.toString()) }
     }
 }

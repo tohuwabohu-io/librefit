@@ -8,6 +8,13 @@ import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.printAuthenticationInfo
 import io.tohuwabohu.security.validateToken
+import jakarta.inject.Inject
+import jakarta.validation.Valid
+import jakarta.ws.rs.*
+import jakarta.ws.rs.core.Context
+import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.core.Response
+import jakarta.ws.rs.core.SecurityContext
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
@@ -15,19 +22,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
-import javax.inject.Inject
-import javax.validation.Valid
-import javax.ws.rs.Consumes
-import javax.ws.rs.DELETE
-import javax.ws.rs.GET
-import javax.ws.rs.POST
-import javax.ws.rs.PUT
-import javax.ws.rs.Path
-import javax.ws.rs.Produces
-import javax.ws.rs.core.Context
-import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
-import javax.ws.rs.core.SecurityContext
+import java.util.*
 
 @Path("/goals")
 class GoalsResource(val goalsRepository: GoalsRepository) {
@@ -63,7 +58,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
         printAuthenticationInfo(jwt, securityContext)
 
         return goalsRepository.validateAndPersist(goal)
-            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).entity(entry).build() }
+            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{throwable -> createErrorResponse(throwable) }
     }
@@ -74,7 +69,6 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
-        APIResponse(responseCode = "304", description = "Not Modified"),
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
@@ -92,14 +86,14 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
         printAuthenticationInfo(jwt, securityContext)
         validateToken(jwt, goal)
 
-        return goalsRepository.updateGoal(goal)
-            .onItem().transform { rowCount -> if (rowCount > 0) Response.ok().build() else Response.notModified().build() }
+        return goalsRepository.updateEntry(goal, Goal::class.java)
+            .onItem().transform { updated -> Response.ok(updated).build() }
             .onFailure().invoke{ e -> Log.error(e)}
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
     @GET
-    @Path("/read/{date}/{id:\\d+}")
+    @Path("/read/{date}/{sequence:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [
@@ -119,18 +113,17 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Operation(
         operationId = "readGoal"
     )
-    fun read(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> =
-        goalsRepository.readEntry(jwt.name.toLong(), date, id)
+    fun read(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> =
+        goalsRepository.readEntry(UUID.fromString(jwt.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 
     @DELETE
-    @Path("/delete/{date}/{id:\\d+}")
+    @Path("/delete/{date}/{sequence:\\d+}")
     @Consumes(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
-        APIResponse(responseCode = "304", description = "Not Modified"),
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
@@ -142,13 +135,13 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Operation(
         operationId = "deleteGoal"
     )
-    fun delete(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> {
-        Log.info("deleting goal with added=$date id=$id")
+    fun delete(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> {
+        Log.info("deleting goal with added=$date Ssequence=$sequence")
 
         printAuthenticationInfo(jwt, securityContext)
 
-        return goalsRepository.deleteEntry(jwt.name.toLong(), date, id)
-            .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
+        return goalsRepository.deleteEntry(UUID.fromString(jwt.name), date, sequence)
+            .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
     }
@@ -173,7 +166,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Operation(
         operationId = "findLastGoal"
     )
-    fun latest(@Context securityContext: SecurityContext): Uni<Response> = goalsRepository.findLastGoal(jwt.name.toLong())
+    fun latest(@Context securityContext: SecurityContext): Uni<Response> = goalsRepository.findLastGoal(UUID.fromString(jwt.name))
         .onItem().transform { entry -> Response.ok(entry).build() }
         .onFailure().invoke { e -> Log.error(e) }
         .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

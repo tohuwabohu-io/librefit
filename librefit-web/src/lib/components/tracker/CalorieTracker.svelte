@@ -8,12 +8,9 @@
     export let categories;
 
     const dispatch = createEventDispatcher();
-    const today = new Date();
-    const todayDateStr = getDateAsStr(new Date());
 
     const addCalories = (e) => {
         dispatch('addCalories', {
-            sequence: getLastSequence(),
             date: e.detail.date,
             value: e.detail.value,
             category: e.detail.category
@@ -35,10 +32,6 @@
             date: e.detail.date
         })
     }
-
-    const getLastSequence = () => {
-        return Math.max(...entries.filter(entry => entry.added === todayDateStr).map(entry => entry.id)) + 1;
-    }
 </script>
 
 <TrackerRadial entries={entries.map(e => e.amount)} />
@@ -47,13 +40,13 @@
         <TrackerInput {categories}
                       value={entry.amount}
                       dateStr={entry.added}
-                      id={entry.id}
+                      id={entry.sequence}
                       category={entry.category}
                       on:add={addCalories}
                       on:update={updateCalories}
                       on:remove={deleteCalories}
-                      existing={entry.id !== undefined}
-                      disabled={entry.id !== undefined}
+                      existing={entry.sequence !== undefined}
+                      disabled={entry.sequence !== undefined}
                       unit={'kcal'}
         />
     {/each}

@@ -26,12 +26,10 @@
     }
 
     const dispatch = createEventDispatcher();
-    let sequence = 1;
     let entriesFiltered = [];
 
     const addWeight = (e) => {
         dispatch('addWeight', {
-            sequence: getLastSequence(),
             date: todayDateStr,
             value: e.detail.value
         });
@@ -39,7 +37,7 @@
 
     const updateWeight = (e) => {
         dispatch('updateWeight', {
-            sequence: lastEntry.id,
+            sequence: lastEntry.sequence,
             date: lastEntry.added,
             value: e.detail.value
         });
@@ -59,11 +57,7 @@
             goal: e.detail.goal
         })
     }
-
-    const getLastSequence = () => {
-        return Math.max(...entries.filter(entry => entry.added === todayDateStr).map(entry => entry.id)) + 1;
-    }
-
+    
     const showWeightModal = () => {
         modalStore.trigger({
             type: 'component',

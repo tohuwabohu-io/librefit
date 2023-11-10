@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "1.7.22"
-    kotlin("plugin.allopen") version "1.7.22"
-    kotlin("plugin.noarg") version "1.7.22"
-    kotlin("plugin.jpa") version "1.7.22"
+    kotlin("jvm") version "1.9.0"
+    kotlin("plugin.allopen") version "1.9.0"
+    kotlin("plugin.noarg") version "1.9.0"
+    kotlin("plugin.jpa") version "1.9.0"
     id("io.quarkus")
 }
 
@@ -16,6 +16,7 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
+    implementation("io.quarkus:quarkus-security-jpa-reactive")
     implementation("io.quarkus:quarkus-smallrye-jwt")
     implementation("io.quarkus:quarkus-smallrye-jwt-build")
     implementation("io.quarkus:quarkus-hibernate-validator")
@@ -29,7 +30,8 @@ dependencies {
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-resteasy-reactive")
     testImplementation("io.quarkus:quarkus-junit5")
-    testImplementation("io.rest-assured:rest-assured")
+    testImplementation("io.rest-assured:rest-assured:5.3.2")
+    testImplementation("io.rest-assured:kotlin-extensions:5.3.2")
     testImplementation("io.quarkus:quarkus-test-security-jwt")
 }
 
@@ -46,11 +48,11 @@ tasks.withType<Test> {
 }
 allOpen {
     annotation("javax.ws.rs.Path")
-    annotation("javax.enterprise.context.ApplicationScoped")
+    annotation("jakarta.enterprise.context.ApplicationScoped")
     annotation("io.quarkus.test.junit.QuarkusTest")
-    annotation("javax.persistence.Entity")
-    annotation("javax.persistence.IdClass")
-    annotation("javax.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.IdClass")
+    annotation("jakarta.persistence.MappedSuperclass")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

@@ -7,320 +7,356 @@ import io.quarkus.test.security.jwt.Claim
 import io.quarkus.test.security.jwt.JwtSecurity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import io.restassured.module.kotlin.extensions.Extract
+import io.restassured.module.kotlin.extensions.Given
+import io.restassured.module.kotlin.extensions.Then
+import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.Goal
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.*
 
 @QuarkusTest
 @TestHTTPEndpoint(GoalsResource::class)
 class GoalsTest {
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create an entry`() {
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 1, userId = 1))
-            .post("/create")
-            .then()
-            .assertThat()
-            .statusCode(201)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        }
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create two entries`() {
-        val created1 = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 4, userId = 1))
-            .post("/create")
-            .then()
+        val created1 = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        created1.assertThat().statusCode(201)
+        val created2 = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        val createdEntry1 = created1.extract().body().`as`(Goal::class.java)
-
-        val created2 = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(5, 1))
-            .post("/create")
-            .then()
-
-        created2.assertThat().statusCode(201)
-
-        val createdEntry2 = created2.extract().body().`as`(Goal::class.java)
-
-        assert(createdEntry1.id != createdEntry2.id)
+        assert(created1.sequence != created2.sequence)
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail on creation`() {
-        var faultyEntry = goal(id = 1, userId = 1)
+        var faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
 
         faultyEntry.startAmount = -100f
 
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(faultyEntry)
-            .post("/create")
-            .then()
-            .assertThat()
-            .statusCode(400)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(faultyEntry)
+        } When {
+            post("/create")
+        } Then {
+            statusCode(400)
+        }
 
-        faultyEntry = goal(id = 1, userId = 1)
+
+        faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
         faultyEntry.endAmount = -200f
 
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(faultyEntry)
-            .post("/create")
-            .then()
-            .assertThat()
-            .statusCode(400)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(faultyEntry)
+        } When {
+            post("/create")
+        } Then {
+            statusCode(400)
+        }
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create and read an entry`() {
-        val created = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 2, userId = 1))
-            .post("/create")
-            .then()
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        created.assertThat().statusCode(201)
+        val read = When {
+            get("/read/${created.added}/${created.sequence}")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        val createdEntry = created.extract().body().`as`(Goal::class.java)
-
-        val read = RestAssured.given().get("/read/${createdEntry.added}/${createdEntry.id}")
-            .then()
-
-        read.assertThat().statusCode(200)
-
-        val readEntry = read.extract().body().`as`(Goal::class.java)
-
-        assert(createdEntry.added == readEntry.added)
-        assert(createdEntry.id == readEntry.id)
-        assert(createdEntry.userId == readEntry.userId)
-        assert(createdEntry.startAmount == readEntry.startAmount)
-        assert(createdEntry.endAmount == readEntry.endAmount)
-        assert(createdEntry.startDate == readEntry.startDate)
-        assert(createdEntry.endDate == readEntry.endDate)
+        assert(created.added == read.added)
+        assert(created.sequence == read.sequence)
+        assert(created.userId == read.userId)
+        assert(created.startAmount == read.startAmount)
+        assert(created.endAmount == read.endAmount)
+        assert(created.startDate == read.startDate)
+        assert(created.endDate == read.endDate)
     }
 
     @Test
-    @TestSecurity(user = "4", roles = ["User"])
+    @TestSecurity(user = "410a1496-7fc7-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create, update and read an entry`() {
-        val entry = goal(id = 1, userId = 4)
+        val goal = goal(userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
 
-        val assured = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry)
-            .post("/create")
-            .then()
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal)
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        assured.assertThat().statusCode(201)
-
-        val created = assured.extract().body().`as`(Goal::class.java)
         created.endAmount = 80.4f
 
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(created)
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(200)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(created)
+        } When {
+            put("/update")
+        } Then {
+            statusCode(200)
+        }
 
-        val assuredRead = RestAssured.given().get("/read/${created.added}/${created.id}").then()
+        val read = When {
+            get("/read/${created.added}/${created.sequence}")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        assuredRead.assertThat().statusCode(200)
-
-        val updated = assuredRead.extract().body().`as`(Goal::class.java)
-
-        assert(created.id == updated.id)
-        assert(entry.endAmount != updated.endAmount)
-        assert(updated.updated != null)
+        assert(created.sequence == read.sequence)
+        assert(goal.endAmount != read.endAmount)
+        assert(read.updated != null)
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93b4fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail on update`() {
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 43L, userId = 1))
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(404)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93b4fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            put("/update")
+        } Then {
+            statusCode(404)
+        }
+
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create and delete an entry`() {
-        val assured = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 1, userId = 1))
-            .post("/create")
-            .then()
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        assured.assertThat().statusCode(201)
-
-        val created = assured.extract().body().`as`(Goal::class.java)
-
-        RestAssured.given().delete("/delete/${created.added}/${created.id}").then().assertThat().statusCode(200)
+        When {
+            delete("/delete/${created.added}/${created.sequence}")
+        } Then {
+            statusCode(200)
+        }
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail on delete`() {
-        val calorieTrackerId = 123L
+        val goalId = 123L
 
-        RestAssured.given().delete("/delete/$calorieTrackerId").then().assertThat().statusCode(404)
+        When {
+            delete("/delete/$goalId")
+        } Then {
+            statusCode(404)
+        }
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create and delete an entry and fail on read`() {
-        val assured = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 3, userId = 1))
-            .post("/create")
-            .then()
-            .assertThat().statusCode(201)
-
-        val createdEntry = assured.extract().body().`as`(Goal::class.java)
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
         RestAssured.given()
-            .delete("/delete/${createdEntry.added}/${createdEntry.id}")
+            .delete("/delete/${created.added}/${created.sequence}")
             .then()
             .assertThat()
             .statusCode(200)
 
         RestAssured.given()
-            .get("/read/${createdEntry.added}/${createdEntry.id}")
+            .get("/read/${created.added}/${created.sequence}")
             .then()
             .assertThat()
             .statusCode(404)
     }
 
     @Test
-    @TestSecurity(user = "72", roles = ["User"])
+    @TestSecurity(user = "1171b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail on finding last entry`() {
-        RestAssured
-            .given()
-            .get("/last")
-            .then().assertThat().statusCode(404)
+        When {
+            get("/last")
+        } Then {
+            statusCode(404)
+        }
     }
 
     @Test
-    @TestSecurity(user = "73", roles = ["User"])
+    @TestSecurity(user = "07225bfc-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should create two entries and find the last`() {
-        val goal = goal(id = 1, 73L)
+        val goal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
         goal.startAmount = 100f
         goal.endAmount = 200f
 
-        val lastGoal = goal(id = 2, 73L)
+        val lastGoal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
         lastGoal.startAmount = 50f
         lastGoal.endAmount = 250f
 
         listOf(goal, lastGoal).forEach { item ->
-            RestAssured.given()
-                .header("Content-Type", ContentType.JSON)
-                .body(item)
-                .post("/create")
-                .then()
-                .assertThat()
-                .statusCode(201)
+            Given {
+                header("Content-Type", ContentType.JSON)
+                body(item)
+            } When {
+                post("/create")
+            } Then {
+                statusCode(201)
+            }
         }
 
-        val assured = RestAssured.given().get("/last").then()
-        val found = assured.extract().body().`as`(Goal::class.java)
-
-        assert(found.added == lastGoal.added)
-        assert(found.id == lastGoal.id)
-        assert(found.userId == lastGoal.userId)
-        assert(found.startAmount == lastGoal.startAmount)
-        assert(found.endAmount == lastGoal.endAmount)
+        When {
+            get("/last")
+        } Then {
+            statusCode(200)
+            body("added", equalTo(lastGoal.added.toString()))
+            body("userId", equalTo(lastGoal.userId.toString()))
+            body("startAmount", equalTo(lastGoal.startAmount))
+            body("endAmount", equalTo(lastGoal.endAmount))
+        }
     }
 
     @Test
-    @TestSecurity(user = "1", roles = ["User"])
+    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
     fun `should fail with 401`() {
-        val userId = 2L // unrelated user's data
+        val userId = UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002") // unrelated user's data
 
-        val entry = goal(id = 1, userId)
+        val entry = goal(userId)
 
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry)
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(401)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry)
+        } When {
+            put("/update")
+        } Then {
+            statusCode(401)
+        }
     }
 
-    private fun goal(id: Long, userId: Long): Goal {
+    private fun goal(userId: UUID): Goal {
         val goal = Goal(
             startDate = LocalDate.now(),
             endDate = LocalDate.now().plusYears(1),
@@ -328,7 +364,6 @@ class GoalsTest {
             endAmount = 75.4f
         )
 
-        goal.id = id
         goal.userId = userId
         goal.added = LocalDate.now()
 

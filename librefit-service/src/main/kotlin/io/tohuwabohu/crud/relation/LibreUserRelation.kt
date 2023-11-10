@@ -1,21 +1,23 @@
 package io.tohuwabohu.crud.relation
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional
+import io.quarkus.hibernate.reactive.panache.Panache
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.ValidationError
+import jakarta.inject.Inject
+import jakarta.persistence.*
+import jakarta.validation.Validator
 import java.io.Serializable
 import java.time.LocalDate
-import javax.inject.Inject
-import javax.persistence.*
-import javax.validation.Validator
+import java.util.*
 
 class LibreUserCompositeKey(
-    var userId: Long = 0L,
+    var userId: UUID? = null,
     var added: LocalDate = LocalDate.now(),
-    var id: Long = 0L
+    var sequence: Long = 0L
 ): Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -25,7 +27,7 @@ class LibreUserCompositeKey(
 
         if (userId != other.userId) return false
         if (added != other.added) return false
-        if (id != other.id) return false
+        if (sequence != other.sequence) return false
 
         return true
     }
@@ -33,12 +35,12 @@ class LibreUserCompositeKey(
     override fun hashCode(): Int {
         var result = userId.hashCode()
         result = 31 * result + added.hashCode()
-        result = 31 * result + id.hashCode()
+        result = 31 * result + sequence.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "LibreUserCompositeKey(userId=$userId, added=$added, id=$id)"
+        return "LibreUserCompositeKey(userId=$userId, added=$added, id=$sequence)"
     }
 }
 
@@ -47,7 +49,7 @@ class LibreUserCompositeKey(
 abstract class LibreUserWeakEntity : PanacheEntityBase {
     @Id
     @Column(nullable = false)
-    var userId: Long = 0L
+    var userId: UUID? = null
 
     @Id
     @Column(nullable = false)
@@ -55,13 +57,12 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
 
     @Id
     @Column(nullable = false)
-    var id: Long = 0L
+    var sequence: Long? = 1L
 
-    @Transient
     @JsonIgnore
     fun getPrimaryKey(): LibreUserCompositeKey {
         return LibreUserCompositeKey(
-            userId, added, id
+            userId!!, added, sequence!!
         )
     }
 }
@@ -77,39 +78,56 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         }
     }
 
-    @ReactiveTransactional
+    @WithTransaction
     fun validateAndPersist(entity: Entity): Uni<Entity> {
         validate(entity)
 
-        return persist(entity)
+        return find("userId = ?1 and added = ?2 order by sequence desc, added, userId", entity.userId!!, entity.added).firstResult()
+            .onItem().transform { item ->
+                if (item != null) {
+                    entity.sequence = item.sequence?.plus(1L)
+                }
+
+                entity
+            }.call { e ->
+                persist(e!!)
+            }
+
     }
 
-    fun readEntry(userId: Long, date: LocalDate, id: Long): Uni<Entity> {
-        // TODO verify that entry belongs to logged in user -> return 404
+    @WithTransaction
+    fun updateEntry(entity: Entity, clazz: Class<Entity>): Uni<Entity> {
+        return Panache.getSession().call { s ->
+            s.find(clazz, entity.getPrimaryKey())
+                .onItem().ifNull().failWith(EntityNotFoundException())
+                .replaceWith(validate(entity))
+        }.chain { s -> s.merge(entity) }
+    }
 
+    fun readEntry(userId: UUID, date: LocalDate, id: Long): Uni<Entity> {
         val key = LibreUserCompositeKey(
             userId = userId,
             added = date,
-            id = id
+            sequence = id
         )
 
         return findById(key).onItem().ifNull().failWith(EntityNotFoundException())
     }
 
-    fun listEntriesForUserAndDate(userId: Long, date: LocalDate): Uni<List<Entity>> {
+    fun listEntriesForUserAndDate(userId: UUID, date: LocalDate): Uni<List<Entity>> {
         return list("userId = ?1 and added = ?2", userId, date)
     }
 
-    fun listEntriesForUserAndDateRange(userId: Long, dateFrom: LocalDate, dateTo: LocalDate): Uni<List<Entity>> {
+    fun listEntriesForUserAndDateRange(userId: UUID, dateFrom: LocalDate, dateTo: LocalDate): Uni<List<Entity>> {
         return list("userId = ?1 and added between ?2 and ?3", userId, dateFrom, dateTo)
     }
 
-    @ReactiveTransactional
-    fun deleteEntry(userId: Long, date: LocalDate, id: Long): Uni<Boolean> {
+    @WithTransaction
+    fun deleteEntry(userId: UUID, date: LocalDate, sequence: Long): Uni<Boolean> {
         val key = LibreUserCompositeKey(
             userId = userId,
             added = date,
-            id = id
+            sequence = sequence
         )
 
         return findById(key).onItem().ifNull().failWith(EntityNotFoundException()).onItem()

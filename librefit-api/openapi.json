@@ -55,7 +55,7 @@
         }
       }
     },
-    "/goals/delete/{date}/{id}" : {
+    "/goals/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Goals Resource" ],
         "operationId" : "deleteGoal",
@@ -67,7 +67,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -81,9 +81,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -141,7 +138,7 @@
         }
       }
     },
-    "/goals/read/{date}/{id}" : {
+    "/goals/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Goals Resource" ],
         "operationId" : "readGoal",
@@ -153,7 +150,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -213,9 +210,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -360,13 +354,11 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
-    "/tracker/calories/delete/{date}/{id}" : {
+    "/tracker/calories/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Calorie Tracker Resource" ],
         "operationId" : "deleteCalorieTrackerEntry",
@@ -378,7 +370,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -392,9 +384,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -420,9 +409,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -465,9 +452,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -518,13 +503,11 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
-    "/tracker/calories/read/{date}/{id}" : {
+    "/tracker/calories/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
         "operationId" : "readCalorieTrackerEntry",
@@ -536,7 +519,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -579,9 +562,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -604,9 +585,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -632,9 +610,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -683,13 +659,11 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
-    "/tracker/weight/delete/{date}/{id}" : {
+    "/tracker/weight/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Weight Tracker Resource" ],
         "operationId" : "deleteWeightTrackerEntry",
@@ -701,7 +675,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -715,9 +689,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -743,9 +714,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -785,9 +754,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -845,9 +812,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -898,13 +863,11 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
-    "/tracker/weight/read/{date}/{id}" : {
+    "/tracker/weight/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
         "operationId" : "readWeightTrackerEntry",
@@ -916,7 +879,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -959,9 +922,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -984,9 +945,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -1012,9 +970,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -1096,9 +1052,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     },
@@ -1185,9 +1139,7 @@
           }
         },
         "security" : [ {
-          "SecurityScheme" : [ "User", "Admin" ]
-        }, {
-          "SecurityScheme" : [ "User", "Admin" ]
+          "SecurityScheme" : [ ]
         } ]
       }
     }
@@ -1216,15 +1168,19 @@
         "type" : "object",
         "properties" : {
           "userId" : {
-            "format" : "int64",
-            "type" : "integer"
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            } ],
+            "nullable" : true
           },
           "added" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
-          "id" : {
+          "sequence" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : "integer",
+            "nullable" : true
           },
           "amount" : {
             "format" : "float",
@@ -1268,15 +1224,19 @@
         "type" : "object",
         "properties" : {
           "userId" : {
-            "format" : "int64",
-            "type" : "integer"
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            } ],
+            "nullable" : true
           },
           "added" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
-          "id" : {
+          "sequence" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : "integer",
+            "nullable" : true
           },
           "startAmount" : {
             "format" : "float",
@@ -1304,18 +1264,24 @@
         }
       },
       "LibreUser" : {
-        "required" : [ "email", "password" ],
+        "required" : [ "email", "password", "role" ],
         "type" : "object",
         "properties" : {
           "id" : {
-            "format" : "int64",
-            "type" : "integer"
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            } ],
+            "nullable" : true
           },
           "email" : {
             "type" : "string"
           },
           "password" : {
             "minLength" : 1,
+            "type" : "string"
+          },
+          "role" : {
             "type" : "string"
           },
           "name" : {
@@ -1395,20 +1361,29 @@
           }
         }
       },
+      "UUID" : {
+        "format" : "uuid",
+        "pattern" : "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}",
+        "type" : "string"
+      },
       "WeightTrackerEntry" : {
         "required" : [ "added" ],
         "type" : "object",
         "properties" : {
           "userId" : {
-            "format" : "int64",
-            "type" : "integer"
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            } ],
+            "nullable" : true
           },
           "added" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
-          "id" : {
+          "sequence" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : "integer",
+            "nullable" : true
           },
           "amount" : {
             "format" : "float",
@@ -1423,6 +1398,14 @@
             "nullable" : true
           }
         }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }

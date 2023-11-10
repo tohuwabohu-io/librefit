@@ -1,7 +1,7 @@
 package io.tohuwabohu.crud.converter
 
 import io.tohuwabohu.crud.Category
-import javax.persistence.AttributeConverter
+import jakarta.persistence.AttributeConverter
 
 class CalorieTrackerCategoryConverter : AttributeConverter<Category, String> {
     override fun convertToDatabaseColumn(attribute: Category?): String {

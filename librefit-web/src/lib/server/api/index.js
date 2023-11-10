@@ -7,7 +7,7 @@ export const api = {
 		guarded: true
 	},
 	deleteGoal: {
-		path: '/goals/delete/{date}/{id}',
+		path: '/goals/delete/{date}/{sequence}',
 		contentType: 'text/plain',
 		method: 'delete',
 		guarded: true
@@ -19,7 +19,7 @@ export const api = {
 		guarded: true
 	},
 	readGoal: {
-		path: '/goals/read/{date}/{id}',
+		path: '/goals/read/{date}/{sequence}',
 		contentType: 'text/plain',
 		method: 'get',
 		guarded: true
@@ -45,7 +45,7 @@ export const api = {
 		guarded: true
 	},
 	deleteCalorieTrackerEntry: {
-		path: '/tracker/calories/delete/{date}/{id}',
+		path: '/tracker/calories/delete/{date}/{sequence}',
 		contentType: 'text/plain',
 		method: 'delete',
 		guarded: true
@@ -63,7 +63,7 @@ export const api = {
 		guarded: true
 	},
 	readCalorieTrackerEntry: {
-		path: '/tracker/calories/read/{date}/{id}',
+		path: '/tracker/calories/read/{date}/{sequence}',
 		contentType: 'text/plain',
 		method: 'get',
 		guarded: true
@@ -83,7 +83,7 @@ export const api = {
 		guarded: true
 	},
 	deleteWeightTrackerEntry: {
-		path: '/tracker/weight/delete/{date}/{id}',
+		path: '/tracker/weight/delete/{date}/{sequence}',
 		contentType: 'text/plain',
 		method: 'delete',
 		guarded: true
@@ -107,7 +107,7 @@ export const api = {
 		guarded: true
 	},
 	readWeightTrackerEntry: {
-		path: '/tracker/weight/read/{date}/{id}',
+		path: '/tracker/weight/read/{date}/{sequence}',
 		contentType: 'text/plain',
 		method: 'get',
 		guarded: true

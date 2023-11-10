@@ -1,14 +1,12 @@
 package io.tohuwabohu.crud.error
 
 import io.quarkus.security.UnauthorizedException
+import jakarta.persistence.EntityNotFoundException
+import jakarta.persistence.NoResultException
+import jakarta.ws.rs.core.Response
+import jakarta.ws.rs.ext.ExceptionMapper
+import jakarta.ws.rs.ext.Provider
 import org.jboss.logging.Logger
-import javax.persistence.EntityNotFoundException
-import javax.persistence.NoResultException
-import javax.validation.ConstraintViolation
-import javax.validation.ConstraintViolationException
-import javax.ws.rs.core.Response
-import javax.ws.rs.ext.ExceptionMapper
-import javax.ws.rs.ext.Provider
 
 fun createErrorResponse(throwable: Throwable): Response {
     return when (throwable) {
