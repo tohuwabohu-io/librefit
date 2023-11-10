@@ -89,6 +89,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         return Panache.getSession().call { s ->
             s.find(clazz, entity.getPrimaryKey())
                 .onItem().ifNull().failWith(EntityNotFoundException())
+                .replaceWith(validate(entity))
         }.chain { s -> s.merge(entity) }
     }
 
