@@ -9,13 +9,8 @@
 
 	export let data;
 
-	/** @type {Array<CalorieTrackerEntry>} */
-	let calorieTrackerEntries = [];
-
-	/** @type {WeightTrackerEntry} */
+	let calorieTrackerEntries;
 	let weightTrackerEntry;
-
-	/** @type {Goal} */
 	let goal;
 
 	$: calorieTrackerEntries;
@@ -110,7 +105,7 @@
 				<WeightTracker entries={[]} lastEntry={weightTrackerEntry} {goal}
 					on:addWeight={addWeight}
 					on:updateWeight={updateWeight}
-				   	on:updateGoal={setGoal}
+					on:updateGoal={setGoal}
 				/>
 			</div>
 		</div>

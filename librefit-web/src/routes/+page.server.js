@@ -26,23 +26,27 @@ export const load = async ({ fetch, cookies }) => {
 	const lastGoalResponse = await proxyFetch(fetch, goalApi, jwt);
 	const lastCtResponse = await proxyFetch(fetch, ctTodayApi, jwt, { date: getDateAsStr(today) });
 
-	/** @type {Array<CalorieTrackerEntry>} */
-	const ctList = await lastCtResponse.json();
+	/** @type Array<CalorieTrackerEntry> */
+	const ctList = [];
 
-	// add a blank entry for new input
-	/** @type {CalorieTrackerEntry} */
-	const blankEntry = {
-		added: getDateAsStr(today),
-		amount: 0,
-		category: Category.Unset
-	};
+	if (lastCtResponse.ok) {
+		ctList.push(...(await lastCtResponse.json()));
 
-	ctList.unshift(blankEntry);
+		// add a blank entry for new input
+		/** @type {CalorieTrackerEntry} */
+		const blankEntry = {
+			added: getDateAsStr(today),
+			amount: 0,
+			category: Category.Unset
+		};
+
+		ctList.unshift(blankEntry);
+	}
 
 	return {
 		authenticated: true,
-		lastWeight: await lastWeightResponse.json(),
-		lastGoal: await lastGoalResponse.json(),
-		lastCt: ctList
+		lastWeight: lastWeightResponse.ok ? await lastWeightResponse.json() : undefined,
+		lastGoal: lastGoalResponse.ok ? await lastGoalResponse.json() : undefined,
+		lastCt: ctList.length > 0 ? ctList : lastCtResponse
 	};
 };
