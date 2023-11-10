@@ -1,7 +1,5 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.reactive.panache.Panache
-import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
@@ -61,14 +59,6 @@ enum class Category {
 
 @ApplicationScoped
 class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>() {
-    @WithTransaction
-    fun updateTrackingEntry(calorieTrackerEntry: CalorieTrackerEntry): Uni<CalorieTrackerEntry> {
-        return Panache.getSession().call { s ->
-            s.find(CalorieTrackerEntry::class.java, calorieTrackerEntry.getPrimaryKey())
-                .onItem().ifNull().failWith(EntityNotFoundException())
-        }.chain { s -> s.merge(calorieTrackerEntry) }
-    }
-
     fun listDatesForUser(userId: UUID): Uni<Set<LocalDate>?> =
         find("#CalorieTrackerEntry.listDates", userId).list()
             .onItem().ifNotNull().transform { list -> list.map { entry -> entry.added }.toSet() }
