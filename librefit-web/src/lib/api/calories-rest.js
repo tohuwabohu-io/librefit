@@ -7,12 +7,10 @@ import { categoriesAsKeyValue, getCategoryValueAsKey } from '$lib/util.js';
  * @param {Function} callback
  * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
  * @param {String} route
- * @param {number} id
  */
-export const addEntry = (e, callback, toastStore, route, id) => {
+export const addEntry = (e, callback, toastStore, route) => {
 	/** @type {CalorieTrackerEntry} */
 	const newEntry = {
-		id: id,
 		added: e.detail.date,
 		amount: e.detail.value,
 		category: e.detail.category

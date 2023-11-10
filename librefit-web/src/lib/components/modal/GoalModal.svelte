@@ -14,7 +14,7 @@
         startDate: getDateAsStr(today),
         startAmount: 0,
         endAmount: 0,
-        id: 1
+        sequence: 1
     }
 
     let startDateInput, endDateInput, startAmountInput, endAmountInput;

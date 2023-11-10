@@ -184,11 +184,11 @@ export const getDisplayDateAsStr = (
 };
 
 /**
- * @param {{ id: any; added: any; userId: any; }} a
- * @param {{ id: any; added: any; userId: any; }} b
+ * @param {Goal | CalorieTrackerEntry | WeightTrackerEntry} a
+ * @param {Goal | CalorieTrackerEntry | WeightTrackerEntry} b
  */
 export function weakEntityEquals(a, b) {
-	return a.id === b.id && a.added === b.added && a.userId === b.userId;
+	return a.sequence === b.sequence && a.added === b.added && a.userId === b.userId;
 }
 
 /**

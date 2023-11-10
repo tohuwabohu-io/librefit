@@ -10,7 +10,7 @@
 	import CancelEdit from '$lib/assets/icons/pencil-off.svg?component';
 	import {Category} from '$lib/api/model.js';
 
-	export let value, dateStr, id;
+	export let value, dateStr, sequence;
 	export let existing = false;
 	export let disabled = false;
 	export let categories = null;
@@ -26,7 +26,7 @@
 
 	const add = () => {
 		dispatch('add', {
-			sequence: id,
+			sequence: sequence,
 			date: dateStr,
 			value: value,
 			category: category
@@ -51,7 +51,7 @@
 
 		if (value !== previous.value || category !== previous.category) {
 			dispatch('update', {
-				sequence: id,
+				sequence: sequence,
 				date: dateStr,
 				value: value,
 				category: category
@@ -66,7 +66,7 @@
 		e.preventDefault();
 
 		dispatch('remove', {
-			sequence: id,
+			sequence: sequence,
 			date: dateStr
 		});
 

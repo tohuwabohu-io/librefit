@@ -30,15 +30,7 @@
 	});
 
 	const addEntry = async (e) => {
-		let id;
-
-		if (await datesToEntries[todayStr]) {
-			id = Math.max(...(await datesToEntries[todayStr]).map(entry => entry.id).filter(id => id !== undefined)) + 1;
-		} else {
-			id = Math.max(...data.entryToday.map(entry => entry.id).filter(id => id !== undefined)) + 1;
-		}
-
-		ct_crud.addEntry(e, loadEntries, toastStore, '/tracker/calories', id);
+		ct_crud.addEntry(e, loadEntries, toastStore, '/tracker/calories');
 	};
 
 	const updateEntry = (e) => {

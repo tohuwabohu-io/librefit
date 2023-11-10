@@ -34,9 +34,7 @@
 	const toastStore = getToastStore();
 
 	const addCalories = (e) => {
-		const id = Math.max(...data.lastCt.map(entry => entry.id).filter(id => id !== undefined)) + 1;
-
-		ct_crud.addEntry(e, loadCalorieTrackerEntries, toastStore, '/', id);
+		ct_crud.addEntry(e, loadCalorieTrackerEntries, toastStore, '/');
 	};
 
 	const updateCalories = (e) => {

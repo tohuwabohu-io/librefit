@@ -49,7 +49,7 @@ export const Category = {
  * @typedef {Object} CalorieTrackerEntry
  * @property {String} [userId]
  * @property {LocalDate} added
- * @property {Number} [id]
+ * @property {Number} [sequence]
  * @property {Number} amount
  * @property {Category} category
  * @property {String} [updated]
@@ -65,7 +65,7 @@ export const Category = {
  * @typedef {Object} Goal
  * @property {String} [userId]
  * @property {LocalDate} added
- * @property {Number} [id]
+ * @property {Number} [sequence]
  * @property {Number} startAmount
  * @property {Number} endAmount
  * @property {LocalDate} startDate
@@ -104,7 +104,7 @@ export const Category = {
  * @typedef {Object} WeightTrackerEntry
  * @property {String} [userId]
  * @property {LocalDate} added
- * @property {Number} [id]
+ * @property {Number} [sequence]
  * @property {Number} [amount]
  * @property {String} [updated]
  */

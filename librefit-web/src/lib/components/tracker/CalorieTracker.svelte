@@ -8,8 +8,6 @@
     export let categories;
 
     const dispatch = createEventDispatcher();
-    const today = new Date();
-    const todayDateStr = getDateAsStr(new Date());
 
     const addCalories = (e) => {
         dispatch('addCalories', {
@@ -42,13 +40,13 @@
         <TrackerInput {categories}
                       value={entry.amount}
                       dateStr={entry.added}
-                      id={entry.id}
+                      id={entry.sequence}
                       category={entry.category}
                       on:add={addCalories}
                       on:update={updateCalories}
                       on:remove={deleteCalories}
-                      existing={entry.id !== undefined}
-                      disabled={entry.id !== undefined}
+                      existing={entry.sequence !== undefined}
+                      disabled={entry.sequence !== undefined}
                       unit={'kcal'}
         />
     {/each}
