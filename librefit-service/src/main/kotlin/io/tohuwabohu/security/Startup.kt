@@ -18,14 +18,6 @@ class Startup {
                     session.persistAll(
                         LibreUser(
                             null,
-                            "test1@test.dev",
-                            "test1",
-                            "User",
-                            "Testuser 1",
-                            avatar = "/assets/images/avatars/dog-1.png"
-                        ),
-                        LibreUser(
-                            null,
                             "test2@test.dev",
                             "test2",
                             "User",
