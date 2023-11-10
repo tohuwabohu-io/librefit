@@ -69,7 +69,6 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
-        APIResponse(responseCode = "304", description = "Not Modified"),
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
@@ -125,7 +124,6 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Consumes(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
-        APIResponse(responseCode = "304", description = "Not Modified"),
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
