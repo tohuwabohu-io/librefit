@@ -149,7 +149,10 @@ class UserResource(val userRepository: LibreUserRepository) {
         libreUser.id = UUID.fromString(jwt.name)
 
         return userRepository.updateUser(libreUser)
-            .onItem().transform { updated -> Response.ok(updated).build() }
+            .onItem().transform { updated ->
+                updated.password = ""
+                Response.ok(updated).build()
+            }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
