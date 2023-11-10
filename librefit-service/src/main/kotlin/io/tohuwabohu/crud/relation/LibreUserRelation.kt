@@ -57,12 +57,12 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
 
     @Id
     @Column(nullable = false)
-    var id: Long = 0L
+    var id: Long? = 1L
 
     @JsonIgnore
     fun getPrimaryKey(): LibreUserCompositeKey {
         return LibreUserCompositeKey(
-            userId!!, added, id
+            userId!!, added, id!!
         )
     }
 }
@@ -82,7 +82,15 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     fun validateAndPersist(entity: Entity): Uni<Entity> {
         validate(entity)
 
-        return persist(entity)
+        return find("userId = ?1 and added = ?2 order by id desc, added, userId", entity.userId!!, entity.added).firstResult()
+            .onItem().transform { item ->
+                if (item != null) {
+                    entity.id = item.id?.plus(1L)
+                }
+
+                entity
+            }.call { e -> persist(e!!) }
+
     }
 
     @WithTransaction

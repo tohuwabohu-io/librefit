@@ -25,7 +25,7 @@ class GoalsTest {
     fun `should create an entry`() {
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 1, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
             .assertThat()
@@ -42,7 +42,7 @@ class GoalsTest {
     fun `should create two entries`() {
         val created1 = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 4, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -52,7 +52,7 @@ class GoalsTest {
 
         val created2 = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(5, UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            .body(goal(UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -71,7 +71,7 @@ class GoalsTest {
         ]
     )
     fun `should fail on creation`() {
-        var faultyEntry = goal(id = 1, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
+        var faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
 
         faultyEntry.startAmount = -100f
 
@@ -83,7 +83,7 @@ class GoalsTest {
             .assertThat()
             .statusCode(400)
 
-        faultyEntry = goal(id = 1, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
+        faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
         faultyEntry.endAmount = -200f
 
         RestAssured.given()
@@ -105,7 +105,7 @@ class GoalsTest {
     fun `should create and read an entry`() {
         val created = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 2, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -137,7 +137,7 @@ class GoalsTest {
         ]
     )
     fun `should create, update and read an entry`() {
-        val entry = goal(id = 1, userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
+        val entry = goal(userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
 
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
@@ -170,7 +170,7 @@ class GoalsTest {
     }
 
     @Test
-    @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
+    @TestSecurity(user = "9f93b4fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -179,7 +179,7 @@ class GoalsTest {
     fun `should fail on update`() {
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 43L, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            .body(goal(userId = UUID.fromString("9f93b4fc-7fb3-11ee-b962-0242ac120002")))
             .put("/update")
             .then()
             .assertThat()
@@ -196,7 +196,7 @@ class GoalsTest {
     fun `should create and delete an entry`() {
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 1, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -230,7 +230,7 @@ class GoalsTest {
     fun `should create and delete an entry and fail on read`() {
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(goal(id = 3, userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
             .assertThat().statusCode(201)
@@ -272,11 +272,11 @@ class GoalsTest {
         ]
     )
     fun `should create two entries and find the last`() {
-        val goal = goal(id = 1, UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
+        val goal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
         goal.startAmount = 100f
         goal.endAmount = 200f
 
-        val lastGoal = goal(id = 2, UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
+        val lastGoal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
         lastGoal.startAmount = 50f
         lastGoal.endAmount = 250f
 
@@ -294,7 +294,6 @@ class GoalsTest {
         val found = assured.extract().body().`as`(Goal::class.java)
 
         assert(found.added == lastGoal.added)
-        assert(found.id == lastGoal.id)
         assert(found.userId == lastGoal.userId)
         assert(found.startAmount == lastGoal.startAmount)
         assert(found.endAmount == lastGoal.endAmount)
@@ -310,7 +309,7 @@ class GoalsTest {
     fun `should fail with 401`() {
         val userId = UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002") // unrelated user's data
 
-        val entry = goal(id = 1, userId)
+        val entry = goal(userId)
 
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
@@ -321,7 +320,7 @@ class GoalsTest {
             .statusCode(401)
     }
 
-    private fun goal(id: Long, userId: UUID): Goal {
+    private fun goal(userId: UUID): Goal {
         val goal = Goal(
             startDate = LocalDate.now(),
             endDate = LocalDate.now().plusYears(1),
@@ -329,7 +328,6 @@ class GoalsTest {
             endAmount = 75.4f
         )
 
-        goal.id = id
         goal.userId = userId
         goal.added = LocalDate.now()
 

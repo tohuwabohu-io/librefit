@@ -1197,7 +1197,8 @@
           },
           "id" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : "integer",
+            "nullable" : true
           },
           "amount" : {
             "format" : "float",
@@ -1252,7 +1253,8 @@
           },
           "id" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : "integer",
+            "nullable" : true
           },
           "startAmount" : {
             "format" : "float",
@@ -1398,7 +1400,8 @@
           },
           "id" : {
             "format" : "int64",
-            "type" : "integer"
+            "type" : "integer",
+            "nullable" : true
           },
           "amount" : {
             "format" : "float",

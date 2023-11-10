@@ -25,7 +25,7 @@ class WeightTrackerResourceTest {
     fun `should create an entry`() {
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 1, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
+            .body(entry(userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
             .assertThat()
@@ -42,7 +42,7 @@ class WeightTrackerResourceTest {
     fun `should create two entries`() {
         val created1 = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 4, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
+            .body(entry(userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -52,7 +52,7 @@ class WeightTrackerResourceTest {
 
         val created2 = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(5, UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
+            .body(entry(UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -71,7 +71,7 @@ class WeightTrackerResourceTest {
         ]
     )
     fun `should fail on creation`() {
-        val faultyEntry = entry(id = 1, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002"))
+        val faultyEntry = entry(userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002"))
         faultyEntry.amount = -100f
 
         RestAssured.given()
@@ -93,7 +93,7 @@ class WeightTrackerResourceTest {
     fun `should create and read an entry`() {
         val created = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 2, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
+            .body(entry(userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -122,7 +122,7 @@ class WeightTrackerResourceTest {
         ]
     )
     fun `should create, update and read an entry`() {
-        val entry = entry(id = 1, userId = UUID.fromString("c9593830-7fb4-11ee-b962-0242ac120002"))
+        val entry = entry(userId = UUID.fromString("c9593830-7fb4-11ee-b962-0242ac120002"))
 
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
@@ -155,7 +155,7 @@ class WeightTrackerResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
+    @TestSecurity(user = "11f63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test@libre.fitness"),
@@ -164,7 +164,7 @@ class WeightTrackerResourceTest {
     fun `should fail on update`() {
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 43L, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
+            .body(entry(userId = UUID.fromString("11f63e90-7fb4-11ee-b962-0242ac120002")))
             .put("/update")
             .then()
             .assertThat()
@@ -181,7 +181,7 @@ class WeightTrackerResourceTest {
     fun `should create and delete an entry`() {
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 1, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
+            .body(entry(userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
 
@@ -215,7 +215,7 @@ class WeightTrackerResourceTest {
     fun `should create and delete an entry and fail on read`() {
         val assured = RestAssured.given()
             .header("Content-Type", ContentType.JSON)
-            .body(entry(id = 3, userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
+            .body(entry(userId = UUID.fromString("71e63e90-7fb4-11ee-b962-0242ac120002")))
             .post("/create")
             .then()
             .assertThat().statusCode(201)
@@ -245,10 +245,10 @@ class WeightTrackerResourceTest {
     fun `should create two entries and list them`() {
         val userId = UUID.fromString("d6d8be4a-7fb4-11ee-b962-0242ac120002")
 
-        val entry1 = entry(id = 1, userId)
+        val entry1 = entry(userId)
         entry1.userId = userId
 
-        val entry2 = entry(id = 2, userId)
+        val entry2 = entry(userId)
         entry2.userId = userId
 
         val added = entry1.added
@@ -284,13 +284,13 @@ class WeightTrackerResourceTest {
         val lastWeek = today.minusWeeks(1)
         val lastMonth = today.minusMonths(1)
 
-        val entry1 = entry(id = 1, userId)
+        val entry1 = entry(userId)
         entry1.added = today
 
-        val entry2 = entry(id = 1, userId)
+        val entry2 = entry(userId)
         entry2.added = lastWeek
 
-        val entry3 = entry(id = 1, userId)
+        val entry3 = entry(userId)
         entry3.added = lastMonth
 
         listOf(entry1, entry2, entry3).forEach { entry ->
@@ -343,13 +343,13 @@ class WeightTrackerResourceTest {
         val lastWeek = LocalDate.now().minusWeeks(1)
         val lastMonth = LocalDate.now().minusMonths(1)
 
-        val entry1 = entry(1, userId)
+        val entry1 = entry(userId)
         entry1.added = lastWeek
 
-        val entry2 = entry(2, userId)
+        val entry2 = entry(userId)
         entry2.added = lastWeek
 
-        val entry3 = entry(1, userId)
+        val entry3 = entry(userId)
         entry3.added = lastMonth
 
         listOf(entry1, entry2, entry3).forEach { entry ->
@@ -368,7 +368,8 @@ class WeightTrackerResourceTest {
 
         val lastEntry = assured.extract().body().`as`(WeightTrackerEntry::class.java)
 
-        assert(lastEntry.getPrimaryKey() == entry2.getPrimaryKey())
+        assert(lastEntry.added == entry2.added)
+        assert(lastEntry.userId == entry2.userId)
     }
 
     @Test
@@ -381,7 +382,7 @@ class WeightTrackerResourceTest {
     fun `should fail with 401`() {
         val userId = UUID.fromString("f1baf2a0-7fb4-11ee-b962-0242ac120002") // unrelated user's data
 
-        val entry = entry(id = 1, userId)
+        val entry = entry(userId)
 
         RestAssured.given()
             .header("Content-Type", ContentType.JSON)
@@ -392,12 +393,11 @@ class WeightTrackerResourceTest {
             .statusCode(401)
     }
 
-    private fun entry(id: Long, userId: UUID): WeightTrackerEntry {
+    private fun entry(userId: UUID): WeightTrackerEntry {
         val entry = WeightTrackerEntry(
             amount = 100f
         )
 
-        entry.id = id
         entry.userId = userId
         entry.added = LocalDate.now()
 

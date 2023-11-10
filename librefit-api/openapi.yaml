@@ -806,6 +806,7 @@ components:
         id:
           format: int64
           type: integer
+          nullable: true
         amount:
           format: float
           minimum: 0
@@ -856,6 +857,7 @@ components:
         id:
           format: int64
           type: integer
+          nullable: true
         startAmount:
           format: float
           minimum: 0
@@ -972,6 +974,7 @@ components:
         id:
           format: int64
           type: integer
+          nullable: true
         amount:
           format: float
           minimum: 0
