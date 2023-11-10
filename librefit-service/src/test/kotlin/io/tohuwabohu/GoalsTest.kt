@@ -7,7 +7,12 @@ import io.quarkus.test.security.jwt.Claim
 import io.quarkus.test.security.jwt.JwtSecurity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import io.restassured.module.kotlin.extensions.Extract
+import io.restassured.module.kotlin.extensions.Given
+import io.restassured.module.kotlin.extensions.Then
+import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.Goal
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.*
@@ -23,13 +28,14 @@ class GoalsTest {
         ]
     )
     fun `should create an entry`() {
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
-            .assertThat()
-            .statusCode(201)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        }
     }
 
     @Test
@@ -40,27 +46,29 @@ class GoalsTest {
         ]
     )
     fun `should create two entries`() {
-        val created1 = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
+        val created1 = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        created1.assertThat().statusCode(201)
+        val created2 = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        val createdEntry1 = created1.extract().body().`as`(Goal::class.java)
-
-        val created2 = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
-
-        created2.assertThat().statusCode(201)
-
-        val createdEntry2 = created2.extract().body().`as`(Goal::class.java)
-
-        assert(createdEntry1.id != createdEntry2.id)
+        assert(created1.id != created2.id)
     }
 
     @Test
@@ -75,24 +83,27 @@ class GoalsTest {
 
         faultyEntry.startAmount = -100f
 
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(faultyEntry)
-            .post("/create")
-            .then()
-            .assertThat()
-            .statusCode(400)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(faultyEntry)
+        } When {
+            post("/create")
+        } Then {
+            statusCode(400)
+        }
+
 
         faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
         faultyEntry.endAmount = -200f
 
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(faultyEntry)
-            .post("/create")
-            .then()
-            .assertThat()
-            .statusCode(400)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(faultyEntry)
+        } When {
+            post("/create")
+        } Then {
+            statusCode(400)
+        }
     }
 
     @Test
@@ -103,30 +114,32 @@ class GoalsTest {
         ]
     )
     fun `should create and read an entry`() {
-        val created = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        created.assertThat().statusCode(201)
+        val read = When {
+            get("/read/${created.added}/${created.id}")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        val createdEntry = created.extract().body().`as`(Goal::class.java)
-
-        val read = RestAssured.given().get("/read/${createdEntry.added}/${createdEntry.id}")
-            .then()
-
-        read.assertThat().statusCode(200)
-
-        val readEntry = read.extract().body().`as`(Goal::class.java)
-
-        assert(createdEntry.added == readEntry.added)
-        assert(createdEntry.id == readEntry.id)
-        assert(createdEntry.userId == readEntry.userId)
-        assert(createdEntry.startAmount == readEntry.startAmount)
-        assert(createdEntry.endAmount == readEntry.endAmount)
-        assert(createdEntry.startDate == readEntry.startDate)
-        assert(createdEntry.endDate == readEntry.endDate)
+        assert(created.added == read.added)
+        assert(created.id == read.id)
+        assert(created.userId == read.userId)
+        assert(created.startAmount == read.startAmount)
+        assert(created.endAmount == read.endAmount)
+        assert(created.startDate == read.startDate)
+        assert(created.endDate == read.endDate)
     }
 
     @Test
@@ -137,36 +150,41 @@ class GoalsTest {
         ]
     )
     fun `should create, update and read an entry`() {
-        val entry = goal(userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
+        val goal = goal(userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
 
-        val assured = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry)
-            .post("/create")
-            .then()
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal)
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        assured.assertThat().statusCode(201)
-
-        val created = assured.extract().body().`as`(Goal::class.java)
         created.endAmount = 80.4f
 
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(created)
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(200)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(created)
+        } When {
+            put("/update")
+        } Then {
+            statusCode(200)
+        }
 
-        val assuredRead = RestAssured.given().get("/read/${created.added}/${created.id}").then()
+        val read = When {
+            get("/read/${created.added}/${created.id}")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        assuredRead.assertThat().statusCode(200)
-
-        val updated = assuredRead.extract().body().`as`(Goal::class.java)
-
-        assert(created.id == updated.id)
-        assert(entry.endAmount != updated.endAmount)
-        assert(updated.updated != null)
+        assert(created.id == read.id)
+        assert(goal.endAmount != read.endAmount)
+        assert(read.updated != null)
     }
 
     @Test
@@ -177,13 +195,15 @@ class GoalsTest {
         ]
     )
     fun `should fail on update`() {
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(userId = UUID.fromString("9f93b4fc-7fb3-11ee-b962-0242ac120002")))
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(404)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93b4fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            put("/update")
+        } Then {
+            statusCode(404)
+        }
+
     }
 
     @Test
@@ -194,17 +214,22 @@ class GoalsTest {
         ]
     )
     fun `should create and delete an entry`() {
-        val assured = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
-        assured.assertThat().statusCode(201)
-
-        val created = assured.extract().body().`as`(Goal::class.java)
-
-        RestAssured.given().delete("/delete/${created.added}/${created.id}").then().assertThat().statusCode(200)
+        When {
+            delete("/delete/${created.added}/${created.id}")
+        } Then {
+            statusCode(200)
+        }
     }
 
     @Test
@@ -215,9 +240,13 @@ class GoalsTest {
         ]
     )
     fun `should fail on delete`() {
-        val calorieTrackerId = 123L
+        val goalId = 123L
 
-        RestAssured.given().delete("/delete/$calorieTrackerId").then().assertThat().statusCode(404)
+        When {
+            delete("/delete/$goalId")
+        } Then {
+            statusCode(404)
+        }
     }
 
     @Test
@@ -228,23 +257,25 @@ class GoalsTest {
         ]
     )
     fun `should create and delete an entry and fail on read`() {
-        val assured = RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
-            .assertThat().statusCode(201)
-
-        val createdEntry = assured.extract().body().`as`(Goal::class.java)
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(Goal::class.java)
+        }
 
         RestAssured.given()
-            .delete("/delete/${createdEntry.added}/${createdEntry.id}")
+            .delete("/delete/${created.added}/${created.id}")
             .then()
             .assertThat()
             .statusCode(200)
 
         RestAssured.given()
-            .get("/read/${createdEntry.added}/${createdEntry.id}")
+            .get("/read/${created.added}/${created.id}")
             .then()
             .assertThat()
             .statusCode(404)
@@ -258,10 +289,11 @@ class GoalsTest {
         ]
     )
     fun `should fail on finding last entry`() {
-        RestAssured
-            .given()
-            .get("/last")
-            .then().assertThat().statusCode(404)
+        When {
+            get("/last")
+        } Then {
+            statusCode(404)
+        }
     }
 
     @Test
@@ -281,22 +313,25 @@ class GoalsTest {
         lastGoal.endAmount = 250f
 
         listOf(goal, lastGoal).forEach { item ->
-            RestAssured.given()
-                .header("Content-Type", ContentType.JSON)
-                .body(item)
-                .post("/create")
-                .then()
-                .assertThat()
-                .statusCode(201)
+            Given {
+                header("Content-Type", ContentType.JSON)
+                body(item)
+            } When {
+                post("/create")
+            } Then {
+                statusCode(201)
+            }
         }
 
-        val assured = RestAssured.given().get("/last").then()
-        val found = assured.extract().body().`as`(Goal::class.java)
-
-        assert(found.added == lastGoal.added)
-        assert(found.userId == lastGoal.userId)
-        assert(found.startAmount == lastGoal.startAmount)
-        assert(found.endAmount == lastGoal.endAmount)
+        When {
+            get("/last")
+        } Then {
+            statusCode(200)
+            body("added", equalTo(lastGoal.added.toString()))
+            body("userId", equalTo(lastGoal.userId.toString()))
+            body("startAmount", equalTo(lastGoal.startAmount))
+            body("endAmount", equalTo(lastGoal.endAmount))
+        }
     }
 
     @Test
@@ -311,13 +346,14 @@ class GoalsTest {
 
         val entry = goal(userId)
 
-        RestAssured.given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry)
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(401)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry)
+        } When {
+            put("/update")
+        } Then {
+            statusCode(401)
+        }
     }
 
     private fun goal(userId: UUID): Goal {

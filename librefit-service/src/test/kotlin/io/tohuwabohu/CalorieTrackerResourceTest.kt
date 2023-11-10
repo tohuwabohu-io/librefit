@@ -5,8 +5,11 @@ import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
 import io.quarkus.test.security.jwt.Claim
 import io.quarkus.test.security.jwt.JwtSecurity
-import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
+import io.restassured.module.kotlin.extensions.Extract
+import io.restassured.module.kotlin.extensions.Given
+import io.restassured.module.kotlin.extensions.Then
+import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.CalorieTrackerEntry
 import io.tohuwabohu.crud.Category
 import org.hamcrest.Matchers.equalTo
@@ -25,14 +28,15 @@ class CalorieTrackerResourceTest {
         ]
     )
     fun `should create an entry`() {
-        given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
-            .assertThat()
-            .statusCode(201)
-            .body("id", equalTo(1))
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+            body("id", equalTo(1))
+        }
     }
 
     @Test
@@ -43,25 +47,27 @@ class CalorieTrackerResourceTest {
         ]
     )
     fun `should create two entries`() {
-        val created1 = given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
+        val createdEntry1 = Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(CalorieTrackerEntry::class.java)
+        }
 
-        created1.assertThat().statusCode(201)
-
-        val createdEntry1 = created1.extract().body().`as`(CalorieTrackerEntry::class.java)
-
-        val created2 = given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
-
-        created2.assertThat().statusCode(201)
-
-        val createdEntry2 = created2.extract().body().`as`(CalorieTrackerEntry::class.java)
+        val createdEntry2 = Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(CalorieTrackerEntry::class.java)
+        }
 
         assert(createdEntry1.id != createdEntry2.id)
     }
@@ -77,13 +83,14 @@ class CalorieTrackerResourceTest {
         val faultyEntry = entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002"))
         faultyEntry.amount = -100f
 
-        given()
-            .header("Content-Type", ContentType.JSON)
-            .body(faultyEntry)
-            .post("/create")
-            .then()
-            .assertThat()
-            .statusCode(400)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(faultyEntry)
+        } When {
+            post("/create")
+        } Then {
+            statusCode(400)
+        }
     }
 
     @Test
@@ -94,22 +101,24 @@ class CalorieTrackerResourceTest {
         ]
     )
     fun `should create and read an entry`() {
-        val created = given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
+        val createdEntry = Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(CalorieTrackerEntry::class.java)
+        }
 
-        created.assertThat().statusCode(201)
-
-        val createdEntry = created.extract().body().`as`(CalorieTrackerEntry::class.java)
-
-        val read = given().get("/read/${createdEntry.added}/${createdEntry.id}")
-            .then()
-
-        read.assertThat().statusCode(200)
-
-        val readEntry = read.extract().body().`as`(CalorieTrackerEntry::class.java)
+        val readEntry = When {
+            get("/read/${createdEntry.added}/${createdEntry.id}")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(CalorieTrackerEntry::class.java)
+        }
 
         assert(createdEntry.added == readEntry.added)
         assert(createdEntry.id == readEntry.id)
@@ -128,31 +137,30 @@ class CalorieTrackerResourceTest {
     fun `should create, update and read an entry`() {
         val entry = entry(userId = UUID.fromString("3902536c-7fb3-11ee-b962-0242ac120002"))
 
-        val assured = given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry)
-            .post("/create")
-            .then()
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry)
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(CalorieTrackerEntry::class.java)
+        }
 
-        assured.assertThat().statusCode(201)
-
-        val created = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
         created.amount = 200f
         created.category = Category.LUNCH
 
-        given()
-            .header("Content-Type", ContentType.JSON)
-            .body(created)
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(200)
-
-        val assuredRead = given().get("/read/${created.added}/${created.id}").then()
-
-        assuredRead.assertThat().statusCode(200)
-
-        val updated = assuredRead.extract().body().`as`(CalorieTrackerEntry::class.java)
+        val updated = Given {
+            header("Content-Type", ContentType.JSON)
+            body(created)
+        } When {
+            put("/update")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(CalorieTrackerEntry::class.java)
+        }
 
         assert(created.id == updated.id)
         assert(entry.amount != updated.amount)
@@ -168,13 +176,14 @@ class CalorieTrackerResourceTest {
         ]
     )
     fun `should fail on update`() {
-        given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry(userId = UUID.fromString("e27c313c-7fb2-11ee-b962-0242ac120002")))
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(404)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry(userId = UUID.fromString("e27c313c-7fb2-11ee-b962-0242ac120002")))
+        } When {
+            put("/update")
+        } Then {
+            statusCode(404)
+        }
     }
 
     @Test
@@ -185,17 +194,22 @@ class CalorieTrackerResourceTest {
         ]
     )
     fun `should create and delete an entry`() {
-        val assured = given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
+        val created = Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(CalorieTrackerEntry::class.java)
+        }
 
-        assured.assertThat().statusCode(201)
-
-        val created = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
-
-        given().delete("/delete/${created.added}/${created.id}").then().assertThat().statusCode(200)
+        When {
+            delete("/delete/${created.added}/${created.id}")
+        } Then {
+            statusCode(200)
+        }
     }
 
     @Test
@@ -208,7 +222,11 @@ class CalorieTrackerResourceTest {
     fun `should fail on delete`() {
         val calorieTrackerId = 123L
 
-        given().delete("/delete/$calorieTrackerId").then().assertThat().statusCode(404)
+        When {
+            delete("/delete/$calorieTrackerId")
+        } Then {
+            statusCode(404)
+        }
     }
 
     @Test
@@ -219,26 +237,29 @@ class CalorieTrackerResourceTest {
         ]
     )
     fun `should create and delete an entry and fail on read`() {
-        val assured = given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
-            .post("/create")
-            .then()
-            .assertThat().statusCode(201)
+        val createdEntry = Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")))
+        } When {
+            post("/create")
+        } Then {
+            statusCode(201)
+        } Extract {
+            body().`as`(CalorieTrackerEntry::class.java)
+        }
 
-        val createdEntry = assured.extract().body().`as`(CalorieTrackerEntry::class.java)
 
-        given()
-            .delete("/delete/${createdEntry.added}/${createdEntry.id}")
-            .then()
-            .assertThat()
-            .statusCode(200)
+        When {
+            delete("/delete/${createdEntry.added}/${createdEntry.id}")
+        } Then {
+            statusCode(200)
+        }
 
-        given()
-            .get("/read/${createdEntry.added}/${createdEntry.id}")
-            .then()
-            .assertThat()
-            .statusCode(404)
+        When {
+            get("/read/${createdEntry.added}/${createdEntry.id}")
+        } Then {
+            statusCode(404)
+        }
     }
 
     @Test
@@ -263,21 +284,26 @@ class CalorieTrackerResourceTest {
         val entry3 = entry(userId)
         entry3.added = yesterday
 
-        listOf(entry1, entry2, entry3).forEachIndexed { i, entry ->
-            given()
-                .header("Content-Type", ContentType.JSON)
-                .body(entry)
-                .post("/create")
-                .then()
-                .assertThat()
-                .statusCode(201)
+        listOf(entry1, entry2, entry3).forEach { entry ->
+            Given {
+                header("Content-Type", ContentType.JSON)
+                body(entry)
+            } When {
+                post("/create")
+            } Then {
+                statusCode(201)
+            }
         }
 
-        val body = given()
-            .header("Content-Type", ContentType.JSON)
-            .get("/list/dates").body
-
-        val dates = body.`as`(Array<LocalDate>::class.java)
+        val dates = Given {
+            header("Content-Type", ContentType.JSON)
+        } When {
+            get("/list/dates")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Array<LocalDate>::class.java)
+        }
 
         assert(dates.contains(today))
         assert(dates.contains(yesterday))
@@ -302,18 +328,23 @@ class CalorieTrackerResourceTest {
         val added = entry1.added
 
         listOf(entry1, entry2).forEach { entry ->
-            given()
-                .header("Content-Type", ContentType.JSON)
-                .body(entry)
-                .post("/create")
-                .then()
-                .assertThat()
-                .statusCode(201)
+            Given {
+                header("Content-Type", ContentType.JSON)
+                body(entry)
+            } When {
+                post("/create")
+            } Then {
+                statusCode(201)
+            }
         }
 
-        val body = given().get("/list/$added").body
-
-        val entries = body.`as`(Array<CalorieTrackerEntry>::class.java)
+        val entries = When {
+            get("/list/$added")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Array<CalorieTrackerEntry>::class.java)
+        }
 
         assert(entries.size == 2)
         assert(entries.map { it.id }.isNotEmpty())
@@ -331,27 +362,29 @@ class CalorieTrackerResourceTest {
 
         val entry = entry(userId)
 
-        given()
-            .header("Content-Type", ContentType.JSON)
-            .body(entry)
-            .put("/update")
-            .then()
-            .assertThat()
-            .statusCode(401)
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(entry)
+        } When {
+            put("/update")
+        } Then {
+            statusCode(401)
+        }
     }
 
     @Test
     @TestSecurity(user = "f31a553b-7fb2-11ee-b962-0242ac120002", roles = ["User"])
     fun `should create four entries with ascending identifiers`() {
         for (i in 1..4) {
-            given()
-                .header("Content-Type", ContentType.JSON)
-                .body(entry(UUID.fromString("f31a553b-7fb2-11ee-b962-0242ac120002")))
-                .post("/create")
-                .then()
-                .assertThat()
-                .statusCode(201)
-                .body("id", equalTo(i))
+            Given {
+                header("Content-Type", ContentType.JSON)
+                body(entry(UUID.fromString("f31a553b-7fb2-11ee-b962-0242ac120002")))
+            } When {
+                post("/create")
+            } Then {
+                statusCode(201)
+                body("id", equalTo(i))
+            }
         }
     }
 
