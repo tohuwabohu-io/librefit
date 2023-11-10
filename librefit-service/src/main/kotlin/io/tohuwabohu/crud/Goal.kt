@@ -6,6 +6,7 @@ import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityNotFoundException
+import jakarta.persistence.PreUpdate
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -40,6 +41,11 @@ data class Goal(
     @Override
     override fun toString(): String {
         return this::class.simpleName + "(userId = $userId , startAmount = $startAmount , endAmount = $endAmount , startDate = $startDate , endDate = $endDate , added = $added , id = $id )"
+    }
+
+    @PreUpdate
+    fun onUpdate() {
+        updated = LocalDateTime.now()
     }
 }
 
