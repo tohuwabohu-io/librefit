@@ -1,6 +1,7 @@
 package io.tohuwabohu.crud.relation
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
@@ -83,9 +84,15 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         return persist(entity)
     }
 
-    fun readEntry(userId: Long, date: LocalDate, id: Long): Uni<Entity> {
-        // TODO verify that entry belongs to logged in user -> return 404
+    @WithTransaction
+    fun updateEntry(entity: Entity, clazz: Class<Entity>): Uni<Entity> {
+        return Panache.getSession().call { s ->
+            s.find(clazz, entity.getPrimaryKey())
+                .onItem().ifNull().failWith(EntityNotFoundException())
+        }.chain { s -> s.merge(entity) }
+    }
 
+    fun readEntry(userId: Long, date: LocalDate, id: Long): Uni<Entity> {
         val key = LibreUserCompositeKey(
             userId = userId,
             added = date,

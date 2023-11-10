@@ -92,8 +92,8 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
         printAuthenticationInfo(jwt, securityContext)
         validateToken(jwt, weightTrackerEntry)
 
-        return weightTrackerRepository.updateTrackingEntry(weightTrackerEntry)
-            .onItem().transform { rowCount -> if (rowCount > 0) Response.ok().build() else Response.notModified().build() }
+        return weightTrackerRepository.updateEntry(weightTrackerEntry, WeightTrackerEntry::class.java)
+            .onItem().transform { updated -> Response.ok(updated).build() }
             .onFailure().invoke{ e -> Log.error(e)}
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }

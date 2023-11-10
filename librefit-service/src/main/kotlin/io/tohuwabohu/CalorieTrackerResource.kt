@@ -90,7 +90,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         printAuthenticationInfo(jwt, securityContext)
         validateToken(jwt, calorieTracker)
 
-        return calorieTrackerRepository.updateTrackingEntry(calorieTracker)
+        return calorieTrackerRepository.updateEntry(calorieTracker, CalorieTrackerEntry::class.java)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

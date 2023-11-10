@@ -86,8 +86,8 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
         printAuthenticationInfo(jwt, securityContext)
         validateToken(jwt, goal)
 
-        return goalsRepository.updateGoal(goal)
-            .onItem().transform { rowCount -> if (rowCount > 0) Response.ok().build() else Response.notModified().build() }
+        return goalsRepository.updateEntry(goal, Goal::class.java)
+            .onItem().transform { updated -> Response.ok(updated).build() }
             .onFailure().invoke{ e -> Log.error(e)}
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }

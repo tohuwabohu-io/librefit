@@ -1,8 +1,6 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
@@ -43,21 +41,6 @@ data class WeightTrackerEntry (
 
 @ApplicationScoped
 class WeightTrackerRepository : LibreUserRelatedRepository<WeightTrackerEntry>() {
-    @WithTransaction
-    fun updateTrackingEntry(weightTrackerEntry: WeightTrackerEntry): Uni<Int> {
-        // TODO verify that entry belongs to logged in user -> return 404
-
-        return findById(weightTrackerEntry.getPrimaryKey()).onItem().ifNull()
-            .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni{ entry ->
-                val key = entry.getPrimaryKey()
-
-                update(
-                    "amount = ?1, updated = ?2 where userId = ?3 and added = ?4 and id = ?5",
-                    weightTrackerEntry.amount, LocalDateTime.now(), key.userId, key.added, key.id
-                )
-            }.onItem().ifNull().failWith{ UnmodifiedError(weightTrackerEntry.toString()) }
-    }
-
     fun findLastEntry(userId: Long): Uni<WeightTrackerEntry?> {
         return find("#WeightTrackerEntry.findLast", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }

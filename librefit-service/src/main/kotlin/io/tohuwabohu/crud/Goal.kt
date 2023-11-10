@@ -1,8 +1,6 @@
 package io.tohuwabohu.crud
 
-import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
@@ -50,18 +48,5 @@ class GoalsRepository : LibreUserRelatedRepository<Goal>() {
     fun findLastGoal(userId: Number): Uni<Goal?> {
         return find("userId = ?1 order by added desc, id desc", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
-    }
-
-    @WithTransaction
-    fun updateGoal(goal: Goal): Uni<Int> {
-        return findById(goal.getPrimaryKey()).onItem().ifNull()
-            .failWith(EntityNotFoundException()).onItem().ifNotNull().transformToUni{ entry ->
-                val key = entry.getPrimaryKey()
-
-                update(
-                    "startAmount = ?1, endAmount = ?2, startDate = ?3, endDate = ?4, updated = ?5 where userId = ?6 and added = ?7 and id = ?8",
-                    goal.startAmount, goal.endAmount, goal.startDate, goal.endDate, LocalDateTime.now(), key.userId, key.added, key.id
-                )
-            }.onItem().ifNull().failWith{ UnmodifiedError(goal.toString()) }
     }
 }
