@@ -4,9 +4,7 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.persistence.Entity
-import jakarta.persistence.EntityNotFoundException
-import jakarta.persistence.PreUpdate
+import jakarta.persistence.*
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -14,6 +12,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity
+@NamedQueries(
+    NamedQuery(name = "Goal.findLast", query = "from Goal where userId = ?1 order by added desc, id desc, userId limit 1")
+)
 data class Goal(
     @field:NotNull(message = "The initial amount of your goal must not be empty.")
     @field:Min(value = 0, message = "The initial amount of your goal must not be less than zero.")
@@ -52,7 +53,7 @@ data class Goal(
 @ApplicationScoped
 class GoalsRepository : LibreUserRelatedRepository<Goal>() {
     fun findLastGoal(userId: Number): Uni<Goal?> {
-        return find("userId = ?1 order by added desc, id desc", userId).firstResult()
+        return find("#Goal.findLast", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 }
