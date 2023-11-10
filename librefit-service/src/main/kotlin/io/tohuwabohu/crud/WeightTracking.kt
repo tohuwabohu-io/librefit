@@ -6,14 +6,15 @@ import io.tohuwabohu.crud.error.UnmodifiedError
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.persistence.Entity
-import jakarta.persistence.EntityNotFoundException
-import jakarta.persistence.PreUpdate
+import jakarta.persistence.*
 import jakarta.validation.constraints.Min
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
 
 @Entity
+@NamedQueries(
+    NamedQuery(name = "WeightTrackerEntry.findLast", query = "from WeightTrackerEntry where userId = ?1 order by added desc, id desc, userId limit 1")
+)
 data class WeightTrackerEntry (
     @field:Min(value = 0, message = "Your weight should not be less than zero.")
     var amount: Float = 0f,
@@ -58,7 +59,7 @@ class WeightTrackerRepository : LibreUserRelatedRepository<WeightTrackerEntry>()
     }
 
     fun findLastEntry(userId: Long): Uni<WeightTrackerEntry?> {
-        return find("userId = ?1 order by added desc, id desc", userId).firstResult()
+        return find("#WeightTrackerEntry.findLast", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 
