@@ -55,7 +55,7 @@
         }
       }
     },
-    "/goals/delete/{date}/{id}" : {
+    "/goals/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Goals Resource" ],
         "operationId" : "deleteGoal",
@@ -67,7 +67,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -81,9 +81,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -141,7 +138,7 @@
         }
       }
     },
-    "/goals/read/{date}/{id}" : {
+    "/goals/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Goals Resource" ],
         "operationId" : "readGoal",
@@ -153,7 +150,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -213,9 +210,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -364,7 +358,7 @@
         } ]
       }
     },
-    "/tracker/calories/delete/{date}/{id}" : {
+    "/tracker/calories/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Calorie Tracker Resource" ],
         "operationId" : "deleteCalorieTrackerEntry",
@@ -376,7 +370,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -390,9 +384,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -516,7 +507,7 @@
         } ]
       }
     },
-    "/tracker/calories/read/{date}/{id}" : {
+    "/tracker/calories/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
         "operationId" : "readCalorieTrackerEntry",
@@ -528,7 +519,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -594,9 +585,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -675,7 +663,7 @@
         } ]
       }
     },
-    "/tracker/weight/delete/{date}/{id}" : {
+    "/tracker/weight/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Weight Tracker Resource" ],
         "operationId" : "deleteWeightTrackerEntry",
@@ -687,7 +675,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -701,9 +689,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -882,7 +867,7 @@
         } ]
       }
     },
-    "/tracker/weight/read/{date}/{id}" : {
+    "/tracker/weight/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
         "operationId" : "readWeightTrackerEntry",
@@ -894,7 +879,7 @@
             "$ref" : "#/components/schemas/LocalDate"
           }
         }, {
-          "name" : "id",
+          "name" : "sequence",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -960,9 +945,6 @@
             "content" : {
               "application/json" : { }
             }
-          },
-          "304" : {
-            "description" : "Not Modified"
           },
           "404" : {
             "description" : "Not Found"
@@ -1195,7 +1177,7 @@
           "added" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
-          "id" : {
+          "sequence" : {
             "format" : "int64",
             "type" : "integer",
             "nullable" : true
@@ -1251,7 +1233,7 @@
           "added" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
-          "id" : {
+          "sequence" : {
             "format" : "int64",
             "type" : "integer",
             "nullable" : true
@@ -1398,7 +1380,7 @@
           "added" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
-          "id" : {
+          "sequence" : {
             "format" : "int64",
             "type" : "integer",
             "nullable" : true

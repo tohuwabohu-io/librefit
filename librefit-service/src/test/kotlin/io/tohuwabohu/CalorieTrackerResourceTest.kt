@@ -35,7 +35,7 @@ class CalorieTrackerResourceTest {
             post("/create")
         } Then {
             statusCode(201)
-            body("id", equalTo(1))
+            body("sequence", equalTo(1))
         }
     }
 
@@ -69,7 +69,7 @@ class CalorieTrackerResourceTest {
             body().`as`(CalorieTrackerEntry::class.java)
         }
 
-        assert(createdEntry1.id != createdEntry2.id)
+        assert(createdEntry1.sequence != createdEntry2.sequence)
     }
 
     @Test
@@ -113,7 +113,7 @@ class CalorieTrackerResourceTest {
         }
 
         val readEntry = When {
-            get("/read/${createdEntry.added}/${createdEntry.id}")
+            get("/read/${createdEntry.added}/${createdEntry.sequence}")
         } Then {
             statusCode(200)
         } Extract {
@@ -121,7 +121,7 @@ class CalorieTrackerResourceTest {
         }
 
         assert(createdEntry.added == readEntry.added)
-        assert(createdEntry.id == readEntry.id)
+        assert(createdEntry.sequence == readEntry.sequence)
         assert(createdEntry.userId == readEntry.userId)
         assert(createdEntry.amount == readEntry.amount)
         assert(createdEntry.category == readEntry.category)
@@ -162,7 +162,7 @@ class CalorieTrackerResourceTest {
             body().`as`(CalorieTrackerEntry::class.java)
         }
 
-        assert(created.id == updated.id)
+        assert(created.sequence == updated.sequence)
         assert(entry.amount != updated.amount)
         assert(entry.category != updated.category)
         assert(updated.updated != null)
@@ -206,7 +206,7 @@ class CalorieTrackerResourceTest {
         }
 
         When {
-            delete("/delete/${created.added}/${created.id}")
+            delete("/delete/${created.added}/${created.sequence}")
         } Then {
             statusCode(200)
         }
@@ -250,13 +250,13 @@ class CalorieTrackerResourceTest {
 
 
         When {
-            delete("/delete/${createdEntry.added}/${createdEntry.id}")
+            delete("/delete/${createdEntry.added}/${createdEntry.sequence}")
         } Then {
             statusCode(200)
         }
 
         When {
-            get("/read/${createdEntry.added}/${createdEntry.id}")
+            get("/read/${createdEntry.added}/${createdEntry.sequence}")
         } Then {
             statusCode(404)
         }
@@ -347,7 +347,7 @@ class CalorieTrackerResourceTest {
         }
 
         assert(entries.size == 2)
-        assert(entries.map { it.id }.isNotEmpty())
+        assert(entries.map { it.sequence }.isNotEmpty())
     }
 
     @Test
@@ -383,7 +383,7 @@ class CalorieTrackerResourceTest {
                 post("/create")
             } Then {
                 statusCode(201)
-                body("id", equalTo(i))
+                body("sequence", equalTo(i))
             }
         }
     }

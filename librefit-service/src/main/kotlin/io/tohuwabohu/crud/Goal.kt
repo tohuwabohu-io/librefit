@@ -14,7 +14,7 @@ import java.util.*
 
 @Entity
 @NamedQueries(
-    NamedQuery(name = "Goal.findLast", query = "from Goal where userId = ?1 order by added desc, id desc, userId limit 1")
+    NamedQuery(name = "Goal.findLast", query = "from Goal where userId = ?1 order by added desc, sequence desc, userId limit 1")
 )
 data class Goal(
     @field:NotNull(message = "The initial amount of your goal must not be empty.")
@@ -42,7 +42,7 @@ data class Goal(
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(userId = $userId , startAmount = $startAmount , endAmount = $endAmount , startDate = $startDate , endDate = $endDate , added = $added , id = $id )"
+        return this::class.simpleName + "(userId = $userId , startAmount = $startAmount , endAmount = $endAmount , startDate = $startDate , endDate = $endDate , added = $added , id = $sequence )"
     }
 
     @PreUpdate

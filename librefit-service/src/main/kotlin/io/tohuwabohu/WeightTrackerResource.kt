@@ -63,7 +63,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
         validateToken(jwt, weightTrackerEntry)
 
         return weightTrackerRepository.validateAndPersist(weightTrackerEntry)
-            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).entity(entry).build() }
+            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{throwable -> createErrorResponse(throwable) }
     }
@@ -99,7 +99,7 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     }
 
     @DELETE
-    @Path("/delete/{date}/{id:\\d+}")
+    @Path("/delete/{date}/{sequence:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("User", "Admin")
     @APIResponses(
@@ -115,19 +115,19 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     @Operation(
         operationId = "deleteWeightTrackerEntry"
     )
-    fun delete(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> {
-         Log.info("Delete weight tracker entry with added=$date id=$id")
+    fun delete(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> {
+         Log.info("Delete weight tracker entry with added=$date sequence=$sequence")
 
         printAuthenticationInfo(jwt, securityContext)
 
-        return weightTrackerRepository.deleteEntry(UUID.fromString(jwt.name), date, id)
-            .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
+        return weightTrackerRepository.deleteEntry(UUID.fromString(jwt.name), date, sequence)
+            .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
     }
 
     @GET
-    @Path("/read/{date}/{id:\\d+}")
+    @Path("/read/{date}/{sequence:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("User", "Admin")
     @APIResponses(
@@ -148,8 +148,8 @@ class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository
     @Operation(
         operationId = "readWeightTrackerEntry"
     )
-    fun read(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> =
-        weightTrackerRepository.readEntry(UUID.fromString(jwt.name), date, id)
+    fun read(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> =
+        weightTrackerRepository.readEntry(UUID.fromString(jwt.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

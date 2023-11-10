@@ -37,13 +37,17 @@ export const Category = {
  */
 
 /**
+ * @typedef {Object} UUID
+ */
+
+/**
  * @typedef {Object} AuthenticationResponse
  * @property {String} token
  */
 
 /**
  * @typedef {Object} CalorieTrackerEntry
- * @property {Number} [userId]
+ * @property {String} [userId]
  * @property {LocalDate} added
  * @property {Number} [id]
  * @property {Number} amount
@@ -59,7 +63,7 @@ export const Category = {
 
 /**
  * @typedef {Object} Goal
- * @property {Number} [userId]
+ * @property {String} [userId]
  * @property {LocalDate} added
  * @property {Number} [id]
  * @property {Number} startAmount
@@ -71,9 +75,10 @@ export const Category = {
 
 /**
  * @typedef {Object} LibreUser
- * @property {Number} [id]
+ * @property {String} [id]
  * @property {String} email
  * @property {String} password
+ * @property {String} role
  * @property {String} [name]
  * @property {String} [registered]
  * @property {String} [lastLogin]
@@ -97,7 +102,7 @@ export const Category = {
 
 /**
  * @typedef {Object} WeightTrackerEntry
- * @property {Number} [userId]
+ * @property {String} [userId]
  * @property {LocalDate} added
  * @property {Number} [id]
  * @property {Number} [amount]

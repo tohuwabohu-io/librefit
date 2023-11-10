@@ -13,7 +13,6 @@
 
     const addCalories = (e) => {
         dispatch('addCalories', {
-            sequence: getLastSequence(),
             date: e.detail.date,
             value: e.detail.value,
             category: e.detail.category
@@ -34,10 +33,6 @@
             sequence: e.detail.sequence,
             date: e.detail.date
         })
-    }
-
-    const getLastSequence = () => {
-        return Math.max(...entries.filter(entry => entry.added === todayDateStr).map(entry => entry.id)) + 1;
     }
 </script>
 

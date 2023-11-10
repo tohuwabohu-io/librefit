@@ -68,7 +68,7 @@ class GoalsTest {
             body().`as`(Goal::class.java)
         }
 
-        assert(created1.id != created2.id)
+        assert(created1.sequence != created2.sequence)
     }
 
     @Test
@@ -126,7 +126,7 @@ class GoalsTest {
         }
 
         val read = When {
-            get("/read/${created.added}/${created.id}")
+            get("/read/${created.added}/${created.sequence}")
         } Then {
             statusCode(200)
         } Extract {
@@ -134,7 +134,7 @@ class GoalsTest {
         }
 
         assert(created.added == read.added)
-        assert(created.id == read.id)
+        assert(created.sequence == read.sequence)
         assert(created.userId == read.userId)
         assert(created.startAmount == read.startAmount)
         assert(created.endAmount == read.endAmount)
@@ -175,14 +175,14 @@ class GoalsTest {
         }
 
         val read = When {
-            get("/read/${created.added}/${created.id}")
+            get("/read/${created.added}/${created.sequence}")
         } Then {
             statusCode(200)
         } Extract {
             body().`as`(Goal::class.java)
         }
 
-        assert(created.id == read.id)
+        assert(created.sequence == read.sequence)
         assert(goal.endAmount != read.endAmount)
         assert(read.updated != null)
     }
@@ -226,7 +226,7 @@ class GoalsTest {
         }
 
         When {
-            delete("/delete/${created.added}/${created.id}")
+            delete("/delete/${created.added}/${created.sequence}")
         } Then {
             statusCode(200)
         }
@@ -269,13 +269,13 @@ class GoalsTest {
         }
 
         RestAssured.given()
-            .delete("/delete/${created.added}/${created.id}")
+            .delete("/delete/${created.added}/${created.sequence}")
             .then()
             .assertThat()
             .statusCode(200)
 
         RestAssured.given()
-            .get("/read/${created.added}/${created.id}")
+            .get("/read/${created.added}/${created.sequence}")
             .then()
             .assertThat()
             .statusCode(404)

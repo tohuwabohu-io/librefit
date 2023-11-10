@@ -61,7 +61,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         validateToken(jwt, calorieTracker)
 
         return calorieTrackerRepository.validateAndPersist(calorieTracker)
-            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).entity(entry).build() }
+            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
@@ -96,7 +96,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
 
 
     @GET
-    @Path("/read/{date}/{id:\\d+}")
+    @Path("/read/{date}/{sequence:\\d+}")
     @RolesAllowed("User", "Admin")
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
@@ -115,10 +115,10 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(operationId = "readCalorieTrackerEntry")
-    fun read(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> {
+    fun read(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
-        return calorieTrackerRepository.readEntry(UUID.fromString(jwt.name), date, id)
+        return calorieTrackerRepository.readEntry(UUID.fromString(jwt.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
@@ -126,7 +126,7 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
 
 
     @DELETE
-    @Path("/delete/{date}/{id:\\d+}")
+    @Path("/delete/{date}/{sequence:\\d+}")
     @RolesAllowed("User", "Admin")
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
@@ -140,12 +140,12 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(operationId = "deleteCalorieTrackerEntry")
-    fun delete(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> {
-        Log.info("Delete calorie tracker entry with added=$date id=$id")
+    fun delete(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> {
+        Log.info("Delete calorie tracker entry with added=$date sequence=$sequence")
         printAuthenticationInfo(jwt, securityContext)
 
-        return calorieTrackerRepository.deleteEntry(UUID.fromString(jwt.name), date, id)
-            .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
+        return calorieTrackerRepository.deleteEntry(UUID.fromString(jwt.name), date, sequence)
+            .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }

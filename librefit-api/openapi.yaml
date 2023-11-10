@@ -36,7 +36,7 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/delete/{date}/{id}:
+  /goals/delete/{date}/{sequence}:
     delete:
       tags:
       - Goals Resource
@@ -47,7 +47,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -58,8 +58,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -94,7 +92,7 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/read/{date}/{id}:
+  /goals/read/{date}/{sequence}:
     get:
       tags:
       - Goals Resource
@@ -105,7 +103,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -145,8 +143,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -245,7 +241,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/calories/delete/{date}/{id}:
+  /tracker/calories/delete/{date}/{sequence}:
     delete:
       tags:
       - Calorie Tracker Resource
@@ -256,7 +252,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -267,8 +263,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -347,7 +341,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/calories/read/{date}/{id}:
+  /tracker/calories/read/{date}/{sequence}:
     get:
       tags:
       - Calorie Tracker Resource
@@ -358,7 +352,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -402,8 +396,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -451,7 +443,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/delete/{date}/{id}:
+  /tracker/weight/delete/{date}/{sequence}:
     delete:
       tags:
       - Weight Tracker Resource
@@ -462,7 +454,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -473,8 +465,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -590,7 +580,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/read/{date}/{id}:
+  /tracker/weight/read/{date}/{sequence}:
     get:
       tags:
       - Weight Tracker Resource
@@ -601,7 +591,7 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/LocalDate'
-      - name: id
+      - name: sequence
         in: path
         required: true
         schema:
@@ -645,8 +635,6 @@ paths:
           description: OK
           content:
             application/json: {}
-        "304":
-          description: Not Modified
         "404":
           description: Not Found
         "400":
@@ -803,7 +791,7 @@ components:
           nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
-        id:
+        sequence:
           format: int64
           type: integer
           nullable: true
@@ -854,7 +842,7 @@ components:
           nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
-        id:
+        sequence:
           format: int64
           type: integer
           nullable: true
@@ -971,7 +959,7 @@ components:
           nullable: true
         added:
           $ref: '#/components/schemas/LocalDate'
-        id:
+        sequence:
           format: int64
           type: integer
           nullable: true

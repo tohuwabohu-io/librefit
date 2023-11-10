@@ -66,7 +66,7 @@ class WeightTrackerResourceTest {
             body().`as`(WeightTrackerEntry::class.java)
         }
 
-        assert(createdEntry1.id != createdEntry2.id)
+        assert(createdEntry1.sequence != createdEntry2.sequence)
     }
 
     @Test
@@ -110,7 +110,7 @@ class WeightTrackerResourceTest {
         }
 
         val readEntry = When {
-            get("/read/${createdEntry.added}/${createdEntry.id}")
+            get("/read/${createdEntry.added}/${createdEntry.sequence}")
         } Then {
             statusCode(200)
         } Extract {
@@ -118,7 +118,7 @@ class WeightTrackerResourceTest {
         }
 
         assert(createdEntry.added == readEntry.added)
-        assert(createdEntry.id == readEntry.id)
+        assert(createdEntry.sequence == readEntry.sequence)
         assert(createdEntry.userId == readEntry.userId)
         assert(createdEntry.amount == readEntry.amount)
     }
@@ -156,14 +156,14 @@ class WeightTrackerResourceTest {
         }
 
         val readEntry = When {
-            get("/read/${created.added}/${created.id}")
+            get("/read/${created.added}/${created.sequence}")
         } Then {
             statusCode(200)
         } Extract {
             body().`as`(WeightTrackerEntry::class.java)
         }
 
-        assert(created.id == readEntry.id)
+        assert(created.sequence == readEntry.sequence)
         assert(entry.amount != readEntry.amount)
         assert(readEntry.updated != null)
     }
@@ -206,7 +206,7 @@ class WeightTrackerResourceTest {
         }
 
         When {
-            delete("/delete/${created.added}/${created.id}")
+            delete("/delete/${created.added}/${created.sequence}")
         } Then {
             statusCode(200)
         }
@@ -249,13 +249,13 @@ class WeightTrackerResourceTest {
         }
 
         When {
-            delete("/delete/${createdEntry.added}/${createdEntry.id}")
+            delete("/delete/${createdEntry.added}/${createdEntry.sequence}")
         } Then {
             statusCode(200)
         }
 
         When {
-            get("/read/${createdEntry.added}/${createdEntry.id}")
+            get("/read/${createdEntry.added}/${createdEntry.sequence}")
         } Then {
             statusCode(404)
         }
@@ -299,7 +299,7 @@ class WeightTrackerResourceTest {
         }
 
         assert(entries.size == 2)
-        assert(entries.map { it.id }.isNotEmpty())
+        assert(entries.map { it.sequence }.isNotEmpty())
     }
 
     @Test

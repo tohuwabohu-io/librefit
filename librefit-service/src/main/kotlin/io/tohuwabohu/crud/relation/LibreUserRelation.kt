@@ -17,7 +17,7 @@ import java.util.*
 class LibreUserCompositeKey(
     var userId: UUID? = null,
     var added: LocalDate = LocalDate.now(),
-    var id: Long = 0L
+    var sequence: Long = 0L
 ): Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -27,7 +27,7 @@ class LibreUserCompositeKey(
 
         if (userId != other.userId) return false
         if (added != other.added) return false
-        if (id != other.id) return false
+        if (sequence != other.sequence) return false
 
         return true
     }
@@ -35,12 +35,12 @@ class LibreUserCompositeKey(
     override fun hashCode(): Int {
         var result = userId.hashCode()
         result = 31 * result + added.hashCode()
-        result = 31 * result + id.hashCode()
+        result = 31 * result + sequence.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "LibreUserCompositeKey(userId=$userId, added=$added, id=$id)"
+        return "LibreUserCompositeKey(userId=$userId, added=$added, id=$sequence)"
     }
 }
 
@@ -57,12 +57,12 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
 
     @Id
     @Column(nullable = false)
-    var id: Long? = 1L
+    var sequence: Long? = 1L
 
     @JsonIgnore
     fun getPrimaryKey(): LibreUserCompositeKey {
         return LibreUserCompositeKey(
-            userId!!, added, id!!
+            userId!!, added, sequence!!
         )
     }
 }
@@ -82,14 +82,16 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     fun validateAndPersist(entity: Entity): Uni<Entity> {
         validate(entity)
 
-        return find("userId = ?1 and added = ?2 order by id desc, added, userId", entity.userId!!, entity.added).firstResult()
+        return find("userId = ?1 and added = ?2 order by sequence desc, added, userId", entity.userId!!, entity.added).firstResult()
             .onItem().transform { item ->
                 if (item != null) {
-                    entity.id = item.id?.plus(1L)
+                    entity.sequence = item.sequence?.plus(1L)
                 }
 
                 entity
-            }.call { e -> persist(e!!) }
+            }.call { e ->
+                persist(e!!)
+            }
 
     }
 
@@ -106,7 +108,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         val key = LibreUserCompositeKey(
             userId = userId,
             added = date,
-            id = id
+            sequence = id
         )
 
         return findById(key).onItem().ifNull().failWith(EntityNotFoundException())
@@ -121,11 +123,11 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     }
 
     @WithTransaction
-    fun deleteEntry(userId: UUID, date: LocalDate, id: Long): Uni<Boolean> {
+    fun deleteEntry(userId: UUID, date: LocalDate, sequence: Long): Uni<Boolean> {
         val key = LibreUserCompositeKey(
             userId = userId,
             added = date,
-            id = id
+            sequence = sequence
         )
 
         return findById(key).onItem().ifNull().failWith(EntityNotFoundException()).onItem()

@@ -16,7 +16,8 @@ import java.util.*
 @Entity
 @NamedQueries(
     NamedQuery(name = "CalorieTrackerEntry.listDates",
-        query = "from CalorieTrackerEntry where userId = ?1 group by added, userId, id order by added, userId, id")
+        query = "from CalorieTrackerEntry where userId = ?1 group by added, userId, sequence order by added, userId, sequence"
+    )
 )
 data class CalorieTrackerEntry (
     @Column(nullable = false)
@@ -43,7 +44,7 @@ data class CalorieTrackerEntry (
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(userId = $userId , amount = $amount , category = $category , updated = $updated , description = $description , added = $added , id = $id )"
+        return this::class.simpleName + "(userId = $userId , amount = $amount , category = $category , updated = $updated , description = $description , added = $added , id = $sequence )"
     }
 
     @PreUpdate

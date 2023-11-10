@@ -12,7 +12,7 @@ import java.util.*
 
 @Entity
 @NamedQueries(
-    NamedQuery(name = "WeightTrackerEntry.findLast", query = "from WeightTrackerEntry where userId = ?1 order by added desc, id desc, userId limit 1")
+    NamedQuery(name = "WeightTrackerEntry.findLast", query = "from WeightTrackerEntry where userId = ?1 order by added desc, sequence desc, userId limit 1")
 )
 data class WeightTrackerEntry (
     @field:Min(value = 0, message = "Your weight should not be less than zero.")
@@ -36,7 +36,7 @@ data class WeightTrackerEntry (
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(userId = $userId , amount = $amount , updated = $updated , added = $added , id = $id )"
+        return this::class.simpleName + "(userId = $userId , amount = $amount , updated = $updated , added = $added , id = $sequence )"
     }
 }
 

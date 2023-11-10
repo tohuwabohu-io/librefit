@@ -26,12 +26,10 @@
     }
 
     const dispatch = createEventDispatcher();
-    let sequence = 1;
     let entriesFiltered = [];
 
     const addWeight = (e) => {
         dispatch('addWeight', {
-            sequence: getLastSequence(),
             date: todayDateStr,
             value: e.detail.value
         });

@@ -58,7 +58,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
         printAuthenticationInfo(jwt, securityContext)
 
         return goalsRepository.validateAndPersist(goal)
-            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).entity(entry).build() }
+            .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{throwable -> createErrorResponse(throwable) }
     }
@@ -93,7 +93,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     }
 
     @GET
-    @Path("/read/{date}/{id:\\d+}")
+    @Path("/read/{date}/{sequence:\\d+}")
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [
@@ -113,14 +113,14 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Operation(
         operationId = "readGoal"
     )
-    fun read(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> =
-        goalsRepository.readEntry(UUID.fromString(jwt.name), date, id)
+    fun read(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> =
+        goalsRepository.readEntry(UUID.fromString(jwt.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 
     @DELETE
-    @Path("/delete/{date}/{id:\\d+}")
+    @Path("/delete/{date}/{sequence:\\d+}")
     @Consumes(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
@@ -135,13 +135,13 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Operation(
         operationId = "deleteGoal"
     )
-    fun delete(@Context securityContext: SecurityContext, date: LocalDate, id: Long): Uni<Response> {
-        Log.info("deleting goal with added=$date id=$id")
+    fun delete(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> {
+        Log.info("deleting goal with added=$date Ssequence=$sequence")
 
         printAuthenticationInfo(jwt, securityContext)
 
-        return goalsRepository.deleteEntry(UUID.fromString(jwt.name), date, id)
-            .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.notModified().build() }
+        return goalsRepository.deleteEntry(UUID.fromString(jwt.name), date, sequence)
+            .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
     }
