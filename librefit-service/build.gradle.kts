@@ -48,11 +48,11 @@ tasks.withType<Test> {
 }
 allOpen {
     annotation("javax.ws.rs.Path")
-    annotation("javax.enterprise.context.ApplicationScoped")
+    annotation("jakarta.enterprise.context.ApplicationScoped")
     annotation("io.quarkus.test.junit.QuarkusTest")
-    annotation("javax.persistence.Entity")
-    annotation("javax.persistence.IdClass")
-    annotation("javax.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.IdClass")
+    annotation("jakarta.persistence.MappedSuperclass")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
