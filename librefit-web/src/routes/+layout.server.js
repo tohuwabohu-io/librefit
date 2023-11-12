@@ -11,10 +11,12 @@ export async function load({ fetch, cookies }) {
 
 		const user = await proxyFetch(fetch, userApi, jwt);
 
-		return {
-			authenticated: true,
-			userData: await user.json()
-		};
+		if (user.ok) {
+			return {
+				authenticated: true,
+				userData: await user.json()
+			};
+		}
 	}
 
 	return {
