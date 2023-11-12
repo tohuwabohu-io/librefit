@@ -14,10 +14,10 @@
     const dispatch = createEventDispatcher();
 
     export const logout = (e) => {
+        drawerStore.close();
+
         goto('/logout');
         dispatch('logout');
-
-        drawerStore.close();
     }
 </script>
 
