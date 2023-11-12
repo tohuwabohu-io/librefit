@@ -43,7 +43,7 @@ export const addEntry = (e, callback, toastStore, route) => {
 export const updateEntry = (e, callback, toastStore, route) => {
 	/** @type {CalorieTrackerEntry} */
 	const entry = {
-		id: e.detail.sequence,
+		sequence: e.detail.sequence,
 		added: e.detail.date,
 		amount: e.detail.value,
 		category: e.detail.category

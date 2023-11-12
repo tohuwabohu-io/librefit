@@ -89,11 +89,12 @@ export const PUT = async ({ request, fetch, cookies }) => {
 			const readApi = api.readWeightTrackerEntry;
 			const updateApi = api.updateWeightTrackerEntry;
 
+			/** @type WeightTrackerEntry */
 			const weight = payload['weight'];
 
 			response = await proxyFetch(fetch, readApi, cookies.get('auth'), {
-				id: weight['id'],
-				date: weight['date']
+				sequence: weight.sequence,
+				date: weight.date
 			}).then(async (result) => {
 				/** @type {import('$lib/server/api/index.js').WeightTrackerEntry} */
 				const entry = await result.json();
@@ -129,7 +130,7 @@ export const DELETE = async ({ fetch, url, cookies }) => {
 
 	try {
 		response = await proxyFetch(fetch, deleteApi, cookies.get('auth'), {
-			id: url.searchParams.get('sequence'),
+			sequence: url.searchParams.get('sequence'),
 			date: url.searchParams.get('date')
 		});
 	} catch (e) {

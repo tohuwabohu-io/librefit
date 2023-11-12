@@ -11,7 +11,7 @@ export const add = (e, callback, toastStore, route) => {
 		method: 'POST',
 		body: JSON.stringify({
 			weight: {
-				id: e.detail.sequence,
+				sequence: e.detail.sequence,
 				added: e.detail.todayDateStr,
 				amount: e.detail.value
 			}
@@ -39,7 +39,7 @@ export const update = (e, callback, toastStore, route) => {
 		method: 'PUT',
 		body: JSON.stringify({
 			weight: {
-				id: e.detail.sequence,
+				sequence: e.detail.sequence,
 				date: e.detail.date,
 				amount: e.detail.value
 			}
