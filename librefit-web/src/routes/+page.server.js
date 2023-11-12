@@ -43,6 +43,8 @@ export const load = async ({ fetch, cookies }) => {
 		ctList.unshift(blankEntry);
 	}
 
+	// Return the resolved promises as values can change when the user interacts with the UI.
+	// There's no way to make this interactivity happen when using await...catch in the template.
 	return {
 		authenticated: true,
 		lastWeight: lastWeightResponse.ok ? await lastWeightResponse.json() : undefined,
