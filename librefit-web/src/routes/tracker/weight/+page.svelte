@@ -6,6 +6,7 @@
 	import {Chart, registerables} from 'chart.js';
 	import {handleApiError, showToastSuccess} from '$lib/toast.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
+	import {getContext} from 'svelte';
 
 	Chart.register(...registerables);
 
@@ -18,9 +19,11 @@
 
 	const today = new Date();
 
-	let lastEntry, entries;
+	let entries;
 	let chartData, chartOptions;
-	let currentGoal;
+
+	const currentGoal = getContext('currentGoal');
+	const lastEntry = getContext('lastWeight')
 
 	const loadEntriesFiltered = async () => {
 		await fetch(`/tracker/weight?filter=${filter}`, {
@@ -33,24 +36,26 @@
 	const paint = (entries) => {
 		const noNaN = entries.map(entry => entry.amount);
 
-		if (filter !== DataViews.Today) {
-			const chart = createWeightChart(filter, today, entries);
-			const dataset = createWeightChartDataset(chart.data);
+		if (noNaN.length > 0) {
+			if (filter !== DataViews.Today) {
+				const chart = createWeightChart(filter, today, entries);
+				const dataset = createWeightChartDataset(chart.data);
 
-			chartData = {
-				labels: chart.legend,
-				datasets: [dataset]
+				chartData = {
+					labels: chart.legend,
+					datasets: [dataset]
+				}
+			} else {
+				chartData = null;
 			}
-		} else {
-			chartData = null;
-		}
 
-		chartOptions = {
-			responsive: true,
-			scales: {
-				y: {
-					suggestedMin: Math.min(...noNaN) - 2.5,
-					suggestedMax: Math.max(...noNaN) + 2.5
+			chartOptions = {
+				responsive: true,
+				scales: {
+					y: {
+						suggestedMin: Math.min(...noNaN) - 2.5,
+						suggestedMax: Math.max(...noNaN) + 2.5
+					}
 				}
 			}
 		}
@@ -58,7 +63,6 @@
 
 	$: if (data && data.entries) {
 		entries = data.entries;
-		lastEntry = data.lastEntry;
 
 		paint(data.entries);
 	}
@@ -81,8 +85,6 @@
 				method: 'GET'
 			}).then(async (response) => {
 				paint(await response.json());
-
-				showToastSuccess(toastStore, 'Update successful.');
 			}).catch(e => handleApiError(toastStore, e))
 		} else {
 			throw Error(result.status)
@@ -104,7 +106,7 @@
 					'Content-Type': 'application/json'
 				}
 			}).then(async (response) => {
-				currentGoal = response.json();
+				currentGoal.set(response.json());
 			}).catch(e => handleApiError(toastStore, e));
 		} else {
 			fetch('/tracker/weight', {
@@ -112,7 +114,7 @@
 				body: JSON.stringify({
 					goal: goal
 				})
-			}).then(async (response) => currentGoal = await response.json())
+			}).then(async (response) => currentGoal.set(await response.json()))
 			.catch(e => handleApiError(toastStore, e))
 		}
 	}
@@ -137,18 +139,14 @@
 				<Line data={chartData} options={chartOptions} />
 			{/if}
 
-			{#if entries}
-				<WeightTracker bind:entries={entries}
-							   bind:lastEntry={lastEntry}
-							   bind:goal={data.goal}
-							   on:addWeight={add}
-							   on:updateWeight={update}
-							   on:deleteWeight={remove}
-							   on:updateGoal={updateGoal}
-				/>
-			{:else}
-				<p>Loading...</p>
-			{/if}
+			<WeightTracker {entries}
+						   bind:lastEntry={$lastEntry}
+						   bind:goal={$currentGoal}
+						   on:addWeight={add}
+						   on:updateWeight={update}
+						   on:deleteWeight={remove}
+						   on:updateGoal={updateGoal}
+			/>
 		</div>
 	</div>
 </section>

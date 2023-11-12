@@ -17,13 +17,7 @@ export const load = async ({ fetch, cookies }) => {
 
 	const today = new Date();
 
-	// return dashboard relevant data
-	const lastWeightApi = api.findLastWeightTrackerEntry;
-	const goalApi = api.findLastGoal;
 	const ctTodayApi = api.listCalorieTrackerEntriesForDate;
-
-	const lastWeightResponse = await proxyFetch(fetch, lastWeightApi, jwt);
-	const lastGoalResponse = await proxyFetch(fetch, goalApi, jwt);
 	const lastCtResponse = await proxyFetch(fetch, ctTodayApi, jwt, { date: getDateAsStr(today) });
 
 	/** @type Array<CalorieTrackerEntry> */
@@ -43,12 +37,8 @@ export const load = async ({ fetch, cookies }) => {
 		ctList.unshift(blankEntry);
 	}
 
-	// Return the resolved promises as values can change when the user interacts with the UI.
-	// There's no way to make this interactivity happen when using await...catch in the template.
 	return {
 		authenticated: true,
-		lastWeight: lastWeightResponse.ok ? await lastWeightResponse.json() : undefined,
-		lastGoal: lastGoalResponse.ok ? await lastGoalResponse.json() : undefined,
-		lastCt: ctList.length > 0 ? ctList : lastCtResponse
+		lastCt: ctList
 	};
 };

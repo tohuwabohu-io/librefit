@@ -5,26 +5,28 @@
 	import {getToastStore} from '@skeletonlabs/skeleton';
 	import * as ct_crud from '$lib/api/calories-rest.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
-	import {getContext} from 'svelte';
+	import {getContext, setContext} from 'svelte';
+	import { writable } from 'svelte/store';
 
 	export let data;
 
 	let calorieTrackerEntries;
-	let weightTrackerEntry;
-	let goal;
+
+	const weightTrackerEntry = writable();
+	const goal = writable();
 
 	$: calorieTrackerEntries;
-	$: weightTrackerEntry
-	$: goal;
+	$: weightTrackerEntry.set(data.lastWeight);
+	$: goal.set(data.goal);
+
+	setContext('lastWeight', weightTrackerEntry);
+	setContext('goal', goal);
 
 	$: if (data) {
 		calorieTrackerEntries = data.lastCt;
-		weightTrackerEntry = data.lastWeight;
-		goal = data.lastGoal;
 	}
 
 	const user = getContext('user');
-	$: user;
 
 	const toastStore = getToastStore();
 
@@ -73,7 +75,7 @@
 
 			const result = response.json();
 
-			weightTrackerEntry = (await result)[0];
+			weightTrackerEntry.set((await result)[0]);
 
 			if (response.ok) {
 				return result;
@@ -102,7 +104,7 @@
 				/>
 			</div>
 			<div class="variant-ghost-surface rounded-xl p-4">
-				<WeightTracker entries={[]} lastEntry={weightTrackerEntry} {goal}
+				<WeightTracker entries={[]} lastEntry={$weightTrackerEntry} goal={$goal}
 					on:addWeight={addWeight}
 					on:updateWeight={updateWeight}
 					on:updateGoal={setGoal}

@@ -12,7 +12,7 @@
     /** @type {WeightTrackerEntry} */
     export let lastEntry;
 
-    /** @type {Goal} */
+    /** @type Goal */
     export let goal;
 
     const modalStore = getModalStore();

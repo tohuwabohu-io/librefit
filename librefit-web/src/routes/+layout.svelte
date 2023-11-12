@@ -29,9 +29,16 @@
 	export let data;
 
 	const user = writable();
+	const lastWeightTrackerEntry = writable();
+	const currentGoal = writable();
+
 	$: user.set(data.userData);
+	$: lastWeightTrackerEntry.set(data.lastWeight);
+	$: currentGoal.set(data.currentGoal);
 
 	setContext('user', user);
+	setContext('lastWeight', lastWeightTrackerEntry);
+	setContext('currentGoal', currentGoal);
 
 	const logout = () => {
 		user.set(undefined);
