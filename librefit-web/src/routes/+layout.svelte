@@ -42,7 +42,6 @@
 
 	const logout = () => {
 		user.set(undefined);
-		data.authenticated = false;
 	}
 </script>
 
