@@ -146,11 +146,9 @@ class UserResource(val userRepository: LibreUserRepository) {
 
         printAuthenticationInfo(jwt, securityContext)
 
-        libreUser.id = UUID.fromString(jwt.name)
-
-        return userRepository.updateUser(libreUser)
-            .onItem().transform { updated ->
-                updated.password = ""
+        return userRepository.updateUser(libreUser, jwt)
+            .onItem().ifNotNull().transform { updated ->
+                updated!!.password = ""
                 Response.ok(updated).build()
             }
             .onFailure().invoke { e -> Log.error(e) }

@@ -5,6 +5,7 @@ import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
+import io.quarkus.security.UnauthorizedException
 import io.quarkus.security.jpa.Password
 import io.quarkus.security.jpa.Roles
 import io.quarkus.security.jpa.UserDefinition
@@ -17,6 +18,7 @@ import jakarta.inject.Inject
 import jakarta.persistence.*
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotEmpty
+import org.eclipse.microprofile.jwt.JsonWebToken
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
 import java.util.*
@@ -99,23 +101,23 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
             }
         }).onItem().ifNull().failWith(EntityNotFoundException())
 
+    /**
+     * Update 2 fields only: avatar, name
+     */
     @WithTransaction
-    fun updateUser(libreUser: LibreUser): Uni<LibreUser> {
-        return Panache.getSession()
-            .call { s -> s.find(LibreUser::class.java, libreUser.id)
-                .onItem().ifNull().failWith(EntityNotFoundException())
-                .replaceWith(findByEmailAndPassword(libreUser.email, libreUser.password))
-                .onItem().ifNull().failWith(ValidationError(listOf("Invalid password.")))
-                .onItem().ifNotNull().invoke(Unchecked.consumer { user ->
-                    val violations = validator.validate(libreUser)
+    fun updateUser(libreUser: LibreUser, jwt: JsonWebToken): Uni<LibreUser?> {
+        return findByEmailAndPassword(libreUser.email, libreUser.password).map (Unchecked.function { user ->
 
-                    if (violations.isNotEmpty()) {
-                        throw ValidationError(violations.map { violation -> violation.message })
-                    }
+            if (user!!.id != UUID.fromString(jwt.name)) {
+                throw UnauthorizedException()
+            }
 
-                    // preserve password on update
-                    libreUser.password = user!!.password
-                })}
-            .chain{ s -> s.merge(libreUser)}
+            user
+        }).call{ user ->
+            user!!.avatar = libreUser.avatar
+            user.name = libreUser.name
+
+            Panache.getSession().call { s -> s.merge(user)}
+        }
     }
 }
