@@ -104,7 +104,7 @@
 				/>
 			</div>
 			<div class="variant-ghost-surface rounded-xl p-4">
-				<WeightTracker entries={[]} lastEntry={$weightTrackerEntry} goal={$goal}
+				<WeightTracker
 					on:addWeight={addWeight}
 					on:updateWeight={updateWeight}
 					on:updateGoal={setGoal}

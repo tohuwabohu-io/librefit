@@ -2,31 +2,17 @@
     import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
     import {convertDateStrToDisplayDateStr, getDateAsStr, parseStringAsDate} from '$lib/util.js';
-    import {createEventDispatcher, onMount} from 'svelte';
+    import {createEventDispatcher, getContext, onMount} from 'svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
-    import * as dateUtil from 'date-fns';
 
-    /** @type {Array<WeightTrackerEntry>} */
-    export let entries;
-
-    /** @type {WeightTrackerEntry} */
-    export let lastEntry;
-
-    /** @type Goal */
-    export let goal;
+    const currentGoal = getContext('currentGoal');
+    const lastEntry = getContext('lastWeight')
 
     const modalStore = getModalStore();
 
-    const today = new Date();
     const todayDateStr = getDateAsStr(new Date());
 
-    let dateFilterRange = {
-        from: getDateAsStr(dateUtil.sub(today, { months: 1})),
-        to: getDateAsStr(today)
-    }
-
     const dispatch = createEventDispatcher();
-    let entriesFiltered = [];
 
     const addWeight = (e) => {
         dispatch('addWeight', {
@@ -89,45 +75,32 @@
             }
         });
     }
-
-    const filterEntries = (e) => {
-        entriesFiltered = entries.filter((entry) => {
-            const addedDate = parseStringAsDate(entry.added);
-            const fromDate = parseStringAsDate(dateFilterRange.from);
-            const toDate = parseStringAsDate(dateFilterRange.to);
-
-            return toDate >= addedDate <= fromDate;
-        })
-    }
-
-    onMount(async () => filterEntries())
-
 </script>
 
 <div class="flex flex-col grow gap-4">
     <div class="flex flex-col gap-4 justify-between">
         <div class="flex flex-col gap-4 text-center items-center">
-            {#if !lastEntry}
+            {#if $lastEntry}
+                <Scale width={100} height={100} />
+
+                <p>
+                    Current weight: {$lastEntry.amount}kg ({convertDateStrToDisplayDateStr($lastEntry.added)})
+                </p>
+            {:else}
                 <NoScale width={100} height={100} />
 
                 <p>
                     Nothing tracked yet. Today is a good day to start!
                 </p>
-            {:else}
-                <Scale width={100} height={100} />
-
-                <p>
-                    Current weight: {lastEntry.amount}kg ({convertDateStrToDisplayDateStr(lastEntry.added)})
-                </p>
             {/if}
 
-            {#if !goal}
+            {#if $currentGoal}
                 <p>
-                    No goal set up.
+                    Goal: {$currentGoal.endAmount}kg @ ({convertDateStrToDisplayDateStr($currentGoal.endDate)})
                 </p>
             {:else}
                 <p>
-                    Goal: {goal.endAmount}kg @ ({convertDateStrToDisplayDateStr(goal.endDate)})
+                    No goal set up.
                 </p>
             {/if}
 
