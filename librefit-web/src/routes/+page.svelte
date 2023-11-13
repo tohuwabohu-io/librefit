@@ -69,7 +69,7 @@
 
 	const loadWeightTracker = async (update) => {
 		if (update.status === 200 || update.status === 201) {
-			const response = await fetch(`/?type=weight&filter=${DataViews.Today}`, {
+			const response = await fetch(`/?type=weight`, {
 				method: 'GET'
 			});
 

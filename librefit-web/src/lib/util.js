@@ -7,7 +7,6 @@ import { Category } from '$lib/api/model.js';
  * @enum {string}
  */
 export const DataViews = {
-	Today: 'TODAY',
 	Week: 'WEEK',
 	Month: 'MONTH',
 	Year: 'YEAR'

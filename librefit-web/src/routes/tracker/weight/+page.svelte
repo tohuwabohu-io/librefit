@@ -37,16 +37,12 @@
 		const noNaN = entries.map(entry => entry.amount);
 
 		if (noNaN.length > 0) {
-			if (filter !== DataViews.Today) {
-				const chart = createWeightChart(filter, today, entries);
-				const dataset = createWeightChartDataset(chart.data);
+			const chart = createWeightChart(filter, today, entries);
+			const dataset = createWeightChartDataset(chart.data);
 
-				chartData = {
-					labels: chart.legend,
-					datasets: [dataset]
-				}
-			} else {
-				chartData = null;
+			chartData = {
+				labels: chart.legend,
+				datasets: [dataset]
 			}
 
 			chartOptions = {
@@ -138,15 +134,6 @@
 			{#if chartData}
 				<Line data={chartData} options={chartOptions} />
 			{/if}
-
-			<WeightTracker {entries}
-						   bind:lastEntry={$lastEntry}
-						   bind:goal={$currentGoal}
-						   on:addWeight={add}
-						   on:updateWeight={update}
-						   on:deleteWeight={remove}
-						   on:updateGoal={updateGoal}
-			/>
 		</div>
 	</div>
 </section>
