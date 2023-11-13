@@ -1,4 +1,4 @@
-import { handleApiError, showToastSuccess } from '$lib/toast.js';
+import { showToastError, showToastSuccess } from '$lib/toast.js';
 
 /**
  * @param e
@@ -25,7 +25,7 @@ export const add = (e, callback, toastStore, route) => {
 
 			showToastSuccess(toastStore, 'Successfully added weight.');
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
 
 /**
@@ -50,7 +50,7 @@ export const update = (e, callback, toastStore, route) => {
 
 			showToastSuccess(toastStore, 'Successfully updated weight.');
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
 
 /**
@@ -77,5 +77,5 @@ export const remove = (e, callback, toastStore, route, params) => {
 
 			showToastSuccess(toastStore, 'Successfully removed weight.');
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };

@@ -2,7 +2,7 @@
  * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
  * @param {String} err
  */
-export const handleApiError = (toastStore, err) => {
+export const showToastError = (toastStore, err) => {
 	console.error(err);
 
 	toastStore.trigger({

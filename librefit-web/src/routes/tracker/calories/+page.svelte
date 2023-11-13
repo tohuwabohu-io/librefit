@@ -1,7 +1,7 @@
 <script>
 	import {Accordion, AccordionItem, getToastStore} from '@skeletonlabs/skeleton';
 	import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util.js';
-	import {handleApiError, showToastSuccess} from '$lib/toast.js';
+	import {showToastError, showToastSuccess} from '$lib/toast.js';
 	import TrackerRadial from '$lib/components/TrackerRadial.svelte';
 	import TrackerInput from '$lib/components/TrackerInput.svelte';
 	import {Category} from '$lib/api/model.js';

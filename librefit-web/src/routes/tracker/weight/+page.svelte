@@ -4,7 +4,7 @@
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
-	import {handleApiError, showToastSuccess} from '$lib/toast.js';
+	import {showToastError, showToastSuccess} from '$lib/toast.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
 	import {getContext} from 'svelte';
 
@@ -85,7 +85,7 @@
 				method: 'GET'
 			}).then(async (response) => {
 				paint(await response.json());
-			}).catch(e => handleApiError(toastStore, e))
+			}).catch(e => showToastError(toastStore, e))
 		} else {
 			throw Error(result.status)
 		}
@@ -107,7 +107,7 @@
 				}
 			}).then(async (response) => {
 				currentGoal.set(response.json());
-			}).catch(e => handleApiError(toastStore, e));
+			}).catch(e => showToastError(toastStore, e));
 		} else {
 			fetch('/tracker/weight', {
 				method: 'PUT',
@@ -115,7 +115,7 @@
 					goal: goal
 				})
 			}).then(async (response) => currentGoal.set(await response.json()))
-			.catch(e => handleApiError(toastStore, e))
+			.catch(e => showToastError(toastStore, e))
 		}
 	}
 </script>

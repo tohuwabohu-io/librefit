@@ -1,4 +1,4 @@
-import { handleApiError, showToastSuccess } from '$lib/toast.js';
+import { showToastError, showToastSuccess } from '$lib/toast.js';
 import { Category } from '$lib/api/model.js';
 import { categoriesAsKeyValue, getCategoryValueAsKey } from '$lib/util.js';
 
@@ -31,7 +31,7 @@ export const addEntry = (e, callback, toastStore, route) => {
 				}.`
 			);
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
 
 /**
@@ -62,7 +62,7 @@ export const updateEntry = (e, callback, toastStore, route) => {
 				}`
 			);
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
 
 /**
@@ -92,5 +92,5 @@ export const deleteEntry = (e, callback, toastStore, route, params) => {
 				throw Error(response.status);
 			}
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
