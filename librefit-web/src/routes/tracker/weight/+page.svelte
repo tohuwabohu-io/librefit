@@ -1,12 +1,12 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
 	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util.js';
-	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
 	import {showToastError, showToastSuccess} from '$lib/toast.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
 	import {getContext} from 'svelte';
+	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
 
 	Chart.register(...registerables);
 
@@ -54,6 +54,9 @@
 					}
 				}
 			}
+		} else {
+			chartData = undefined;
+			chartOptions = undefined;
 		}
 	}
 
@@ -125,14 +128,24 @@
 		<div class="flex flex-col gap-4">
 			<RadioGroup>
 				{#each enumKeys(DataViews) as dataView}
-					<RadioItem bind:group={filter} name="justify" value={DataViews[dataView]} on:change={loadEntriesFiltered}
-					>{dataView}</RadioItem
-					>
+					<RadioItem bind:group={filter}
+							   name="justify"
+							   value={DataViews[dataView]}
+							   on:change={loadEntriesFiltered}>
+						{dataView}
+					</RadioItem>
 				{/each}
 			</RadioGroup>
 
-			{#if chartData}
+			{#if chartData }
 				<Line data={chartData} options={chartOptions} />
+			{:else}
+				<div class="flex flex-col items-center text-center gap-4">
+					<NoScale width={100} height={100}/>
+					<p>
+						Insufficient data for to render your history.
+					</p>
+				</div>
 			{/if}
 		</div>
 	</div>
