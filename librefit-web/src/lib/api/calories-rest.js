@@ -20,8 +20,9 @@ export const addEntry = (e, callback, toastStore, route) => {
 		method: 'POST',
 		body: JSON.stringify(newEntry)
 	})
-		.then((_) => {
-			callback(newEntry.added);
+		.then(async (_) => {
+			await callback(newEntry.added);
+
 			showToastSuccess(
 				toastStore,
 				`Successfully added ${
@@ -53,8 +54,8 @@ export const updateEntry = (e, callback, toastStore, route) => {
 		method: 'PUT',
 		body: JSON.stringify(entry)
 	})
-		.then((_) => {
-			callback(entry.added);
+		.then(async (_) => {
+			await callback(entry.added);
 			showToastSuccess(
 				toastStore,
 				`Successfully updated ${
@@ -84,10 +85,11 @@ export const deleteEntry = (e, callback, toastStore, route, params) => {
 	fetch(query, {
 		method: 'DELETE'
 	})
-		.then((response) => {
+		.then(async (response) => {
 			if (response.status === 200) {
+				await callback(e.detail.date);
+
 				showToastSuccess(toastStore, 'Deletion successful.');
-				callback(e.detail.date);
 			} else {
 				throw Error(response.status);
 			}

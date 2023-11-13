@@ -20,8 +20,8 @@ export const add = (e, callback, toastStore, route) => {
 			'Content-Type': 'application/json'
 		}
 	})
-		.then((response) => {
-			callback(response);
+		.then(async (response) => {
+			await callback(response);
 
 			showToastSuccess(toastStore, 'Successfully added weight.');
 		})
@@ -45,8 +45,8 @@ export const update = (e, callback, toastStore, route) => {
 			}
 		})
 	})
-		.then((response) => {
-			callback(response);
+		.then(async (response) => {
+			await callback(response);
 
 			showToastSuccess(toastStore, 'Successfully updated weight.');
 		})
@@ -72,8 +72,8 @@ export const remove = (e, callback, toastStore, route, params) => {
 	fetch(query, {
 		method: 'DELETE'
 	})
-		.then((response) => {
-			callback(response);
+		.then(async (response) => {
+			await callback(response);
 
 			showToastSuccess(toastStore, 'Successfully removed weight.');
 		})
