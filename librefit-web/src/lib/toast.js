@@ -23,3 +23,15 @@ export const showToastSuccess = (toastStore, toastMessage) => {
 		autohide: true
 	});
 };
+
+/**
+ * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
+ * @param {String} toastMessage
+ */
+export const showToastInfo = (toastStore, toastMessage) => {
+	toastStore.trigger({
+		message: toastMessage,
+		background: 'variant-filled-tertiary',
+		autohide: true
+	});
+};
