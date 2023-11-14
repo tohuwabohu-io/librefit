@@ -15,7 +15,7 @@
 
 <AppBar shadow="drop-shadow">
 	<svelte:fragment slot="lead">
-		<a href="/" class="font-logo text-2xl">
+		<a href="/dashboard" class="font-logo text-2xl">
 			<span class="text-primary-500"> Libre </span>
 			<span class="text-secondary-500"> Fit </span>
 		</a>

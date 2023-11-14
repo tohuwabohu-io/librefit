@@ -2,18 +2,12 @@ import { api } from '$lib/server/api/index.js';
 import { proxyFetch } from '$lib/server/api/util.js';
 import { getDateAsStr } from '$lib/util.js';
 import { Category } from '$lib/api/model.js';
+import { redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ fetch, cookies }) => {
 	/** @type String | undefined */
 	const jwt = cookies.get('auth');
-
-	// show default main page
-	if (!jwt || jwt === 'undefined') {
-		return {
-			authenticated: false
-		};
-	}
 
 	const today = new Date();
 

@@ -2,7 +2,10 @@ import { redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ fetch, cookies }) => {
-	cookies.delete('auth');
+	/** @type String | undefined */
+	const jwt = cookies.get('auth');
 
-	throw redirect(303, '/');
+	if (jwt) {
+		throw redirect(303, '/dashboard');
+	}
 };

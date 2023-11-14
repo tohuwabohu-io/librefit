@@ -4,6 +4,7 @@
     import {getContext} from 'svelte';
     import {Avatar, getModalStore, getToastStore} from '@skeletonlabs/skeleton';
     import { showToastError, showToastSuccess, showToastInfo} from '$lib/toast.js';
+    import {goto} from '$app/navigation';
 
     const user = getContext('user');
     $: user;
@@ -43,6 +44,7 @@
 
 </script>
 
+{#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-8">
         <h1>Profile</h1>
@@ -119,3 +121,4 @@
         </form>
     </div>
 </section>
+{/if}

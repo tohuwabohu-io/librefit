@@ -73,9 +73,9 @@
 				method: 'GET'
 			});
 
-			const result = response.json();
+			const result = await response.json();
 
-			weightTrackerEntry.set((await result)[0]);
+			weightTrackerEntry.set(result[0]);
 
 			if (response.ok) {
 				return result;
@@ -83,6 +83,7 @@
 				throw Error(await result);
 			}
 		} else {
+			console.log(update);
 			throw Error(update.status)
 		}
 	}
@@ -90,25 +91,28 @@
 
 <section>
 	<div class="container mx-auto p-8 space-y-8">
+		{#if $user}
+			<h1>Good {getDaytimeGreeting(new Date())}, {$user.name}!</h1>
+			<h2>This is your daily summary.</h2>
 
-		<h1>Good {getDaytimeGreeting(new Date())}, {$user.name}!</h1>
-		<h2>This is your daily summary.</h2>
+			<div class="flex flex-row gap-8">
+				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4">
+					<CalorieTracker entries={calorieTrackerEntries} categories={categoriesAsKeyValue}
+									on:addCalories={addCalories}
+									on:updateCalories={updateCalories}
+									on:deleteCalories={deleteCalories}
+					/>
+				</div>
+				<div class="variant-ghost-surface rounded-xl p-4">
+					<WeightTracker
+							on:addWeight={addWeight}
+							on:updateWeight={updateWeight}
+							on:updateGoal={setGoal}
+					/>
+				</div>
+			</div>
+		{/if}
 
-		<div class="flex flex-row gap-8">
-			<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4">
-				<CalorieTracker entries={calorieTrackerEntries} categories={categoriesAsKeyValue}
-					on:addCalories={addCalories}
-					on:updateCalories={updateCalories}
-					on:deleteCalories={deleteCalories}
-				/>
-			</div>
-			<div class="variant-ghost-surface rounded-xl p-4">
-				<WeightTracker
-					on:addWeight={addWeight}
-					on:updateWeight={updateWeight}
-					on:updateGoal={setGoal}
-				/>
-			</div>
-		</div>
+
 	</div>
 </section>

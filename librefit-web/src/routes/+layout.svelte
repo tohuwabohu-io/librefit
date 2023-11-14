@@ -9,6 +9,7 @@
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
+	import {afterNavigate, goto, invalidateAll, onNavigate} from '$app/navigation';
 
 	initializeStores();
 
@@ -41,7 +42,7 @@
 	setContext('currentGoal', currentGoal);
 
 	const logout = () => {
-		user.set(undefined);
+		user.set(null);
 	}
 </script>
 
