@@ -1,5 +1,6 @@
 import { api } from '$lib/server/api/index.js';
 import { proxyFetch } from '$lib/server/api/util.js';
+import { fail } from '@sveltejs/kit';
 
 /**
  * @type {import('@sveltejs/kit').RequestHandler}
@@ -9,14 +10,5 @@ export async function POST({ request, fetch }) {
 	const tdeeApi = api.calculateTdee;
 
 	/** @type {Response} */
-	let response;
-
-	try {
-		response = await proxyFetch(fetch, tdeeApi, undefined, tdee);
-	} catch (e) {
-		console.log(e);
-		response = new Response();
-	}
-
-	return response;
+	return await proxyFetch(fetch, tdeeApi, undefined, tdee);
 }

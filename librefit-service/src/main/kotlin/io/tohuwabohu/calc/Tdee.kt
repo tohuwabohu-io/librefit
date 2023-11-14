@@ -31,7 +31,7 @@ data class Tdee(
 
     val tdee = round(activityLevel.toFloat() * bmr)
 
-    val deficit = weeklyDifference.toFloat() * 7000 / 7
+    val deficit = weeklyDifference.toFloat() / 10 * 7000 / 7
 
     val target: Float = when (calculationGoal) {
         CalculationGoal.GAIN -> {

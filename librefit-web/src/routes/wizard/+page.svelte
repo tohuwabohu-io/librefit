@@ -1,15 +1,13 @@
 <script>
-	import { RadioGroup, RadioItem, RangeSlider, Step, Stepper } from '@skeletonlabs/skeleton';
+	import {RadioGroup, RadioItem, RangeSlider, Step, Stepper} from '@skeletonlabs/skeleton';
 	import {CalculationGoal, CalculationSex} from '$lib/api/model.js';
 
-	/** @type Tdee} */
+	/** @type Tdee */
 	let calculationResult;
 
 	let calculationError;
 
-	let step = 1;
-
-	/** @type Tdee} */
+	/** @type Tdee */
 	const exampleTdee = {
 		age: 30,
 		height: 160,
@@ -48,8 +46,12 @@
 				'Content-Type': 'application/json'
 			}
 		}).then(async (response) => {
-			calculationResult = await response.json()
-		}).catch((_ => calculationError = true));
+			if (response.ok) {
+				calculationResult = await response.json()
+			} else {
+				calculationError = true;
+			}
+		}).catch(console.error);
 	}
 </script>
 
@@ -239,6 +241,12 @@
 			<p>
 				Based on your input, your basic metabolic rate is {calculationResult.bmr}kcal. Your daily calorie
 				consumption to hold your weight should be around {calculationResult.tdee}kcal.
+			</p>
+			<p>
+				Deficit: {calculationResult.deficit}
+			</p>
+			<p>
+				Target: {calculationResult.target}
 			</p>
 		{:else}
 			<p>
