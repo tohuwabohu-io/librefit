@@ -3,7 +3,7 @@
 	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util.js';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
-	import {showToastError, showToastSuccess} from '$lib/toast.js';
+	import {showToastError} from '$lib/toast.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
 	import {getContext} from 'svelte';
 	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
