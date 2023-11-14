@@ -6,36 +6,48 @@ import { DataViews, getDateAsStr } from '$lib/util.js';
  * @type {import('@sveltejs/kit').RequestHandler}
  */
 export const GET = async ({ fetch, url, cookies }) => {
-	const listApi = api.listWeightTrackerEntriesRange;
+	const operation = url.searchParams.get('operation');
 
 	/** @type {Response} */
 	let response = new Response();
 
-	const fromDate = new Date();
-	const toDate = new Date();
-	const filter = url.searchParams.get('filter');
+	if (operation !== 'last') {
+		const listApi = api.listWeightTrackerEntriesRange;
 
-	switch (filter) {
-		case DataViews.Week:
-			fromDate.setDate(fromDate.getDate() - 7);
-			break;
-		case DataViews.Month:
-			fromDate.setMonth(fromDate.getMonth() - 1);
-			break;
-		case DataViews.Year:
-			fromDate.setFullYear(fromDate.getFullYear() - 1);
-			break;
-		default:
-			break;
-	}
+		const fromDate = new Date();
+		const toDate = new Date();
+		const filter = url.searchParams.get('filter');
 
-	try {
-		response = await proxyFetch(fetch, listApi, cookies.get('auth'), {
-			dateFrom: getDateAsStr(fromDate),
-			dateTo: getDateAsStr(toDate)
-		});
-	} catch (e) {
-		console.error(e);
+		switch (filter) {
+			case DataViews.Week:
+				fromDate.setDate(fromDate.getDate() - 7);
+				break;
+			case DataViews.Month:
+				fromDate.setMonth(fromDate.getMonth() - 1);
+				break;
+			case DataViews.Year:
+				fromDate.setFullYear(fromDate.getFullYear() - 1);
+				break;
+			default:
+				break;
+		}
+
+		try {
+			response = await proxyFetch(fetch, listApi, cookies.get('auth'), {
+				dateFrom: getDateAsStr(fromDate),
+				dateTo: getDateAsStr(toDate)
+			});
+		} catch (e) {
+			console.error(e);
+		}
+	} else {
+		try {
+			const lastApi = api.findLastWeightTrackerEntry;
+
+			response = await proxyFetch(fetch, lastApi, cookies.get('auth'));
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	return response;

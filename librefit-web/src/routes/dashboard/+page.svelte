@@ -11,22 +11,14 @@
 	export let data;
 
 	let calorieTrackerEntries;
-
-	const weightTrackerEntry = writable();
-	const goal = writable();
-
 	$: calorieTrackerEntries;
-	$: weightTrackerEntry.set(data.lastWeight);
-	$: goal.set(data.goal);
-
-	setContext('lastWeight', weightTrackerEntry);
-	setContext('goal', goal);
 
 	$: if (data) {
 		calorieTrackerEntries = data.lastCt;
 	}
 
 	const user = getContext('user');
+	const weightTrackerEntry = getContext('lastWeight');
 
 	const toastStore = getToastStore();
 
@@ -69,13 +61,12 @@
 
 	const loadWeightTracker = async (update) => {
 		if (update.status === 200 || update.status === 201) {
-			const response = await fetch(`/dashboard?type=weight`, {
+			const response = await fetch(`/dashboard?type=weight&operation=last`, {
 				method: 'GET'
 			});
 
 			const result = await response.json();
-
-			weightTrackerEntry.set(result[0]);
+			weightTrackerEntry.set(result);
 
 			if (response.ok) {
 				return result;
