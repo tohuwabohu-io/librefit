@@ -9,6 +9,7 @@
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
+	import {afterNavigate, goto, invalidateAll, onNavigate} from '$app/navigation';
 
 	initializeStores();
 
@@ -29,12 +30,19 @@
 	export let data;
 
 	const user = writable();
+	const lastWeightTrackerEntry = writable();
+	const currentGoal = writable();
+
 	$: user.set(data.userData);
+	$: lastWeightTrackerEntry.set(data.lastWeight);
+	$: currentGoal.set(data.currentGoal);
 
 	setContext('user', user);
+	setContext('lastWeight', lastWeightTrackerEntry);
+	setContext('currentGoal', currentGoal);
 
 	const logout = () => {
-		user.set(undefined);
+		user.set(null);
 	}
 </script>
 

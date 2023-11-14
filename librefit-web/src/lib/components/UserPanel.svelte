@@ -14,13 +14,14 @@
     const dispatch = createEventDispatcher();
 
     export const logout = (e) => {
-        goto('/logout');
-        dispatch('logout');
-
         drawerStore.close();
+        goto('/logout')
+
+        dispatch('logout');
     }
 </script>
 
+{#if $user}
 <div class="container mx-auto p-8 space-y-10">
     <div class="flex flex-row gap-6">
         <span>
@@ -39,7 +40,7 @@
     <nav class="list-nav">
         <ul>
             <li>
-                <a href="/" class="{classesActive('/')}" on:click={() => drawerStore.close()}>
+                <a href="/dashboard" class="{classesActive('/dashboard')}" on:click={() => drawerStore.close()}>
                     Dashboard
                 </a>
             </li>
@@ -73,3 +74,4 @@
 
     <button data-sveltekit-reload class="btn variant-filled-secondary" on:click|preventDefault={logout}>Log out</button>
 </div>
+{/if}

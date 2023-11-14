@@ -1,11 +1,12 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
 	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util.js';
-	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
-	import {handleApiError, showToastSuccess} from '$lib/toast.js';
+	import {showToastError, showToastSuccess} from '$lib/toast.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
+	import {getContext} from 'svelte';
+	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
 
 	Chart.register(...registerables);
 
@@ -18,9 +19,11 @@
 
 	const today = new Date();
 
-	let lastEntry, entries;
+	let entries;
 	let chartData, chartOptions;
-	let currentGoal;
+
+	const currentGoal = getContext('currentGoal');
+	const lastEntry = getContext('lastWeight')
 
 	const loadEntriesFiltered = async () => {
 		await fetch(`/tracker/weight?filter=${filter}`, {
@@ -33,7 +36,7 @@
 	const paint = (entries) => {
 		const noNaN = entries.map(entry => entry.amount);
 
-		if (filter !== DataViews.Today) {
+		if (noNaN.length > 0) {
 			const chart = createWeightChart(filter, today, entries);
 			const dataset = createWeightChartDataset(chart.data);
 
@@ -41,24 +44,24 @@
 				labels: chart.legend,
 				datasets: [dataset]
 			}
-		} else {
-			chartData = null;
-		}
 
-		chartOptions = {
-			responsive: true,
-			scales: {
-				y: {
-					suggestedMin: Math.min(...noNaN) - 2.5,
-					suggestedMax: Math.max(...noNaN) + 2.5
+			chartOptions = {
+				responsive: true,
+				scales: {
+					y: {
+						suggestedMin: Math.min(...noNaN) - 2.5,
+						suggestedMax: Math.max(...noNaN) + 2.5
+					}
 				}
 			}
+		} else {
+			chartData = undefined;
+			chartOptions = undefined;
 		}
 	}
 
 	$: if (data && data.entries) {
 		entries = data.entries;
-		lastEntry = data.lastEntry;
 
 		paint(data.entries);
 	}
@@ -81,9 +84,7 @@
 				method: 'GET'
 			}).then(async (response) => {
 				paint(await response.json());
-
-				showToastSuccess(toastStore, 'Update successful.');
-			}).catch(e => handleApiError(toastStore, e))
+			}).catch(e => showToastError(toastStore, e))
 		} else {
 			throw Error(result.status)
 		}
@@ -104,16 +105,16 @@
 					'Content-Type': 'application/json'
 				}
 			}).then(async (response) => {
-				currentGoal = response.json();
-			}).catch(e => handleApiError(toastStore, e));
+				currentGoal.set(response.json());
+			}).catch(e => showToastError(toastStore, e));
 		} else {
 			fetch('/tracker/weight', {
 				method: 'PUT',
 				body: JSON.stringify({
 					goal: goal
 				})
-			}).then(async (response) => currentGoal = await response.json())
-			.catch(e => handleApiError(toastStore, e))
+			}).then(async (response) => currentGoal.set(await response.json()))
+			.catch(e => showToastError(toastStore, e))
 		}
 	}
 </script>
@@ -127,27 +128,24 @@
 		<div class="flex flex-col gap-4">
 			<RadioGroup>
 				{#each enumKeys(DataViews) as dataView}
-					<RadioItem bind:group={filter} name="justify" value={DataViews[dataView]} on:change={loadEntriesFiltered}
-					>{dataView}</RadioItem
-					>
+					<RadioItem bind:group={filter}
+							   name="justify"
+							   value={DataViews[dataView]}
+							   on:change={loadEntriesFiltered}>
+						{dataView}
+					</RadioItem>
 				{/each}
 			</RadioGroup>
 
-			{#if chartData}
+			{#if chartData }
 				<Line data={chartData} options={chartOptions} />
-			{/if}
-
-			{#if entries}
-				<WeightTracker bind:entries={entries}
-							   bind:lastEntry={lastEntry}
-							   bind:goal={data.goal}
-							   on:addWeight={add}
-							   on:updateWeight={update}
-							   on:deleteWeight={remove}
-							   on:updateGoal={updateGoal}
-				/>
 			{:else}
-				<p>Loading...</p>
+				<div class="flex flex-col items-center text-center gap-4">
+					<NoScale width={100} height={100}/>
+					<p>
+						Insufficient data for to render your history.
+					</p>
+				</div>
 			{/if}
 		</div>
 	</div>

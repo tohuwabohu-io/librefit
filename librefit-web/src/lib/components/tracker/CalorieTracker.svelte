@@ -40,7 +40,7 @@
         <TrackerInput {categories}
                       value={entry.amount}
                       dateStr={entry.added}
-                      id={entry.sequence}
+                      sequence={entry.sequence}
                       category={entry.category}
                       on:add={addCalories}
                       on:update={updateCalories}

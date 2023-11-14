@@ -159,7 +159,7 @@ class UserResourceTest {
         ]
     )
     @Order(8)
-    fun `should fail on updating user data` () {
+    fun `should fail on updating user data with other user email` () {
         val user = user()
         user.avatar = "/path"
 
@@ -169,7 +169,7 @@ class UserResourceTest {
         } When {
             post("/update")
         } Then {
-            statusCode(404)
+            statusCode(401)
         }
     }
 

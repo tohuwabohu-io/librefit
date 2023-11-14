@@ -1,4 +1,4 @@
-import { handleApiError, showToastSuccess } from '$lib/toast.js';
+import { showToastError, showToastSuccess } from '$lib/toast.js';
 
 /**
  * @param e
@@ -11,7 +11,7 @@ export const add = (e, callback, toastStore, route) => {
 		method: 'POST',
 		body: JSON.stringify({
 			weight: {
-				id: e.detail.sequence,
+				sequence: e.detail.sequence,
 				added: e.detail.todayDateStr,
 				amount: e.detail.value
 			}
@@ -20,12 +20,12 @@ export const add = (e, callback, toastStore, route) => {
 			'Content-Type': 'application/json'
 		}
 	})
-		.then((response) => {
-			callback(response);
+		.then(async (response) => {
+			await callback(response);
 
 			showToastSuccess(toastStore, 'Successfully added weight.');
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
 
 /**
@@ -39,18 +39,18 @@ export const update = (e, callback, toastStore, route) => {
 		method: 'PUT',
 		body: JSON.stringify({
 			weight: {
-				id: e.detail.sequence,
+				sequence: e.detail.sequence,
 				date: e.detail.date,
 				amount: e.detail.value
 			}
 		})
 	})
-		.then((response) => {
-			callback(response);
+		.then(async (response) => {
+			await callback(response);
 
 			showToastSuccess(toastStore, 'Successfully updated weight.');
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
 
 /**
@@ -72,10 +72,10 @@ export const remove = (e, callback, toastStore, route, params) => {
 	fetch(query, {
 		method: 'DELETE'
 	})
-		.then((response) => {
-			callback(response);
+		.then(async (response) => {
+			await callback(response);
 
 			showToastSuccess(toastStore, 'Successfully removed weight.');
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };

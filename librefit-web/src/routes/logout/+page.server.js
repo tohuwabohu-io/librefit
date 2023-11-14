@@ -4,5 +4,5 @@ import { redirect } from '@sveltejs/kit';
 export const load = async ({ fetch, cookies }) => {
 	cookies.delete('auth');
 
-	throw redirect(302, '/');
+	throw redirect(303, '/');
 };

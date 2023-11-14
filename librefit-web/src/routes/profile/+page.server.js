@@ -1,6 +1,6 @@
 import { api } from '$lib/server/api/index.js';
 import { convertFormDataToJson, proxyFetch } from '$lib/server/api/util.js';
-import { validateFields, validatePassword, validatePasswordConfirmation } from '$lib/validation.js';
+import { fail } from '@sveltejs/kit';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -18,17 +18,6 @@ export const actions = {
 			avatar: userData.avatar
 		};
 
-		const pwdError = validatePassword(userData.currentPassword);
-		const pwdConfirmationError = null;
-
-		/*const pwdError = validatePassword(userData.password);
-		const pwdConfirmationError = validatePasswordConfirmation(
-			userData.password,
-			userData.passwordConfirmation
-		);*/
-
-		console.log(user);
-
 		let result;
 
 		const response = await proxyFetch(event.fetch, userApi, event.cookies.get('auth'), user);
@@ -40,14 +29,14 @@ export const actions = {
 				success: true
 			};
 		} else if (response.status === 400) {
-			console.log(await response.json());
+			return fail(400, 'An error occurred. Please check your input.');
+		} else if (response.status === 404) {
+			return fail(404, 'The password provided did not match.');
 		} else {
-			result = {
-				error: 'An error occurred. Please try again later.'
-			};
+			return fail(500, 'An error occurred. Please try again later.');
 		}
 
-		console.log(`register returning value=${JSON.stringify(result)}`);
+		console.log(`profile returning value=${JSON.stringify(result)}`);
 
 		return result;
 	}

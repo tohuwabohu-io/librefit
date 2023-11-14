@@ -1,4 +1,4 @@
-import { handleApiError, showToastSuccess } from '$lib/toast.js';
+import { showToastError, showToastSuccess } from '$lib/toast.js';
 import { Category } from '$lib/api/model.js';
 import { categoriesAsKeyValue, getCategoryValueAsKey } from '$lib/util.js';
 
@@ -20,8 +20,9 @@ export const addEntry = (e, callback, toastStore, route) => {
 		method: 'POST',
 		body: JSON.stringify(newEntry)
 	})
-		.then((_) => {
-			callback(newEntry.added);
+		.then(async (_) => {
+			await callback(newEntry.added);
+
 			showToastSuccess(
 				toastStore,
 				`Successfully added ${
@@ -31,7 +32,7 @@ export const addEntry = (e, callback, toastStore, route) => {
 				}.`
 			);
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
 
 /**
@@ -43,7 +44,7 @@ export const addEntry = (e, callback, toastStore, route) => {
 export const updateEntry = (e, callback, toastStore, route) => {
 	/** @type {CalorieTrackerEntry} */
 	const entry = {
-		id: e.detail.sequence,
+		sequence: e.detail.sequence,
 		added: e.detail.date,
 		amount: e.detail.value,
 		category: e.detail.category
@@ -53,8 +54,8 @@ export const updateEntry = (e, callback, toastStore, route) => {
 		method: 'PUT',
 		body: JSON.stringify(entry)
 	})
-		.then((_) => {
-			callback(entry.added);
+		.then(async (_) => {
+			await callback(entry.added);
 			showToastSuccess(
 				toastStore,
 				`Successfully updated ${
@@ -62,7 +63,7 @@ export const updateEntry = (e, callback, toastStore, route) => {
 				}`
 			);
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };
 
 /**
@@ -84,13 +85,14 @@ export const deleteEntry = (e, callback, toastStore, route, params) => {
 	fetch(query, {
 		method: 'DELETE'
 	})
-		.then((response) => {
+		.then(async (response) => {
 			if (response.status === 200) {
+				await callback(e.detail.date);
+
 				showToastSuccess(toastStore, 'Deletion successful.');
-				callback(e.detail.date);
 			} else {
 				throw Error(response.status);
 			}
 		})
-		.catch((e) => handleApiError(toastStore, e));
+		.catch((e) => showToastError(toastStore, e));
 };

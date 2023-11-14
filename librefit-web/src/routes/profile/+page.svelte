@@ -2,19 +2,19 @@
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import { enhance } from '$app/forms';
     import {getContext} from 'svelte';
-    import {validatePassword, validatePasswordConfirmation} from '$lib/validation.js';
-    import {Avatar, getModalStore} from '@skeletonlabs/skeleton';
+    import {Avatar, getModalStore, getToastStore} from '@skeletonlabs/skeleton';
+    import { showToastError, showToastSuccess, showToastInfo} from '$lib/toast.js';
+    import {goto} from '$app/navigation';
 
     const user = getContext('user');
     $: user;
 
     const modalStore = getModalStore();
+    const toastStore = getToastStore();
 
     /** @type {import('./$types/').ActionData} */
     export let form;
 
-    let pwdInput;
-    let avatarInput;
     let selectedAvatar = $user.avatar;
 
     const showAvatarPickerModal = () => {
@@ -30,17 +30,35 @@
             }
         });
     }
+    const handleResult = (result) => {
+        if (result.type === 'failure') {
+            showToastError(toastStore, result.data);
+        } else if (result.type === 'success') {
+            showToastSuccess(toastStore, 'Successfully updated profile.')
+        }
+    }
+
+    const showNoChange = () => {
+        showToastInfo(toastStore, 'There are no changes to be applied.')
+    }
 
 </script>
 
+{#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-8">
         <h1>Profile</h1>
         <h2>Change your user settings.</h2>
 
-        <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" use:enhance={() => {
-			return async ({ update }) => {
-			  update({ reset: false });
+        <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" use:enhance={({formData, cancel}) => {
+            if (formData.get('avatar') === $user.avatar && formData.get('username') === $user.name) {
+                cancel();
+                showNoChange();
+            }
+
+			return async ({ result, update }) => {
+                handleResult(result)
+			    update({ reset: false });
 			};
 		  }}>
 
@@ -73,7 +91,7 @@
                         <button on:click|preventDefault={showAvatarPickerModal}
                                 class="btn variant-filled-secondary">Change</button>
                     </div>
-                    <input bind:this={avatarInput} bind:value={selectedAvatar} name="avatar" type="text" style="visibility:hidden"/>
+                    <input bind:value={selectedAvatar} name="avatar" type="text" style="visibility:hidden"/>
                 </div>
 
             </div>
@@ -84,7 +102,6 @@
                         type="password"
                         placeholder="Enter Password"
                         label="Current Password"
-                        bind:this={pwdInput}
                         required
                 />
             {:else}
@@ -93,7 +110,6 @@
                         type="password"
                         placeholder="Enter Password"
                         label="Current password"
-                        bind:this={pwdInput}
                         required
                         errorMessage={form.errors['password']}
                 />
@@ -105,3 +121,4 @@
         </form>
     </div>
 </section>
+{/if}

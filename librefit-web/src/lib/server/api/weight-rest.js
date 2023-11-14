@@ -6,36 +6,48 @@ import { DataViews, getDateAsStr } from '$lib/util.js';
  * @type {import('@sveltejs/kit').RequestHandler}
  */
 export const GET = async ({ fetch, url, cookies }) => {
-	const listApi = api.listWeightTrackerEntriesRange;
+	const operation = url.searchParams.get('operation');
 
 	/** @type {Response} */
 	let response = new Response();
 
-	const fromDate = new Date();
-	const toDate = new Date();
-	const filter = url.searchParams.get('filter');
+	if (operation !== 'last') {
+		const listApi = api.listWeightTrackerEntriesRange;
 
-	switch (filter) {
-		case DataViews.Week:
-			fromDate.setDate(fromDate.getDate() - 7);
-			break;
-		case DataViews.Month:
-			fromDate.setMonth(fromDate.getMonth() - 1);
-			break;
-		case DataViews.Year:
-			fromDate.setFullYear(fromDate.getFullYear() - 1);
-			break;
-		default:
-			break;
-	}
+		const fromDate = new Date();
+		const toDate = new Date();
+		const filter = url.searchParams.get('filter');
 
-	try {
-		response = await proxyFetch(fetch, listApi, cookies.get('auth'), {
-			dateFrom: getDateAsStr(fromDate),
-			dateTo: getDateAsStr(toDate)
-		});
-	} catch (e) {
-		console.error(e);
+		switch (filter) {
+			case DataViews.Week:
+				fromDate.setDate(fromDate.getDate() - 7);
+				break;
+			case DataViews.Month:
+				fromDate.setMonth(fromDate.getMonth() - 1);
+				break;
+			case DataViews.Year:
+				fromDate.setFullYear(fromDate.getFullYear() - 1);
+				break;
+			default:
+				break;
+		}
+
+		try {
+			response = await proxyFetch(fetch, listApi, cookies.get('auth'), {
+				dateFrom: getDateAsStr(fromDate),
+				dateTo: getDateAsStr(toDate)
+			});
+		} catch (e) {
+			console.error(e);
+		}
+	} else {
+		try {
+			const lastApi = api.findLastWeightTrackerEntry;
+
+			response = await proxyFetch(fetch, lastApi, cookies.get('auth'));
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	return response;
@@ -89,11 +101,12 @@ export const PUT = async ({ request, fetch, cookies }) => {
 			const readApi = api.readWeightTrackerEntry;
 			const updateApi = api.updateWeightTrackerEntry;
 
+			/** @type WeightTrackerEntry */
 			const weight = payload['weight'];
 
 			response = await proxyFetch(fetch, readApi, cookies.get('auth'), {
-				id: weight['id'],
-				date: weight['date']
+				sequence: weight.sequence,
+				date: weight.date
 			}).then(async (result) => {
 				/** @type {import('$lib/server/api/index.js').WeightTrackerEntry} */
 				const entry = await result.json();
@@ -129,7 +142,7 @@ export const DELETE = async ({ fetch, url, cookies }) => {
 
 	try {
 		response = await proxyFetch(fetch, deleteApi, cookies.get('auth'), {
-			id: url.searchParams.get('sequence'),
+			sequence: url.searchParams.get('sequence'),
 			date: url.searchParams.get('date')
 		});
 	} catch (e) {

@@ -68,7 +68,7 @@ export const PUT = async ({ request, fetch, cookies }) => {
 
 	try {
 		response = await proxyFetch(fetch, api.readCalorieTrackerEntry, cookies.get('auth'), {
-			id: payload.id,
+			sequence: payload.sequence,
 			date: payload.added
 		}).then(async (result) => {
 			/** @type {CalorieTrackerEntry} */
@@ -94,7 +94,7 @@ export const DELETE = async ({ fetch, url, cookies }) => {
 
 	try {
 		response = await proxyFetch(fetch, api.deleteCalorieTrackerEntry, cookies.get('auth'), {
-			id: url.searchParams.get('sequence'),
+			sequence: url.searchParams.get('sequence'),
 			date: url.searchParams.get('added')
 		});
 	} catch (e) {
