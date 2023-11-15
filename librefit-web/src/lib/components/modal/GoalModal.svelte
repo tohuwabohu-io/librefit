@@ -13,25 +13,22 @@
         endDate: getDateAsStr(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())),
         startDate: getDateAsStr(today),
         startAmount: 0,
-        endAmount: 0,
-        sequence: 1
+        endAmount: 0
     }
-
-    let startDateInput, endDateInput, startAmountInput, endAmountInput;
 
     const onSubmit = () => {
         if ($modalStore[0].response) {
             $modalStore[0].response({
-                detail: {
-                    goal: goal
-                }
+                goal: goal
             });
         }
     }
 
     const onCancel = () => {
         if ($modalStore[0].response) {
-            $modalStore[0].response(undefined);
+            $modalStore[0].response({
+                cancelled: true
+            });
         }
     }
 </script>
@@ -49,7 +46,6 @@
                     label="Begin"
                     required
                     bind:value={goal.startDate}
-                    bind:this={startDateInput}
             />
 
             <ValidatedInput
@@ -58,7 +54,6 @@
                     label="Starting weight"
                     required
                     bind:value={goal.startAmount}
-                    bind:this={startAmountInput}
             />
 
             <ValidatedInput
@@ -67,7 +62,6 @@
                     label="End"
                     required
                     bind:value={goal.endDate}
-                    bind:this={endDateInput}
             />
 
             <ValidatedInput
@@ -76,7 +70,6 @@
                     label="Target weight"
                     required
                     bind:value={goal.endAmount}
-                    bind:this={endAmountInput}
             />
         </form>
     </div>

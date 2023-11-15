@@ -37,10 +37,8 @@
     }
 
     const updateGoal = (e) => {
-        console.log(e);
-
         dispatch('updateGoal', {
-            goal: e.detail.goal
+            goal: e
         })
     }
     
@@ -67,7 +65,7 @@
             type: 'component',
             component: 'goalModal',
             response: (e) => {
-                if (e) {
+                if (!e.cancelled) {
                     updateGoal(e)
                 }
 
