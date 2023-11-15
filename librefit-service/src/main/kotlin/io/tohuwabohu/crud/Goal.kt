@@ -20,13 +20,23 @@ data class Goal(
     @field:NotNull(message = "The initial amount of your goal must not be empty.")
     @field:Min(value = 0, message = "The initial amount of your goal must not be less than zero.")
     var startAmount: Float,
+
     @field:NotNull(message = "The target amount of your goal must not be empty.")
     @field:Min(value = 0, message = "The target amount of your goal must not be less than zero.")
     var endAmount: Float,
+
     @field:NotNull(message = "The starting date of your goal must not be empty.")
     var startDate: LocalDate,
+
     @field:NotNull(message = "The end date of your goal must not be empty.")
     var endDate: LocalDate,
+
+    @field:Min(value = 0, message = "The target calorie amount must not be less than zero.")
+    var targetCalories: Float,
+
+    @field:Min(value = 0, message = "The maximum calorie amount must not be less than zero.")
+    var maximumCalories: Float,
+
     var updated: LocalDateTime? = null
 ) : LibreUserWeakEntity() {
 
