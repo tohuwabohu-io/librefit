@@ -70,6 +70,8 @@ export const Category = {
  * @property {Number} endAmount
  * @property {LocalDate} startDate
  * @property {LocalDate} endDate
+ * @property {Number} [targetCalories]
+ * @property {Number} [maximumCalories]
  * @property {String} [updated]
  */
 

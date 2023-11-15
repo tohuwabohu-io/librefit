@@ -1254,6 +1254,14 @@
           "endDate" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
+          "targetCalories" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "maximumCalories" : {
+            "format" : "float",
+            "type" : "number"
+          },
           "updated" : {
             "type" : "string",
             "allOf" : [ {
