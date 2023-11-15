@@ -63,15 +63,15 @@ export const POST = async ({ request, fetch, cookies }) => {
 	let response = new Response();
 
 	try {
-		if (payload['weight']) {
+		if (payload.weight) {
 			response = await proxyFetch(
 				fetch,
 				api.createWeightTrackerEntry,
 				cookies.get('auth'),
-				payload['weight']
+				payload.weight
 			);
-		} else if (payload['goal']) {
-			response = await proxyFetch(fetch, api.createGoal, cookies.get('auth'), payload['weight']);
+		} else if (payload.goal) {
+			response = await proxyFetch(fetch, api.createGoal, cookies.get('auth'), payload.goal);
 		} else {
 			console.error(`weight api can't be called with payload ${JSON.stringify(payload)}`);
 
