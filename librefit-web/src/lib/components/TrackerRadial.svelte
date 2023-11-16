@@ -2,8 +2,9 @@
 	import {getContext} from 'svelte';
 
 	const currentGoal = getContext('currentGoal');
-	export let limit = $currentGoal ? $currentGoal.targetCalories : 0,
-		maximum = $currentGoal ? $currentGoal.maximumCalories : 0,
+
+	export let limit = $currentGoal && $currentGoal.targetCalories ? $currentGoal.targetCalories : 0,
+		maximum = $currentGoal && $currentGoal.maximumCalories ? $currentGoal.maximumCalories : 0,
 		total = 0;
 	export let width = 512,
 		height = 512;
