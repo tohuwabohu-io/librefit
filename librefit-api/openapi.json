@@ -1155,6 +1155,10 @@
           }
         }
       },
+      "BmiCategory" : {
+        "enum" : [ "UNDERWEIGHT", "STANDARD_WEIGHT", "OVERWEIGHT", "OBESE", "SEVERELY_OBESE" ],
+        "type" : "string"
+      },
       "CalculationGoal" : {
         "enum" : [ "GAIN", "LOSS" ],
         "type" : "string"
@@ -1331,7 +1335,7 @@
         "example" : "2022-03-10T12:15:50"
       },
       "Tdee" : {
-        "required" : [ "age", "sex", "weight", "height", "activityLevel", "weeklyDifference", "calculationGoal" ],
+        "required" : [ "age", "sex", "weight", "height", "activityLevel", "weeklyDifference", "calculationGoal", "bmiCategory", "targetBmi" ],
         "type" : "object",
         "properties" : {
           "age" : {
@@ -1370,6 +1374,20 @@
           "target" : {
             "format" : "float",
             "type" : "number"
+          },
+          "bmi" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "bmiCategory" : {
+            "$ref" : "#/components/schemas/BmiCategory"
+          },
+          "targetBmi" : {
+            "type" : "array",
+            "items" : {
+              "format" : "int32",
+              "type" : "integer"
+            }
           }
         }
       },

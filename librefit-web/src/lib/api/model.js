@@ -2,6 +2,18 @@
  * @readonly
  * @enum {String}
  */
+export const BmiCategory = {
+	Underweight: 'UNDERWEIGHT',
+	Standard_weight: 'STANDARD_WEIGHT',
+	Overweight: 'OVERWEIGHT',
+	Obese: 'OBESE',
+	Severely_obese: 'SEVERELY_OBESE'
+}
+
+/**
+ * @readonly
+ * @enum {String}
+ */
 export const CalculationGoal = {
 	Gain: 'GAIN',
 	Loss: 'LOSS'
@@ -100,6 +112,9 @@ export const Category = {
  * @property {Number} [tdee]
  * @property {Number} [deficit]
  * @property {Number} [target]
+ * @property {Number} [bmi]
+ * @property {BmiCategory} bmiCategory
+ * @property {Array<Number>} targetBmi
  */
 
 /**

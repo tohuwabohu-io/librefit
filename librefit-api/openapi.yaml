@@ -767,6 +767,14 @@ components:
       properties:
         token:
           type: string
+    BmiCategory:
+      enum:
+      - UNDERWEIGHT
+      - STANDARD_WEIGHT
+      - OVERWEIGHT
+      - OBESE
+      - SEVERELY_OBESE
+      type: string
     CalculationGoal:
       enum:
       - GAIN
@@ -925,6 +933,8 @@ components:
       - activityLevel
       - weeklyDifference
       - calculationGoal
+      - bmiCategory
+      - targetBmi
       type: object
       properties:
         age:
@@ -953,6 +963,16 @@ components:
         target:
           format: float
           type: number
+        bmi:
+          format: float
+          type: number
+        bmiCategory:
+          $ref: '#/components/schemas/BmiCategory'
+        targetBmi:
+          type: array
+          items:
+            format: int32
+            type: integer
     UUID:
       format: uuid
       pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
