@@ -94,7 +94,7 @@
 
             {#if $currentGoal}
                 <p>
-                    Goal: {$currentGoal.endAmount}kg @ ({convertDateStrToDisplayDateStr($currentGoal.endDate)})
+                    Goal: {$currentGoal.targetWeight}kg @ ({convertDateStrToDisplayDateStr($currentGoal.endDate)})
                 </p>
             {:else}
                 <p>
