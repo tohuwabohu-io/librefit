@@ -12,8 +12,8 @@
         added: getDateAsStr(today),
         endDate: getDateAsStr(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())),
         startDate: getDateAsStr(today),
-        startAmount: 0,
-        endAmount: 0
+        initialWeight: 0,
+        targetWeight: 0
     }
 
     const onSubmit = () => {
@@ -49,11 +49,11 @@
             />
 
             <ValidatedInput
-                    name="startAmount"
+                    name="initialWeight"
                     type="number"
                     label="Starting weight"
                     required
-                    bind:value={goal.startAmount}
+                    bind:value={goal.initialWeight}
             />
 
             <ValidatedInput
@@ -65,11 +65,11 @@
             />
 
             <ValidatedInput
-                    name="endAmount"
+                    name="targetWeight"
                     type="number"
                     label="Target weight"
                     required
-                    bind:value={goal.endAmount}
+                    bind:value={goal.targetWeight}
             />
         </form>
     </div>

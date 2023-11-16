@@ -829,8 +829,8 @@ components:
     Goal:
       required:
       - added
-      - startAmount
-      - endAmount
+      - initialWeight
+      - targetWeight
       - startDate
       - endDate
       type: object
@@ -846,11 +846,11 @@ components:
           format: int64
           type: integer
           nullable: true
-        startAmount:
+        initialWeight:
           format: float
           minimum: 0
           type: number
-        endAmount:
+        targetWeight:
           format: float
           minimum: 0
           type: number
@@ -860,10 +860,14 @@ components:
           $ref: '#/components/schemas/LocalDate'
         targetCalories:
           format: float
+          minimum: 0
           type: number
+          nullable: true
         maximumCalories:
           format: float
+          minimum: 0
           type: number
+          nullable: true
         updated:
           type: string
           allOf:

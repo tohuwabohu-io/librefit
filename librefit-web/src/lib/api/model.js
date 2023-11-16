@@ -66,8 +66,8 @@ export const Category = {
  * @property {String} [userId]
  * @property {LocalDate} added
  * @property {Number} [sequence]
- * @property {Number} startAmount
- * @property {Number} endAmount
+ * @property {Number} initialWeight
+ * @property {Number} targetWeight
  * @property {LocalDate} startDate
  * @property {LocalDate} endDate
  * @property {Number} [targetCalories]

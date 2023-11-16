@@ -1220,7 +1220,7 @@
         }
       },
       "Goal" : {
-        "required" : [ "added", "startAmount", "endAmount", "startDate", "endDate" ],
+        "required" : [ "added", "initialWeight", "targetWeight", "startDate", "endDate" ],
         "type" : "object",
         "properties" : {
           "userId" : {
@@ -1238,12 +1238,12 @@
             "type" : "integer",
             "nullable" : true
           },
-          "startAmount" : {
+          "initialWeight" : {
             "format" : "float",
             "minimum" : 0,
             "type" : "number"
           },
-          "endAmount" : {
+          "targetWeight" : {
             "format" : "float",
             "minimum" : 0,
             "type" : "number"
@@ -1256,11 +1256,15 @@
           },
           "targetCalories" : {
             "format" : "float",
-            "type" : "number"
+            "minimum" : 0,
+            "type" : "number",
+            "nullable" : true
           },
           "maximumCalories" : {
             "format" : "float",
-            "type" : "number"
+            "minimum" : 0,
+            "type" : "number",
+            "nullable" : true
           },
           "updated" : {
             "type" : "string",
