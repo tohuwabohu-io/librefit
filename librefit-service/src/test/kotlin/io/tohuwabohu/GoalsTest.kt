@@ -361,7 +361,9 @@ class GoalsTest {
             startDate = LocalDate.now(),
             endDate = LocalDate.now().plusYears(1),
             startAmount = 95.3f,
-            endAmount = 75.4f
+            endAmount = 75.4f,
+            targetCalories = 1921f,
+            maximumCalories = 2200f
         )
 
         goal.userId = userId
