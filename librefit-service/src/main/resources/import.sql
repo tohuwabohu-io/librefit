@@ -289,5 +289,5 @@ values ('2023-03-01', 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97),
        ('2023-03-30', 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 93),
        ('2023-03-31', 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 93);
 
-insert into goal (user_id, added, sequence, start_date, end_date, start_amount, end_amount )
-    values ('b21291e5-db51-4a52-a997-25f4021c0ac6', '2023-02-01', 1, '2023-02-01', '2024-02-01', 104, 77);
+insert into goal (user_id, added, sequence, start_date, end_date, start_amount, end_amount, target_calories, maximum_calories )
+    values ('b21291e5-db51-4a52-a997-25f4021c0ac6', '2023-02-01', 1, '2023-02-01', '2024-02-01', 104, 77, 1849, 2398);
