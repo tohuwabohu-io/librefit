@@ -13,7 +13,9 @@
         endDate: getDateAsStr(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())),
         startDate: getDateAsStr(today),
         initialWeight: 0,
-        targetWeight: 0
+        targetWeight: 0,
+        targetCalories: 0,
+        maximumCalories: 0
     }
 
     const onSubmit = () => {
@@ -53,6 +55,7 @@
                     type="number"
                     label="Starting weight"
                     required
+                    unit="kg"
                     bind:value={goal.initialWeight}
             />
 
@@ -69,7 +72,24 @@
                     type="number"
                     label="Target weight"
                     required
+                    unit="kg"
                     bind:value={goal.targetWeight}
+            />
+
+            <ValidatedInput
+                    name="targetCalories"
+                    type="number"
+                    label="Target intake"
+                    unit="kcal"
+                    bind:value={goal.targetCalories}
+            />
+
+            <ValidatedInput
+                    name="maximumCalories"
+                    type="number"
+                    label="Maximum intake"
+                    unit="kcal"
+                    bind:value={goal.maximumCalories}
             />
         </form>
     </div>
