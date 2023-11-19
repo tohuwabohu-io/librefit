@@ -115,6 +115,8 @@ export const Category = {
  * @property {Number} [bmi]
  * @property {BmiCategory} bmiCategory
  * @property {Array<Number>} targetBmi
+ * @property {Number} [targetWeight]
+ * @property {Number} [durationDays]
  */
 
 /**

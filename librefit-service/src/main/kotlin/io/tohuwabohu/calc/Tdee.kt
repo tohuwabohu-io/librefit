@@ -40,7 +40,7 @@ data class Tdee(
         }
     }
 
-    val bmi: Float = round(weight.toFloat() / ((height.toFloat() / 10).pow(2)))
+    val bmi: Float = round(weight.toFloat() / ((height.toFloat() / 100).pow(2)))
 
     val bmiCategory: BmiCategory  = when (sex) {
         CalculationSex.FEMALE -> {
@@ -71,6 +71,18 @@ data class Tdee(
         in 45..54 -> arrayOf(22,27)
         in 55..64 -> arrayOf(23,28)
         else -> arrayOf(24,29)
+    }
+
+    val targetWeight = round(((targetBmi[0] + targetBmi[1]).toFloat() / 2) * (height.toFloat() / 100).pow(2))
+
+    val durationDays = when (calculationGoal) {
+        CalculationGoal.GAIN -> {
+            (targetWeight - weight.toFloat()) * 7000 / deficit
+        }
+
+        CalculationGoal.LOSS -> {
+            (weight.toFloat() - targetWeight) * 7000 / deficit
+        }
     }
 }
 

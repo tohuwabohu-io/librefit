@@ -1388,6 +1388,14 @@
               "format" : "int32",
               "type" : "integer"
             }
+          },
+          "targetWeight" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "durationDays" : {
+            "format" : "float",
+            "type" : "number"
           }
         }
       },
