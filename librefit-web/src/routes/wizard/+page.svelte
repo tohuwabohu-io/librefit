@@ -5,9 +5,13 @@
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
 	import {bmiCategoriesAsKeyValue, getDateAsStr} from '$lib/util.js';
 	import * as dateUtil from 'date-fns';
+	import {getContext} from 'svelte';
 
 	const modalStore = getModalStore();
 	const toastStore = getToastStore();
+
+	const lastWeightEntry = getContext('lastWeight');
+	const currentGoal = getContext('currentGoal');
 
 	/** @type Tdee */
 	let calculationResult = null;
@@ -61,6 +65,7 @@
 			response: async (e) => {
 				if (!e.cancelled) {
 					await createGoal(e.goal);
+					await createWeightTrackerEntry(e.goal)
 				}
 
 				modalStore.close();
@@ -71,17 +76,43 @@
 	const createGoal = async (goal) => {
 		await fetch('/wizard', {
 			method: 'POST',
-			body: JSON.stringify({goal: goal}),
+			body: JSON.stringify({
+				goal: goal
+			}),
 			headers: {
 				'Content-Type': 'application/json'
 			}
 		}).then(async response => {
 			if (response.ok) {
 				showToastSuccess(toastStore, 'Successfully created goal.');
+
+				currentGoal.set(await response.json());
 			} else {
 				throw Error()
 			}
 		}).catch((error) => showToastError(toastStore, error))
+	}
+
+	const createWeightTrackerEntry = async (goal) => {
+		await fetch('/wizard', {
+			method: 'POST',
+			body: JSON.stringify({
+				/** @type WeightTrackerEntry */
+				weight: {
+					added: getDateAsStr(today),
+					amount: goal.initialWeight
+				}}
+			),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}).then(async response => {
+			if (response.ok) {
+				lastWeightEntry.set(await response.json());
+			}
+
+			// fail silently
+		}).catch(_ => {})
 	}
 </script>
 

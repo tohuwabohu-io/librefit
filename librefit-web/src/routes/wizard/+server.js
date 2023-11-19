@@ -18,7 +18,7 @@ export async function POST({ request, fetch, cookies }) {
 
 		/** @type {Response} */
 		response = await proxyFetch(fetch, tdeeApi, undefined, payload.tdee);
-	} else if (peeked.goal) {
+	} else if (peeked.goal || peeked.weight) {
 		response = weight_crud.POST({ request, fetch, cookies });
 	} else {
 		console.error(`wizard api can't be called with payload ${JSON.stringify(peeked)}`);
