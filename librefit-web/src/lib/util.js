@@ -1,6 +1,6 @@
 import * as dateUtil from 'date-fns';
 import * as dateLocales from 'date-fns/locale/index.js';
-import { Category } from '$lib/api/model.js';
+import { BmiCategory, Category } from '$lib/api/model.js';
 
 /**
  * @readonly
@@ -218,6 +218,16 @@ export const categoriesAsKeyValue = Object.keys(Category).map((key) => {
 	return {
 		label: key,
 		value: Category[key]
+	};
+});
+
+/**
+ * @type {{label: String, value: String}[]}
+ */
+export const bmiCategoriesAsKeyValue = Object.keys(BmiCategory).map((key) => {
+	return {
+		label: key.replace('_', ' '),
+		value: BmiCategory[key]
 	};
 });
 
