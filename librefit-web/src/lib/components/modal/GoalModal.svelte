@@ -18,6 +18,10 @@
         maximumCalories: 0
     }
 
+    if ($modalStore[0] && $modalStore[0].meta) {
+        goal = $modalStore[0].meta.goal;
+    }
+
     const onSubmit = () => {
         if ($modalStore[0].response) {
             $modalStore[0].response({
