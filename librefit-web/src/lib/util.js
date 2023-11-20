@@ -139,6 +139,42 @@ const up = (
 ) => (ctx.p0.parsed.y < ctx.p1.parsed.y ? value : undefined);
 
 /**
+ *
+ * @param {Array<WeightTrackerEntry>} entries
+ * @param {Date} date
+ * @param {DataViews} filter
+ */
+export const paintWeightTrackerEntries = (entries, date, filter) => {
+	const noNaN = entries.map((entry) => entry.amount);
+
+	if (noNaN.length > 0) {
+		const chart = createWeightChart(filter, date, entries);
+		const dataset = createWeightChartDataset(chart.data);
+
+		return {
+			chartData: {
+				labels: chart.legend,
+				datasets: [dataset]
+			},
+			chartOptions: {
+				responsive: true,
+				scales: {
+					y: {
+						suggestedMin: Math.min(...noNaN) - 2.5,
+						suggestedMax: Math.max(...noNaN) + 2.5
+					}
+				}
+			}
+		};
+	}
+
+	return {
+		chartData: undefined,
+		chartOptions: undefined
+	};
+};
+
+/**
  * @param {number | Date} d
  * @param {string | undefined} [format]
  */
