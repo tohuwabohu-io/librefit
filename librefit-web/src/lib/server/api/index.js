@@ -56,6 +56,12 @@ export const api = {
 		method: 'get',
 		guarded: true
 	},
+	listCalorieTrackerEntriesRange: {
+		path: '/tracker/calories/list/{dateFrom}/{dateTo}',
+		contentType: 'text/plain',
+		method: 'get',
+		guarded: true
+	},
 	listCalorieTrackerEntriesForDate: {
 		path: '/tracker/calories/list/{date}',
 		contentType: 'text/plain',

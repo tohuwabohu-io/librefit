@@ -205,4 +205,34 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
+
+    @GET
+    @Path("/list/{dateFrom}/{dateTo}")
+    @RolesAllowed("User", "Admin")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = Array<CalorieTrackerEntry>::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "401", description = "Unauthorized"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+        operationId = "listCalorieTrackerEntriesRange"
+    )
+    fun listEntries(@Context securityContext: SecurityContext, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
+        printAuthenticationInfo(jwt, securityContext)
+
+        return calorieTrackerRepository.listEntriesForUserAndDateRange(UUID.fromString(jwt.name), dateFrom, dateTo)
+            .onItem().transform { list -> Response.ok(list).build() }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+    }
 }

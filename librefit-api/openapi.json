@@ -456,6 +456,64 @@
         } ]
       }
     },
+    "/tracker/calories/list/{dateFrom}/{dateTo}" : {
+      "get" : {
+        "tags" : [ "Calorie Tracker Resource" ],
+        "operationId" : "listCalorieTrackerEntriesRange",
+        "parameters" : [ {
+          "name" : "dateFrom",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "dateTo",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
     "/tracker/calories/list/{date}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
