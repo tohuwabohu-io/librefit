@@ -2,7 +2,7 @@ import { api } from '$lib/server/api/index.js';
 import { proxyFetch } from '$lib/server/api/util.js';
 import { getDateAsStr } from '$lib/util.js';
 import { Category } from '$lib/api/model.js';
-import { redirect } from '@sveltejs/kit';
+import * as dateUtil from 'date-fns';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ fetch, cookies }) => {
@@ -13,6 +13,12 @@ export const load = async ({ fetch, cookies }) => {
 
 	const ctTodayApi = api.listCalorieTrackerEntriesForDate;
 	const lastCtResponse = await proxyFetch(fetch, ctTodayApi, jwt, { date: getDateAsStr(today) });
+
+	const weightApi = api.listWeightTrackerEntriesRange;
+	const listWeightResponse = await proxyFetch(fetch, weightApi, jwt, {
+		dateFrom: getDateAsStr(dateUtil.subMonths(today, 1)),
+		dateTo: getDateAsStr(today)
+	});
 
 	/** @type Array<CalorieTrackerEntry> */
 	const ctList = [];
@@ -33,6 +39,7 @@ export const load = async ({ fetch, cookies }) => {
 
 	return {
 		authenticated: true,
-		lastCt: ctList
+		lastCt: ctList,
+		listWeight: listWeightResponse.ok ? await listWeightResponse.json() : undefined
 	};
 };

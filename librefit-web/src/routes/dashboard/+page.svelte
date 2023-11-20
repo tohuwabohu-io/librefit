@@ -1,20 +1,32 @@
 <script>
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-	import {categoriesAsKeyValue, getDaytimeGreeting} from '$lib/util.js';
+	import {categoriesAsKeyValue, DataViews, getDaytimeGreeting, paintWeightTrackerEntries} from '$lib/util.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import {getToastStore} from '@skeletonlabs/skeleton';
 	import * as ct_crud from '$lib/api/calories-rest.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
-	import {getContext, setContext} from 'svelte';
-	import {writable} from 'svelte/store';
+	import {getContext} from 'svelte';
+	import {Chart, registerables} from 'chart.js';
+	import {Line} from 'svelte-chartjs';
+
+	Chart.register(...registerables);
 
 	export let data;
 
 	let calorieTrackerEntries;
 	$: calorieTrackerEntries;
 
+	let chartData, chartOptions;
+
 	$: if (data) {
 		calorieTrackerEntries = data.lastCt;
+
+		if (data.listWeight) {
+			const chartMeta = paintWeightTrackerEntries(data.listWeight, new Date(), DataViews.Month)
+
+			chartData = chartMeta.chartData;
+			chartOptions = chartMeta.chartOptions;
+		}
 	}
 
 	const user = getContext('user');
@@ -103,7 +115,5 @@
 				</div>
 			</div>
 		{/if}
-
-
 	</div>
 </section>
