@@ -20,6 +20,12 @@ export const load = async ({ fetch, cookies }) => {
 		dateTo: getDateAsStr(today)
 	});
 
+	const ctRangeApi = api.listCalorieTrackerEntriesRange;
+	const listCtResponse = await proxyFetch(fetch, ctRangeApi, jwt, {
+		dateFrom: getDateAsStr(dateUtil.subMonths(today, 1)),
+		dateTo: getDateAsStr(today)
+	});
+
 	/** @type Array<CalorieTrackerEntry> */
 	const ctList = [];
 
@@ -40,6 +46,7 @@ export const load = async ({ fetch, cookies }) => {
 	return {
 		authenticated: true,
 		lastCt: ctList,
-		listWeight: listWeightResponse.ok ? await listWeightResponse.json() : undefined
+		listWeight: listWeightResponse.ok ? await listWeightResponse.json() : undefined,
+		listCt: listCtResponse ? listCtResponse.json() : undefined
 	};
 };

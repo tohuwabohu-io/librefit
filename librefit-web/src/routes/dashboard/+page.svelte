@@ -7,7 +7,8 @@
 	import * as weight_crud from '$lib/api/weight-rest.js';
 	import {getContext} from 'svelte';
 	import {Chart, registerables} from 'chart.js';
-	import {Line} from 'svelte-chartjs';
+	import {Doughnut, Line} from 'svelte-chartjs';
+	import {Category} from '$lib/api/model.js';
 
 	Chart.register(...registerables);
 
@@ -90,6 +91,54 @@
 			throw Error(update.status)
 		}
 	}
+
+	const getConfig = (chartData) => {
+		return {
+			type: 'doughnut',
+			data: chartData,
+			options: {
+				responsive: true,
+				plugins: {
+					legend: {
+						position: 'top',
+					},
+					title: {
+						display: true,
+						text: 'Chart.js Doughnut Chart'
+					}
+				}
+			},
+		};
+	}
+
+	/**
+	 * @param {Array<CalorieTrackerEntry>} entries
+	 */
+	const getData = (entries) => {
+		const labels = [];
+		const values = [];
+
+		for (let cat of Object.keys(Category)) {
+			labels.push(cat);
+
+			const amounts = entries.filter(e => e.category === Category[cat] && e.amount > 0).map(e => e.amount);
+
+			if (amounts.length > 0) {
+				values.push(amounts.reduce((a, b) => a + b));
+			} else {
+				values.push(0);
+			}
+		}
+
+		return {
+			labels: labels,
+			datasets: [{
+				label: 'Total kcal',
+				data: values,
+				hoverOffset: 4
+			}]
+		};
+	}
 </script>
 
 <section>
@@ -112,6 +161,35 @@
 							on:updateWeight={updateWeight}
 							on:updateGoal={setGoal}
 					/>
+				</div>
+			</div>
+
+			<div class="flex flex-row gap-8">
+				<div class="variant-ghost-surface rounded-xl p-4">
+					{#await data.listCt}
+						<p>Loading...</p>
+					{:then ctList}
+						{@const data = getData(ctList)}
+						{@const options = getConfig(data)}
+
+						<Doughnut {options} {data}/>
+
+						<button class="btn variant-filled">Show history</button>
+					{:catch error}
+						<p>Error.</p>
+					{/await}
+				</div>
+
+				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4">
+					{#await data.listWeight}
+						<p>Loading...</p>
+					{:then weightList}
+						{@const meta = paintWeightTrackerEntries(weightList, new Date(), DataViews.Month)}
+
+						<Line options={meta.chartOptions} data={meta.chartData}/>
+					{:catch error}
+						<p>Error.</p>
+					{/await}
 				</div>
 			</div>
 		{/if}
