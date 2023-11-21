@@ -31,7 +31,6 @@
 		}).then(async (response) => {
 			if (response.ok) {
 				calculationResult = await response.json()
-				console.log(calculationResult);
 			} else {
 				calculationError = true;
 			}
