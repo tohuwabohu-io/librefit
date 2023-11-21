@@ -109,23 +109,68 @@
 		const labels = [];
 		const values = [];
 
-		for (let cat of Object.keys(Category)) {
-			const amounts = entries.filter(e => e.category === Category[cat] && e.amount > 0).map(e => e.amount);
+		const averageCategoryIntake = getAverageCategoryIntake(entries)
 
-			if (amounts.length > 0) {
-				values.push(amounts.reduce((a, b) => a + b));
-				labels.push(cat);
+		if (averageCategoryIntake != null) {
+			for (let cat of Object.keys(Category)) {
+				const averageIntake = averageCategoryIntake.get(cat);
+
+				if (averageIntake > 0) {
+					values.push(averageCategoryIntake.get(cat));
+					labels.push(cat);
+				}
 			}
 		}
 
 		return {
 			labels: labels,
 			datasets: [{
-				label: 'Total kcal',
+				label: '∅ kcal',
 				data: values,
 				hoverOffset: 4
 			}]
 		};
+	}
+
+	const getAverageCategoryIntake = (entries) => {
+		const nonEmpty = entries.filter(e => e.amount > 0);
+
+		if (nonEmpty.length > 0) {
+			const catMap = new Map();
+
+			const sum = nonEmpty.map(e => e.amount).reduce((a, b) => a + b);
+			const dailyAverage = getAverageDailyIntake(entries);
+
+			for (let cat of Object.keys(Category)) {
+				const catEntries = nonEmpty.filter(e => e.category === Category[cat]);
+				const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
+
+				catMap.set(cat, Math.round(dailyAverage * (catSum / sum)));
+			}
+
+			return catMap;
+		}
+
+		return null;
+	}
+
+	/** @param {Array<CalorieTrackerEntry>} entries */
+	const getAverageDailyIntake = (entries) => {
+		const nonEmpty = entries.filter(e => e.amount > 0);
+
+		if (nonEmpty.length > 0) {
+			const days = new Set(nonEmpty.map(e => e.added));
+
+			let sum = 0;
+
+			for (let day of days) {
+				sum += entries.filter(e => e.added === day).map(e => e.amount).reduce((a, b) => a + b)
+			}
+
+			return Math.round(sum / days.size);
+		}
+
+		return 0;
 	}
 </script>
 
@@ -153,7 +198,7 @@
 			</div>
 
 			<div class="flex flex-row gap-8">
-				<div class="variant-ghost-surface rounded-xl p-4">
+				<div class="variant-ghost-surface rounded-xl p-4 flex flex-col text-center justify-between">
 					{#await data.listCt}
 						<p>Loading...</p>
 					{:then ctList}
@@ -161,6 +206,10 @@
 						{@const options = getConfig(data)}
 
 						<h3 class="h3">Average distribution</h3>
+
+						<p>
+							&empty; daily intake: {getAverageDailyIntake(ctList)}kcal
+						</p>
 
 						<PolarArea {options} {data}/>
 
