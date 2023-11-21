@@ -7,7 +7,7 @@
 	import * as weight_crud from '$lib/api/weight-rest.js';
 	import {getContext} from 'svelte';
 	import {Chart, registerables} from 'chart.js';
-	import {Doughnut, Line} from 'svelte-chartjs';
+	import {Line, PolarArea} from 'svelte-chartjs';
 	import {Category} from '$lib/api/model.js';
 
 	Chart.register(...registerables);
@@ -17,17 +17,8 @@
 	let calorieTrackerEntries;
 	$: calorieTrackerEntries;
 
-	let chartData, chartOptions;
-
 	$: if (data) {
 		calorieTrackerEntries = data.lastCt;
-
-		if (data.listWeight) {
-			const chartMeta = paintWeightTrackerEntries(data.listWeight, new Date(), DataViews.Month)
-
-			chartData = chartMeta.chartData;
-			chartOptions = chartMeta.chartOptions;
-		}
 	}
 
 	const user = getContext('user');
@@ -94,7 +85,7 @@
 
 	const getConfig = (chartData) => {
 		return {
-			type: 'doughnut',
+			type: 'polarArea',
 			data: chartData,
 			options: {
 				responsive: true,
@@ -104,7 +95,7 @@
 					},
 					title: {
 						display: true,
-						text: 'Chart.js Doughnut Chart'
+						text: 'Chart.js Polar Area Chart'
 					}
 				}
 			},
@@ -119,14 +110,11 @@
 		const values = [];
 
 		for (let cat of Object.keys(Category)) {
-			labels.push(cat);
-
 			const amounts = entries.filter(e => e.category === Category[cat] && e.amount > 0).map(e => e.amount);
 
 			if (amounts.length > 0) {
 				values.push(amounts.reduce((a, b) => a + b));
-			} else {
-				values.push(0);
+				labels.push(cat);
 			}
 		}
 
@@ -172,7 +160,9 @@
 						{@const data = getData(ctList)}
 						{@const options = getConfig(data)}
 
-						<Doughnut {options} {data}/>
+						<h3 class="h3">Average distribution</h3>
+
+						<PolarArea {options} {data}/>
 
 						<button class="btn variant-filled">Show history</button>
 					{:catch error}
