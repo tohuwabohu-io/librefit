@@ -18,7 +18,7 @@
         maximumCalories: 0
     }
 
-    if ($modalStore[0] && $modalStore[0].meta) {
+    if ($modalStore[0] && $modalStore[0].meta && $modalStore[0].meta.goal) {
         goal = $modalStore[0].meta.goal;
     }
 

@@ -64,6 +64,7 @@
         modalStore.trigger({
             type: 'component',
             component: 'goalModal',
+            meta: { goal: $currentGoal },
             response: (e) => {
                 if (!e.cancelled) {
                     updateGoal(e)
