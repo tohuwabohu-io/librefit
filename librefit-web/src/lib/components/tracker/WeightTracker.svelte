@@ -77,7 +77,7 @@
 
 <div class="flex flex-col grow gap-4">
     <div class="flex flex-col gap-4 justify-between">
-        <div class="flex flex-col gap-4 text-center items-center">
+        <div class="flex flex-col gap-4 text-center items-center justify-between">
             {#if $lastEntry}
                 <Scale width={100} height={100} />
 

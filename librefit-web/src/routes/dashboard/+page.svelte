@@ -9,6 +9,7 @@
 	import {Chart, registerables} from 'chart.js';
 	import {Line, PolarArea} from 'svelte-chartjs';
 	import {Category} from '$lib/api/model.js';
+	import {goto} from '$app/navigation';
 
 	Chart.register(...registerables);
 
@@ -23,6 +24,7 @@
 
 	const user = getContext('user');
 	const weightTrackerEntry = getContext('lastWeight');
+	const currentGoal = getContext('currentGoal');
 
 	const toastStore = getToastStore();
 
@@ -143,9 +145,13 @@
 
 			for (let cat of Object.keys(Category)) {
 				const catEntries = nonEmpty.filter(e => e.category === Category[cat]);
-				const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
 
-				catMap.set(cat, Math.round(dailyAverage * (catSum / sum)));
+				if (catEntries.length > 0) {
+					const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
+
+					catMap.set(cat, Math.round(dailyAverage * (catSum / sum)));
+				}
+
 			}
 
 			return catMap;
@@ -204,16 +210,24 @@
 					{:then ctList}
 						{@const data = getData(ctList)}
 						{@const options = getConfig(data)}
+						{@const dailyAverage = getAverageDailyIntake(ctList)}
 
 						<h3 class="h3">Average distribution</h3>
 
-						<p>
-							&empty; daily intake: {getAverageDailyIntake(ctList)}kcal
-						</p>
+						<div>
+							<p>
+								&empty; daily intake: ~{dailyAverage}kcal
+							</p>
+							{#if $currentGoal}
+							<p>
+								&empty; target intake: ~{$currentGoal.targetCalories}kcal
+							</p>
+							{/if}
+						</div>
 
 						<PolarArea {options} {data}/>
 
-						<button class="btn variant-filled">Show history</button>
+						<button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>
 					{:catch error}
 						<p>Error.</p>
 					{/await}
