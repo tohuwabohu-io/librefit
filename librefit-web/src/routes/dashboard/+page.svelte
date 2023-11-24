@@ -180,6 +180,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>LibreFit - Dashboard</title>
+</svelte:head>
+
 <section>
 	<div class="container mx-auto p-8 space-y-8">
 		{#if $user}
@@ -228,8 +232,6 @@
 						<PolarArea {options} {data}/>
 
 						<button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>
-					{:catch error}
-						<p>Error.</p>
 					{/await}
 				</div>
 
@@ -240,8 +242,6 @@
 						{@const meta = paintWeightTrackerEntries(weightList, new Date(), DataViews.Month)}
 
 						<Line options={meta.chartOptions} data={meta.chartData}/>
-					{:catch error}
-						<p>Error.</p>
 					{/await}
 				</div>
 			</div>
