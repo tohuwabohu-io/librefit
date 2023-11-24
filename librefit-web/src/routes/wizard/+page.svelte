@@ -30,7 +30,8 @@
 			}
 		}).then(async (response) => {
 			if (response.ok) {
-				calculationResult = await response.json()
+				calculationResult = await response.json();
+				console.log(calculationResult);
 			} else {
 				calculationError = true;
 			}
@@ -87,7 +88,7 @@
 
 				currentGoal.set(await response.json());
 			} else {
-				throw Error()
+				throw Error();
 			}
 		}).catch((error) => showToastError(toastStore, error))
 	}
@@ -246,15 +247,16 @@
 						you are out of
 					{/if}
 
-					the optimal BMI range of {bmiMin} to {bmiMax}, leaving you {calculationResult.bmiCategory}. Your
-					weight should be around {calculationResult.targetWeight}kg.
+					the optimal BMI range of {bmiMin} to {bmiMax}, leaving you
+					{bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label}.
+					Your weight should be around {calculationResult.targetWeight}kg.
 				{/if}
 			</p>
 
 			<p>
-				To reach the weight within the standard weight range, you will need to consume calories at a difference
-				of {calculationResult.deficit}kcal for {calculationResult.durationDays} days. Your caloric intake should
-				be around {calculationResult.target}kcal during that time.
+				To reach the optimal weight within the standard weight range, you will need to consume calories at a
+				difference of {calculationResult.deficit}kcal for {calculationResult.durationDays} days.
+				Your caloric intake should be around {calculationResult.target}kcal during that time.
 			</p>
 
 			<p>
