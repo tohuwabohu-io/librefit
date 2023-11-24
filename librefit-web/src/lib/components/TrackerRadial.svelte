@@ -49,6 +49,8 @@
 		}
 	};
 
+	$: strokeClass = total <= limit ? 'stroke-primary-500' : (total > limit && total <= maximum ? 'stroke-overflow-1' : 'stroke-overflow-2');
+
 	$: outerEnd = calculateEnd(total, limit);
 	$: innerEnd = calculateEnd(total, maximum);
 
@@ -67,13 +69,13 @@
 			{#if $currentGoal}
 				<path
 					d={arc(width / 2, height / 2, outerRadius, 0, outerEnd)}
-					class="progress-radial-track fill-transparent stroke-primary-500"
+					class="progress-radial-track fill-transparent {strokeClass}"
 				/>
 
 				{#if total > 0}
 					<path
 						d={arc(width / 2, height / 2, outerRadius, outerEnd, outerEnd)}
-						class="progress-radial-track fill-transparent stroke-primary-500"
+						class="progress-radial-track fill-transparent {strokeClass}"
 						stroke-linecap="round"
 					/>
 				{/if}
@@ -129,3 +131,13 @@
 		{/if}
 	</svg>
 </figure>
+
+<style>
+	.stroke-overflow-1 {
+		stroke: rgb(var(--color-warning-500) / 1);
+	}
+
+	.stroke-overflow-2 {
+		stroke: rgb(var(--color-error-500) / 1);
+	}
+</style>
