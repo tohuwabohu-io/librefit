@@ -10,6 +10,9 @@
 	import {Line, PolarArea} from 'svelte-chartjs';
 	import {Category} from '$lib/api/model.js';
 	import {goto} from '$app/navigation';
+	import Overflow1 from '$lib/assets/icons/overflow-1.svg?component';
+	import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
+	import Check from '$lib/assets/icons/check.svg?component';
 
 	Chart.register(...registerables);
 
@@ -218,18 +221,32 @@
 
 						<h3 class="h3">Average distribution</h3>
 
+						<PolarArea {options} {data}/>
+
 						<div>
-							<p>
-								&empty; daily intake: ~{dailyAverage}kcal
-							</p>
+							<div class="flex flex-row justify-center">
+								<p>
+									&empty; daily intake: ~{dailyAverage}kcal
+								</p>
+								{#if $currentGoal}
+									{@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
+									<span>
+										{#if targetAverageRatio <= 1.05}
+											<Check color="rgb(var(--color-primary-700))"/>
+										{:else if targetAverageRatio >= 1.06 && targetAverageRatio <= 1.15}
+											<Overflow1 color="rgb(var(--color-warning-500))"/>
+										{:else}
+											<Overflow2 color="rgb(var(--color-error-500))"/>
+										{/if}
+									</span>
+								{/if}
+							</div>
 							{#if $currentGoal}
-							<p>
-								&empty; target intake: ~{$currentGoal.targetCalories}kcal
-							</p>
+								<p>
+									&empty; target intake: ~{$currentGoal.targetCalories}kcal
+								</p>
 							{/if}
 						</div>
-
-						<PolarArea {options} {data}/>
 
 						<button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>
 					{/await}
