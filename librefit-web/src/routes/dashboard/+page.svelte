@@ -231,13 +231,15 @@
 						<PolarArea {options} {data}/>
 
 						<div>
-							<div class="flex flex-row justify-center">
-								<p>
-									&empty; daily intake: ~{dailyAverage}kcal
-								</p>
-								{#if $currentGoal}
-									{@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
-									<span>
+							<div class="w-full grid grid-cols-[auto_1fr_auto]">
+								<div>&empty; daily intake:</div>
+								<div>
+									~{dailyAverage}kcal
+								</div>
+								<div>
+									{#if $currentGoal}
+										{@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
+										<span>
 										{#if targetAverageRatio <= 1}
 											<Check color="rgb(var(--color-primary-700))"/>
 										{:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
@@ -246,13 +248,21 @@
 											<Overflow2 color="rgb(var(--color-error-500))"/>
 										{/if}
 									</span>
+									{/if}
+								</div>
+
+								{#if $currentGoal}
+									<div>
+										&empty; target intake:
+									</div>
+									<div>
+										~{$currentGoal.targetCalories}kcal
+									</div>
+									<div>
+
+									</div>
 								{/if}
 							</div>
-							{#if $currentGoal}
-								<p>
-									&empty; target intake: ~{$currentGoal.targetCalories}kcal
-								</p>
-							{/if}
 						</div>
 
 						<button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>
