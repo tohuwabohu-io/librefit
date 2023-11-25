@@ -81,7 +81,7 @@ class GoalsTest {
     fun `should fail on creation`() {
         var faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
 
-        faultyEntry.startAmount = -100f
+        faultyEntry.initialWeight = -100f
 
         Given {
             header("Content-Type", ContentType.JSON)
@@ -94,7 +94,7 @@ class GoalsTest {
 
 
         faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
-        faultyEntry.endAmount = -200f
+        faultyEntry.targetWeight = -200f
 
         Given {
             header("Content-Type", ContentType.JSON)
@@ -136,8 +136,8 @@ class GoalsTest {
         assert(created.added == read.added)
         assert(created.sequence == read.sequence)
         assert(created.userId == read.userId)
-        assert(created.startAmount == read.startAmount)
-        assert(created.endAmount == read.endAmount)
+        assert(created.initialWeight == read.initialWeight)
+        assert(created.targetWeight == read.targetWeight)
         assert(created.startDate == read.startDate)
         assert(created.endDate == read.endDate)
     }
@@ -163,7 +163,7 @@ class GoalsTest {
             body().`as`(Goal::class.java)
         }
 
-        created.endAmount = 80.4f
+        created.targetWeight = 80.4f
 
         Given {
             header("Content-Type", ContentType.JSON)
@@ -183,7 +183,7 @@ class GoalsTest {
         }
 
         assert(created.sequence == read.sequence)
-        assert(goal.endAmount != read.endAmount)
+        assert(goal.targetWeight != read.targetWeight)
         assert(read.updated != null)
     }
 
@@ -305,12 +305,12 @@ class GoalsTest {
     )
     fun `should create two entries and find the last`() {
         val goal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
-        goal.startAmount = 100f
-        goal.endAmount = 200f
+        goal.initialWeight = 100f
+        goal.targetWeight = 200f
 
         val lastGoal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
-        lastGoal.startAmount = 50f
-        lastGoal.endAmount = 250f
+        lastGoal.initialWeight = 50f
+        lastGoal.targetWeight = 250f
 
         listOf(goal, lastGoal).forEach { item ->
             Given {
@@ -329,8 +329,8 @@ class GoalsTest {
             statusCode(200)
             body("added", equalTo(lastGoal.added.toString()))
             body("userId", equalTo(lastGoal.userId.toString()))
-            body("startAmount", equalTo(lastGoal.startAmount))
-            body("endAmount", equalTo(lastGoal.endAmount))
+            body("initialWeight", equalTo(lastGoal.initialWeight))
+            body("targetWeight", equalTo(lastGoal.targetWeight))
         }
     }
 
@@ -360,8 +360,10 @@ class GoalsTest {
         val goal = Goal(
             startDate = LocalDate.now(),
             endDate = LocalDate.now().plusYears(1),
-            startAmount = 95.3f,
-            endAmount = 75.4f
+            initialWeight = 95.3f,
+            targetWeight = 75.4f,
+            targetCalories = 1921f,
+            maximumCalories = 2200f
         )
 
         goal.userId = userId

@@ -55,6 +55,8 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     fun create(@Context securityContext: SecurityContext, @Valid goal: Goal): Uni<Response> {
         Log.info("Creating a new goal=$goal")
 
+        goal.userId = UUID.fromString(jwt.name);
+
         printAuthenticationInfo(jwt, securityContext)
 
         return goalsRepository.validateAndPersist(goal)
@@ -113,11 +115,14 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
     @Operation(
         operationId = "readGoal"
     )
-    fun read(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> =
-        goalsRepository.readEntry(UUID.fromString(jwt.name), date, sequence)
+    fun read(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> {
+        printAuthenticationInfo(jwt, securityContext)
+
+        return goalsRepository.readEntry(UUID.fromString(jwt.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+    }
 
     @DELETE
     @Path("/delete/{date}/{sequence:\\d+}")

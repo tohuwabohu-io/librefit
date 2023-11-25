@@ -1,6 +1,10 @@
 <script>
-	export let limit = 1900,
-		maximum = 2500,
+	import {getContext} from 'svelte';
+
+	const currentGoal = getContext('currentGoal');
+
+	export let limit = $currentGoal && $currentGoal.targetCalories ? $currentGoal.targetCalories : 0,
+		maximum = $currentGoal && $currentGoal.maximumCalories ? $currentGoal.maximumCalories : 0,
 		total = 0;
 	export let width = 512,
 		height = 512;
@@ -45,6 +49,8 @@
 		}
 	};
 
+	$: strokeClass = total <= limit ? 'stroke-primary-500' : (total > limit && total <= maximum ? 'stroke-overflow-1' : 'stroke-overflow-2');
+
 	$: outerEnd = calculateEnd(total, limit);
 	$: innerEnd = calculateEnd(total, maximum);
 
@@ -60,17 +66,19 @@
 				stroke-linecap="round"
 			/>
 
-			<path
-				d={arc(width / 2, height / 2, outerRadius, 0, outerEnd)}
-				class="progress-radial-track fill-transparent stroke-primary-500"
-			/>
-
-			{#if total > 0}
+			{#if $currentGoal}
 				<path
-					d={arc(width / 2, height / 2, outerRadius, outerEnd, outerEnd)}
-					class="progress-radial-track fill-transparent stroke-primary-500"
-					stroke-linecap="round"
+					d={arc(width / 2, height / 2, outerRadius, 0, outerEnd)}
+					class="progress-radial-track fill-transparent {strokeClass}"
 				/>
+
+				{#if total > 0}
+					<path
+						d={arc(width / 2, height / 2, outerRadius, outerEnd, outerEnd)}
+						class="progress-radial-track fill-transparent {strokeClass}"
+						stroke-linecap="round"
+					/>
+				{/if}
 			{/if}
 		</g>
 
@@ -81,17 +89,19 @@
 				stroke-linecap="round"
 			/>
 
-			<path
-				d={arc(width / 2, height / 2, innerRadius, 0, innerEnd)}
-				class="progress-radial-track fill-transparent stroke-secondary-500"
-			/>
-
-			{#if total > 0}
+			{#if $currentGoal}
 				<path
-					d={arc(width / 2, height / 2, innerRadius, innerEnd, innerEnd)}
+					d={arc(width / 2, height / 2, innerRadius, 0, innerEnd)}
 					class="progress-radial-track fill-transparent stroke-secondary-500"
-					stroke-linecap="round"
 				/>
+
+				{#if total > 0}
+					<path
+						d={arc(width / 2, height / 2, innerRadius, innerEnd, innerEnd)}
+						class="progress-radial-track fill-transparent stroke-secondary-500"
+						stroke-linecap="round"
+					/>
+				{/if}
 			{/if}
 		</g>
 		<text
@@ -103,18 +113,31 @@
 			font-size="56"
 			class="progress-radial-text fill-token"
 		>
-			{total} / {limit}
+			{total} {#if $currentGoal} / {limit} {/if}
 		</text>
-		<text
-			x={width / 2}
-			y={height / 2 + 60}
-			text-anchor="middle"
-			dominant-baseline="middle"
-			font-weight="bold"
-			font-size="34"
-			class="progress-radial-text fill-token"
-		>
-			{total} / {maximum}
-		</text>
+
+		{#if $currentGoal}
+			<text
+				x={width / 2}
+				y={height / 2 + 60}
+				text-anchor="middle"
+				dominant-baseline="middle"
+				font-weight="bold"
+				font-size="34"
+				class="progress-radial-text fill-token"
+			>
+				{total} / {maximum}
+			</text>
+		{/if}
 	</svg>
 </figure>
+
+<style>
+	.stroke-overflow-1 {
+		stroke: rgb(var(--color-warning-500) / 1);
+	}
+
+	.stroke-overflow-2 {
+		stroke: rgb(var(--color-error-500) / 1);
+	}
+</style>

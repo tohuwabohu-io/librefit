@@ -1,9 +1,9 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-	import {createWeightChart, createWeightChartDataset, DataViews, enumKeys} from '$lib/util.js';
+	import {DataViews, enumKeys, paintWeightTrackerEntries} from '$lib/util.js';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
-	import {showToastError, showToastSuccess} from '$lib/toast.js';
+	import {showToastError} from '$lib/toast.js';
 	import * as weight_crud from '$lib/api/weight-rest.js';
 	import {getContext} from 'svelte';
 	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
@@ -34,30 +34,10 @@
 	}
 
 	const paint = (entries) => {
-		const noNaN = entries.map(entry => entry.amount);
+		const paintMeta = paintWeightTrackerEntries(entries, today, filter);
 
-		if (noNaN.length > 0) {
-			const chart = createWeightChart(filter, today, entries);
-			const dataset = createWeightChartDataset(chart.data);
-
-			chartData = {
-				labels: chart.legend,
-				datasets: [dataset]
-			}
-
-			chartOptions = {
-				responsive: true,
-				scales: {
-					y: {
-						suggestedMin: Math.min(...noNaN) - 2.5,
-						suggestedMax: Math.max(...noNaN) + 2.5
-					}
-				}
-			}
-		} else {
-			chartData = undefined;
-			chartOptions = undefined;
-		}
+		chartData = paintMeta.chartData;
+		chartOptions = paintMeta.chartOptions;
 	}
 
 	$: if (data && data.entries) {
@@ -143,7 +123,7 @@
 				<div class="flex flex-col items-center text-center gap-4">
 					<NoScale width={100} height={100}/>
 					<p>
-						Insufficient data for to render your history.
+						Insufficient data to render your history.
 					</p>
 				</div>
 			{/if}

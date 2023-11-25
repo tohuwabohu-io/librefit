@@ -17,16 +17,28 @@ import java.util.*
     NamedQuery(name = "Goal.findLast", query = "from Goal where userId = ?1 order by added desc, sequence desc, userId limit 1")
 )
 data class Goal(
-    @field:NotNull(message = "The initial amount of your goal must not be empty.")
-    @field:Min(value = 0, message = "The initial amount of your goal must not be less than zero.")
-    var startAmount: Float,
-    @field:NotNull(message = "The target amount of your goal must not be empty.")
-    @field:Min(value = 0, message = "The target amount of your goal must not be less than zero.")
-    var endAmount: Float,
+    @field:NotNull(message = "The initial weight of your goal must not be empty.")
+    @field:Min(value = 0, message = "The initial weight of your goal must not be less than zero.")
+    var initialWeight: Float,
+
+    @field:NotNull(message = "The target weight of your goal must not be empty.")
+    @field:Min(value = 0, message = "The target weight of your goal must not be less than zero.")
+    var targetWeight: Float,
+
     @field:NotNull(message = "The starting date of your goal must not be empty.")
     var startDate: LocalDate,
+
     @field:NotNull(message = "The end date of your goal must not be empty.")
     var endDate: LocalDate,
+
+    @Column(nullable = true)
+    @field:Min(value = 0, message = "The target calorie amount must not be less than zero.")
+    var targetCalories: Float? = null,
+
+    @Column(nullable = true)
+    @field:Min(value = 0, message = "The maximum calorie amount must not be less than zero.")
+    var maximumCalories: Float? = null,
+
     var updated: LocalDateTime? = null
 ) : LibreUserWeakEntity() {
 
@@ -42,7 +54,7 @@ data class Goal(
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(userId = $userId , startAmount = $startAmount , endAmount = $endAmount , startDate = $startDate , endDate = $endDate , added = $added , id = $sequence )"
+        return this::class.simpleName + "(userId = $userId , initialWeight = $initialWeight , targetWeight = $targetWeight , startDate = $startDate , endDate = $endDate , added = $added , id = $sequence )"
     }
 
     @PreUpdate

@@ -37,10 +37,8 @@
     }
 
     const updateGoal = (e) => {
-        console.log(e);
-
         dispatch('updateGoal', {
-            goal: e.detail.goal
+            goal: e
         })
     }
     
@@ -66,8 +64,9 @@
         modalStore.trigger({
             type: 'component',
             component: 'goalModal',
+            meta: { goal: $currentGoal },
             response: (e) => {
-                if (e) {
+                if (!e.cancelled) {
                     updateGoal(e)
                 }
 
@@ -79,7 +78,7 @@
 
 <div class="flex flex-col grow gap-4">
     <div class="flex flex-col gap-4 justify-between">
-        <div class="flex flex-col gap-4 text-center items-center">
+        <div class="flex flex-col gap-4 text-center items-center justify-between">
             {#if $lastEntry}
                 <Scale width={100} height={100} />
 
@@ -96,7 +95,7 @@
 
             {#if $currentGoal}
                 <p>
-                    Goal: {$currentGoal.endAmount}kg @ ({convertDateStrToDisplayDateStr($currentGoal.endDate)})
+                    Goal: {$currentGoal.targetWeight}kg @ ({convertDateStrToDisplayDateStr($currentGoal.endDate)})
                 </p>
             {:else}
                 <p>

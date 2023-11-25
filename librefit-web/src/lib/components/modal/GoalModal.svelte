@@ -12,26 +12,29 @@
         added: getDateAsStr(today),
         endDate: getDateAsStr(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())),
         startDate: getDateAsStr(today),
-        startAmount: 0,
-        endAmount: 0,
-        sequence: 1
+        initialWeight: 0,
+        targetWeight: 0,
+        targetCalories: 0,
+        maximumCalories: 0
     }
 
-    let startDateInput, endDateInput, startAmountInput, endAmountInput;
+    if ($modalStore[0] && $modalStore[0].meta && $modalStore[0].meta.goal) {
+        goal = $modalStore[0].meta.goal;
+    }
 
     const onSubmit = () => {
         if ($modalStore[0].response) {
             $modalStore[0].response({
-                detail: {
-                    goal: goal
-                }
+                goal: goal
             });
         }
     }
 
     const onCancel = () => {
         if ($modalStore[0].response) {
-            $modalStore[0].response(undefined);
+            $modalStore[0].response({
+                cancelled: true
+            });
         }
     }
 </script>
@@ -49,16 +52,15 @@
                     label="Begin"
                     required
                     bind:value={goal.startDate}
-                    bind:this={startDateInput}
             />
 
             <ValidatedInput
-                    name="startAmount"
+                    name="initialWeight"
                     type="number"
                     label="Starting weight"
                     required
-                    bind:value={goal.startAmount}
-                    bind:this={startAmountInput}
+                    unit="kg"
+                    bind:value={goal.initialWeight}
             />
 
             <ValidatedInput
@@ -67,16 +69,31 @@
                     label="End"
                     required
                     bind:value={goal.endDate}
-                    bind:this={endDateInput}
             />
 
             <ValidatedInput
-                    name="endAmount"
+                    name="targetWeight"
                     type="number"
                     label="Target weight"
                     required
-                    bind:value={goal.endAmount}
-                    bind:this={endAmountInput}
+                    unit="kg"
+                    bind:value={goal.targetWeight}
+            />
+
+            <ValidatedInput
+                    name="targetCalories"
+                    type="number"
+                    label="Target intake"
+                    unit="kcal"
+                    bind:value={goal.targetCalories}
+            />
+
+            <ValidatedInput
+                    name="maximumCalories"
+                    type="number"
+                    label="Maximum intake"
+                    unit="kcal"
+                    bind:value={goal.maximumCalories}
             />
         </form>
     </div>

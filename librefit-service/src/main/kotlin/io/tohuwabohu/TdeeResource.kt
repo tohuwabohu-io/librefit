@@ -18,7 +18,7 @@ class TdeeResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/calculate/{age:\\d+}/{sex}/{weight:\\d+}/{height:\\d+}/{activityLevel}/{weeklyDifference}/{calculationGoal}")
+    @Path("/calculate/{age:\\d+}/{sex}/{weight:\\d+}/{height:\\d+}/{activityLevel}/{weeklyDifference:\\d+}/{calculationGoal}")
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
