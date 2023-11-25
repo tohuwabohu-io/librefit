@@ -132,7 +132,14 @@
 			datasets: [{
 				label: '∅ kcal',
 				data: values,
-				hoverOffset: 4
+				hoverOffset: 4,
+				backgroundColor: [
+					'rgb(182 200 0 / .3)',
+					'rgb(140 67 210 / .3)',
+					'rgb(14 165 233 / .3)',
+					'rgb(234 179 8 / .3)',
+					'rgb(165 29 45 / .3)'
+				]
 			}]
 		};
 	}
@@ -231,9 +238,9 @@
 								{#if $currentGoal}
 									{@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
 									<span>
-										{#if targetAverageRatio <= 1.05}
+										{#if targetAverageRatio <= 1}
 											<Check color="rgb(var(--color-primary-700))"/>
-										{:else if targetAverageRatio >= 1.06 && targetAverageRatio <= 1.15}
+										{:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
 											<Overflow1 color="rgb(var(--color-warning-500))"/>
 										{:else}
 											<Overflow2 color="rgb(var(--color-error-500))"/>
