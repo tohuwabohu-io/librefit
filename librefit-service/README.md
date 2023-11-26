@@ -1,4 +1,4 @@
-# librefit
+# librefit-service
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
@@ -58,3 +58,19 @@ If you want to learn more about building native executables, please consult http
 Easily start your Reactive RESTful Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+## Integration Tests
+
+All tests are located in the `src/test` package. Those tests are general API tests that ensure general functionality of
+all endpoints as a whole. The tests use the default Quarkus [testcontainers](https://testcontainers.com/) setup with the
+`postgres:15.2-alpine` image, requiring a running docker instance.
+
+### Coverage
+
+Find the test coverage by generating a Jacoco report:
+
+```shell
+./gradlew librefit-service:jacocoTestReport
+```
+
+The report is located at `build/jacoco-report/index.html`.
