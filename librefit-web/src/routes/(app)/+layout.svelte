@@ -1,15 +1,13 @@
 <script>
-	import '../app.pcss';
-	import {AppShell, Drawer, Modal, Toast} from '@skeletonlabs/skeleton';
+	import '../../app.pcss';
+	import {AppShell, Drawer, initializeStores, Modal, Toast} from '@skeletonlabs/skeleton';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import WeightModal from '$lib/components/modal/WeightModal.svelte';
 	import GoalModal from '$lib/components/modal/GoalModal.svelte';
-	import { initializeStores } from '@skeletonlabs/skeleton';
 	import UserPanel from '$lib/components/UserPanel.svelte';
-	import { setContext } from 'svelte';
-	import { writable } from 'svelte/store';
+	import {setContext} from 'svelte';
+	import {writable} from 'svelte/store';
 	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
-	import {afterNavigate, goto, invalidateAll, onNavigate} from '$app/navigation';
 
 	initializeStores();
 

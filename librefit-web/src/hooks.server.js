@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 
-const unguardedRoutes = ['/', '/login', '/register'];
+const unguardedRoutes = ['/', '/login', '/register', '/tos', '/imprint'];
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
