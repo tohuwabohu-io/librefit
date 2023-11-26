@@ -14,13 +14,14 @@ dependencies {
 }
 
 tasks.openApiValidate {
-    inputSpec.set("openapi.yaml")
+    inputSpec.set("${project.projectDir}/openapi.yaml")
 }
 
 tasks.register<JavaExec>("ApiCodegen") {
     dependsOn(tasks.openApiValidate)
 
     classpath = sourceSets.test.get().runtimeClasspath
+
     main = "io.tohuwabohu.librefit.api.codegen.ApiCodegen"
     args = listOf("${project.projectDir}/openapi.json", "${project.projectDir}/rest/lib")
 
