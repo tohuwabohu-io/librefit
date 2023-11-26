@@ -1,6 +1,7 @@
 <script>
 
-import {AppShell} from '@skeletonlabs/skeleton';
+	import '../../app.pcss';
+	import {AppShell} from '@skeletonlabs/skeleton';
 </script>
 
 <AppShell>
