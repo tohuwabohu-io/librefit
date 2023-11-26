@@ -4,6 +4,7 @@ plugins {
     kotlin("plugin.noarg") version "1.9.0"
     kotlin("plugin.jpa") version "1.9.0"
     id("io.quarkus")
+    id("jacoco")
 }
 
 repositories {
@@ -16,6 +17,7 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
+    implementation("io.quarkus:quarkus-jacoco")
     implementation("io.quarkus:quarkus-security-jpa-reactive")
     implementation("io.quarkus:quarkus-smallrye-jwt")
     implementation("io.quarkus:quarkus-smallrye-jwt-build")
@@ -60,3 +62,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.javaParameters = true
 }
 
+tasks.jacocoTestReport {
+    reports {
+        csv.required.set(true)
+    }
+}
