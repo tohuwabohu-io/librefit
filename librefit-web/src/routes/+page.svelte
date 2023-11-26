@@ -24,9 +24,9 @@
 </svelte:head>
 
 
-<section class="variant-ghost-surface">
-    <div class="container mx-auto p-12 space-y-8">
-        <div class="grid grid-cols-[auto_1fr_auto] xl:grid-cols-2 gap-4">
+<section class="variant-ghost-surface h-full flex">
+    <div class="container mx-auto p-12 space-y-8 self-center">
+        <div class="grid grid-cols-[auto_1fr_auto] xl:grid-cols-2 gap-4 align-middle">
             <div class="flex flex-col gap-4">
                 <h1 class="font-logo">
                     <span class="text-primary-500 text-9xl">Libre</span>
