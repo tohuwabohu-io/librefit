@@ -24,4 +24,16 @@ tasks.npmInstall {
 
 tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_build") {
     dependsOn(tasks.npmInstall)
+
+    inputs.dir(fileTree("src"))
+    inputs.dir(fileTree("static"))
+
+    inputs.file("package.json")
+    inputs.file("package-lock.json")
+
+    outputs.dir("build")
+}
+
+tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_dev") {
+    dependsOn(tasks.npmInstall)
 }
