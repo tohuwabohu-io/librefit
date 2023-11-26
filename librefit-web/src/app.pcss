@@ -6,9 +6,15 @@
 @tailwind variants;
 
 @font-face {
-	font-family: Soda Berry;
+	font-family: Project Blackbird;
 	font-weight: 400;
-	src: url('/src/assets/fonts/Soda Berry.ttf');
+	src: url('/src/assets/fonts/PROJEKT BLACKBIRD.otf');
+}
+
+@font-face {
+	font-family: Bombardier;
+	font-weight: 400;
+	src: url('/src/assets/fonts/Bombardier-Regular.ttf');
 }
 
 @layer base {
@@ -24,6 +30,7 @@
 html,
 body {
 	@apply h-full overflow-hidden;
+	font-family: Project Blackbird, serif !important;
 }
 
 h1 {
@@ -31,7 +38,7 @@ h1 {
 }
 
 .font-logo {
-	font-family: Soda Berry, serif !important;
+	font-family: Bombardier, serif !important;
 }
 
 .validation-error-text {
