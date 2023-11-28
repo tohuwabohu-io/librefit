@@ -41,7 +41,7 @@ fun generateToken(user: LibreUser): String =
         .claim(Claims.email, user.email)
         .claim(Claims.nickname, user.name)
         .groups(user.role)
-        .expiresAt(System.currentTimeMillis() + 15 * 60 * 1000L)
+        .expiresAt(System.currentTimeMillis() / 1000 + (15 * 60))
         .sign()
 
 fun main() {
