@@ -6,11 +6,15 @@ import io.smallrye.jwt.build.Jwt
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.ws.rs.core.SecurityContext
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eclipse.microprofile.jwt.Claims
 import org.eclipse.microprofile.jwt.JsonWebToken
 import java.util.*
 
 class AuthenticationResponse (val token: String)
+
+@ConfigProperty(name = "libreuser.tokens.expiration.minutes", defaultValue = "25")
+private lateinit var ttlMin: String
 
 fun printAuthenticationInfo(jwt: JsonWebToken, ctx: SecurityContext) {
     val name = if (ctx.userPrincipal == null) {
@@ -41,7 +45,7 @@ fun generateToken(user: LibreUser): String =
         .claim(Claims.email, user.email)
         .claim(Claims.nickname, user.name)
         .groups(user.role)
-        .expiresAt(System.currentTimeMillis() / 1000 + (15 * 60))
+        .expiresAt(System.currentTimeMillis() / 1000 + (ttlMin.toInt() * 60))
         .sign()
 
 fun main() {
