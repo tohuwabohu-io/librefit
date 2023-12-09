@@ -9,12 +9,18 @@ import jakarta.ws.rs.core.SecurityContext
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eclipse.microprofile.jwt.Claims
 import org.eclipse.microprofile.jwt.JsonWebToken
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
-class AuthenticationResponse (val token: String)
+class AuthenticationResponse (val token: String, val refreshToken: String)
 
-@ConfigProperty(name = "libreuser.tokens.expiration.minutes", defaultValue = "25")
-private lateinit var ttlMin: String
+@ConfigProperty(name = "libreuser.tokens.access.expiration.minutes", defaultValue = "25")
+private var ttlMinAccess: String = "25"
+
+@ConfigProperty(name = "libreuser.tokens.refresh.expiration.minutes", defaultValue = "1440")
+private var ttlMinRefresh: String = "1440"
 
 fun printAuthenticationInfo(jwt: JsonWebToken, ctx: SecurityContext) {
     val name = if (ctx.userPrincipal == null) {
@@ -39,20 +45,30 @@ fun validateToken(jwt: JsonWebToken, data: LibreUserWeakEntity) {
     }
 }
 
-fun generateToken(user: LibreUser): String =
+fun generateAccessToken(user: LibreUser, ttlMinutes: Int): String =
     Jwt.issuer("https://libre.fitness/")
         .upn(user.id.toString())
         .claim(Claims.email, user.email)
         .claim(Claims.nickname, user.name)
         .groups(user.role)
-        .expiresAt(System.currentTimeMillis() / 1000 + (ttlMin.toInt() * 60))
+        .expiresAt(System.currentTimeMillis() / 1000 + (ttlMinutes * 60))
         .sign()
 
+fun generateRefreshToken(ttlMinutes: Int): Pair<String, LocalDateTime> {
+    val expiresAt = System.currentTimeMillis() / 1000 + (ttlMinutes * 60)
+    val expirationDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAt * 1000), ZoneId.systemDefault())
+
+    return Pair(Jwt.issuer("https://libre.fitness/").expiresAt(expiresAt).sign(),
+        expirationDate)
+}
+
 fun main() {
-    println(generateToken(LibreUser(
+    println(generateAccessToken(LibreUser(
         id = UUID.randomUUID(),
         email = "test@libre.fitness",
         name = "testuser",
         password = "1234"
-    )))
+    ), 15))
+
+    println(generateRefreshToken(1440).first)
 }
