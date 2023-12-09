@@ -1065,6 +1065,9 @@
               }
             }
           },
+          "404" : {
+            "description" : "Not Found"
+          },
           "500" : {
             "description" : "Internal Server Error"
           }
@@ -1205,10 +1208,13 @@
   "components" : {
     "schemas" : {
       "AuthenticationResponse" : {
-        "required" : [ "token" ],
+        "required" : [ "token", "refreshToken" ],
         "type" : "object",
         "properties" : {
           "token" : {
+            "type" : "string"
+          },
+          "refreshToken" : {
             "type" : "string"
           }
         }

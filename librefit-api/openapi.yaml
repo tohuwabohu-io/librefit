@@ -712,6 +712,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
   /user/read:
@@ -802,9 +804,12 @@ components:
     AuthenticationResponse:
       required:
       - token
+      - refreshToken
       type: object
       properties:
         token:
+          type: string
+        refreshToken:
           type: string
     BmiCategory:
       enum:

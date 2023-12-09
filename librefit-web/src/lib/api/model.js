@@ -55,6 +55,7 @@ export const Category = {
 /**
  * @typedef {Object} AuthenticationResponse
  * @property {String} token
+ * @property {String} refreshToken
  */
 
 /**
