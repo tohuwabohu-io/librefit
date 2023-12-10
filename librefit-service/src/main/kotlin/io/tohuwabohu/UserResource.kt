@@ -39,10 +39,10 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
     lateinit var jwt: JsonWebToken
 
     @ConfigProperty(name = "libreuser.tokens.access.expiration.minutes", defaultValue = "25")
-    private lateinit var ttlMinutesAccess: String;
+    private lateinit var ttlMinutesAccess: String
 
     @ConfigProperty(name = "libreuser.tokens.refresh.expiration.minutes", defaultValue = "1440")
-    private lateinit var ttlMinutesRefresh: String;
+    private lateinit var ttlMinutesRefresh: String
 
     @POST
     @Path("/register")
@@ -102,6 +102,65 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
         }.onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
         .onFailure().invoke{ e -> Log.error(e) }
         .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    }
+
+    @POST
+    @Path("/logout")
+    @Produces(MediaType.TEXT_PLAIN)
+    @RolesAllowed("User", "Admin")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "404", description = "Not Found"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    fun logout(@Context securityContext: SecurityContext, refreshToken: String): Uni<Response> {
+        Log.info("Logout user ${jwt.name}")
+
+        return authRepository.invalidateSession(UUID.fromString(jwt.name), refreshToken)
+            .onItem().transform { _ -> Response.ok().build() }
+            .onFailure().invoke{ e -> Log.error(e) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    }
+
+    @POST
+    @Path("/refresh")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("User", "Admin")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = LibreUser::class)
+            )
+        ]),
+        APIResponse(responseCode = "404", description = "Not Found"),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "403", description = "Forbidden"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    fun refreshToken(@Context securityContext: SecurityContext, oldRefreshToken: String): Uni<Response> {
+        Log.info("Refresh token")
+
+        printAuthenticationInfo(jwt, securityContext)
+
+        val userId = UUID.fromString(jwt.name)
+
+        return authRepository.findSession(userId, oldRefreshToken).flatMap { _ -> userRepository.findById(userId) }.chain { user ->
+            val accessToken = generateAccessToken(user!!, ttlMinutesAccess.toInt())
+            val refreshToken = generateRefreshToken(ttlMinutesRefresh.toInt())
+
+            val authSession = AuthSession(refreshToken.first, refreshToken.second)
+            authSession.userId = user.id
+
+            authRepository.invalidateSession(userId, oldRefreshToken)
+                .flatMap { authRepository.addSession(authSession, accessToken) }
+        }.onItem().transform { authenticationResponse -> Response.ok(authenticationResponse).build() }
+            .onFailure().invoke{ e -> Log.error(e) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
 
     @GET
@@ -173,34 +232,4 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }
-/*
-    @POST
-    @Path("/refresh")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed("User", "Admin")
-    @APIResponses(
-        APIResponse(responseCode = "200", description = "OK", content = [
-            Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = LibreUser::class)
-            )
-        ]),
-        APIResponse(responseCode = "404", description = "Not Found"),
-        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = ErrorResponse::class)
-        )]),
-        APIResponse(responseCode = "403", description = "Forbidden"),
-        APIResponse(responseCode = "500", description = "Internal Server Error")
-    )
-    fun refreshToken(@Context securityContext: SecurityContext, authSession: AuthSession): Uni<Response> {
-        Log.info("Refresh token $authSession")
-
-        printAuthenticationInfo(jwt, securityContext)
-
-        authSession.userId = UUID.fromString(jwt.name)
-
-        authRepository.addSession(authSession)
-    }*/
 }
