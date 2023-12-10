@@ -3,6 +3,7 @@ package io.tohuwabohu.crud
 import io.quarkus.elytron.security.common.BcryptUtil
 import io.quarkus.security.ForbiddenException
 import io.smallrye.mutiny.Uni
+import io.smallrye.mutiny.unchecked.Unchecked
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import io.tohuwabohu.security.AuthenticationResponse
@@ -63,9 +64,9 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
 
     fun findSession(userId: UUID, token: String) = find("#AuthSession.findRefreshToken", userId, BcryptUtil.bcryptHash(token))
         .firstResult().onItem().ifNull().failWith(EntityNotFoundException())
-        .onItem().ifNotNull().transform { authSession ->
+        .onItem().ifNotNull().invoke (Unchecked.consumer { authSession ->
             if (authSession!!.expiresAt!!.isBefore(LocalDateTime.now())) throw ForbiddenException("Refresh token expired.")
-        }
+        })
 
     fun addSession(authSession: AuthSession, accessToken: String): Uni<AuthenticationResponse> = list("#AuthSession.listRefreshTokens", authSession.userId!!)
         .onItem().ifNotNull().transform { list ->
@@ -74,4 +75,8 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
         }.chain { oldest ->
             oldest?.let { delete(oldest) }?.chain { _ -> validateAndPersist(authSession) } ?: validateAndPersist(authSession)
         }.onItem().transform { persistedAuthSession -> AuthenticationResponse(accessToken, persistedAuthSession.refreshToken!! ) }
+
+    fun invalidateSession(userId: UUID, refreshToken: String): Uni<AuthSession?> = findSession(userId, refreshToken)
+        .onItem().ifNotNull().call { authSession -> delete(authSession!!) }
+
 }
