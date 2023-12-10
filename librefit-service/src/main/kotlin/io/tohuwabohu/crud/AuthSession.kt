@@ -1,6 +1,7 @@
 package io.tohuwabohu.crud
 
 import io.quarkus.elytron.security.common.BcryptUtil
+import io.quarkus.security.ForbiddenException
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
@@ -18,10 +19,8 @@ import java.util.*
         query = "from AuthSession where userId = ?1 and refreshToken = ?2"
     ),
     NamedQuery(name = "AuthSession.listRefreshTokens",
-        query = "from AuthSession where userId = ?1"
-    ),
-    NamedQuery(name = "AuthSession.deleteOldestToken",
-        query = "from AuthSession where userId = ?1 and added = (select min(added) from AuthSession where userId = ?1)")
+        query = "from AuthSession where userId = ?1 order by added desc"
+    )
 )
 @Cacheable
 data class AuthSession (
@@ -65,14 +64,14 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
     fun findSession(userId: UUID, token: String) = find("#AuthSession.findRefreshToken", userId, BcryptUtil.bcryptHash(token))
         .firstResult().onItem().ifNull().failWith(EntityNotFoundException())
         .onItem().ifNotNull().transform { authSession ->
-            if (authSession!!.expiresAt!!.isBefore(LocalDateTime.now())) throw Exception("Refresh token expired.")
+            if (authSession!!.expiresAt!!.isBefore(LocalDateTime.now())) throw ForbiddenException("Refresh token expired.")
         }
 
-    fun addSession(authSession: AuthSession, accessToken: String): Uni<AuthenticationResponse> = count("#AuthSession.listRefreshTokens", authSession.userId!!)
-        .onFailure(NoResultException::class.java).recoverWithItem(0)
-        .onItem().ifNotNull().transform { count -> count > maxTokens.toLong() }.chain { maxReached ->
-            if (maxReached) {
-                delete("#AuthSession.deleteOldestToken", authSession.userId!!).chain{ _ -> validateAndPersist(authSession) }
-            } else validateAndPersist(authSession)
+    fun addSession(authSession: AuthSession, accessToken: String): Uni<AuthenticationResponse> = list("#AuthSession.listRefreshTokens", authSession.userId!!)
+        .onItem().ifNotNull().transform { list ->
+            if (list.size >= maxTokens.toLong()) list[0]
+            else null
+        }.chain { oldest ->
+            oldest?.let { delete(oldest) }?.chain { _ -> validateAndPersist(authSession) } ?: validateAndPersist(authSession)
         }.onItem().transform { persistedAuthSession -> AuthenticationResponse(accessToken, persistedAuthSession.refreshToken!! ) }
 }
