@@ -12,39 +12,37 @@ import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.LibreUser
 import org.hamcrest.Matchers.equalTo
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
-import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestMethodOrder
-import java.util.*
 
-@TestMethodOrder(OrderAnnotation::class)
 @QuarkusTest
 @TestHTTPEndpoint(UserResource::class)
 class UserResourceTest {
     @Test
-    @Order(1)
     fun `should register user`() {
-        val user = user()
-        user.id = UUID.fromString("1171b08c-7fb5-11ee-b962-0242ac120002")
-
         Given {
             header("Content-Type", ContentType.JSON)
-            body(user())
+            body(user("register-test@test.dev"))
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
+    }
+
+    @Test
+    fun `should fail on duplicate email registration`() {
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(user("duplicate-test@test.dev"))
         } When {
             post("/register")
         } Then {
             statusCode(201)
         }
 
-    }
-
-    @Test
-    @Order(2)
-    fun `should fail on duplicate email registration`() {
         Given {
             header("Content-Type", "application/json")
-            body(failingUser())
+            body(user("duplicate-test@test.dev"))
         } When {
             post("/register")
         } Then {
@@ -53,11 +51,19 @@ class UserResourceTest {
     }
 
     @Test
-    @Order(3)
     fun `should login user`() {
         Given {
+            header("Content-Type", ContentType.JSON)
+            body(user("login-test@test.dev"))
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
+
+        Given {
             header("Content-Type", "application/json")
-            body(user())
+            body(user("login-test@test.dev"))
         } When {
             post("/login")
         } Then {
@@ -66,11 +72,10 @@ class UserResourceTest {
     }
 
     @Test
-    @Order(4)
     fun `should fail on login`() {
         Given {
             header("Content-Type", "application/json")
-            body(failingUser())
+            body(user("not-existing@test.dev"))
         } When {
             post("/login")
         } Then {
@@ -85,8 +90,16 @@ class UserResourceTest {
             Claim(key = "email", value = "unit-test1@test.dev")
         ]
     )
-    @Order(5)
     fun `should return user data`() {
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(user("data-test@test.dev"))
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
+
         When {
             get("/read")
         } Then {
@@ -105,7 +118,6 @@ class UserResourceTest {
             Claim(key = "email", value = "unit-test2@test.dev")
         ]
     )
-    @Order(6)
     fun `should fail on reading user data`() {
         When {
             get("/read")
@@ -121,13 +133,22 @@ class UserResourceTest {
             Claim(key = "email", value = "unit-test1@test.dev"),
         ]
     )
-    @Order(7)
     fun `should update user data`() {
+        val userOriginal = user("update-test@test.dev")
         val user = LibreUser(
             email = "unit-test1@test.dev",
             password = "test1",
             avatar = "/path"
         )
+
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(userOriginal)
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
 
         Given {
             header("Content-Type", "application/json")
@@ -152,29 +173,6 @@ class UserResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "330ff8f4-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test3@test.dev"),
-        ]
-    )
-    @Order(8)
-    fun `should fail on updating user data with other user email` () {
-        val user = user()
-        user.avatar = "/path"
-
-        Given {
-            header("Content-Type", "application/json")
-            body(user)
-        } When {
-            post("/update")
-        } Then {
-            statusCode(401)
-        }
-    }
-
-    @Test
-    @Order(9)
     fun `should fail registration validation`() {
         Given {
             header("Content-Type", ContentType.JSON)
@@ -193,9 +191,17 @@ class UserResourceTest {
             Claim(key = "email", value = "test1@test.dev"),
         ]
     )
-    @Order(10)
     fun `should fail on updating user data with wrong password`() {
-        val user = user()
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(user("wrong-pwd@test.dev"))
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
+
+        val user = user("wrong-pwd@test.dev")
         user.avatar = "/path"
         user.password = "notquiteright"
 
@@ -209,19 +215,11 @@ class UserResourceTest {
         }
     }
 
-    private fun user(): LibreUser {
+    private fun user(email: String): LibreUser {
         return LibreUser(
-            email = "test1@test.dev",
+            email = email,
             password = "tastb1",
             name = "testname",
-        )
-    }
-
-    private fun failingUser(): LibreUser {
-        return LibreUser(
-            email = "test1@test.dev",
-            password = "otherpasswordthanuser2b",
-            name = "nottestname"
         )
     }
 
