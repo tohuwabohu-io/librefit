@@ -2,13 +2,9 @@ package io.tohuwabohu
 
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.AuthRepository
-import io.tohuwabohu.crud.AuthSession
-import io.tohuwabohu.crud.LibreUser
-import io.tohuwabohu.crud.LibreUserRepository
+import io.tohuwabohu.crud.*
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
-import io.tohuwabohu.crud.AuthInfo
 import io.tohuwabohu.security.generateAccessToken
 import io.tohuwabohu.security.generateRefreshToken
 import io.tohuwabohu.security.printAuthenticationInfo
@@ -115,6 +111,8 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
     )
     fun logout(@Context securityContext: SecurityContext, authSession: AuthSession): Uni<Response> {
         Log.info("Logout user ${jwt.name}")
+
+        printAuthenticationInfo(jwt, securityContext)
 
         return authRepository.invalidateSession(UUID.fromString(jwt.name), authSession.refreshToken!!)
             .onItem().transform { _ -> Response.ok().build() }
