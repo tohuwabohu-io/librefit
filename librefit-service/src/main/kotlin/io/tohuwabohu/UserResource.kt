@@ -109,12 +109,12 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun logout(@Context securityContext: SecurityContext, authSession: AuthSession): Uni<Response> {
+    fun logout(@Context securityContext: SecurityContext, authInfo: AuthInfo): Uni<Response> {
         Log.info("Logout user ${jwt.name}")
 
         printAuthenticationInfo(jwt, securityContext)
 
-        return authRepository.invalidateSession(UUID.fromString(jwt.name), authSession.refreshToken!!)
+        return authRepository.invalidateSession(UUID.fromString(jwt.name), authInfo.refreshToken)
             .onItem().transform { _ -> Response.ok().build() }
             .onFailure().invoke{ e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
@@ -140,21 +140,21 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
         APIResponse(responseCode = "403", description = "Forbidden"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun refreshToken(@Context securityContext: SecurityContext, oldRefreshToken: String): Uni<Response> {
+    fun refreshToken(@Context securityContext: SecurityContext, authInfo: AuthInfo): Uni<Response> {
         Log.info("Refresh token")
 
         printAuthenticationInfo(jwt, securityContext)
 
         val userId = UUID.fromString(jwt.name)
 
-        return authRepository.findSession(userId, oldRefreshToken).flatMap { _ -> userRepository.findById(userId) }.chain { user ->
+        return authRepository.findSession(userId, authInfo.refreshToken).flatMap { _ -> userRepository.findById(userId) }.chain { user ->
             val accessToken = generateAccessToken(user!!, ttlMinutesAccess.toInt())
             val refreshToken = generateRefreshToken(ttlMinutesRefresh.toInt())
 
             val authSession = AuthSession(refreshToken.first, refreshToken.second)
             authSession.userId = user.id
 
-            authRepository.invalidateSession(userId, oldRefreshToken)
+            authRepository.invalidateSession(userId, authInfo.refreshToken)
                 .flatMap { authRepository.addSession(authSession, accessToken) }
         }.onItem().transform { authenticationResponse -> Response.ok(authenticationResponse).build() }
             .onFailure().invoke{ e -> Log.error(e) }
