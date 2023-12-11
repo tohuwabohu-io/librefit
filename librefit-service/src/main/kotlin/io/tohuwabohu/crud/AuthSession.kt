@@ -6,7 +6,6 @@ import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.unchecked.Unchecked
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
-import io.tohuwabohu.security.AuthenticationResponse
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.*
 import org.eclipse.microprofile.config.inject.ConfigProperty
@@ -62,21 +61,23 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
     @ConfigProperty(name = "libreuser.tokens.max", defaultValue = "1")
     private lateinit var maxTokens: String
 
-    fun findSession(userId: UUID, token: String) = find("#AuthSession.findRefreshToken", userId, BcryptUtil.bcryptHash(token))
+    fun findSession(userId: UUID, token: String): Uni<AuthSession?> = find("#AuthSession.findRefreshToken", userId, BcryptUtil.bcryptHash(token))
         .firstResult().onItem().ifNull().failWith(EntityNotFoundException())
         .onItem().ifNotNull().invoke (Unchecked.consumer { authSession ->
             if (authSession!!.expiresAt!!.isBefore(LocalDateTime.now())) throw ForbiddenException("Refresh token expired.")
         })
 
-    fun addSession(authSession: AuthSession, accessToken: String): Uni<AuthenticationResponse> = list("#AuthSession.listRefreshTokens", authSession.userId!!)
+    fun addSession(authSession: AuthSession, accessToken: String): Uni<AuthInfo> = list("#AuthSession.listRefreshTokens", authSession.userId!!)
         .onItem().ifNotNull().transform { list ->
             if (list.size >= maxTokens.toLong()) list[0]
             else null
         }.chain { oldest ->
             oldest?.let { delete(oldest) }?.chain { _ -> validateAndPersist(authSession) } ?: validateAndPersist(authSession)
-        }.onItem().transform { persistedAuthSession -> AuthenticationResponse(accessToken, persistedAuthSession.refreshToken!! ) }
+        }.onItem().transform { persistedAuthSession -> AuthInfo(accessToken, persistedAuthSession.refreshToken!! ) }
 
     fun invalidateSession(userId: UUID, refreshToken: String): Uni<AuthSession?> = findSession(userId, refreshToken)
         .onItem().ifNotNull().call { authSession -> delete(authSession!!) }
 
 }
+
+class AuthInfo (val token: String, val refreshToken: String)

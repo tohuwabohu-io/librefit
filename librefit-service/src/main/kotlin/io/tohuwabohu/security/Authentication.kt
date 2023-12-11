@@ -14,8 +14,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
 
-class AuthenticationResponse (val token: String, val refreshToken: String)
-
 @ConfigProperty(name = "libreuser.tokens.access.expiration.minutes", defaultValue = "25")
 private var ttlMinAccess: String = "25"
 

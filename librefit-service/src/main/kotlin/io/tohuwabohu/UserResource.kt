@@ -8,7 +8,7 @@ import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
-import io.tohuwabohu.security.AuthenticationResponse
+import io.tohuwabohu.crud.AuthInfo
 import io.tohuwabohu.security.generateAccessToken
 import io.tohuwabohu.security.generateRefreshToken
 import io.tohuwabohu.security.printAuthenticationInfo
@@ -78,7 +78,7 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = AuthenticationResponse::class)
+                schema = Schema(implementation = AuthInfo::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -113,10 +113,10 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun logout(@Context securityContext: SecurityContext, refreshToken: String): Uni<Response> {
+    fun logout(@Context securityContext: SecurityContext, authSession: AuthSession): Uni<Response> {
         Log.info("Logout user ${jwt.name}")
 
-        return authRepository.invalidateSession(UUID.fromString(jwt.name), refreshToken)
+        return authRepository.invalidateSession(UUID.fromString(jwt.name), authSession.refreshToken!!)
             .onItem().transform { _ -> Response.ok().build() }
             .onFailure().invoke{ e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
