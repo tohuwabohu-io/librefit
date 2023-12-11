@@ -27,6 +27,14 @@ export const login = async (event) => {
 			maxAge: 1000 * 60 * 15 // 15 mins
 		});
 
+		event.cookies.set('refresh', auth.refreshToken, {
+			httpOnly: true,
+			path: '/',
+			secure: true,
+			sameSite: 'strict',
+			maxAge: 1000 * 60 * 1440 // 2 weeks
+		});
+
 		throw redirect(303, '/dashboard');
 	}
 
