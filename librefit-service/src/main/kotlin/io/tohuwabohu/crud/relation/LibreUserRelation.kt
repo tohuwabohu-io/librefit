@@ -130,6 +130,11 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
             sequence = sequence
         )
 
+        return deleteEntry(key)
+    }
+
+    @WithTransaction
+    fun deleteEntry(key: LibreUserCompositeKey): Uni<Boolean> {
         return findById(key).onItem().ifNull().failWith(EntityNotFoundException()).onItem()
             .ifNotNull().transformToUni { entry -> deleteById(entry.getPrimaryKey())}
     }

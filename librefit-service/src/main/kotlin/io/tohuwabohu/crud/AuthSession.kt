@@ -61,7 +61,7 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
     @ConfigProperty(name = "libreuser.tokens.max", defaultValue = "1")
     private lateinit var maxTokens: String
 
-    fun findSession(userId: UUID, token: String): Uni<AuthSession?> = find("#AuthSession.findRefreshToken", userId, BcryptUtil.bcryptHash(token))
+    fun findSession(userId: UUID, token: String): Uni<AuthSession?> = find("#AuthSession.findRefreshToken", userId, token)
         .firstResult().onItem().ifNull().failWith(EntityNotFoundException())
         .onItem().ifNotNull().invoke (Unchecked.consumer { authSession ->
             if (authSession!!.expiresAt!!.isBefore(LocalDateTime.now())) throw ForbiddenException("Refresh token expired.")
@@ -75,8 +75,8 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
             oldest?.let { delete(oldest) }?.chain { _ -> validateAndPersist(authSession) } ?: validateAndPersist(authSession)
         }.onItem().transform { persistedAuthSession -> AuthInfo(accessToken, persistedAuthSession.refreshToken!! ) }
 
-    fun invalidateSession(userId: UUID, refreshToken: String): Uni<AuthSession?> = findSession(userId, refreshToken)
-        .onItem().ifNotNull().call { authSession -> delete(authSession!!) }
+    fun invalidateSession(userId: UUID, refreshToken: String): Uni<Boolean> = findSession(userId, refreshToken)
+        .onItem().ifNotNull().transform { authSession -> authSession!!.getPrimaryKey() }.chain{key -> deleteEntry(key) }
 
 }
 
