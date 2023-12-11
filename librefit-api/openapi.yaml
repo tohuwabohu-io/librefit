@@ -705,7 +705,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticationResponse'
+                $ref: '#/components/schemas/AuthInfo'
         "400":
           description: Bad Request
           content:
@@ -716,6 +716,30 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
+  /user/logout:
+    post:
+      tags:
+      - User Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthInfo'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain: {}
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+        "401":
+          description: Not Authorized
+      security:
+      - SecurityScheme: []
   /user/read:
     get:
       tags:
@@ -742,6 +766,38 @@ paths:
           description: Internal Server Error
         "403":
           description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /user/refresh:
+    post:
+      tags:
+      - User Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthInfo'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibreUser'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Not Authorized
       security:
       - SecurityScheme: []
   /user/register:
@@ -801,7 +857,7 @@ paths:
       - SecurityScheme: []
 components:
   schemas:
-    AuthenticationResponse:
+    AuthInfo:
       required:
       - token
       - refreshToken
