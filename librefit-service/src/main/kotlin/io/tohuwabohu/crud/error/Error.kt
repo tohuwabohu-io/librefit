@@ -1,5 +1,6 @@
 package io.tohuwabohu.crud.error
 
+import io.quarkus.security.ForbiddenException
 import io.quarkus.security.UnauthorizedException
 import jakarta.persistence.EntityNotFoundException
 import jakarta.persistence.NoResultException
@@ -28,6 +29,10 @@ fun createErrorResponse(throwable: Throwable): Response {
 
         is UnauthorizedException -> {
             UnauthorizedExceptionMapper().toResponse(throwable)
+        }
+
+        is ForbiddenException -> {
+            Response.status(Response.Status.FORBIDDEN).build()
         }
 
         else -> {
