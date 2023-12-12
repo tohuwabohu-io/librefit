@@ -124,7 +124,6 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
     @Path("/refresh")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed("User", "Admin")
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
@@ -140,11 +139,7 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
         APIResponse(responseCode = "403", description = "Forbidden"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    fun refreshToken(@Context securityContext: SecurityContext, authInfo: AuthInfo): Uni<Response> {
-        Log.info("Refresh token")
-
-        printAuthenticationInfo(jwt, securityContext)
-
+    fun refreshToken(authInfo: AuthInfo): Uni<Response> {
         return authRepository.findSession(authInfo.refreshToken)
             .flatMap { authSession -> userRepository.findById(authSession!!.userId) }.chain { user ->
                 val accessToken = generateAccessToken(user!!, ttlMinutesAccess.toInt())
