@@ -61,7 +61,7 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
     private lateinit var maxTokens: String
 
     fun findSession(token: String): Uni<AuthSession?> = find("#AuthSession.findRefreshToken", token)
-        .firstResult().onItem().ifNull().failWith(EntityNotFoundException())
+        .firstResult().onItem().ifNull().failWith(ForbiddenException("Refresh token expired."))
         .onItem().ifNotNull().invoke (Unchecked.consumer { authSession ->
             if (authSession!!.expiresAt!!.isBefore(LocalDateTime.now())) throw ForbiddenException("Refresh token expired.")
         })
