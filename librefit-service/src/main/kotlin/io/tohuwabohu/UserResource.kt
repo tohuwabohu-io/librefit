@@ -114,7 +114,7 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
 
         printAuthenticationInfo(jwt, securityContext)
 
-        return authRepository.invalidateSession(UUID.fromString(jwt.name), authInfo.refreshToken)
+        return authRepository.invalidateSession(authInfo.refreshToken)
             .onItem().transform { _ -> Response.ok().build() }
             .onFailure().invoke{ e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
@@ -145,17 +145,16 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
 
         printAuthenticationInfo(jwt, securityContext)
 
-        val userId = UUID.fromString(jwt.name)
+        return authRepository.findSession(authInfo.refreshToken)
+            .flatMap { authSession -> userRepository.findById(authSession!!.userId) }.chain { user ->
+                val accessToken = generateAccessToken(user!!, ttlMinutesAccess.toInt())
+                val refreshToken = generateRefreshToken(ttlMinutesRefresh.toInt())
 
-        return authRepository.findSession(userId, authInfo.refreshToken).flatMap { _ -> userRepository.findById(userId) }.chain { user ->
-            val accessToken = generateAccessToken(user!!, ttlMinutesAccess.toInt())
-            val refreshToken = generateRefreshToken(ttlMinutesRefresh.toInt())
+                val authSession = AuthSession(refreshToken.first, refreshToken.second)
+                authSession.userId = user.id
 
-            val authSession = AuthSession(refreshToken.first, refreshToken.second)
-            authSession.userId = user.id
-
-            authRepository.invalidateSession(userId, authInfo.refreshToken)
-                .flatMap { authRepository.addSession(authSession, accessToken) }
+                authRepository.invalidateSession(authInfo.refreshToken)
+                    .flatMap { authRepository.addSession(authSession, accessToken) }
         }.onItem().transform { authenticationResponse -> Response.ok(authenticationResponse).build() }
             .onFailure().invoke{ e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

@@ -11,12 +11,11 @@ import jakarta.persistence.*
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hibernate.proxy.HibernateProxy
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 @NamedQueries(
     NamedQuery(name = "AuthSession.findRefreshToken",
-        query = "from AuthSession where userId = ?1 and refreshToken = ?2"
+        query = "from AuthSession where refreshToken = ?1"
     ),
     NamedQuery(name = "AuthSession.listRefreshTokens",
         query = "from AuthSession where userId = ?1 order by added desc"
@@ -24,7 +23,7 @@ import java.util.*
 )
 @Cacheable
 data class AuthSession (
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     var refreshToken: String? = null,
 
     var expiresAt: LocalDateTime? = null
@@ -61,21 +60,23 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
     @ConfigProperty(name = "libreuser.tokens.max", defaultValue = "1")
     private lateinit var maxTokens: String
 
-    fun findSession(userId: UUID, token: String): Uni<AuthSession?> = find("#AuthSession.findRefreshToken", userId, token)
+    fun findSession(token: String): Uni<AuthSession?> = find("#AuthSession.findRefreshToken", token)
         .firstResult().onItem().ifNull().failWith(EntityNotFoundException())
         .onItem().ifNotNull().invoke (Unchecked.consumer { authSession ->
             if (authSession!!.expiresAt!!.isBefore(LocalDateTime.now())) throw ForbiddenException("Refresh token expired.")
         })
 
-    fun addSession(authSession: AuthSession, accessToken: String): Uni<AuthInfo> = list("#AuthSession.listRefreshTokens", authSession.userId!!)
-        .onItem().ifNotNull().transform { list ->
+    fun addSession(authSession: AuthSession, accessToken: String): Uni<AuthInfo> = list("#AuthSession.listRefreshTokens",
+        authSession.userId!!).onItem().ifNotNull().transform { list ->
             if (list.size >= maxTokens.toLong()) list[0]
             else null
         }.chain { oldest ->
             oldest?.let { delete(oldest) }?.chain { _ -> validateAndPersist(authSession) } ?: validateAndPersist(authSession)
-        }.onItem().transform { persistedAuthSession -> AuthInfo(accessToken, persistedAuthSession.refreshToken!! ) }
+        }.onItem().transform { persistedAuthSession ->
+            AuthInfo(token = accessToken, refreshToken = persistedAuthSession.refreshToken!!)
+        }
 
-    fun invalidateSession(userId: UUID, refreshToken: String): Uni<Boolean> = findSession(userId, refreshToken)
+    fun invalidateSession(refreshToken: String): Uni<Boolean> = findSession(refreshToken)
         .onItem().ifNotNull().transform { authSession -> authSession!!.getPrimaryKey() }.chain{key -> deleteEntry(key) }
 
 }

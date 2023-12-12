@@ -10,6 +10,7 @@ import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
+import io.tohuwabohu.crud.AuthInfo
 import io.tohuwabohu.crud.LibreUser
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
@@ -212,6 +213,39 @@ class UserResourceTest {
             post("/update")
         } Then {
             statusCode(404)
+        }
+    }
+
+    @Test
+    @TestSecurity(user = "11e45d14-7fb5-11ee-b962-0242ac120002", roles = ["User"])
+    fun `should login and logout a user`() {
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(user("auth-test1@test.dev"))
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
+
+        val authInfo = Given {
+            header("Content-Type", "application/json")
+            body(user("auth-test1@test.dev"))
+        } When {
+            post("/login")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(AuthInfo::class.java)
+        }
+
+        Given {
+            header("Content-Type", "application/json")
+            body(AuthInfo(token = "", refreshToken = authInfo.refreshToken))
+        } When {
+            post("/logout")
+        } Then {
+            statusCode(200)
         }
     }
 
