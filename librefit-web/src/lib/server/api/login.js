@@ -16,24 +16,10 @@ export const login = async (event) => {
 	const response = await proxyFetch(event.fetch, userApi, undefined, libreUser);
 
 	if (response.status === 200) {
-		/** @type {import('$lib/server/api/index.js').AuthenticationResponse} */
+		/** @type {AuthInfo} */
 		const auth = await response.json();
 
-		event.cookies.set('auth', auth.token, {
-			httpOnly: true,
-			path: '/',
-			secure: true,
-			sameSite: 'strict',
-			maxAge: 1000 * 60 * 15 // 15 mins
-		});
-
-		event.cookies.set('refresh', auth.refreshToken, {
-			httpOnly: true,
-			path: '/',
-			secure: true,
-			sameSite: 'strict',
-			maxAge: 1000 * 60 * 1440 // 2 weeks
-		});
+		setAuthInfo(auth, event.cookies);
 
 		throw redirect(303, '/dashboard');
 	}
@@ -41,4 +27,28 @@ export const login = async (event) => {
 	return {
 		error: 'Invalid username or password.'
 	};
+};
+
+/**
+ * @param {AuthInfo} authInfo
+ * @param {Cookies} cookies
+ */
+export const setAuthInfo = (authInfo, cookies) => {
+	console.log('updated authInfo.');
+
+	cookies.set('auth', authInfo.token, {
+		httpOnly: true,
+		path: '/',
+		secure: true,
+		sameSite: 'strict',
+		maxAge: 1000 * 60 * 15 // 15 mins
+	});
+
+	cookies.set('refresh', authInfo.refreshToken, {
+		httpOnly: true,
+		path: '/',
+		secure: true,
+		sameSite: 'strict',
+		maxAge: 1000 * 60 * 1440 // 2 weeks
+	});
 };
