@@ -150,7 +150,7 @@ export const api = {
 		/** @see AuthInfo */
 		contentType: 'application/json',
 		method: 'post',
-		guarded: true
+		guarded: false
 	},
 	postUserRegister: {
 		path: '/user/register',

@@ -796,10 +796,6 @@ paths:
           description: Forbidden
         "500":
           description: Internal Server Error
-        "401":
-          description: Not Authorized
-      security:
-      - SecurityScheme: []
   /user/register:
     post:
       tags:
