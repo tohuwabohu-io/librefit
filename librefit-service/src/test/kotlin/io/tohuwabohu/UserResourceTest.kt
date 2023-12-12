@@ -249,6 +249,118 @@ class UserResourceTest {
         }
     }
 
+    @Test
+    @TestSecurity(user = "11e45d14-7fb5-11ee-b962-0242ac120002", roles = ["User"])
+    fun `should login a user 4 times and invalidate the oldest refresh token`() {
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(user("auth-test2@test.dev"))
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
+
+        val authInfo1 = Given {
+            header("Content-Type", "application/json")
+            body(user("auth-test2@test.dev"))
+        } When {
+            post("/login")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(AuthInfo::class.java)
+        }
+
+        Given {
+            header("Content-Type", "application/json")
+            body(user("auth-test2@test.dev"))
+        } When {
+            post("/login")
+        } Then {
+            statusCode(200)
+        }
+
+        Given {
+            header("Content-Type", "application/json")
+            body(user("auth-test2@test.dev"))
+        } When {
+            post("/login")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(AuthInfo::class.java)
+        }
+
+        Given {
+            header("Content-Type", "application/json")
+            body(user("auth-test2@test.dev"))
+        } When {
+            post("/login")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(AuthInfo::class.java)
+        }
+
+        Given {
+            header("Content-Type", "application/json")
+            body(AuthInfo(token = "", refreshToken = authInfo1.refreshToken))
+        } When {
+            post("/refresh")
+        } Then {
+            statusCode(403)
+        }
+    }
+
+    @Test
+    @TestSecurity(user = "11e45d14-7fb5-11ee-b962-0242ac120002", roles = ["User"])
+    fun `should login a user and rotate the refresh token`() {
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(user("auth-test3@test.dev"))
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
+
+        val authInfo1 = Given {
+            header("Content-Type", "application/json")
+            body(user("auth-test3@test.dev"))
+        } When {
+            post("/login")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(AuthInfo::class.java)
+        }
+
+        val authInfo2 = Given {
+            header("Content-Type", "application/json")
+            body(authInfo1)
+        } When {
+            post("/refresh")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(AuthInfo::class.java)
+        }
+
+        assert(authInfo1.token != authInfo2.token)
+        assert(authInfo1.refreshToken != authInfo2.refreshToken)
+
+        Given {
+            header("Content-Type", "application/json")
+            body(authInfo1)
+        } When {
+            post("/refresh")
+        } Then {
+            statusCode(403)
+        } Extract {
+        }
+    }
+
     private fun user(email: String): LibreUser {
         return LibreUser(
             email = email,
