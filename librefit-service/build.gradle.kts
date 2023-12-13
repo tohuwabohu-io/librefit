@@ -17,6 +17,7 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
+    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-jacoco")
     implementation("io.quarkus:quarkus-security-jpa-reactive")
     implementation("io.quarkus:quarkus-smallrye-jwt")
@@ -25,7 +26,6 @@ dependencies {
     implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
     implementation("io.quarkus:quarkus-reactive-pg-client")
     implementation("io.quarkus:quarkus-smallrye-openapi")
-    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

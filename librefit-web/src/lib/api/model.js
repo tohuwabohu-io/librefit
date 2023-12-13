@@ -53,8 +53,11 @@ export const Category = {
  */
 
 /**
- * @typedef {Object} AuthenticationResponse
- * @property {String} token
+ * @typedef {Object} AuthInfo
+ * @property {String} accessToken
+ * @property {String} [accessExpires]
+ * @property {String} refreshToken
+ * @property {String} [refreshExpires]
  */
 
 /**

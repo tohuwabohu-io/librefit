@@ -2,12 +2,14 @@ package io.tohuwabohu
 
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
+import io.tohuwabohu.crud.AuthInfo
+import io.tohuwabohu.crud.AuthRepository
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
-import io.tohuwabohu.security.AuthenticationResponse
-import io.tohuwabohu.security.generateToken
+import io.tohuwabohu.security.generateAccessToken
+import io.tohuwabohu.security.generateRefreshToken
 import io.tohuwabohu.security.printAuthenticationInfo
 import jakarta.annotation.security.PermitAll
 import jakarta.annotation.security.RolesAllowed
@@ -19,6 +21,7 @@ import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.SecurityContext
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
@@ -30,9 +33,15 @@ import java.util.*
 
 @Path("/user")
 @RequestScoped
-class UserResource(val userRepository: LibreUserRepository) {
+class UserResource(val userRepository: LibreUserRepository, val authRepository: AuthRepository) {
     @Inject
     lateinit var jwt: JsonWebToken
+
+    @ConfigProperty(name = "libreuser.tokens.access.expiration.minutes", defaultValue = "25")
+    private lateinit var ttlMinutesAccess: String
+
+    @ConfigProperty(name = "libreuser.tokens.refresh.expiration.minutes", defaultValue = "1440")
+    private lateinit var ttlMinutesRefresh: String
 
     @POST
     @Path("/register")
@@ -68,19 +77,78 @@ class UserResource(val userRepository: LibreUserRepository) {
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = AuthenticationResponse::class)
+                schema = Schema(implementation = AuthInfo::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class),
         )]),
+        APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     fun login(libreUser: LibreUser): Uni<Response> {
-        return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password)
-            .onItem().ifNotNull().transform { user -> Response.ok(AuthenticationResponse(generateToken(user!!))).build() }
-            .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
+        return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password).flatMap { user ->
+            authRepository.addSession(
+                userId = user!!.id!!,
+                access = generateAccessToken(user, ttlMinutesAccess.toInt()),
+                refresh = generateRefreshToken(ttlMinutesRefresh.toInt())
+            )
+        }.onItem().transform { authenticationResponse ->
+            Response.ok(authenticationResponse).build()
+        }.onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
+        .onFailure().invoke{ e -> Log.error(e) }
+        .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    }
+
+    @POST
+    @Path("/logout")
+    @Produces(MediaType.TEXT_PLAIN)
+    @RolesAllowed("User", "Admin")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "404", description = "Not Found"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    fun logout(@Context securityContext: SecurityContext, authInfo: AuthInfo): Uni<Response> {
+        Log.info("Logout user ${jwt.name}")
+
+        printAuthenticationInfo(jwt, securityContext)
+
+        return authRepository.invalidateSession(authInfo.refreshToken)
+            .onItem().transform { _ -> Response.ok().build() }
+            .onFailure().invoke{ e -> Log.error(e) }
+            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    }
+
+    @POST
+    @Path("/refresh")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = LibreUser::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "403", description = "Forbidden"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    fun refreshToken(authInfo: AuthInfo): Uni<Response> {
+        return authRepository.findSession(authInfo.refreshToken)
+            .flatMap { authSession -> userRepository.findById(authSession!!.userId) }.chain { user ->
+                authRepository.invalidateSession(authInfo.refreshToken)
+                    .flatMap { authRepository.addSession(
+                        userId = user.id!!,
+                        access = generateAccessToken(user, ttlMinutesAccess.toInt()),
+                        refresh = generateRefreshToken(ttlMinutesRefresh.toInt())
+                    ) }
+        }.onItem().transform { authenticationResponse -> Response.ok(authenticationResponse).build() }
             .onFailure().invoke{ e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
     }

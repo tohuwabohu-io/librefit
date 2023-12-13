@@ -132,11 +132,25 @@ export const api = {
 		method: 'post',
 		guarded: false
 	},
+	postUserLogout: {
+		path: '/user/logout',
+		/** @see AuthInfo */
+		contentType: 'application/json',
+		method: 'post',
+		guarded: true
+	},
 	readUserInfo: {
 		path: '/user/read',
 		contentType: 'text/plain',
 		method: 'get',
 		guarded: true
+	},
+	postUserRefresh: {
+		path: '/user/refresh',
+		/** @see AuthInfo */
+		contentType: 'application/json',
+		method: 'post',
+		guarded: false
 	},
 	postUserRegister: {
 		path: '/user/register',

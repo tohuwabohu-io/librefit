@@ -705,15 +705,41 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticationResponse'
+                $ref: '#/components/schemas/AuthInfo'
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
+  /user/logout:
+    post:
+      tags:
+      - User Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthInfo'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain: {}
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+        "401":
+          description: Not Authorized
+      security:
+      - SecurityScheme: []
   /user/read:
     get:
       tags:
@@ -742,6 +768,32 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
+  /user/refresh:
+    post:
+      tags:
+      - User Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthInfo'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibreUser'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server Error
   /user/register:
     post:
       tags:
@@ -799,13 +851,26 @@ paths:
       - SecurityScheme: []
 components:
   schemas:
-    AuthenticationResponse:
+    AuthInfo:
       required:
-      - token
+      - accessToken
+      - refreshToken
       type: object
       properties:
-        token:
+        accessToken:
           type: string
+        accessExpires:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+        refreshToken:
+          type: string
+        refreshExpires:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
     BmiCategory:
       enum:
       - UNDERWEIGHT
