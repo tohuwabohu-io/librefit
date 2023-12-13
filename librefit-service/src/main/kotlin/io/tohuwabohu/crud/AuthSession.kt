@@ -11,6 +11,7 @@ import jakarta.persistence.*
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hibernate.proxy.HibernateProxy
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @NamedQueries(
@@ -66,14 +67,24 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
             if (authSession!!.expiresAt!!.isBefore(LocalDateTime.now())) throw ForbiddenException("Refresh token expired.")
         })
 
-    fun addSession(authSession: AuthSession, accessToken: String): Uni<AuthInfo> = list("#AuthSession.listRefreshTokens",
-        authSession.userId!!).onItem().ifNotNull().transform { list ->
+    fun addSession(userId: UUID, access: Pair<String, LocalDateTime>, refresh: Pair<String, LocalDateTime>): Uni<AuthInfo> = list("#AuthSession.listRefreshTokens", userId)
+        .onItem().ifNotNull().transform { list ->
             if (list.size >= maxTokens.toLong()) list[0]
             else null
         }.chain { oldest ->
-            oldest?.let { delete(oldest) }?.chain { _ -> validateAndPersist(authSession) } ?: validateAndPersist(authSession)
+            val authSession = AuthSession(refreshToken = refresh.first, expiresAt = refresh.second)
+            authSession.userId = userId
+
+            oldest?.let { deleteEntry(oldest.getPrimaryKey()) }?.chain { _ ->
+                validateAndPersist(authSession)
+            } ?: validateAndPersist(authSession)
         }.onItem().transform { persistedAuthSession ->
-            AuthInfo(token = accessToken, refreshToken = persistedAuthSession.refreshToken!!)
+            AuthInfo(
+                accessToken = access.first,
+                accessExpires = access.second,
+                refreshToken = persistedAuthSession.refreshToken!!,
+                refreshExpires = refresh.second
+            )
         }
 
     fun invalidateSession(refreshToken: String): Uni<Boolean> = findSession(refreshToken)
@@ -81,4 +92,4 @@ class AuthRepository : LibreUserRelatedRepository<AuthSession>() {
 
 }
 
-class AuthInfo (val token: String, val refreshToken: String)
+class AuthInfo (val accessToken: String, val accessExpires: LocalDateTime? = null, val refreshToken: String, val refreshExpires: LocalDateTime? = null)

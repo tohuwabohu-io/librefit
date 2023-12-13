@@ -1,6 +1,7 @@
 import { api } from '$lib/server/api/index.js';
 import { proxyFetch } from '$lib/server/api/util.js';
 import { redirect } from '@sveltejs/kit';
+import * as dateUtil from 'date-fns';
 
 export const login = async (event) => {
 	const userApi = api.postUserLogin;
@@ -36,12 +37,12 @@ export const login = async (event) => {
 export const setAuthInfo = (authInfo, cookies) => {
 	console.log('updated authInfo.');
 
-	cookies.set('auth', authInfo.token, {
+	cookies.set('auth', authInfo.accessToken, {
 		httpOnly: true,
 		path: '/',
 		secure: true,
 		sameSite: 'strict',
-		maxAge: 1000 * 60 * 15 // 15 mins
+		expires: dateUtil.parse(authInfo.accessExpires, "yyyy-MM-dd'T'HH:mm:ss", new Date())
 	});
 
 	cookies.set('refresh', authInfo.refreshToken, {
@@ -49,6 +50,6 @@ export const setAuthInfo = (authInfo, cookies) => {
 		path: '/',
 		secure: true,
 		sameSite: 'strict',
-		maxAge: 1000 * 60 * 1440 // 2 weeks
+		expires: dateUtil.parse(authInfo.refreshExpires, "yyyy-MM-dd'T'HH:mm:ss", new Date())
 	});
 };

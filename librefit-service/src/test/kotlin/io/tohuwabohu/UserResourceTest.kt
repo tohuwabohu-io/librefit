@@ -241,7 +241,7 @@ class UserResourceTest {
 
         Given {
             header("Content-Type", "application/json")
-            body(AuthInfo(token = "", refreshToken = authInfo.refreshToken))
+            body(AuthInfo(accessToken = "", refreshToken = authInfo.refreshToken))
         } When {
             post("/logout")
         } Then {
@@ -305,7 +305,7 @@ class UserResourceTest {
 
         Given {
             header("Content-Type", "application/json")
-            body(AuthInfo(token = "", refreshToken = authInfo1.refreshToken))
+            body(AuthInfo(accessToken = "", refreshToken = authInfo1.refreshToken))
         } When {
             post("/refresh")
         } Then {
@@ -347,7 +347,7 @@ class UserResourceTest {
             body().`as`(AuthInfo::class.java)
         }
 
-        assert(authInfo1.token != authInfo2.token)
+        assert(authInfo1.accessToken != authInfo2.accessToken)
         assert(authInfo1.refreshToken != authInfo2.refreshToken)
 
         Given {

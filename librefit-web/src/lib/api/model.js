@@ -54,8 +54,10 @@ export const Category = {
 
 /**
  * @typedef {Object} AuthInfo
- * @property {String} token
+ * @property {String} accessToken
+ * @property {String} [accessExpires]
  * @property {String} refreshToken
+ * @property {String} [refreshExpires]
  */
 
 /**

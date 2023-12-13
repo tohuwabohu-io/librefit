@@ -2,7 +2,10 @@ package io.tohuwabohu
 
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.*
+import io.tohuwabohu.crud.AuthInfo
+import io.tohuwabohu.crud.AuthRepository
+import io.tohuwabohu.crud.LibreUser
+import io.tohuwabohu.crud.LibreUserRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.generateAccessToken
@@ -86,13 +89,11 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
     )
     fun login(libreUser: LibreUser): Uni<Response> {
         return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password).flatMap { user ->
-            val accessToken = generateAccessToken(user!!, ttlMinutesAccess.toInt())
-            val refreshToken = generateRefreshToken(ttlMinutesRefresh.toInt())
-
-            val authSession = AuthSession(refreshToken.first, refreshToken.second)
-            authSession.userId = user.id
-
-            authRepository.addSession(authSession, accessToken)
+            authRepository.addSession(
+                userId = user!!.id!!,
+                access = generateAccessToken(user, ttlMinutesAccess.toInt()),
+                refresh = generateRefreshToken(ttlMinutesRefresh.toInt())
+            )
         }.onItem().transform { authenticationResponse ->
             Response.ok(authenticationResponse).build()
         }.onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
@@ -131,7 +132,6 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
                 schema = Schema(implementation = LibreUser::class)
             )
         ]),
-        APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
             mediaType = "application/json",
             schema = Schema(implementation = ErrorResponse::class)
@@ -142,14 +142,12 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
     fun refreshToken(authInfo: AuthInfo): Uni<Response> {
         return authRepository.findSession(authInfo.refreshToken)
             .flatMap { authSession -> userRepository.findById(authSession!!.userId) }.chain { user ->
-                val accessToken = generateAccessToken(user!!, ttlMinutesAccess.toInt())
-                val refreshToken = generateRefreshToken(ttlMinutesRefresh.toInt())
-
-                val authSession = AuthSession(refreshToken.first, refreshToken.second)
-                authSession.userId = user.id
-
                 authRepository.invalidateSession(authInfo.refreshToken)
-                    .flatMap { authRepository.addSession(authSession, accessToken) }
+                    .flatMap { authRepository.addSession(
+                        userId = user.id!!,
+                        access = generateAccessToken(user, ttlMinutesAccess.toInt()),
+                        refresh = generateRefreshToken(ttlMinutesRefresh.toInt())
+                    ) }
         }.onItem().transform { authenticationResponse -> Response.ok(authenticationResponse).build() }
             .onFailure().invoke{ e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }

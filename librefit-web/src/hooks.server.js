@@ -20,7 +20,13 @@ export async function handle({ event, resolve }) {
 			} else {
 				const refreshApi = api.postUserRefresh;
 
-				await proxyFetch(event.fetch, refreshApi, null, { token: '', refreshToken: refreshToken })
+				/** @type {AuthInfo} */
+				const authInfo = {
+					accessToken: '',
+					refreshToken: refreshToken
+				};
+
+				await proxyFetch(event.fetch, refreshApi, null, authInfo)
 					.then(async (authInfo) => setAuthInfo(await authInfo.json(), event.cookies))
 					.catch((e) => {
 						console.error(e);

@@ -1177,9 +1177,6 @@
               }
             }
           },
-          "404" : {
-            "description" : "Not Found"
-          },
           "400" : {
             "description" : "Bad Request",
             "content" : {
@@ -1290,14 +1287,28 @@
   "components" : {
     "schemas" : {
       "AuthInfo" : {
-        "required" : [ "token", "refreshToken" ],
+        "required" : [ "accessToken", "refreshToken" ],
         "type" : "object",
         "properties" : {
-          "token" : {
+          "accessToken" : {
             "type" : "string"
+          },
+          "accessExpires" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            } ],
+            "nullable" : true
           },
           "refreshToken" : {
             "type" : "string"
+          },
+          "refreshExpires" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            } ],
+            "nullable" : true
           }
         }
       },

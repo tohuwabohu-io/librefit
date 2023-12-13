@@ -6,7 +6,7 @@ import { redirect } from '@sveltejs/kit';
 export const load = async ({ fetch, cookies }) => {
 	/** @type AuthInfo */
 	const authInfo = {
-		token: cookies.get('auth'),
+		accessToken: cookies.get('auth'),
 		refreshToken: cookies.get('refresh')
 	};
 
@@ -14,7 +14,7 @@ export const load = async ({ fetch, cookies }) => {
 	cookies.delete('refresh');
 
 	const userApi = api.postUserLogout;
-	const response = await proxyFetch(fetch, userApi, authInfo.token, authInfo);
+	const response = await proxyFetch(fetch, userApi, authInfo.accessToken, authInfo);
 
 	throw redirect(303, '/');
 };

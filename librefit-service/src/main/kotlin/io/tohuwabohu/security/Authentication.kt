@@ -6,19 +6,12 @@ import io.smallrye.jwt.build.Jwt
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.ws.rs.core.SecurityContext
-import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eclipse.microprofile.jwt.Claims
 import org.eclipse.microprofile.jwt.JsonWebToken
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
-
-@ConfigProperty(name = "libreuser.tokens.access.expiration.minutes", defaultValue = "25")
-private var ttlMinAccess: String = "25"
-
-@ConfigProperty(name = "libreuser.tokens.refresh.expiration.minutes", defaultValue = "1440")
-private var ttlMinRefresh: String = "1440"
 
 fun printAuthenticationInfo(jwt: JsonWebToken, ctx: SecurityContext) {
     val name = if (ctx.userPrincipal == null) {
@@ -43,14 +36,20 @@ fun validateToken(jwt: JsonWebToken, data: LibreUserWeakEntity) {
     }
 }
 
-fun generateAccessToken(user: LibreUser, ttlMinutes: Int): String =
-    Jwt.issuer("https://libre.fitness/")
+fun generateAccessToken(user: LibreUser, ttlMinutes: Int): Pair<String, LocalDateTime> {
+    val expiresAt = System.currentTimeMillis() / 1000 + (ttlMinutes * 60)
+    val expirationDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAt * 1000), ZoneId.systemDefault())
+
+    val jwtString = Jwt.issuer("https://libre.fitness/")
         .upn(user.id.toString())
         .claim(Claims.email, user.email)
         .claim(Claims.nickname, user.name)
         .groups(user.role)
-        .expiresAt(System.currentTimeMillis() / 1000 + (ttlMinutes * 60))
+        .expiresAt(expiresAt)
         .sign()
+
+    return Pair(jwtString, expirationDate)
+}
 
 fun generateRefreshToken(ttlMinutes: Int): Pair<String, LocalDateTime> {
     val expiresAt = System.currentTimeMillis() / 1000 + (ttlMinutes * 60)
