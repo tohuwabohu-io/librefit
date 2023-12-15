@@ -121,7 +121,7 @@
 					styling="checkbox self-center"
 					validateDetail={tosValidation}
 				>
-					I agree to LibreFit's terms and conditions.
+					I agree to LibreFit's <a href="/tos">terms and conditions.</a>
 				</ValidatedInput>
 			{:else}
 				<ValidatedInput
