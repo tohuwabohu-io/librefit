@@ -44,7 +44,7 @@ data class LibreUser (
     var password: String,
 
     @Roles
-    var role: String = "User",
+    var role: String? = "User",
 
     @Column(nullable = true)
     var name: String? = null,
@@ -88,6 +88,8 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
             .onItem().ifNotNull().failWith(ValidationError(listOf("A User with this E-Mail already exists.")))
             .onItem().ifNull().continueWith(user)
             .invoke(Unchecked.consumer { new ->
+                if (new!!.role == null) new.role = "User"
+
                 val violations = validator.validate(new)
 
                 if (violations.isNotEmpty()) {
