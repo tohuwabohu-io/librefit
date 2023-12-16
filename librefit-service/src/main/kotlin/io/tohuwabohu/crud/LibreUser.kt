@@ -20,6 +20,7 @@ import jakarta.validation.Validator
 import jakarta.validation.constraints.NotEmpty
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.hibernate.Hibernate
+import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import java.util.*
 
@@ -39,6 +40,7 @@ data class LibreUser (
     @Password
     @Column(nullable = false)
     @field:NotEmpty(message = "The provided password is empty.")
+    @field:Length(min = 6, message = "Chosen password must be at least 6 characters long.")
     var password: String,
 
     @Roles

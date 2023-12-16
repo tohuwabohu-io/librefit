@@ -138,7 +138,7 @@ class UserResourceTest {
         val userOriginal = user("update-test@test.dev")
         val user = LibreUser(
             email = "unit-test1@test.dev",
-            password = "test1",
+            password = "password",
             avatar = "/path"
         )
 
@@ -357,7 +357,60 @@ class UserResourceTest {
             post("/refresh")
         } Then {
             statusCode(403)
+        }
+    }
+
+    @Test
+    fun `should register user, login and return profile`() {
+        val user = user("profile-test1@test.dev")
+        user.avatar = "/path"
+        user.name = "Testname"
+
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(user)
+        } When {
+            post("/register")
+        } Then {
+            statusCode(201)
+        }
+
+        val authInfo = Given {
+            header("Content-Type", ContentType.JSON)
+            body(user)
+        } When {
+            post("/login")
+        } Then {
+            statusCode(200)
         } Extract {
+            body().`as`(AuthInfo::class.java)
+        }
+
+        Given {
+            header("Authorization", "Bearer ${authInfo.accessToken}")
+        } When {
+            get("/read")
+        } Then {
+            statusCode(200)
+            body("email", equalTo(user.email))
+            body("avatar", equalTo(user.avatar))
+            body("name", equalTo(user.name))
+            body("password", equalTo(""))
+        }
+    }
+
+    @Test
+    fun `should fail due to not meeting password requirements`() {
+        val user = user("profile-test2@test.dev")
+        user.password = "12345"
+
+        Given {
+            header("Content-Type", ContentType.JSON)
+            body(user)
+        } When {
+            post("/register")
+        } Then {
+            statusCode(400)
         }
     }
 

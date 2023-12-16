@@ -38,8 +38,8 @@ export const validateEmail = (email) => {
  * @returns {String | null}
  */
 export const validatePassword = (pwd) => {
-	if (pwd === null || pwd.indexOf('a') < 0) {
-		return "Chosen password must contain at least one 'a' letter.";
+	if (pwd === null || pwd.length < 6) {
+		return 'Chosen password must be at least 6 characters long.';
 	}
 
 	return null;
