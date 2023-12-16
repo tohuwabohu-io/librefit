@@ -1,12 +1,21 @@
 <script>
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
 	import { enhance } from '$app/forms';
-	import {validatePassword, validatePasswordConfirmation, validateTos} from '$lib/validation.js';
+	import {validateEmail, validatePassword, validatePasswordConfirmation, validateTos} from '$lib/validation.js';
 
 	/** @type {import('./$types/').ActionData} */
 	export let form;
 
 	let pwdInput;
+
+	const emailValidation = (e) => {
+		const msg = validateEmail(e.value);
+
+		return {
+			valid: msg === null,
+			errorMessage: msg
+		}
+	}
 
 	const passwordValidation = (e) => {
 		const msg = validatePassword(e.value);
@@ -52,13 +61,26 @@
 			  update({ reset: false });
 			};
 		  }}>
-			<ValidatedInput
-				name="email"
-				type="email"
-				placeholder="Enter E-Mail"
-				label="E-Mail"
-				required
-			/>
+			{#if !form?.errors}
+				<ValidatedInput
+					name="email"
+					type="email"
+					placeholder="Enter E-Mail"
+					label="E-Mail"
+					required
+					validateDetail={emailValidation}
+				/>
+			{:else}
+				<ValidatedInput
+						name="email"
+						type="email"
+						placeholder="Enter E-Mail"
+						label="E-Mail"
+						required
+						validateDetail={emailValidation}
+						errorMessage={form.errors['email']}
+				/>
+			{/if}
 
 			{#if !form?.errors}
 				<ValidatedInput
@@ -107,7 +129,7 @@
 			<label class="label">
 				<span>Nickname</span>
 				<input
-					name="username"
+					name="name"
 					class="input"
 					type="text"
 					placeholder="Enter Nickname (optional)"

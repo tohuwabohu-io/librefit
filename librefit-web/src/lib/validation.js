@@ -26,7 +26,7 @@ export const validateFields = (fields) => {
  * @returns {String | null}
  */
 export const validateEmail = (email) => {
-	if (email === null || (email.indexOf('@') <= 0 && email.length <= 4)) {
+	if (email === null || email.indexOf('@') <= 0 || email.length <= 4) {
 		return 'Please enter a valid email address.';
 	}
 
