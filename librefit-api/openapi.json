@@ -1032,6 +1032,36 @@
         } ]
       }
     },
+    "/user/activate/{activationId}" : {
+      "get" : {
+        "tags" : [ "User Resource" ],
+        "parameters" : [ {
+          "name" : "activationId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "text/plain" : { }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
+    },
     "/user/login" : {
       "post" : {
         "tags" : [ "User Resource" ],
@@ -1478,6 +1508,9 @@
           "avatar" : {
             "type" : "string",
             "nullable" : true
+          },
+          "activated" : {
+            "type" : "boolean"
           }
         }
       },

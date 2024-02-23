@@ -27,6 +27,9 @@ import java.util.*
 @Entity
 @Cacheable
 @UserDefinition
+@NamedQueries(
+    NamedQuery(name = "findByEmailAndPassword", query = "from LibreUser where email = ?1 and password = ?2")
+)
 data class LibreUser (
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -44,7 +47,8 @@ data class LibreUser (
     var password: String,
 
     @Roles
-    var role: String? = "User",
+    @Column(nullable = false)
+    var role: String = "User",
 
     @Column(nullable = true)
     var name: String? = null,
@@ -52,7 +56,10 @@ data class LibreUser (
     var lastLogin: LocalDateTime? = null,
 
     @Column(nullable = true)
-    var avatar: String? = null
+    var avatar: String? = null,
+
+    @Column(nullable = false)
+    var activated: Boolean = false
 ): PanacheEntityBase {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -64,9 +71,8 @@ data class LibreUser (
 
     override fun hashCode(): Int = javaClass.hashCode()
 
-    @Override
     override fun toString(): String {
-        return this::class.simpleName + "(id = $id , email = $email , password = $password , name = $name , registered = $registered , lastLogin = $lastLogin , avatar = $avatar )"
+        return "LibreUser(id=$id, email='$email', password='$password', role='$role', name=$name, registered=$registered, lastLogin=$lastLogin, avatar=$avatar, activated=$activated)"
     }
 
     @PrePersist
@@ -122,6 +128,15 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
             user.name = libreUser.name
 
             Panache.getSession().call { s -> s.merge(user)}
+        }
+    }
+
+    @WithTransaction
+    fun activateUser(userId: UUID): Uni<LibreUser> {
+        return findById(userId).call { user ->
+            user.activated = true
+
+            Panache.getSession().call { s -> s.merge(user) }
         }
     }
 }

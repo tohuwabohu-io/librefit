@@ -66,6 +66,7 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
         )
     }
 }
+
 abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : PanacheRepositoryBase<Entity, LibreUserCompositeKey> {
     @Inject
     lateinit var validator: Validator
@@ -79,7 +80,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     }
 
     @WithTransaction
-    fun validateAndPersist(entity: Entity): Uni<Entity> {
+    open fun validateAndPersist(entity: Entity): Uni<Entity> {
         validate(entity)
 
         return find("userId = ?1 and added = ?2 order by sequence desc, added, userId", entity.userId!!, entity.added).firstResult()
