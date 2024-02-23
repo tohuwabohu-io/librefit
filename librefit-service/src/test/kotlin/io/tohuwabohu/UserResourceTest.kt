@@ -1,23 +1,35 @@
 package io.tohuwabohu
 
+import io.quarkus.test.InjectMock
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
 import io.quarkus.test.security.jwt.Claim
 import io.quarkus.test.security.jwt.JwtSecurity
+import io.quarkus.test.vertx.RunOnVertxContext
+import io.quarkus.test.vertx.UniAsserter
 import io.restassured.http.ContentType
 import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
-import io.tohuwabohu.crud.AuthInfo
-import io.tohuwabohu.crud.LibreUser
+import io.smallrye.mutiny.Uni
+import io.tohuwabohu.crud.*
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
+import java.time.LocalDateTime
+import java.util.*
 
 @QuarkusTest
 @TestHTTPEndpoint(UserResource::class)
 class UserResourceTest {
+    @InjectMock
+    lateinit var userRepository: LibreUserRepository
+
+    @InjectMock
+    lateinit var accountActivationRepository: AccountActivationRepository
+
     @Test
     fun `should register user`() {
         Given {
@@ -413,6 +425,27 @@ class UserResourceTest {
             statusCode(400)
         }
     }
+
+    @Test
+    @RunOnVertxContext
+    fun `should activate a user account`(asserter: UniAsserter) {
+        val userId = UUID.fromString("11e45d14-7fb5-11ee-b962-0242ac120002")
+
+        val timeNow = LocalDateTime.now()
+        val activationId = UUID.nameUUIDFromBytes("${userId}${timeNow}".toByteArray()).toString()
+
+        asserter.execute {
+            Mockito.`when`(accountActivationRepository.findByActivationId(activationId))
+                .thenReturn(Uni.createFrom().item(AccountActivation(activationId, timeNow)))
+        }
+
+        When {
+            get("/activate/$activationId")
+        } Then {
+            statusCode(200)
+        }
+    }
+
 
     private fun user(email: String): LibreUser {
         return LibreUser(
