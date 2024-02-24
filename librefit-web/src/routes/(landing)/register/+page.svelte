@@ -184,8 +184,7 @@
 				<button class="btn variant-filled-primary">Register</button>
 
 				<div class="flex flex-row gap-4">
-					<p class="self-center text-sm unstyled">Already registered?</p>
-					<a href="/login" class="btn variant-filled-secondary cursor-pointer"> Login </a>
+					<a href="/login" class="self-center text-sm unstyled">Already registered?</a>
 				</div>
 			</div>
 		</form>
