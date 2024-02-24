@@ -8,6 +8,7 @@
 	import {setContext} from 'svelte';
 	import {writable} from 'svelte/store';
 	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
+	import TosModal from '$lib/components/modal/TosModal.svelte';
 
 	initializeStores();
 
@@ -22,6 +23,10 @@
 
 		avatarModal: {
 			ref: AvatarModal
+		},
+
+		tosModal: {
+			ref: TosModal
 		}
 	};
 

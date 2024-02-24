@@ -2,6 +2,9 @@
 	import ValidatedInput from '$lib/components/ValidatedInput.svelte';
 	import { enhance } from '$app/forms';
 	import {validateEmail, validatePassword, validatePasswordConfirmation, validateTos} from '$lib/validation.js';
+	import {getModalStore} from '@skeletonlabs/skeleton';
+
+	const modalStore = getModalStore();
 
 	/** @type {import('./$types/').ActionData} */
 	export let form;
@@ -43,6 +46,14 @@
 			errorMessage: msg
 		};
 	};
+
+	const showTosModal = () => {
+		modalStore.trigger({
+			type: 'component',
+			component: 'tosModal',
+			response: () => modalStore.close()
+		});
+	}
 </script>
 
 <svelte:head>
@@ -143,7 +154,7 @@
 					styling="checkbox self-center"
 					validateDetail={tosValidation}
 				>
-					I agree to LibreFit's <a href="/tos">terms and conditions.</a>
+					I agree to LibreFit's <a href="#" on:click|preventDefault={showTosModal}>terms and conditions.</a>
 				</ValidatedInput>
 			{:else}
 				<ValidatedInput
