@@ -755,10 +755,10 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-        "401":
-          description: Not Authorized
         "403":
           description: Not Allowed
+        "401":
+          description: Not Authorized
       security:
       - SecurityScheme: []
   /user/read:
