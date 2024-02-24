@@ -154,7 +154,7 @@
 					styling="checkbox self-center"
 					validateDetail={tosValidation}
 				>
-					I agree to LibreFit's <a href="#" on:click|preventDefault={showTosModal}>terms and conditions.</a>
+					I agree to LibreFit's <button class="hyperlink" on:click|preventDefault={showTosModal}>terms and conditions</button>.
 				</ValidatedInput>
 			{:else}
 				<ValidatedInput
@@ -164,7 +164,7 @@
 						validateDetail={tosValidation}
 						errorMessage={form.errors['confirmation']}
 				>
-					I agree to LibreFit's terms and conditions.
+					I agree to LibreFit's <button class="hyperlink" on:click|preventDefault={showTosModal}>terms and conditions.</button>.
 				</ValidatedInput>
 			{/if}
 
