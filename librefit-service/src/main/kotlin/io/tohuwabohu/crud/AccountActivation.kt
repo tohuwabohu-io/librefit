@@ -12,7 +12,7 @@ import java.util.*
 
 @Entity
 @NamedQueries(
-    NamedQuery(name = "findByActivationId", query = "from AccountActivation where activationId = ?1")
+    NamedQuery(name = "AccountActivation.findByActivationId", query = "from AccountActivation where activationId = ?1 and validTo >= ?2")
 )
 data class AccountActivation (
     @Column(unique = true, nullable = false)
@@ -47,7 +47,7 @@ data class AccountActivation (
 @ApplicationScoped
 class AccountActivationRepository : LibreUserRelatedRepository<AccountActivation>() {
     fun findByActivationId(activationId: String): Uni<AccountActivation> {
-        return find("#AccountActivation.findByActivationId", activationId).singleResult()
+        return find("#AccountActivation.findByActivationId", activationId, LocalDateTime.now()).singleResult()
             .onItem().ifNull().failWith(EntityNotFoundException())
     }
 
@@ -58,7 +58,7 @@ class AccountActivationRepository : LibreUserRelatedRepository<AccountActivation
 
         val accountActivation = AccountActivation(
             activationId = activationId.toString(),
-            validTo = timeNow.plusDays(30)
+            validTo = timeNow.plusDays(14)
         )
 
         accountActivation.userId = userId
