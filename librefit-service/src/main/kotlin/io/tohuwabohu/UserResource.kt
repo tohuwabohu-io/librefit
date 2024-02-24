@@ -234,7 +234,7 @@ class UserResource(val userRepository: LibreUserRepository,
         Log.info("Activating user profile $activationId")
 
         return activationRepository.findByActivationId(activationId).onItem().ifNotNull().call { activation ->
-            userRepository.activateUser(activation.userId!!).chain { _ -> activationRepository.deleteEntry(activation.getPrimaryKey()) }
+            userRepository.activateUser(activation!!.userId!!).chain { _ -> activationRepository.deleteEntry(activation.getPrimaryKey()) }
         }.onItem().transform { _ -> Response.ok().build() }
         .onFailure().invoke { e -> Log.error(e) }
         .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }

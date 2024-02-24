@@ -46,8 +46,8 @@ data class AccountActivation (
 
 @ApplicationScoped
 class AccountActivationRepository : LibreUserRelatedRepository<AccountActivation>() {
-    fun findByActivationId(activationId: String): Uni<AccountActivation> {
-        return find("#AccountActivation.findByActivationId", activationId, LocalDateTime.now()).singleResult()
+    fun findByActivationId(activationId: String): Uni<AccountActivation?> {
+        return find("#AccountActivation.findByActivationId", activationId, LocalDateTime.now()).firstResult()
             .onItem().ifNull().failWith(EntityNotFoundException())
     }
 
