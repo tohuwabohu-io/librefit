@@ -6,6 +6,7 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
+import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
 import jakarta.inject.Inject
 import jakarta.persistence.*
@@ -66,6 +67,7 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
         )
     }
 }
+
 abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : PanacheRepositoryBase<Entity, LibreUserCompositeKey> {
     @Inject
     lateinit var validator: Validator
@@ -74,12 +76,16 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         val violations = validator.validate(entity)
 
         if (violations.isNotEmpty()) {
-            throw ValidationError(violations.map { violation -> violation.message })
+            val errors = violations.map { violation ->
+                ErrorDescription(violation.propertyPath.filterNotNull()[0].name, violation.message)
+            }
+
+            throw ValidationError(errors)
         }
     }
 
     @WithTransaction
-    fun validateAndPersist(entity: Entity): Uni<Entity> {
+    open fun validateAndPersist(entity: Entity): Uni<Entity> {
         validate(entity)
 
         return find("userId = ?1 and added = ?2 order by sequence desc, added, userId", entity.userId!!, entity.added).firstResult()

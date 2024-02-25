@@ -1,24 +1,37 @@
-/** @param {any} fields */
+/**
+ * @param {any} fields
+ * @return {ErrorResponse | undefined}
+ */
 export const validateFields = (fields) => {
-	const errors = {};
+	const inputValidation = {};
 
 	const email = String(fields['email']);
 	const pwd = String(fields['password']);
 	const pwdConfirmation = String(fields['passwordConfirmation']);
 	const tosAccepted = Boolean(fields['confirmation']);
 
-	errors['email'] = validateEmail(email);
-	errors['password'] = validatePassword(pwd);
-	errors['passwordConfirmation'] = validatePasswordConfirmation(pwd, pwdConfirmation);
-	errors['confirmation'] = validateTos(tosAccepted);
+	inputValidation['email'] = validateEmail(email);
+	inputValidation['password'] = validatePassword(pwd);
+	inputValidation['passwordConfirmation'] = validatePasswordConfirmation(pwd, pwdConfirmation);
+	inputValidation['confirmation'] = validateTos(tosAccepted);
 
-	if (Object.entries(errors).filter(([_, error]) => error !== null).length > 0) {
+	const inputErrors = Object.entries(inputValidation).filter(([_, error]) => error !== null);
+
+	if (inputErrors.length > 0) {
+		/** @type {Array<ErrorDescription>} */
+		const errorDescriptions = inputValidation.map(([inputField, validationMessage]) => {
+			return {
+				field: inputField,
+				message: validationMessage
+			};
+		});
+
 		return {
-			errors: errors
+			errors: errorDescriptions
 		};
 	}
 
-	return null;
+	return undefined;
 };
 
 /**
@@ -26,7 +39,7 @@ export const validateFields = (fields) => {
  * @returns {String | null}
  */
 export const validateEmail = (email) => {
-	if (email === null || (email.indexOf('@') <= 0 && email.length <= 4)) {
+	if (email === null || email.indexOf('@') <= 0 || email.length <= 4) {
 		return 'Please enter a valid email address.';
 	}
 
@@ -38,8 +51,8 @@ export const validateEmail = (email) => {
  * @returns {String | null}
  */
 export const validatePassword = (pwd) => {
-	if (pwd === null || pwd.indexOf('a') < 0) {
-		return "Chosen password must contain at least one 'a' letter.";
+	if (pwd === null || pwd.length < 6) {
+		return 'Chosen password must be at least 6 characters long.';
 	}
 
 	return null;
@@ -69,4 +82,23 @@ export const validateTos = (tosAccepted) => {
 	}
 
 	return null;
+};
+
+/**
+ * @param errorResponse {ErrorResponse | { success: boolean}}
+ * @param fieldName {String}
+ * @return {undefined | String}
+ */
+export const getFieldError = (errorResponse, fieldName) => {
+	if (!errorResponse || errorResponse.success) {
+		return undefined;
+	}
+
+	/** @type {Array<ErrorDescription>} */
+	const descriptions = errorResponse.errors;
+
+	/** @type {ErrorDescription} */
+	const description = descriptions.filter((description) => description.field === fieldName)[0];
+
+	return description ? description.message : undefined;
 };

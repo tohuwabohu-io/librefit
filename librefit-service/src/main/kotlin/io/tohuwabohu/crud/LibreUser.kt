@@ -12,6 +12,7 @@ import io.quarkus.security.jpa.UserDefinition
 import io.quarkus.security.jpa.Username
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.unchecked.Unchecked
+import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
@@ -20,12 +21,16 @@ import jakarta.validation.Validator
 import jakarta.validation.constraints.NotEmpty
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.hibernate.Hibernate
+import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
 @Cacheable
 @UserDefinition
+@NamedQueries(
+    NamedQuery(name = "findByEmailAndPassword", query = "from LibreUser where email = ?1 and password = ?2")
+)
 data class LibreUser (
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -39,9 +44,11 @@ data class LibreUser (
     @Password
     @Column(nullable = false)
     @field:NotEmpty(message = "The provided password is empty.")
+    @field:Length(min = 6, message = "Chosen password must be at least 6 characters long.")
     var password: String,
 
     @Roles
+    @Column(nullable = false)
     var role: String = "User",
 
     @Column(nullable = true)
@@ -50,7 +57,10 @@ data class LibreUser (
     var lastLogin: LocalDateTime? = null,
 
     @Column(nullable = true)
-    var avatar: String? = null
+    var avatar: String? = null,
+
+    @Column(nullable = false)
+    var activated: Boolean = false
 ): PanacheEntityBase {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -62,9 +72,8 @@ data class LibreUser (
 
     override fun hashCode(): Int = javaClass.hashCode()
 
-    @Override
     override fun toString(): String {
-        return this::class.simpleName + "(id = $id , email = $email , password = $password , name = $name , registered = $registered , lastLogin = $lastLogin , avatar = $avatar )"
+        return "LibreUser(id=$id, email='$email', password='$password', role='$role', name=$name, registered=$registered, lastLogin=$lastLogin, avatar=$avatar, activated=$activated)"
     }
 
     @PrePersist
@@ -83,13 +92,19 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
 
     fun createUser(user: LibreUser): Uni<LibreUser?> {
         return findByEmail(user.email)
-            .onItem().ifNotNull().failWith(ValidationError(listOf("A User with this E-Mail already exists.")))
+            .onItem().ifNotNull().failWith(ValidationError(listOf(ErrorDescription("email", "A User with this E-Mail already exists."))))
             .onItem().ifNull().continueWith(user)
             .invoke(Unchecked.consumer { new ->
+                if (new!!.role == null) new.role = "User"
+
                 val violations = validator.validate(new)
 
                 if (violations.isNotEmpty()) {
-                    throw ValidationError(violations.map { violation -> violation.message })
+                    val errors = violations.map { violation ->
+                        ErrorDescription(violation.propertyPath.filterNotNull()[0].name, violation.message)
+                    }
+
+                    throw ValidationError(errors)
                 }
             }).chain { new -> persistAndFlush(new!!) }
     }
@@ -118,6 +133,15 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
             user.name = libreUser.name
 
             Panache.getSession().call { s -> s.merge(user)}
+        }
+    }
+
+    @WithTransaction
+    fun activateUser(userId: UUID): Uni<LibreUser> {
+        return findById(userId).call { user ->
+            user.activated = true
+
+            Panache.getSession().call { s -> s.merge(user) }
         }
     }
 }

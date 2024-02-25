@@ -41,8 +41,9 @@ fun createErrorResponse(throwable: Throwable): Response {
     }
 }
 
-class ErrorResponse(val messages: List<String>)
-class ValidationError(val violations: List<String>) : Throwable()
+class ErrorDescription(val field: String, val message: String)
+class ErrorResponse(val errors: List<ErrorDescription>)
+class ValidationError(val errors: List<ErrorDescription>) : Throwable()
 class UnmodifiedError(override val message: String) : Throwable()
 
 @Provider
@@ -53,7 +54,7 @@ class ValidationErrorMapper : ExceptionMapper<ValidationError> {
     override fun toResponse(exception: ValidationError): Response {
         log.error("Validation failed", exception)
 
-        return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(exception.violations)).build()
+        return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(exception.errors)).build()
     }
 }
 

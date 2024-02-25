@@ -158,9 +158,12 @@ fun collectSchemas(schemas: JsonObject): List<Schema> {
             }
 
             if (typeOrRef == "array") {
-                val arrayType = typeOrRefElement.jsonObject["items"]!!.jsonObject["type"]!!.jsonPrimitive.content
+                val arrayType = typeOrRefElement.jsonObject["items"]!!.jsonObject["type"]
+                val arrayRef = typeOrRefElement.jsonObject["items"]!!.jsonObject["\$ref"]
 
-                typeOrRef = "Array<${typeMap[arrayType] ?: arrayType}>"
+                val arrayTypeOrArrayRef = arrayType ?: arrayRef;
+
+                typeOrRef = "Array<${typeMap[arrayTypeOrArrayRef!!.jsonPrimitive.content] ?: arrayTypeOrArrayRef.jsonPrimitive.content.substringAfterLast("/")}>"
             }
 
             typeMap[typeOrRef] ?: typeOrRef

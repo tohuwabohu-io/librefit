@@ -1032,6 +1032,36 @@
         } ]
       }
     },
+    "/user/activate/{activationId}" : {
+      "get" : {
+        "tags" : [ "User Resource" ],
+        "parameters" : [ {
+          "name" : "activationId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "text/plain" : { }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
+    },
     "/user/login" : {
       "post" : {
         "tags" : [ "User Resource" ],
@@ -1099,11 +1129,11 @@
           "500" : {
             "description" : "Internal Server Error"
           },
-          "403" : {
-            "description" : "Not Allowed"
-          },
           "401" : {
             "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
           }
         },
         "security" : [ {
@@ -1368,14 +1398,26 @@
         "enum" : [ "BREAKFAST", "LUNCH", "DINNER", "SNACK", "UNSET" ],
         "type" : "string"
       },
-      "ErrorResponse" : {
-        "required" : [ "messages" ],
+      "ErrorDescription" : {
+        "required" : [ "field", "message" ],
         "type" : "object",
         "properties" : {
-          "messages" : {
+          "field" : {
+            "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ErrorResponse" : {
+        "required" : [ "errors" ],
+        "type" : "object",
+        "properties" : {
+          "errors" : {
             "type" : "array",
             "items" : {
-              "type" : "string"
+              "$ref" : "#/components/schemas/ErrorDescription"
             }
           }
         }
@@ -1478,6 +1520,9 @@
           "avatar" : {
             "type" : "string",
             "nullable" : true
+          },
+          "activated" : {
+            "type" : "boolean"
           }
         }
       },

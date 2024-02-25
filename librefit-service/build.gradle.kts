@@ -4,7 +4,6 @@ plugins {
     kotlin("plugin.noarg") version "1.9.0"
     kotlin("plugin.jpa") version "1.9.0"
     id("io.quarkus")
-    id("jacoco")
 }
 
 repositories {
@@ -18,7 +17,6 @@ val quarkusPlatformVersion: String by project
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-    implementation("io.quarkus:quarkus-jacoco")
     implementation("io.quarkus:quarkus-security-jpa-reactive")
     implementation("io.quarkus:quarkus-smallrye-jwt")
     implementation("io.quarkus:quarkus-smallrye-jwt-build")
@@ -31,10 +29,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-resteasy-reactive")
-    testImplementation("io.quarkus:quarkus-junit5")
+    testImplementation("io.quarkus:quarkus-jacoco")
+    testImplementation("io.quarkus:quarkus-junit5:3.6.3")
+    testImplementation("io.quarkus:quarkus-junit5-mockito:3.6.3")
     testImplementation("io.rest-assured:rest-assured:5.3.2")
     testImplementation("io.rest-assured:kotlin-extensions:5.3.2")
     testImplementation("io.quarkus:quarkus-test-security-jwt")
+    testImplementation("io.quarkus:quarkus-test-vertx")
 }
 
 group = "io.tohuwabohu"
@@ -60,10 +61,4 @@ allOpen {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     kotlinOptions.javaParameters = true
-}
-
-tasks.jacocoTestReport {
-    reports {
-        csv.required.set(true)
-    }
 }

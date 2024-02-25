@@ -2,10 +2,7 @@ package io.tohuwabohu
 
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.AuthInfo
-import io.tohuwabohu.crud.AuthRepository
-import io.tohuwabohu.crud.LibreUser
-import io.tohuwabohu.crud.LibreUserRepository
+import io.tohuwabohu.crud.*
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.generateAccessToken
@@ -33,7 +30,9 @@ import java.util.*
 
 @Path("/user")
 @RequestScoped
-class UserResource(val userRepository: LibreUserRepository, val authRepository: AuthRepository) {
+class UserResource(val userRepository: LibreUserRepository,
+                   val authRepository: AuthRepository,
+                   val activationRepository: AccountActivationRepository) {
     @Inject
     lateinit var jwt: JsonWebToken
 
@@ -61,10 +60,9 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
 
         Log.info("Registering a new user=$libreUser")
 
-        return userRepository.createUser(libreUser)
+        return userRepository.createUser(libreUser).chain { user -> activationRepository.createAccountActivation(user!!.id!!) }
             .onItem().transform { Response.ok(libreUser).status(Response.Status.CREATED).build() }
-            .onFailure().invoke { e ->
-                Log.error(e) }
+            .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
@@ -221,5 +219,24 @@ class UserResource(val userRepository: LibreUserRepository, val authRepository: 
             }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    }
+
+    @GET
+    @Path("/activate/{activationId}")
+    @Produces(MediaType.TEXT_PLAIN)
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "400", description = "Bad Request"),
+        APIResponse(responseCode = "404", description = "Not Found"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    fun activate(activationId: String): Uni<Response> {
+        Log.info("Activating user profile $activationId")
+
+        return activationRepository.findByActivationId(activationId).onItem().ifNotNull().call { activation ->
+            userRepository.activateUser(activation!!.userId!!).chain { _ -> activationRepository.deleteEntry(activation.getPrimaryKey()) }
+        }.onItem().transform { _ -> Response.ok().build() }
+        .onFailure().invoke { e -> Log.error(e) }
+        .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 }

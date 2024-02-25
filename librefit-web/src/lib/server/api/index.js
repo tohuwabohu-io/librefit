@@ -125,6 +125,12 @@ export const api = {
 		method: 'put',
 		guarded: true
 	},
+	getUserActivateActivationId: {
+		path: '/user/activate/{activationId}',
+		contentType: 'text/plain',
+		method: 'get',
+		guarded: false
+	},
 	postUserLogin: {
 		path: '/user/login',
 		/** @see LibreUser */

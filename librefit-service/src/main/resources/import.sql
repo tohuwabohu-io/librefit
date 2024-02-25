@@ -29,8 +29,8 @@ values (CURRENT_DATE - 58, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 100),
        (CURRENT_DATE - 32, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97),
        (CURRENT_DATE - 31, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97);
 
-insert into libre_user (registered, id, avatar, email, name, password, role)
-values (NOW(),'b21291e5-db51-4a52-a997-25f4021c0ac6','/assets/images/avatars/dog-1.png','test1@test.dev','Arnie','$2a$10$sFGAyHJY3jWxLjhkr7q8B.DdzYL5v4CqTDlW1iVQhPOrSN9UEqoBe','User');
+insert into libre_user (registered, id, avatar, email, name, password, role, activated)
+values (NOW(),'b21291e5-db51-4a52-a997-25f4021c0ac6','/assets/images/avatars/dog-1.png','test1@test.dev','Arnie','$2a$10$sFGAyHJY3jWxLjhkr7q8B.DdzYL5v4CqTDlW1iVQhPOrSN9UEqoBe','User', true);
 
 
 insert into calorie_tracker_entry (added, sequence, user_id, amount, category)
