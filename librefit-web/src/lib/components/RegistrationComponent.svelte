@@ -137,12 +137,18 @@
 
             <div>
                 {#if status?.success}
-                    <p class="variant-glass-success variant-ringed-success p-4 rounded-full" >
-                        Successfully signed up! Please proceed to the <a href="/login">Login</a>.
-                    </p>
+                    {#if !isModal}
+                        <p class="variant-glass-success variant-ringed-success p-4 rounded-full" >
+                            Successfully signed up! Please proceed to the <a href="/login">Login</a>.
+                        </p>
+                    {:else}
+                        <p class="variant-glass-success variant-ringed-success p-4 rounded-full" >
+                            Successfully signed up! You can <button class="hyperlink" on:click|preventDefault={onCancel}>close</button> this window now.
+                        </p>
+                    {/if}
                 {:else if status?.errors}
                     <p class="variant-glass-error variant-ringed-error p-4 rounded-full">
-                        {status.errors}
+                        Error during registration.
                     </p>
                 {/if}
             </div>

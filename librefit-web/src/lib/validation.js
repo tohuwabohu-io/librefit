@@ -85,12 +85,12 @@ export const validateTos = (tosAccepted) => {
 };
 
 /**
- * @param errorResponse {ErrorResponse}
+ * @param errorResponse {ErrorResponse | { success: boolean}}
  * @param fieldName {String}
  * @return {undefined | String}
  */
 export const getFieldError = (errorResponse, fieldName) => {
-	if (!errorResponse) {
+	if (!errorResponse || errorResponse.success) {
 		return undefined;
 	}
 
