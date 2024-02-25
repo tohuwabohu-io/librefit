@@ -1,24 +1,37 @@
-/** @param {any} fields */
+/**
+ * @param {any} fields
+ * @return {ErrorResponse | undefined}
+ */
 export const validateFields = (fields) => {
-	const errors = {};
+	const inputValidation = {};
 
 	const email = String(fields['email']);
 	const pwd = String(fields['password']);
 	const pwdConfirmation = String(fields['passwordConfirmation']);
 	const tosAccepted = Boolean(fields['confirmation']);
 
-	errors['email'] = validateEmail(email);
-	errors['password'] = validatePassword(pwd);
-	errors['passwordConfirmation'] = validatePasswordConfirmation(pwd, pwdConfirmation);
-	errors['confirmation'] = validateTos(tosAccepted);
+	inputValidation['email'] = validateEmail(email);
+	inputValidation['password'] = validatePassword(pwd);
+	inputValidation['passwordConfirmation'] = validatePasswordConfirmation(pwd, pwdConfirmation);
+	inputValidation['confirmation'] = validateTos(tosAccepted);
 
-	if (Object.entries(errors).filter(([_, error]) => error !== null).length > 0) {
+	const inputErrors = Object.entries(inputValidation).filter(([_, error]) => error !== null);
+
+	if (inputErrors.length > 0) {
+		/** @type {Array<ErrorDescription>} */
+		const errorDescriptions = inputValidation.map(([inputField, validationMessage]) => {
+			return {
+				field: inputField,
+				message: validationMessage
+			};
+		});
+
 		return {
-			errors: errors
+			errors: errorDescriptions
 		};
 	}
 
-	return null;
+	return undefined;
 };
 
 /**
