@@ -1,6 +1,7 @@
 import { api } from '$lib/server/api/index.js';
 import { convertFormDataToJson, proxyFetch } from '$lib/server/api/util.js';
 import { validateFields } from '$lib/validation.js';
+import { fail } from '@sveltejs/kit';
 
 export const registerUser = async (event) => {
 	const userApi = api.postUserRegister;
@@ -23,7 +24,12 @@ export const registerUser = async (event) => {
 				success: true
 			};
 		} else if (response.status === 400) {
-			console.log(await response.json());
+			/** @type {ErrorResponse} */
+			const errorResponse = await response.json();
+
+			console.log(errorResponse);
+
+			result = fail(400, errorResponse);
 		} else {
 			result = {
 				error: 'An error occurred. Please try again later.'

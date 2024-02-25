@@ -70,3 +70,22 @@ export const validateTos = (tosAccepted) => {
 
 	return null;
 };
+
+/**
+ * @param errorResponse {ErrorResponse}
+ * @param fieldName {String}
+ * @return {undefined | String}
+ */
+export const getFieldError = (errorResponse, fieldName) => {
+	if (!errorResponse) {
+		return undefined;
+	}
+
+	/** @type {Array<ErrorDescription>} */
+	const descriptions = errorResponse.errors;
+
+	/** @type {ErrorDescription} */
+	const description = descriptions.filter((description) => description.field === fieldName)[0];
+
+	return description ? description.message : undefined;
+};

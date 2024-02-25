@@ -3,10 +3,11 @@
     import {writable} from 'svelte/store';
     import ArrowRight from '$lib/assets/icons/arrow-right.svg?component';
     import Login from '$lib/assets/icons/login.svg?component';
-    import TrackerRadial from '$lib/components/TrackerRadial.svelte';
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
+    import {getModalStore} from '@skeletonlabs/skeleton';
 
     const goal = writable();
+    const modalStore = getModalStore();
 
     $: goal.set({
         targetCalories: 1923,
@@ -16,7 +17,17 @@
     setContext('currentGoal', goal);
 
     /** @type {import('./$types/').ActionData} */
-    export let form;
+    export let loginForm;
+
+    const showRegisterModal = () => {
+        modalStore.trigger({
+            type: 'component',
+            component: 'registrationModal',
+            response: (e) => {
+                if (!e) modalStore.close()
+            }
+        });
+    }
 </script>
 
 <svelte:head>
@@ -49,7 +60,7 @@
             </div>
             <div class="w-2/3">
                 <div>
-                    <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST">
+                    <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/login">
                         <ValidatedInput
                                 label="E-Mail"
                                 type="email"
@@ -66,9 +77,9 @@
                         />
 
                         <div>
-                            {#if form?.error}
+                            {#if loginForm?.error}
                                 <p class="variant-glass-error variant-ringed-error p-4 rounded-full">
-                                    {form.error}
+                                    {loginForm.error}
                                 </p>
                             {/if}
                         </div>
@@ -84,13 +95,11 @@
 
                             <div class="flex flex-row gap-4">
                                 <p class="self-center text-sm unstyled">Not signed up yet?</p>
-                                <a href="/register" class="btn variant-filled-secondary">
-                                <span>
-                                    Register
-                                </span>
-
-                                    <ArrowRight/>
-                                </a>
+                                <button class="btn variant-filled-secondary" on:click|preventDefault={showRegisterModal}>
+                                    <span>
+                                        Register
+                                    </span>
+                                </button>
                             </div>
                         </div>
                     </form>
