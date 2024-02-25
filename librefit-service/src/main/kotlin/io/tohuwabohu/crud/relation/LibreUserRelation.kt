@@ -6,6 +6,7 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
+import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
 import jakarta.inject.Inject
 import jakarta.persistence.*
@@ -75,7 +76,11 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         val violations = validator.validate(entity)
 
         if (violations.isNotEmpty()) {
-            throw ValidationError(violations.map { violation -> violation.message })
+            val errors = violations.map { violation ->
+                ErrorDescription(violation.propertyPath.filterNotNull()[0].name, violation.message)
+            }
+
+            throw ValidationError(errors)
         }
     }
 

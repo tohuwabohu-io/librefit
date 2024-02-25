@@ -12,6 +12,7 @@ import io.quarkus.security.jpa.UserDefinition
 import io.quarkus.security.jpa.Username
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.unchecked.Unchecked
+import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
@@ -91,7 +92,7 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
 
     fun createUser(user: LibreUser): Uni<LibreUser?> {
         return findByEmail(user.email)
-            .onItem().ifNotNull().failWith(ValidationError(listOf("A User with this E-Mail already exists.")))
+            .onItem().ifNotNull().failWith(ValidationError(listOf(ErrorDescription("email", "A User with this E-Mail already exists."))))
             .onItem().ifNull().continueWith(user)
             .invoke(Unchecked.consumer { new ->
                 if (new!!.role == null) new.role = "User"
@@ -99,7 +100,11 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
                 val violations = validator.validate(new)
 
                 if (violations.isNotEmpty()) {
-                    throw ValidationError(violations.map { violation -> violation.message })
+                    val errors = violations.map { violation ->
+                        ErrorDescription(violation.propertyPath.filterNotNull()[0].name, violation.message)
+                    }
+
+                    throw ValidationError(errors)
                 }
             }).chain { new -> persistAndFlush(new!!) }
     }

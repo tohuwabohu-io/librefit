@@ -1398,14 +1398,26 @@
         "enum" : [ "BREAKFAST", "LUNCH", "DINNER", "SNACK", "UNSET" ],
         "type" : "string"
       },
-      "ErrorResponse" : {
-        "required" : [ "messages" ],
+      "ErrorDescription" : {
+        "required" : [ "field", "message" ],
         "type" : "object",
         "properties" : {
-          "messages" : {
+          "field" : {
+            "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ErrorResponse" : {
+        "required" : [ "errors" ],
+        "type" : "object",
+        "properties" : {
+          "errors" : {
             "type" : "array",
             "items" : {
-              "type" : "string"
+              "$ref" : "#/components/schemas/ErrorDescription"
             }
           }
         }

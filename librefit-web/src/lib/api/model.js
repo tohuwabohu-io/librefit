@@ -72,8 +72,14 @@ export const Category = {
  */
 
 /**
+ * @typedef {Object} ErrorDescription
+ * @property {String} field
+ * @property {String} message
+ */
+
+/**
  * @typedef {Object} ErrorResponse
- * @property {Array<String>} messages
+ * @property {Array<ErrorDescription>} errors
  */
 
 /**
@@ -100,6 +106,7 @@ export const Category = {
  * @property {String} [registered]
  * @property {String} [lastLogin]
  * @property {String} [avatar]
+ * @property {boolean} [activated]
  */
 
 /**
