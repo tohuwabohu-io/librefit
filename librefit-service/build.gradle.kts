@@ -71,6 +71,6 @@ tasks.register("generateKeypair") {
     }
 }
 
-project.tasks.testClasses {
+tasks.testClasses {
     dependsOn("generateKeypair")
 }
