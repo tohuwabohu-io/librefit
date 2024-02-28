@@ -73,31 +73,13 @@ tasks.register("generateKeypair") {
 
 
 tasks.test {
-    doFirst {
-        exec {
-            commandLine("./generate-keypair.sh")
-        }
-    }
-
     dependsOn("generateKeypair")
 }
 
 tasks.testClasses {
-    doFirst {
-        exec {
-            commandLine("./generate-keypair.sh")
-        }
-    }
-
     dependsOn("generateKeypair")
 }
 
 tasks.testNative {
-    doFirst {
-        exec {
-            commandLine("./generate-keypair.sh")
-        }
-    }
-
     dependsOn("generateKeypair")
 }

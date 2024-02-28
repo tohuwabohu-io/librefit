@@ -4,6 +4,9 @@ openssl rsa -in privateKey.pem -pubout > publicKey.pem 2>/dev/null
 mv privateKey.pem src/main/resources/
 mv publicKey.pem src/main/resources/
 x=$(ls -l src/main/resources/*.pem | wc -l)
+ls -l src/main/resources/*.pem
+chmod a+r privateKey.pem publicKey.pem
+ls -l src/main/resources/*.pem
 echo "... finished. Counting $x generated files."
 
 if [ "$x" -lt 2 ]
