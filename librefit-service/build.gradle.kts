@@ -71,15 +71,6 @@ tasks.register("generateKeypair") {
     }
 }
 
-
-tasks.test {
-    dependsOn("generateKeypair")
-}
-
 tasks.testClasses {
-    dependsOn("generateKeypair")
-}
-
-tasks.testNative {
     dependsOn("generateKeypair")
 }
