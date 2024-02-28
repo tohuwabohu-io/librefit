@@ -62,3 +62,15 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     kotlinOptions.javaParameters = true
 }
+
+tasks.register("generateKeypair") {
+    doFirst {
+        exec {
+            commandLine("./generate-keypair.sh")
+        }
+    }
+}
+
+tasks.testClasses {
+    dependsOn("generateKeypair")
+}

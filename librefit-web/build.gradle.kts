@@ -37,3 +37,7 @@ tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_build") {
 tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_dev") {
     dependsOn(tasks.npmInstall)
 }
+
+tasks.build {
+    dependsOn("npm_run_build")
+}

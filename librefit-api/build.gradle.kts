@@ -38,3 +38,6 @@ tasks.register<JavaExec>("ApiCodegen") {
     }
 }
 
+tasks.build {
+    dependsOn("ApiCodegen")
+}
