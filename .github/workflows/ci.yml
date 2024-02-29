@@ -11,8 +11,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  setup:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -30,10 +29,19 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
     - name: Run gradle build
       run: ./gradlew build
       #run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
 
+  jacoco:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' && github.ref_name != 'main'
+    steps:
     - name: Generate JaCoCo Badge
       if: github.event_name != 'pull_request'
       id: jacoco
@@ -42,7 +50,6 @@ jobs:
         jacoco-csv-file: librefit-service/build/jacoco-report/jacoco.csv
 
     - name: Commit and push the badge (if it changed)
-      if: github.event_name != 'pull_request'
       run: |
         if [[ `git status --porcelain` ]]; then
           git config --global user.name 'tohuwabohu-io'
@@ -53,7 +60,6 @@ jobs:
         fi
 
     - name: Upload JaCoCo coverage report
-      if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@v2
       with:
         name: jacoco-report
