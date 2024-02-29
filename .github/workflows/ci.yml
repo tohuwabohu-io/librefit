@@ -34,6 +34,25 @@ jobs:
       run: ./gradlew build
       #run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
 
+    - name: Generate JaCoCo Badge
+      id: jacoco
+      uses: cicirello/jacoco-badge-generator@v2
+      with:
+        jacoco-csv-file: librefit-service/build/jacoco-report/jacoco.csv
+
+    - name: Commit and push the badge (if it changed)
+      uses: EndBug/add-and-commit@v7
+      with:
+        default_author: github_actions
+        message: 'commit badge'
+        add: '*.svg'
+
+    - name: Upload JaCoCo coverage report
+      uses: actions/upload-artifact@v2
+      with:
+        name: jacoco-report
+        path: librefit-service/build/jacoco-report/
+
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
     #
