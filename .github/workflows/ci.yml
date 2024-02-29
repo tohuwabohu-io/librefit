@@ -35,20 +35,12 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
-  build:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
     - name: Run gradle build
       run: ./gradlew build
       #run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
 
-  jacoco:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
-    steps:
     - name: Generate JaCoCo Badge
+      if: github.event_name != 'pull_request'
       id: jacoco
       uses: cicirello/jacoco-badge-generator@v2
       with:
@@ -56,17 +48,20 @@ jobs:
         badges-directory: badges
 
     - name: Log coverage percentages to workflow output
+      if: github.event_name != 'pull_request'
       run: |
         echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
         echo "branches = ${{ steps.jacoco.outputs.branches }}"
 
     - name: Upload JaCoCo coverage report
+      if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@v2
       with:
         name: jacoco-report
         path: librefit-service/build/jacoco-report/
 
     - name: Commit and push badge to 'badges' branch if required
+      if: github.event_name != 'pull_request'
       run: |
         cd badges
         if [[ `git status --porcelain` ]]; then
@@ -78,6 +73,7 @@ jobs:
         fi
 
     - name: Comment on PR with coverage percentages
+      if: github.event_name != 'pull_request'
       run: |
         REPORT=$(<badges/coverage-summary.json)
         COVERAGE=$(jq -r '.coverage' <<< "$REPORT")%
@@ -85,6 +81,7 @@ jobs:
         NEWLINE=$'\n'
         BODY="## JaCoCo Test Coverage Summary Statistics${NEWLINE}* __Coverage:__ ${COVERAGE}${NEWLINE}* __Branches:__ ${BRANCHES}"
         gh pr comment ${{github.event.pull_request.number}} -b "${BODY}"
+
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
