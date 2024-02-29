@@ -72,17 +72,6 @@ jobs:
           git push
         fi
 
-    - name: Comment on PR with coverage percentages
-      if: github.event_name != 'pull_request'
-      run: |
-        REPORT=$(<badges/coverage-summary.json)
-        COVERAGE=$(jq -r '.coverage' <<< "$REPORT")%
-        BRANCHES=$(jq -r '.branches' <<< "$REPORT")%
-        NEWLINE=$'\n'
-        BODY="## JaCoCo Test Coverage Summary Statistics${NEWLINE}* __Coverage:__ ${COVERAGE}${NEWLINE}* __Branches:__ ${BRANCHES}"
-        gh pr comment ${{github.event.pull_request.number}} -b "${BODY}"
-
-
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
     #
