@@ -42,6 +42,7 @@ jobs:
         jacoco-csv-file: librefit-service/build/jacoco-report/jacoco.csv
 
     - name: Commit and push the badge (if it changed)
+      if: github.event_name != 'pull_request'
       run: |
         if [[ `git status --porcelain` ]]; then
           git config --global user.name 'tohuwabohu-io'
