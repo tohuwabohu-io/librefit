@@ -8,6 +8,8 @@
 
 ---
 
+![Coverage](.github/badges/jacoco.svg)
+
 LibreFit is my hobby project that allows you to calculate your TDEE (Total Daily Energy Expenditure) based on your body
 metrics, create goals for weight loss or weight gain from that and encourages you to track your daily calorie intake.
 Based in your input, you will see easy to understand charts to keep on track with your goal - all that with privacy
