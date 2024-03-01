@@ -1,61 +1,63 @@
 package io.tohuwabohu.csv
 
+import io.smallrye.mutiny.Uni
+import io.tohuwabohu.crud.CalorieTrackerEntry
+import io.tohuwabohu.crud.WeightTrackerEntry
+import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import java.io.File
+import java.lang.Float.parseFloat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.*
 
-fun main() {
-    import()
+private const val defaultDatePattern = "d-MMM-yyyy"
+private const val defaultHeaderLength = 2
+private val converter = CalorieTrackerCategoryConverter()
+
+fun readCsv(file: File, importConfig: ImportConfig): Uni<CsvData> {
+    return Uni.createFrom().item(
+        CsvData(
+            importConfig,
+            file.bufferedReader()
+            .lineSequence().drop(importConfig.headerLength)
+            .filter { it.isNotBlank() }
+            .map {
+                val line = it.split(',')
+
+                Line(
+                    line[0].trim(),
+                    line[1].trim(),
+                    line[2].trim(),
+                    line[3].trim(),
+                    line[4].trim(),
+                    line[5].trim(),
+                    line[11].trim()
+                )
+            }.toList()
+        )
+    )
 }
 
-fun import() {
-    val csv = readCsv("in.csv")
+fun collectWeightEntries(userId: UUID, csvData: CsvData): Uni<List<WeightTrackerEntry>> {
+    val dateFormatter = DateTimeFormatter.ofPattern(csvData.config.datePattern)
 
-    println(makeWeightSql(csv))
-    println(makeKcalSql(csv))
+    return Uni.createFrom().item(csvData.csv.map { line ->
+        val weightTrackerEntry = WeightTrackerEntry(
+            amount = parseFloat(line.weight)
+        )
+
+        weightTrackerEntry.userId = userId
+        weightTrackerEntry.added = LocalDate.parse(line.date, dateFormatter)
+
+        weightTrackerEntry
+    })
 }
 
-fun readCsv(fileName: String): List<Line> {
-    val reader = File(fileName).bufferedReader()
+fun collectCalorieTrackerEntries(userId: UUID, csvData: CsvData): Uni<List<CalorieTrackerEntry>> {
+    val dateFormatter = DateTimeFormatter.ofPattern(csvData.config.datePattern)
 
-    // 2 header lines
-    reader.readLine()
-    reader.readLine()
-
-    return reader.lineSequence()
-        .filter { it.isNotBlank() }
-        .map {
-            val line = it.split(',')
-
-            Line(line[0].trim(), line[1].trim(), line[2].trim(), line[3].trim(), line[4].trim(), line[5].trim(), line[11].trim())
-        }.toList()
-}
-
-fun makeWeightSql(csv: List<Line>): String {
-    val sql = "insert into weight_tracker_entry (added, id, user_id, amount) values "
-
-    val parseFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("d-MMM-yyyy")
-    val writeFormat: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
-
-    val values = csv.map { line ->
-        val parsedDate: LocalDate = LocalDate.parse(line.date, parseFormat)
-
-        "('${writeFormat.format(parsedDate)}', 1, 1, ${line.weight})"
-    }.joinToString (separator = ",\n")
-
-    return sql + values
-}
-
-fun makeKcalSql(csv: List<Line>): String {
-    val sql = "insert into calorie_tracker_entry (added, id, user_id, amount, category) values "
-
-    val parseFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("d-MMM-yyyy")
-    val writeFormat: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
-
-    val values = csv.map { line ->
-        val parsedDate: LocalDate = LocalDate.parse(line.date, parseFormat)
-
-        var i = 1
+    return Uni.createFrom().item(csvData.csv.map { line ->
+        val parsedDate: LocalDate = LocalDate.parse(line.date, dateFormatter)
 
         mapOf(
             "b" to line.breakfast,
@@ -65,14 +67,17 @@ fun makeKcalSql(csv: List<Line>): String {
             "s" to line.snacks
         ).map { entry ->
             if (entry.value.isNotEmpty()) {
-                "('${writeFormat.format(parsedDate)}', ${i++}, 1, ${entry.value}, '${entry.key}')"
+                val calorieTrackerEntry = CalorieTrackerEntry(
+                    amount = parseFloat(entry.value),
+                    category = converter.convertToEntityAttribute(entry.key)
+                )
+
+                calorieTrackerEntry.added = parsedDate;
+                calorieTrackerEntry.userId = userId;
+                calorieTrackerEntry
             } else null
-        }.filterNotNull().joinToString(separator = ",")
-
-
-    }.joinToString (separator = ",\n")
-
-    return sql + values
+        }.filterNotNull().first()
+    })
 }
 
 data class Line(
@@ -83,4 +88,14 @@ data class Line(
     val shakes: String,
     val snacks: String,
     val weight: String
+)
+
+data class ImportConfig (
+    val datePattern: String = defaultDatePattern,
+    val headerLength: Int = defaultHeaderLength
+)
+
+data class CsvData (
+    val config: ImportConfig,
+    val csv: List<Line>
 )
