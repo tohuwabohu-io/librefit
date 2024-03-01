@@ -19,7 +19,7 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 	let path = api.path;
 
 	/** @type {any} */
-	const headers = {
+	let headers = {
 		'content-type': api.contentType
 	};
 
@@ -33,20 +33,38 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 		}
 	}
 
-	if (method === 'POST' || method === 'PUT') {
-		call = fetchApi(PUBLIC_API_BASE_PATH + path, {
-			method: api.method,
-			headers,
-			body: JSON.stringify(data)
-		});
-	} else if (method === 'GET' || method === 'DELETE') {
-		path = replaceGetParamsJson(path, data);
+	if (api.contentType === 'multipart/form-data') {
+		if (method === 'POST') {
+			// content-type header must not be set for multipart/form-data
+			// to let the browser decide the appropriate encoding
+			headers = {
+				Authorization: `Bearer ${jwt}`
+			};
 
-		call = fetchApi(PUBLIC_API_BASE_PATH + path, {
-			method: api.method,
-			headers
-		});
+			call = fetchApi(PUBLIC_API_BASE_PATH + path, {
+				method: api.method,
+				headers,
+				body: data
+			});
+		}
 	} else {
+		if (method === 'POST' || method === 'PUT') {
+			call = fetchApi(PUBLIC_API_BASE_PATH + path, {
+				method: api.method,
+				headers,
+				body: JSON.stringify(data)
+			});
+		} else if (method === 'GET' || method === 'DELETE') {
+			path = replaceGetParamsJson(path, data);
+
+			call = fetchApi(PUBLIC_API_BASE_PATH + path, {
+				method: api.method,
+				headers
+			});
+		}
+	}
+
+	if (!call) {
 		console.log(`method ${api.method} not implemented`);
 		throw error(405);
 	}
