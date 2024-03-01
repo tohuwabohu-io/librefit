@@ -144,4 +144,9 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         return findById(key).onItem().ifNull().failWith(EntityNotFoundException()).onItem()
             .ifNotNull().transformToUni { entry -> deleteById(entry.getPrimaryKey())}
     }
+
+    @WithTransaction
+    fun importBulk(entries: List<Entity>): Uni<Void> {
+        return persist(entries)
+    }
 }
