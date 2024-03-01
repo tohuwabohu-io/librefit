@@ -54,7 +54,7 @@ class ImportResource(val weightTrackerRepository: WeightTrackerRepository, val c
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     fun bulk(@Context securityContext: SecurityContext,
-             @RestForm fileName: String,
+             @RestForm @PartType("text/plain") fileName: String,
              @RestForm @PartType("application/json") config: ImportConfig,
              @RestForm @PartType("application/octet-stream") file: FileUpload
     ): Uni<Response> {

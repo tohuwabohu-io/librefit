@@ -5,6 +5,7 @@ import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
+import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
@@ -98,7 +99,6 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
             }.call { e ->
                 persist(e!!)
             }
-
     }
 
     @WithTransaction
@@ -147,6 +147,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
 
     @WithTransaction
     fun importBulk(entries: List<Entity>): Uni<Void> {
-        return persist(entries)
+        return Multi.createFrom().iterable(entries.filter { validator.validate(it).isEmpty() }.sortedBy { it.added } )
+            .onItem().call { entity -> validateAndPersist(entity) }.collect().asList().replaceWithVoid()
     }
 }
