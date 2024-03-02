@@ -128,6 +128,10 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         return list("userId = ?1 and added between ?2 and ?3", userId, dateFrom, dateTo)
     }
 
+    private fun deleteEntriesForUserAndDate(userId: UUID, date: List<LocalDate>): Uni<Long> {
+        return delete("userId = ?1 and added in (?2)", userId, date)
+    }
+
     @WithTransaction
     fun deleteEntry(userId: UUID, date: LocalDate, sequence: Long): Uni<Boolean> {
         val key = LibreUserCompositeKey(
@@ -146,8 +150,18 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     }
 
     @WithTransaction
-    fun importBulk(entries: List<Entity>): Uni<Void> {
-        return Multi.createFrom().iterable(entries.filter { validator.validate(it).isEmpty() }.sortedBy { it.added } )
+    fun importBulk(entries: List<Entity>, drop: Boolean? = false): Uni<Void> {
+        val filtered = entries.filter { validator.validate(it).isEmpty() }.sortedBy { it.added }
+        val persistFlow = Multi.createFrom().iterable(entries.filter { validator.validate(it).isEmpty() }.sortedBy { it.added } )
             .onItem().call { entity -> validateAndPersist(entity) }.collect().asList().replaceWithVoid()
+
+        return if (drop == false) {
+            persistFlow
+        } else {
+            val dates = filtered.map { it.added }.distinct()
+            val userId = filtered.first().userId!!
+
+            deleteEntriesForUserAndDate(userId, dates).replaceWith(persistFlow)
+        }
     }
 }
