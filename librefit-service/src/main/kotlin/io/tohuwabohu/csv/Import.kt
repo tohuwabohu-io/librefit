@@ -56,7 +56,7 @@ fun collectWeightEntries(userId: UUID, csvData: CsvData): Uni<List<WeightTracker
 fun collectCalorieTrackerEntries(userId: UUID, csvData: CsvData): Uni<List<CalorieTrackerEntry>> {
     val dateFormatter = DateTimeFormatter.ofPattern(csvData.config.datePattern)
 
-    return Uni.createFrom().item(csvData.csv.map { line ->
+    return Uni.createFrom().item(csvData.csv.flatMap { line ->
         val parsedDate: LocalDate = LocalDate.parse(line.date, dateFormatter)
 
         mapOf(
@@ -76,7 +76,7 @@ fun collectCalorieTrackerEntries(userId: UUID, csvData: CsvData): Uni<List<Calor
                 calorieTrackerEntry.userId = userId;
                 calorieTrackerEntry
             } else null
-        }.filterNotNull().first()
+        }.filterNotNull()
     })
 }
 
