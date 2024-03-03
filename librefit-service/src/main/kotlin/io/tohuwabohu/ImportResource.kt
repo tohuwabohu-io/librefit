@@ -6,10 +6,10 @@ import io.tohuwabohu.crud.CalorieTrackerRepository
 import io.tohuwabohu.crud.WeightTrackerRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
-import io.tohuwabohu.csv.ImportConfig
-import io.tohuwabohu.csv.collectCalorieTrackerEntries
-import io.tohuwabohu.csv.collectWeightEntries
-import io.tohuwabohu.csv.readCsv
+import io.tohuwabohu.crud.ImportConfig
+import io.tohuwabohu.crud.collectCalorieTrackerEntries
+import io.tohuwabohu.crud.collectWeightEntries
+import io.tohuwabohu.crud.readCsv
 import io.tohuwabohu.security.printAuthenticationInfo
 import jakarta.annotation.security.RolesAllowed
 import jakarta.enterprise.context.RequestScoped

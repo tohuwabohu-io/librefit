@@ -1,8 +1,6 @@
-package io.tohuwabohu.csv
+package io.tohuwabohu.crud
 
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.CalorieTrackerEntry
-import io.tohuwabohu.crud.WeightTrackerEntry
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import java.io.File
 import java.lang.Float.parseFloat
@@ -12,6 +10,7 @@ import java.util.*
 
 private const val defaultDatePattern = "d-MMM-yyyy"
 private const val defaultHeaderLength = 2
+
 private val converter = CalorieTrackerCategoryConverter()
 
 fun readCsv(file: File, importConfig: ImportConfig): Uni<CsvData> {

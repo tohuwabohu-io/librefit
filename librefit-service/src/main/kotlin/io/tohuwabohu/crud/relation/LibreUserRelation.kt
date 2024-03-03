@@ -9,7 +9,7 @@ import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
-import io.tohuwabohu.csv.ImportConfig
+import io.tohuwabohu.crud.ImportConfig
 import jakarta.inject.Inject
 import jakarta.persistence.*
 import jakarta.validation.Validator
