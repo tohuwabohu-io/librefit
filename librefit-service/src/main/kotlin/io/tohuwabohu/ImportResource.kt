@@ -2,14 +2,10 @@ package io.tohuwabohu;
 
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.CalorieTrackerRepository
-import io.tohuwabohu.crud.WeightTrackerRepository
+import io.tohuwabohu.crud.*
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
-import io.tohuwabohu.crud.ImportConfig
-import io.tohuwabohu.crud.collectCalorieTrackerEntries
-import io.tohuwabohu.crud.collectWeightEntries
-import io.tohuwabohu.crud.readCsv
+import io.tohuwabohu.crud.error.transformDateTimeParseException
 import io.tohuwabohu.security.printAuthenticationInfo
 import jakarta.annotation.security.RolesAllowed
 import jakarta.enterprise.context.RequestScoped
@@ -30,6 +26,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.jboss.resteasy.reactive.PartType
 import org.jboss.resteasy.reactive.RestForm
 import org.jboss.resteasy.reactive.multipart.FileUpload
+import java.time.format.DateTimeParseException
 import java.util.*
 
 @Path("/import")
@@ -70,6 +67,7 @@ class ImportResource(val weightTrackerRepository: WeightTrackerRepository, val c
                 }
         }.onItem().transform { _ -> Response.ok().build() }
             .onFailure().invoke { e -> Log.error(e) }
+            .onFailure(DateTimeParseException::class.java).transform { _ -> transformDateTimeParseException(config.datePattern) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 }

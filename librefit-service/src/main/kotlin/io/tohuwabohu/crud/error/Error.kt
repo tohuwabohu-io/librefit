@@ -41,6 +41,17 @@ fun createErrorResponse(throwable: Throwable): Response {
     }
 }
 
+fun transformDateTimeParseException(datePattern: String): ValidationError {
+    return ValidationError(
+        listOf(
+            ErrorDescription(
+                "datePattern",
+                "Dates in data received could not be parsed with '$datePattern' pattern."
+            )
+        )
+    )
+}
+
 class ErrorDescription(val field: String, val message: String)
 class ErrorResponse(val errors: List<ErrorDescription>)
 class ValidationError(val errors: List<ErrorDescription>) : Throwable()
