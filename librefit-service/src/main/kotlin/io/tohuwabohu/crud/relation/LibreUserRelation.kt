@@ -9,6 +9,7 @@ import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
+import io.tohuwabohu.csv.ImportConfig
 import jakarta.inject.Inject
 import jakarta.persistence.*
 import jakarta.validation.Validator
@@ -150,12 +151,12 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     }
 
     @WithTransaction
-    fun importBulk(entries: List<Entity>, drop: Boolean? = false): Uni<Void> {
+    fun importBulk(entries: List<Entity>, config: ImportConfig): Uni<Void> {
         val filtered = entries.filter { validator.validate(it).isEmpty() }.sortedBy { it.added }
         val persistFlow = Multi.createFrom().iterable(entries.filter { validator.validate(it).isEmpty() }.sortedBy { it.added } )
             .onItem().call { entity -> validateAndPersist(entity) }.collect().asList().replaceWithVoid()
 
-        return if (drop == false) {
+        return if (!config.drop) {
             persistFlow
         } else {
             val dates = filtered.map { it.added }.distinct()

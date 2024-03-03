@@ -91,8 +91,11 @@ data class Line(
 )
 
 data class ImportConfig (
-    val datePattern: String = defaultDatePattern,
-    val headerLength: Int = defaultHeaderLength
+    var datePattern: String = defaultDatePattern,
+    var headerLength: Int = defaultHeaderLength,
+    var drop: Boolean = false,
+    var updateCalorieTracker: Boolean = true,
+    var updateWeightTracker: Boolean = true
 )
 
 data class CsvData (

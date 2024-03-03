@@ -63,8 +63,11 @@ class ImportResource(val weightTrackerRepository: WeightTrackerRepository, val c
         val userId = UUID.fromString(jwt.name)
 
         return readCsv(file.uploadedFile().toFile(), config).chain { csv ->
-            collectCalorieTrackerEntries(userId, csv).chain(calorieTrackerRepository::importBulk)
-                .chain { _ -> collectWeightEntries(userId, csv).chain(weightTrackerRepository::importBulk)}
+            collectCalorieTrackerEntries(userId, csv)
+                .chain { ctPersist -> calorieTrackerRepository.importBulk(ctPersist, csv.config) }
+                .chain { _ -> collectWeightEntries(userId, csv)
+                    .chain { wtPersist -> weightTrackerRepository.importBulk(wtPersist, csv.config) }
+                }
         }.onItem().transform { _ -> Response.ok().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
