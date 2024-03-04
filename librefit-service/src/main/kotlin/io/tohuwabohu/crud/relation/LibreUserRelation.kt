@@ -7,9 +7,9 @@ import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
+import io.tohuwabohu.crud.ImportConfig
 import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
-import io.tohuwabohu.crud.ImportConfig
 import jakarta.inject.Inject
 import jakarta.persistence.*
 import jakarta.validation.Validator
@@ -131,6 +131,10 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
 
     private fun deleteEntriesForUserAndDate(userId: UUID, date: List<LocalDate>): Uni<Long> {
         return delete("userId = ?1 and added in (?2)", userId, date)
+    }
+
+    fun listEntriesForUser(userId: UUID): Uni<List<Entity>> {
+        return list("userId = ?1", userId)
     }
 
     @WithTransaction
