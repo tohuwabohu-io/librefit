@@ -2,10 +2,12 @@ package io.tohuwabohu;
 
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.*
+import io.tohuwabohu.crud.ImportConfig
+import io.tohuwabohu.crud.ImportHelper
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.crud.error.transformDateTimeParseException
+import io.tohuwabohu.crud.error.transformNumberFormatException
 import io.tohuwabohu.security.printAuthenticationInfo
 import jakarta.annotation.security.RolesAllowed
 import jakarta.enterprise.context.RequestScoped
@@ -31,7 +33,7 @@ import java.util.*
 
 @Path("/import")
 @RequestScoped
-class ImportResource(val weightTrackerRepository: WeightTrackerRepository, val calorieTrackerRepository: CalorieTrackerRepository) {
+class ImportResource(private val importHelper: ImportHelper) {
 
     @Inject
     private lateinit var jwt: JsonWebToken
@@ -59,15 +61,15 @@ class ImportResource(val weightTrackerRepository: WeightTrackerRepository, val c
 
         val userId = UUID.fromString(jwt.name)
 
-        return readCsv(file.uploadedFile().toFile(), config).chain { csv ->
-            collectCalorieTrackerEntries(userId, csv)
-                .chain { ctPersist -> calorieTrackerRepository.importBulk(ctPersist, csv.config) }
-                .chain { _ -> collectWeightEntries(userId, csv)
-                    .chain { wtPersist -> weightTrackerRepository.importBulk(wtPersist, csv.config) }
-                }
-        }.onItem().transform { _ -> Response.ok().build() }
+        return importHelper.readCsv(file.uploadedFile().toFile(), config)
+            .chain { csv -> importHelper.import(userId, csv) }
+        .onItem().transform { _ -> Response.ok().build() }
             .onFailure().invoke { e -> Log.error(e) }
-            .onFailure(DateTimeParseException::class.java).transform { _ -> transformDateTimeParseException(config.datePattern) }
+            .onFailure(DateTimeParseException::class.java)
+                .transform { t -> transformDateTimeParseException(t as DateTimeParseException, config.datePattern) }
+            .onFailure(NumberFormatException::class.java)
+                .transform { _ -> transformNumberFormatException() }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+
     }
 }
