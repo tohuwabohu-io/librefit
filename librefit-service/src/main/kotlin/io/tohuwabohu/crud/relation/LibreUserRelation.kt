@@ -156,15 +156,14 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
 
     @WithTransaction
     fun importBulk(entries: List<Entity>, config: ImportConfig): Uni<Void> {
-        val filtered = entries.filter { validator.validate(it).isEmpty() }.sortedBy { it.added }
-        val persistFlow = Multi.createFrom().iterable(entries.filter { validator.validate(it).isEmpty() }.sortedBy { it.added } )
+        val persistFlow = Multi.createFrom().iterable(entries.sortedBy { it.added } )
             .onItem().call { entity -> validateAndPersist(entity) }.collect().asList().replaceWithVoid()
 
         return if (!config.drop) {
             persistFlow
         } else {
-            val dates = filtered.map { it.added }.distinct()
-            val userId = filtered.first().userId!!
+            val dates = entries.map { it.added }.distinct()
+            val userId = entries.first().userId!!
 
             deleteEntriesForUserAndDate(userId, dates).replaceWith(persistFlow)
         }
