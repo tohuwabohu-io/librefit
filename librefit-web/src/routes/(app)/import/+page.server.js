@@ -14,6 +14,21 @@ export const actions = {
 
 		const importerSelection = formData['importer'];
 
+		/** @type File */
+		const file = formData.get('file');
+
+		console.log(file);
+
+		if (file.type !== 'text/csv') {
+			return fail(400, { errors: [{ field: 'file', message: 'Please choose a valid CSV file.' }] });
+		}
+
+		if (file.size > 32768) {
+			return fail(400, {
+				errors: [{ field: 'file', message: 'File size exceeds the limit of 32 KB.' }]
+			});
+		}
+
 		/** @type ImportConfig */
 		const config = {
 			datePattern: formData['datePattern'],
@@ -30,9 +45,6 @@ export const actions = {
 		formData.delete('drop');
 		formData.delete('importer');
 
-		console.log('POST');
-		console.log(formData);
-
 		const response = await proxyFetch(event.fetch, importApi, event.cookies.get('auth'), formData);
 
 		let result;
@@ -42,6 +54,7 @@ export const actions = {
 				success: true
 			};
 		} else {
+			/** @type ErrorResponse */
 			const errorResponse = await response.json();
 
 			result = fail(response.status, errorResponse);

@@ -97,6 +97,10 @@
                 <svelte:fragment slot="lead">
                     <div class="btn-icon scale-150">
                         <FileUpload/>
+
+                        {#if getFieldError(form, 'file') }
+                            <strong class="text-error-400"> {getFieldError(form, 'file')} </strong>
+                        {/if}
                     </div>
                 </svelte:fragment>
                 <svelte:fragment slot="message">
@@ -112,7 +116,7 @@
                     {#if files}
                         Size: {files[0].size} Bytes
                     {:else}
-                        CSV allowed.
+                        CSV allowed. Max. size: 32 KB
                     {/if}
                 </svelte:fragment>
             </FileDropzone>
