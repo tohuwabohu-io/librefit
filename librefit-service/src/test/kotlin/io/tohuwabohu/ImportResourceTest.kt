@@ -67,7 +67,7 @@ class ImportResourceTest {
     }
 
     @Test
-    @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
+    @TestSecurity(user = "e24c313c-7fb2-11ef-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
             Claim(key = "email", value = "test2@libre.fit")
@@ -106,12 +106,12 @@ class ImportResourceTest {
         }
 
         uniAsserter.assertThat(
-            { calorieTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")) },
+            { calorieTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ef-b962-0242ac120002")) },
             { result -> Assertions.assertEquals(30, result.size) }
         )
 
         uniAsserter.assertThat (
-            { weightTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002")) },
+            { weightTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ef-b962-0242ac120002")) },
             { result -> Assertions.assertEquals(6, result.size)}
         )
     }
