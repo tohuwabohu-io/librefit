@@ -86,6 +86,13 @@
                 </a>
             </li>
             <li>
+                <a href="/import" class="{classesActive('/tracker/weight')}" on:click={() => drawerStore.close()}>
+                    <span class="flex-auto">
+                        Import data
+                    </span>
+                </a>
+            </li>
+            <li>
                 <a href="https://github.com/tohuwabohu-io/librefit" target="_blank">
                     <span><GitHub/></span>
                     <span class="flex-auto">
