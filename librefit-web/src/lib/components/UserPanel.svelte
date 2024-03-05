@@ -8,7 +8,8 @@
     import User from '$lib/assets/icons/user.svg?component';
     import GitHub from '$lib/assets/icons/github.svg?component';
     import Food from '$lib/assets/icons/food.svg?component';
-    import Scale from '$lib/assets/icons/scale-outline.svg?component'
+    import Scale from '$lib/assets/icons/scale-outline.svg?component';
+    import FileTypeCsv from '$lib/assets/icons/file-type-csv.svg';
 
     const drawerStore = getDrawerStore();
 
@@ -87,6 +88,7 @@
             </li>
             <li>
                 <a href="/import" class="{classesActive('/tracker/weight')}" on:click={() => drawerStore.close()}>
+                    <span><FileTypeCsv/></span>
                     <span class="flex-auto">
                         Import data
                     </span>
