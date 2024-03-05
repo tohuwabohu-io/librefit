@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.ext.ExceptionMapper
 import jakarta.ws.rs.ext.Provider
 import org.jboss.logging.Logger
+import java.time.format.DateTimeParseException
 
 fun createErrorResponse(throwable: Throwable): Response {
     return when (throwable) {
@@ -39,6 +40,28 @@ fun createErrorResponse(throwable: Throwable): Response {
             Response.status(Response.Status.INTERNAL_SERVER_ERROR).build()
         }
     }
+}
+
+fun transformDateTimeParseException(t: DateTimeParseException, datePattern: String): ValidationError {
+    return ValidationError(
+        listOf(
+            ErrorDescription(
+                "datePattern",
+                "Date '${t.parsedString}' in data received could not be parsed with '$datePattern' pattern."
+            )
+        )
+    )
+}
+
+fun transformNumberFormatException(): ValidationError {
+    return ValidationError(
+        listOf(
+            ErrorDescription(
+                "amount",
+                "Values in data received could not be parsed as number."
+            )
+        )
+    )
 }
 
 class ErrorDescription(val field: String, val message: String)

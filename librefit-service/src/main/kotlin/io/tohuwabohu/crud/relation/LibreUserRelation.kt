@@ -5,7 +5,9 @@ import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
+import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
+import io.tohuwabohu.crud.ImportConfig
 import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
 import jakarta.inject.Inject
@@ -98,7 +100,6 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
             }.call { e ->
                 persist(e!!)
             }
-
     }
 
     @WithTransaction
@@ -128,6 +129,14 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         return list("userId = ?1 and added between ?2 and ?3", userId, dateFrom, dateTo)
     }
 
+    private fun deleteEntriesForUserAndDate(userId: UUID, date: List<LocalDate>): Uni<Long> {
+        return delete("userId = ?1 and added in (?2)", userId, date)
+    }
+
+    fun listEntriesForUser(userId: UUID): Uni<List<Entity>> {
+        return list("userId = ?1", userId)
+    }
+
     @WithTransaction
     fun deleteEntry(userId: UUID, date: LocalDate, sequence: Long): Uni<Boolean> {
         val key = LibreUserCompositeKey(
@@ -143,5 +152,20 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
     fun deleteEntry(key: LibreUserCompositeKey): Uni<Boolean> {
         return findById(key).onItem().ifNull().failWith(EntityNotFoundException()).onItem()
             .ifNotNull().transformToUni { entry -> deleteById(entry.getPrimaryKey())}
+    }
+
+    @WithTransaction
+    fun importBulk(entries: List<Entity>, config: ImportConfig): Uni<Void> {
+        val persistFlow = Multi.createFrom().iterable(entries.sortedBy { it.added } )
+            .onItem().call { entity -> validateAndPersist(entity) }.collect().asList().replaceWithVoid()
+
+        return if (!config.drop) {
+            persistFlow
+        } else {
+            val dates = entries.map { it.added }.distinct()
+            val userId = entries.first().userId!!
+
+            deleteEntriesForUserAndDate(userId, dates).replaceWith(persistFlow)
+        }
     }
 }

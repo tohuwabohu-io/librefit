@@ -233,6 +233,73 @@
         }
       }
     },
+    "/import/bulk" : {
+      "post" : {
+        "tags" : [ "Import Resource" ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "required" : [ "fileName" ],
+                "type" : "object",
+                "properties" : {
+                  "fileName" : {
+                    "type" : "string"
+                  },
+                  "config" : {
+                    "$ref" : "#/components/schemas/ImportConfig"
+                  },
+                  "file" : {
+                    "$ref" : "#/components/schemas/FileUpload"
+                  }
+                }
+              },
+              "encoding" : {
+                "fileName" : {
+                  "contentType" : "text/csv"
+                },
+                "file" : {
+                  "contentType" : "application/octet-stream"
+                },
+                "config" : {
+                  "contentType" : "application/json"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
     "/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}" : {
       "get" : {
         "tags" : [ "Tdee Resource" ],
@@ -1129,11 +1196,11 @@
           "500" : {
             "description" : "Internal Server Error"
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1422,6 +1489,9 @@
           }
         }
       },
+      "FileUpload" : {
+        "type" : "object"
+      },
       "Goal" : {
         "required" : [ "added", "initialWeight", "targetWeight", "startDate", "endDate" ],
         "type" : "object",
@@ -1475,6 +1545,28 @@
               "$ref" : "#/components/schemas/LocalDateTime"
             } ],
             "nullable" : true
+          }
+        }
+      },
+      "ImportConfig" : {
+        "required" : [ "datePattern" ],
+        "type" : "object",
+        "properties" : {
+          "datePattern" : {
+            "type" : "string"
+          },
+          "headerLength" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "drop" : {
+            "type" : "boolean"
+          },
+          "updateCalorieTracker" : {
+            "type" : "boolean"
+          },
+          "updateWeightTracker" : {
+            "type" : "boolean"
           }
         }
       },
