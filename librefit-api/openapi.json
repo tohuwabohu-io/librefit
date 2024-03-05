@@ -255,6 +255,9 @@
                 }
               },
               "encoding" : {
+                "fileName" : {
+                  "contentType" : "text/csv"
+                },
                 "file" : {
                   "contentType" : "application/octet-stream"
                 },
@@ -1193,11 +1196,11 @@
           "500" : {
             "description" : "Internal Server Error"
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1555,6 +1558,15 @@
           "headerLength" : {
             "format" : "int32",
             "type" : "integer"
+          },
+          "drop" : {
+            "type" : "boolean"
+          },
+          "updateCalorieTracker" : {
+            "type" : "boolean"
+          },
+          "updateWeightTracker" : {
+            "type" : "boolean"
           }
         }
       },

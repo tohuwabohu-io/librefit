@@ -53,7 +53,7 @@ class ImportResource(private val importHelper: ImportHelper) {
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     fun bulk(@Context securityContext: SecurityContext,
-             @RestForm @PartType("text/plain") fileName: String,
+             @RestForm @PartType("text/csv") fileName: String,
              @RestForm @PartType("application/json") config: ImportConfig,
              @RestForm @PartType("application/octet-stream") file: FileUpload
     ): Uni<Response> {

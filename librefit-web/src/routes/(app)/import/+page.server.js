@@ -17,8 +17,6 @@ export const actions = {
 		/** @type File */
 		const file = formData.get('file');
 
-		console.log(file);
-
 		if (file.type !== 'text/csv') {
 			return fail(400, { errors: [{ field: 'file', message: 'Please choose a valid CSV file.' }] });
 		}
