@@ -24,7 +24,6 @@ export const actions = {
 		};
 
 		formData.append('config', JSON.stringify(config));
-		formData.append('fileName', 'import.csv');
 
 		formData.delete('datePattern');
 		formData.delete('headerLength');

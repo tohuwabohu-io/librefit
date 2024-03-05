@@ -20,6 +20,9 @@
 
     let importGroup = 'A';
 
+    /** @type FileList */
+    let files;
+
     const handleResult = (result) => {
         if (result.data.success) {
             showToastSuccess(toastStore, 'Import successful.');
@@ -64,7 +67,7 @@
                     type="text"
                     placeholder="2"
                     value="2"
-                    label="No. of header rows"
+                    label="Number of header rows"
                     required
                     errorMessage={getFieldError(form, 'headerLength')}
             />
@@ -88,13 +91,30 @@
                 Overwrite duplicates
             </ValidatedInput>
 
-            <FileDropzone name="file">
+            <input value={files ? files[0].name : ''} name="fileName" type="text" hidden aria-hidden="true"/>
+
+            <FileDropzone name="file" bind:files={files} accept="text/csv">
                 <svelte:fragment slot="lead">
                     <div class="btn-icon scale-150">
                         <FileUpload/>
                     </div>
                 </svelte:fragment>
-                <svelte:fragment slot="meta">CSV allowed.</svelte:fragment>
+                <svelte:fragment slot="message">
+                    {#if files}
+                        <p>
+                            Selected: {files[0].name}
+                        </p>
+                    {:else}
+                        <strong>Upload a file</strong> or drag and drop
+                    {/if}
+                </svelte:fragment>
+                <svelte:fragment slot="meta">
+                    {#if files}
+                        Size: {files[0].size} Bytes
+                    {:else}
+                        CSV allowed.
+                    {/if}
+                </svelte:fragment>
             </FileDropzone>
 
             <div class="flex justify-between">
