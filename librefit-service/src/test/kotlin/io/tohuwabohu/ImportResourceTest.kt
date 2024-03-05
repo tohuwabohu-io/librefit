@@ -40,7 +40,7 @@ class ImportResourceTest {
     )
     @TestReactiveTransaction
     @RunOnVertxContext
-    fun `should upload and append calorie tracker entries`(uniAsserter: UniAsserter) {
+    fun `should upload and append tracker entries`(uniAsserter: UniAsserter) {
         val happyFlowCsv = File(this.javaClass.classLoader.getResource("import-test-happy-flow-1.csv")!!.toURI())
         val importConfig = ImportConfig()
 
@@ -272,6 +272,118 @@ class ImportResourceTest {
 
         uniAsserter.assertThat (
             { weightTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120005")) },
+            { result -> Assertions.assertEquals(0, result.size)}
+        )
+    }
+
+    @Test
+    @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120006", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test6libre.fit")
+        ]
+    )
+    @TestReactiveTransaction
+    @RunOnVertxContext
+    fun `should upload and update calorie tracker exclusively`(uniAsserter: UniAsserter) {
+        val happyFlowCsv = File(this.javaClass.classLoader.getResource("import-test-happy-flow-1.csv")!!.toURI())
+        val importConfig = ImportConfig()
+        importConfig.updateCalorieTracker = true
+        importConfig.updateWeightTracker = false
+
+        Given {
+            header("Content-Type", "multipart/form-data")
+            multiPart("fileName", "import-test-happy-flow-1.csv", "text/plain")
+            multiPart("config", importConfig, "application/json")
+            multiPart("file", happyFlowCsv, "application/octet-stream")
+        } When {
+            post("/bulk")
+        } Then {
+            statusCode(200)
+        }
+
+        uniAsserter.assertThat(
+            { calorieTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120006")) },
+            { result -> Assertions.assertEquals(20, result.size) }
+        )
+
+        uniAsserter.assertThat (
+            { weightTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120006")) },
+            { result -> Assertions.assertEquals(0, result.size)}
+        )
+    }
+
+    @Test
+    @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120007", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test7libre.fit")
+        ]
+    )
+    @TestReactiveTransaction
+    @RunOnVertxContext
+    fun `should upload and update weight tracker exclusively`(uniAsserter: UniAsserter) {
+        val happyFlowCsv = File(this.javaClass.classLoader.getResource("import-test-happy-flow-1.csv")!!.toURI())
+        val importConfig = ImportConfig()
+        importConfig.updateCalorieTracker = false
+        importConfig.updateWeightTracker = true
+
+        Given {
+            header("Content-Type", "multipart/form-data")
+            multiPart("fileName", "import-test-happy-flow-1.csv", "text/plain")
+            multiPart("config", importConfig, "application/json")
+            multiPart("file", happyFlowCsv, "application/octet-stream")
+        } When {
+            post("/bulk")
+        } Then {
+            statusCode(200)
+        }
+
+        uniAsserter.assertThat(
+            { calorieTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120007")) },
+            { result -> Assertions.assertEquals(0, result.size) }
+        )
+
+        uniAsserter.assertThat (
+            { weightTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120007")) },
+            { result -> Assertions.assertEquals(5, result.size)}
+        )
+    }
+
+    @Test
+    @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120008", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test8libre.fit")
+        ]
+    )
+    @TestReactiveTransaction
+    @RunOnVertxContext
+    fun `should upload and fail due to unselected importer`(uniAsserter: UniAsserter) {
+        val happyFlowCsv = File(this.javaClass.classLoader.getResource("import-test-happy-flow-1.csv")!!.toURI())
+        val importConfig = ImportConfig()
+        importConfig.updateCalorieTracker = false
+        importConfig.updateWeightTracker = false
+
+        Given {
+            header("Content-Type", "multipart/form-data")
+            multiPart("fileName", "import-test-happy-flow-1.csv", "text/plain")
+            multiPart("config", importConfig, "application/json")
+            multiPart("file", happyFlowCsv, "application/octet-stream")
+        } When {
+            post("/bulk")
+        } Then {
+            statusCode(400)
+            body("errors[0].field", Matchers.equalTo("importer"))
+        }
+
+        uniAsserter.assertThat(
+            { calorieTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120008")) },
+            { result -> Assertions.assertEquals(0, result.size) }
+        )
+
+        uniAsserter.assertThat (
+            { weightTrackerRepository.listEntriesForUser(UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120008")) },
             { result -> Assertions.assertEquals(0, result.size)}
         )
     }

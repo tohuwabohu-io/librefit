@@ -3,6 +3,8 @@ package io.tohuwabohu.crud
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
+import io.tohuwabohu.crud.error.ErrorDescription
+import io.tohuwabohu.crud.error.ValidationError
 import jakarta.enterprise.context.ApplicationScoped
 import java.io.File
 import java.lang.Float.parseFloat
@@ -88,8 +90,18 @@ class ImportHelper(val calorieTrackerRepository: CalorieTrackerRepository, val w
         val calorieTrackerEntries = collectCalorieTrackerEntries(userId, csvData)
         val weightTrackerEntries = collectWeightEntries(userId, csvData)
 
-        return calorieTrackerRepository.importBulk(calorieTrackerEntries, csvData.config)
-            .chain { _ -> weightTrackerRepository.importBulk(weightTrackerEntries, csvData.config) }
+        return if (csvData.config.updateCalorieTracker && csvData.config.updateWeightTracker) {
+            calorieTrackerRepository.importBulk(calorieTrackerEntries, csvData.config)
+                .chain { _ -> weightTrackerRepository.importBulk(weightTrackerEntries, csvData.config) }
+        } else if (csvData.config.updateCalorieTracker) {
+            calorieTrackerRepository.importBulk(calorieTrackerEntries, csvData.config)
+        } else if (csvData.config.updateWeightTracker) {
+            weightTrackerRepository.importBulk(weightTrackerEntries, csvData.config)
+        } else {
+            return Uni.createFrom().failure(ValidationError(listOf(
+                ErrorDescription("importer", "At least one importer must be selected.")
+            )))
+        }
     }
 }
 
