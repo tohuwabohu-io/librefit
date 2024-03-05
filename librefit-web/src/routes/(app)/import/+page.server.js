@@ -12,19 +12,24 @@ export const actions = {
 
 		console.log(formData);
 
-		/** @type {ImportConfig} */
-		formData.append(
-			'config',
-			JSON.stringify({
-				datePattern: formData['datePattern'],
-				headerLength: formData['headerLength']
-			})
-		);
+		const importerSelection = formData['importer'];
 
+		/** @type ImportConfig */
+		const config = {
+			datePattern: formData['datePattern'],
+			headerLength: formData['headerLength'],
+			drop: formData['drop'],
+			updateCalorieTracker: importerSelection !== 'W',
+			updateWeightTracker: importerSelection !== 'C'
+		};
+
+		formData.append('config', JSON.stringify(config));
 		formData.append('fileName', 'import.csv');
 
 		formData.delete('datePattern');
 		formData.delete('headerLength');
+		formData.delete('drop');
+		formData.delete('importer');
 
 		console.log('POST');
 		console.log(formData);

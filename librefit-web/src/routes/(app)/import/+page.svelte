@@ -1,6 +1,6 @@
 <script>
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import { enhance } from '$app/forms';
+    import {applyAction, enhance} from '$app/forms';
     import {getFieldError} from '$lib/validation.js';
     import {showToastError, showToastSuccess} from '$lib/toast.js';
     import {FileDropzone, getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
@@ -21,10 +21,10 @@
     let importGroup = 'A';
 
     const handleResult = (result) => {
-        if (result.success) {
+        if (result.data.success) {
             showToastSuccess(toastStore, 'Import successful.');
         } else {
-            showToastError(toastStore, result?.data);
+            showToastError(toastStore, result?.data.errors);
         }
     }
 </script>
@@ -39,11 +39,13 @@
         <h2>Upload data from existing sources.</h2>
 
         <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" enctype="multipart/form-data"
-              action="?/startImport" use:enhance={({formData, cancel}) => {
+              action="?/startImport" use:enhance={() => {
             return async ({ result, update }) => {
                 update({ reset: false });
 
                 handleResult(result);
+
+                await applyAction(result);
             };}}
         >
 
@@ -54,7 +56,7 @@
                     value="d-MMM-yyyy"
                     label="Date format"
                     required
-                    errorMessage={getFieldError($form?.status, 'datePattern')}
+                    errorMessage={getFieldError(form, 'datePattern')}
             />
 
             <ValidatedInput
@@ -64,7 +66,7 @@
                     value="2"
                     label="No. of header rows"
                     required
-                    errorMessage={getFieldError($form?.status, 'headerLength')}
+                    errorMessage={getFieldError(form, 'headerLength')}
             />
 
             <p>
@@ -72,7 +74,7 @@
             </p>
             <RadioGroup>
                 {#each radioOptions as option}
-                    <RadioItem value={option.value} name="types" bind:group={importGroup}>
+                    <RadioItem value={option.value} name="importer" bind:group={importGroup}>
                         {option.label}
                     </RadioItem>
                 {/each}

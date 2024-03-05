@@ -85,7 +85,7 @@ export const validateTos = (tosAccepted) => {
 };
 
 /**
- * @param errorResponse {ErrorResponse | { success: boolean}}
+ * @param errorResponse {ErrorResponse | { success: boolean} | FormData}
  * @param fieldName {String}
  * @return {undefined | String}
  */
