@@ -3,18 +3,19 @@ package io.tohuwabohu.crud.util
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
+import jakarta.validation.Payload
 import kotlin.reflect.KClass
 
 /**
  * Custom annotation to check if a number matches a given set
  */
 @Target(AnnotationTarget.FIELD)
-@Retention(AnnotationRetention.RUNTIME)
-@Constraint(validatedBy = [ OneOfValidator::class ])
+@MustBeDocumented
+@Constraint(validatedBy = [OneOfValidator::class])
 annotation class OneOfFloat(
-    val message: String = "...provide your default message here...",
+    val message: String = "{...}",
     val groups: Array<KClass<*>> = [],
-    val payload: Array<KClass<out Any>> = [],
+    val payload: Array<KClass<out Payload>> = [],
     /** The array of allowed values.  */
     vararg val value: Float
 )
