@@ -87,7 +87,7 @@ For more details, see [librefit-service/README.md](https://github.com/tohuwabohu
 
 ### librefit-web
 
-You can either provide a node installation yourself or let gradle handle it for you. Gradle will download a [node 19.6.0](https://nodejs.org/en/blog/release/v19.6.0) 
+You can either provide a node installation yourself or let gradle handle it for you. Gradle will download a [node 21.7.0](https://nodejs.org/en/blog/release/v21.7.0) 
 environment for this project to use.
 
 Start dev server with gradle:

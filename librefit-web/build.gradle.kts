@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.7.22"
+    kotlin("jvm") version "1.9.0"
     id("com.github.node-gradle.node") version "3.5.1"
 }
 
@@ -8,8 +8,8 @@ repositories {
 }
 
 node {
-    version.set("19.6.0")
-    npmVersion.set("9.4.0")
+    version.set("21.7.0")
+    npmVersion.set("10.5.0")
     npmInstallCommand.set("install")
     npmWorkDir.set(file("${project.projectDir}/.cache/npm"))
     distBaseUrl.set("https://nodejs.org/dist")
