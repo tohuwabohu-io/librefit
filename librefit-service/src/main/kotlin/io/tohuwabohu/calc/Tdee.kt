@@ -138,7 +138,7 @@ data class Tdee(
     var deficit: Float = 0f,
     var target: Float = 0f,
     var bmi: Float = 0f,
-    var bmiCategory: BmiCategory? = BmiCategory.STANDARD_WEIGHT,
+    var bmiCategory: BmiCategory = BmiCategory.STANDARD_WEIGHT,
     var targetBmi: Array<Int> = arrayOf(),
     var targetWeight: Float = 0f,
     var durationDays: Number = 0
