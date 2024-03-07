@@ -58,7 +58,6 @@ fun transformNumberFormatException(): ValidationError {
 class ErrorDescription(val field: String, val message: String)
 class ErrorResponse(val errors: List<ErrorDescription>)
 class ValidationError(val errors: List<ErrorDescription>) : Throwable()
-class UnmodifiedError(override val message: String) : Throwable()
 
 @Provider
 class ValidationErrorMapper : ExceptionMapper<ValidationError> {

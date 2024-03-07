@@ -388,6 +388,45 @@ class CalorieTrackerResourceTest {
         }
     }
 
+    @Test
+    @TestSecurity(user = "69f01b4e-7fb3-11ee-b962-0242ac120003", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test3@libre.fit"),
+        ]
+    )
+    fun `should create two entries and list with range`() {
+        val userId = UUID.fromString("69f01b4e-7fb3-11ee-b962-0242ac120003")
+
+        val entry1 = entry(userId)
+        entry1.added = LocalDate.of(2024, 1, 3)
+
+        val entry2 = entry(userId)
+        entry2.added = LocalDate.of(2024, 1, 31)
+
+        listOf(entry1, entry2).forEach { entry ->
+            Given {
+                header("Content-Type", ContentType.JSON)
+                body(entry)
+            } When {
+                post("/create")
+            } Then {
+                statusCode(201)
+            }
+        }
+
+        val entries = When {
+            get("/list/${entry1.added}/${entry2.added}")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Array<CalorieTrackerEntry>::class.java)
+        }
+
+        assert(entries.size == 2)
+        assert(entries.map { it.sequence }.isNotEmpty())
+    }
+
     private fun entry(userId: UUID): CalorieTrackerEntry {
         val entry = CalorieTrackerEntry(
             amount = 100f,

@@ -419,12 +419,6 @@ class UserResourceTest {
         // valid activation link - expires in 14 days
         val activationId = "89a4e017-8781-3658-b9e6-3930cd79b078";
 
-        /*
-        asserter.execute {
-            Mockito.`when`(accountActivationRepository.findByActivationId(activationId))
-                .thenReturn(Uni.createFrom().item(AccountActivation(activationId, timeNow)))
-        }*/
-
         When {
             get("/activate/$activationId")
         } Then {
@@ -436,12 +430,7 @@ class UserResourceTest {
     fun `should fail on user account activation`() {
         // invalid activation link - expired 14 days ago
         val activationId = "89a4e017-8481-3658-b9e6-3930cd79b077";
-/*
-        asserter.execute {
-            Mockito.`when`(accountActivationRepository.findByActivationId(activationId))
-                .thenThrow(EntityNotFoundException())
-        }
-*/
+
         When {
             get("/activate/$activationId")
         } Then {
