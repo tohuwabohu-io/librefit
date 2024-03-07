@@ -6,10 +6,7 @@ import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.security.UnauthorizedException
-import io.quarkus.security.jpa.Password
-import io.quarkus.security.jpa.Roles
-import io.quarkus.security.jpa.UserDefinition
-import io.quarkus.security.jpa.Username
+import io.quarkus.security.jpa.*
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.unchecked.Unchecked
 import io.tohuwabohu.crud.error.ErrorDescription
@@ -20,7 +17,6 @@ import jakarta.persistence.*
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotEmpty
 import org.eclipse.microprofile.jwt.JsonWebToken
-import org.hibernate.Hibernate
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import java.util.*
@@ -41,7 +37,7 @@ data class LibreUser (
     @Column(unique = true, nullable = false)
     var email: String,
 
-    @Password
+    @Password(PasswordType.CLEAR) // <-- automatic encryption with annotation does not work due to a bug
     @Column(nullable = false)
     @field:NotEmpty(message = "The provided password is empty.")
     @field:Length(min = 6, message = "Chosen password must be at least 6 characters long.")
@@ -62,20 +58,6 @@ data class LibreUser (
     @Column(nullable = false)
     var activated: Boolean = false
 ): PanacheEntityBase {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as LibreUser
-
-        return id == other.id
-    }
-
-    override fun hashCode(): Int = javaClass.hashCode()
-
-    override fun toString(): String {
-        return "LibreUser(id=$id, email='$email', password='$password', role='$role', name=$name, registered=$registered, lastLogin=$lastLogin, avatar=$avatar, activated=$activated)"
-    }
-
     @PrePersist
     fun onInsert() {
         password = BcryptUtil.bcryptHash(password)

@@ -11,7 +11,6 @@ import org.eclipse.microprofile.jwt.JsonWebToken
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.*
 
 fun printAuthenticationInfo(jwt: JsonWebToken, ctx: SecurityContext) {
     val name = if (ctx.userPrincipal == null) {
@@ -57,15 +56,4 @@ fun generateRefreshToken(ttlMinutes: Int): Pair<String, LocalDateTime> {
 
     return Pair(Jwt.issuer("https://libre.fitness/").expiresAt(expiresAt).sign(),
         expirationDate)
-}
-
-fun main() {
-    println(generateAccessToken(LibreUser(
-        id = UUID.randomUUID(),
-        email = "test@libre.fitness",
-        name = "testuser",
-        password = "1234"
-    ), 15))
-
-    println(generateRefreshToken(1440).first)
 }

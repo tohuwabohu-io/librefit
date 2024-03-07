@@ -20,29 +20,7 @@ data class AccountActivation (
 
     @Column(nullable = false)
     var validTo: LocalDateTime
-): LibreUserWeakEntity() {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AccountActivation
-
-        if (activationId != other.activationId) return false
-        if (validTo != other.validTo) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = activationId.hashCode()
-        result = 31 * result + validTo.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "AccountActivation(activationId='$activationId', validTo=$validTo)"
-    }
-}
+): LibreUserWeakEntity()
 
 @ApplicationScoped
 class AccountActivationRepository : LibreUserRelatedRepository<AccountActivation>() {
