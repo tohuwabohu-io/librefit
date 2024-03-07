@@ -3,7 +3,6 @@ package io.tohuwabohu.crud.error
 import io.quarkus.security.ForbiddenException
 import io.quarkus.security.UnauthorizedException
 import jakarta.persistence.EntityNotFoundException
-import jakarta.persistence.NoResultException
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.ext.ExceptionMapper
 import jakarta.ws.rs.ext.Provider
@@ -18,14 +17,6 @@ fun createErrorResponse(throwable: Throwable): Response {
 
         is EntityNotFoundException -> {
             Response.status(Response.Status.NOT_FOUND).build()
-        }
-
-        is NoResultException -> {
-            Response.status(Response.Status.NOT_FOUND).build()
-        }
-
-        is UnmodifiedError -> {
-            UnmodifiedErrorMapper().toResponse(throwable)
         }
 
         is UnauthorizedException -> {
@@ -78,17 +69,6 @@ class ValidationErrorMapper : ExceptionMapper<ValidationError> {
         log.error("Validation failed", exception)
 
         return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(exception.errors)).build()
-    }
-}
-
-@Provider
-class UnmodifiedErrorMapper : ExceptionMapper<UnmodifiedError> {
-    private val log: Logger = Logger.getLogger(javaClass)
-
-    override fun toResponse(exception: UnmodifiedError): Response {
-        log.error("Update statement has been issued but no data updated", exception)
-
-        return Response.status(Response.Status.NOT_MODIFIED).build()
     }
 }
 
