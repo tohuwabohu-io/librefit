@@ -29,9 +29,9 @@ values (CURRENT_DATE - 58, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 100),
        (CURRENT_DATE - 32, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97),
        (CURRENT_DATE - 31, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97);
 
-insert into libre_user (registered, id, avatar, email, name, password, role, activated)
-values (NOW(),'b21291e5-db51-4a52-a997-25f4021c0ac6','/assets/images/avatars/dog-1.png','test1@test.dev','Arnie','$2a$10$sFGAyHJY3jWxLjhkr7q8B.DdzYL5v4CqTDlW1iVQhPOrSN9UEqoBe','User', true);
-
+INSERT INTO public.libre_user (activated, last_login, registered, id, avatar, email, name, password, role) VALUES (true, null, NOW(), 'b21291e5-db51-4a52-a997-25f4021c0ac6', '/assets/images/avatars/dog-1.png', 'test1@test.dev', 'Arnie', '$2a$10$sFGAyHJY3jWxLjhkr7q8B.DdzYL5v4CqTDlW1iVQhPOrSN9UEqoBe', 'User');
+INSERT INTO public.libre_user (activated, last_login, registered, id, avatar, email, name, password, role) VALUES (false, null, NOW(), '4dd0a829-1bfa-48cc-b13c-a80eb36b1e3f', '/assets/images/avatars/buffdude-1.png', 'test2@test.dev', 'Testuser 2', '$2a$10$gKye9AdO/HeGqcbF5Cg1eObW3kmz26d107xmzSEHAtBaB/dkDWoa2', 'User');
+INSERT INTO public.libre_user (activated, last_login, registered, id, avatar, email, name, password, role) VALUES (false, null, NOW(), '8d45c705-feb3-4daf-80f0-dd89bbccd746', '/assets/images/avatars/lady-1.png', 'test3@test.dev', 'Testuser 3', '$2a$10$HooeSwYKozLREB36NVXWoumq5LH.gTh6KFJpuO8WnPPHyxBIsfea6', 'User');
 
 insert into calorie_tracker_entry (added, sequence, user_id, amount, category)
 values (CURRENT_DATE - 58, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 240, 'b'),
