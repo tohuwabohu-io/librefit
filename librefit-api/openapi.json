@@ -370,6 +370,16 @@
               }
             }
           },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500" : {
             "description" : "Internal Server Error"
           }
@@ -1629,36 +1639,44 @@
         "example" : "2022-03-10T12:15:50"
       },
       "Tdee" : {
-        "required" : [ "age", "sex", "weight", "height", "activityLevel", "weeklyDifference", "calculationGoal", "bmiCategory", "targetBmi" ],
+        "required" : [ "age", "sex", "weight", "height", "weeklyDifference", "calculationGoal", "tdee", "bmiCategory", "targetBmi", "durationDays" ],
         "type" : "object",
         "properties" : {
           "age" : {
+            "maximum" : 99,
+            "minimum" : 18,
             "type" : "number"
           },
           "sex" : {
             "$ref" : "#/components/schemas/CalculationSex"
           },
           "weight" : {
+            "maximum" : 300,
+            "minimum" : 30,
             "type" : "number"
           },
           "height" : {
+            "maximum" : 300,
+            "minimum" : 30,
             "type" : "number"
           },
           "activityLevel" : {
+            "format" : "float",
             "type" : "number"
           },
           "weeklyDifference" : {
+            "maximum" : 7,
+            "minimum" : 0,
             "type" : "number"
           },
           "calculationGoal" : {
             "$ref" : "#/components/schemas/CalculationGoal"
           },
           "bmr" : {
-            "format" : "double",
+            "format" : "float",
             "type" : "number"
           },
           "tdee" : {
-            "format" : "double",
             "type" : "number"
           },
           "deficit" : {
@@ -1688,7 +1706,6 @@
             "type" : "number"
           },
           "durationDays" : {
-            "format" : "float",
             "type" : "number"
           }
         }

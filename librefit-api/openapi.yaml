@@ -252,6 +252,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tdee'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
   /tracker/calories/create:
@@ -1129,32 +1135,41 @@ components:
       - sex
       - weight
       - height
-      - activityLevel
       - weeklyDifference
       - calculationGoal
+      - tdee
       - bmiCategory
       - targetBmi
+      - durationDays
       type: object
       properties:
         age:
+          maximum: 99
+          minimum: 18
           type: number
         sex:
           $ref: '#/components/schemas/CalculationSex'
         weight:
+          maximum: 300
+          minimum: 30
           type: number
         height:
+          maximum: 300
+          minimum: 30
           type: number
         activityLevel:
+          format: float
           type: number
         weeklyDifference:
+          maximum: 7
+          minimum: 0
           type: number
         calculationGoal:
           $ref: '#/components/schemas/CalculationGoal'
         bmr:
-          format: double
+          format: float
           type: number
         tdee:
-          format: double
           type: number
         deficit:
           format: float
@@ -1176,7 +1191,6 @@ components:
           format: float
           type: number
         durationDays:
-          format: float
           type: number
     UUID:
       format: uuid
