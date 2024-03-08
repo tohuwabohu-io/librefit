@@ -70,6 +70,8 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 	}
 
 	try {
+		console.log(`${method} ${PUBLIC_API_BASE_PATH + path}`);
+
 		response = await call;
 
 		console.log(
