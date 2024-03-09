@@ -37,7 +37,7 @@ jobs:
         run: docker build -f librefit-web/Dockerfile -t librefit-web librefit-web/.
 
       - name: Push librefit-service image
-        run: docker push ghcr.io/tohuwabohu-io/librefit-service:latest
+        run: docker push librefit-service
 
       - name: Push librefit-web image
-        run: docker push ghcr.io/tohuwabohu-io/librefit-web:latest
+        run: docker push librefit-web
