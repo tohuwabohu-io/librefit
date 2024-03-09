@@ -10,11 +10,17 @@ export const load = async ({ fetch, cookies }) => {
 		refreshToken: cookies.get('refresh')
 	};
 
-	cookies.delete('auth');
-	cookies.delete('refresh');
+	cookies.delete('auth', {
+		path: '/'
+	});
+
+	cookies.delete('refresh', {
+		path: '/'
+	});
 
 	const userApi = api.postUserLogout;
-	const response = await proxyFetch(fetch, userApi, authInfo.accessToken, authInfo);
+
+	await proxyFetch(fetch, userApi, authInfo.accessToken, authInfo);
 
 	throw redirect(303, '/');
 };
