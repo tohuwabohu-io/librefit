@@ -1,11 +1,8 @@
 FROM node:21-alpine
 # AS builder
 WORKDIR /app
-COPY package*.json .
-RUN npm ci
 COPY . .
 RUN rm .env
-RUN npm run build
 RUN npm prune --production
 
 # FROM node:18-alpine
