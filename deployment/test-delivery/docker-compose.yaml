@@ -12,7 +12,12 @@ services:
     environment:
       - POSTGRES_USER=librefit
       - POSTGRES_PASSWORD=librefit
-      - POSTGRES_DB=dev
+      - POSTGRES_DB=librefit
+    healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U librefit" ]
+        interval: 5s
+        timeout: 5s
+        retries: 6
     ports:
       - '5432:5432'
     networks:
@@ -24,19 +29,25 @@ services:
     hostname: librefit-service
     container_name: librefit-service
     environment:
-      - POSTGRES_USER=librefit
-      - POSTGRES_PASSWORD=librefit
-      - POSTGRES_HOST=librefit-db
-      - POSTGRES_DB=dev
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://librefit-db:5432/librefit
+      QUARKUS_DATASOURCE_USERNAME: librefit
+      QUARKUS_DATASOURCE_PASSWORD: librefit
     ports:
       - '8080:8080'
     networks:
       - librefit-network
+    depends_on:
+      db:
+        condition: service_healthy
 
   web:
     image: librefit-web:latest
     container_name: librefit-web
+    hostname: librefit-web
     restart: always
+    environment:
+      - ORIGIN=http://localhost:3000
+      - API_BASE_PATH=http://librefit-service:8080
     ports:
       - '3000:3000'
     networks:
