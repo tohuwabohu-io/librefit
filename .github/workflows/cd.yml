@@ -1,4 +1,4 @@
-name: Build and publish Dockerfiles
+name: Build and publish docker images
 on: workflow_dispatch
 permissions:
   packages: write
@@ -31,13 +31,13 @@ jobs:
         run: ./gradlew build -Dquarkus.package.type=jar
 
       - name: Build librefit-service jvm image
-        run: docker build -f librefit-service/src/main/docker/Dockerfile.jvm -t librefit-service librefit-service/.
+        run: docker build -f librefit-service/src/main/docker/Dockerfile.jvm -t ghcr.io/tohuwabohu-io/librefit-service:latest librefit-service/.
 
       - name: Build librefit-web node image
-        run: docker build -f librefit-web/Dockerfile -t librefit-web librefit-web/.
+        run: docker build -f librefit-web/Dockerfile -t ghcr.io/tohuwabohu-io/librefit-web:latest librefit-web/.
 
       - name: Push librefit-service image
-        run: docker push librefit-service
+        run: docker push ghcr.io/tohuwabohu-io/librefit-service:latest
 
       - name: Push librefit-web image
-        run: docker push librefit-web
+        run: docker push ghcr.io/tohuwabohu-io/librefit-web:latest
