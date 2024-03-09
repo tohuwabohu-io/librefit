@@ -1,0 +1,43 @@
+name: Build and publish Dockerfiles
+on: workflow_dispatch
+permissions:
+  packages: write
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.ACTOR}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Build librefit-service
+        run: ./gradlew build -Dquarkus.package.type=jar
+
+      - name: Build librefit-service jvm image
+        run: docker build -f librefit-service/src/main/docker/Dockerfile.jvm -t librefit-service librefit-service/.
+
+      - name: Build librefit-web node image
+        run: docker build -f librefit-web/Dockerfile -t librefit-web librefit-web/.
+
+      - name: Push librefit-service image
+        run: docker push ghcr.io/tohuwabohu-io/librefit-service:latest
+
+      - name: Push librefit-web image
+        run: docker push ghcr.io/tohuwabohu-io/librefit-web:latest
