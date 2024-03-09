@@ -32,7 +32,7 @@ class FlywayMigration {
     fun runFlywayMigration(@Observes event: StartupEvent?) {
         val migrate = migrateAtStart.isPresent && migrateAtStart.get()
 
-        Log.info("Checking migration... flag is set to {$migrate}.")
+        Log.info("Checking migration... flag is set to $migrate.")
 
         if (migrate) {
             val flyway =
