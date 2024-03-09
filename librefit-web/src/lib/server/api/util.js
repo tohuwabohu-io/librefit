@@ -1,4 +1,4 @@
-import { PUBLIC_API_BASE_PATH } from '$env/static/public';
+import { env } from '$env/dynamic/private';
 import { error, redirect } from '@sveltejs/kit';
 
 /**
@@ -41,7 +41,7 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 				Authorization: `Bearer ${jwt}`
 			};
 
-			call = fetchApi(PUBLIC_API_BASE_PATH + path, {
+			call = fetchApi(env.API_BASE_PATH + path, {
 				method: api.method,
 				headers,
 				body: data
@@ -49,7 +49,7 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 		}
 	} else {
 		if (method === 'POST' || method === 'PUT') {
-			call = fetchApi(PUBLIC_API_BASE_PATH + path, {
+			call = fetchApi(env.API_BASE_PATH + path, {
 				method: api.method,
 				headers,
 				body: JSON.stringify(data)
@@ -57,7 +57,7 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 		} else if (method === 'GET' || method === 'DELETE') {
 			path = replaceGetParamsJson(path, data);
 
-			call = fetchApi(PUBLIC_API_BASE_PATH + path, {
+			call = fetchApi(env.API_BASE_PATH + path, {
 				method: api.method,
 				headers
 			});
@@ -70,7 +70,7 @@ export const proxyFetch = async (fetchApi, api, jwt, data) => {
 	}
 
 	try {
-		console.log(`${method} ${PUBLIC_API_BASE_PATH + path}`);
+		console.log(`${method} ${env.API_BASE_PATH + path}`);
 
 		response = await call;
 
