@@ -74,8 +74,6 @@
 
               status = result.data;
 
-              console.log(status);
-
               await applyAction(result);
 			};
 		  }}>
