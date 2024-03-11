@@ -91,7 +91,7 @@ export const deleteEntry = (e, callback, toastStore, route, params) => {
 
 				showToastSuccess(toastStore, 'Deletion successful.');
 			} else {
-				throw Error(response.status);
+				throw Error(await response.json());
 			}
 		})
 		.catch((e) => showToastError(toastStore, e));

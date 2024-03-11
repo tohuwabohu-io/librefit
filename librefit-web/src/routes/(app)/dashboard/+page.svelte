@@ -44,12 +44,8 @@
 	};
 
 	const addWeight = (e) => {
-		weight_crud.add(e, loadWeightTracker, toastStore, '/dashboard');
+		weight_crud.add(e, updateWeightTracker, toastStore, '/dashboard');
 	}
-
-	const updateWeight = (e) => {
-		weight_crud.update(e, loadWeightTracker, toastStore, '/dashboard');
-	};
 
 	const setGoal = (e) => {
 
@@ -68,24 +64,14 @@
 		}
 	}
 
-	const loadWeightTracker = async (update) => {
-		if (update.status === 200 || update.status === 201) {
-			const response = await fetch(`/dashboard?type=weight&operation=last`, {
-				method: 'GET'
-			});
+	const updateWeightTracker = async (response) => {
+		// const response = await fetch(`/dashboard?type=weight&operation=last`, {method: 'GET'});
+		const result = await response.json();
 
-			const result = await response.json();
-			weightTrackerEntry.set(result);
+		/** @type WeightTrackerEntry */
+		const updatedEntry = await result;
 
-			if (response.ok) {
-				return result;
-			} else {
-				throw Error(await result);
-			}
-		} else {
-			console.log(update);
-			throw Error(update.status)
-		}
+		weightTrackerEntry.set(updatedEntry);
 	}
 
 	const getConfig = (chartData) => {
@@ -211,7 +197,6 @@
 				<div class="variant-ghost-surface rounded-xl p-4">
 					<WeightTracker
 							on:addWeight={addWeight}
-							on:updateWeight={updateWeight}
 							on:updateGoal={setGoal}
 					/>
 				</div>

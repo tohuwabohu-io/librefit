@@ -12,8 +12,6 @@ export const GET = async ({ fetch, url, cookies }) => {
 	let response = new Response();
 
 	if (operation !== 'last') {
-		const listApi = api.listWeightTrackerEntriesRange;
-
 		const fromDate = new Date();
 		const toDate = new Date();
 		const filter = url.searchParams.get('filter');
@@ -33,18 +31,27 @@ export const GET = async ({ fetch, url, cookies }) => {
 		}
 
 		try {
-			response = await proxyFetch(fetch, listApi, cookies.get('auth'), {
+			response = proxyFetch(fetch, api.listWeightTrackerEntriesRange, cookies.get('auth'), {
 				dateFrom: getDateAsStr(fromDate),
 				dateTo: getDateAsStr(toDate)
+			}).then(async (result) => {
+				/** @type Array<WeightTrackerEntry> */
+				const entries = await result.json();
+
+				return new Response(JSON.stringify(entries));
 			});
 		} catch (e) {
 			console.error(e);
 		}
 	} else {
 		try {
-			const lastApi = api.findLastWeightTrackerEntry;
+			response = await proxyFetch(fetch, api.findLastWeightTrackerEntry, cookies.get('auth')).then(
+				async (result) => {
+					const entry = await result.json();
 
-			response = await proxyFetch(fetch, lastApi, cookies.get('auth'));
+					return new Response(JSON.stringify(entry));
+				}
+			);
 		} catch (e) {
 			console.error(e);
 		}
@@ -69,9 +76,25 @@ export const POST = async ({ request, fetch, cookies }) => {
 				api.createWeightTrackerEntry,
 				cookies.get('auth'),
 				payload.weight
-			);
+			).then(async (result) => {
+				const newEntry = await result.json();
+
+				return new Response(JSON.stringify(newEntry), {
+					status: result.status,
+					statusText: result.statusText
+				});
+			});
 		} else if (payload.goal) {
-			response = await proxyFetch(fetch, api.createGoal, cookies.get('auth'), payload.goal);
+			response = await proxyFetch(fetch, api.createGoal, cookies.get('auth'), payload.goal).then(
+				async (result) => {
+					const newGoal = await result.json();
+
+					return new Response(JSON.stringify(newGoal), {
+						status: result.status,
+						statusText: result.statusText
+					});
+				}
+			);
 		} else {
 			console.error(`weight api can't be called with payload ${JSON.stringify(payload)}`);
 

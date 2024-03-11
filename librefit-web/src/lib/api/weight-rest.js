@@ -7,23 +7,28 @@ import { showToastError, showToastSuccess } from '$lib/toast.js';
  * @param {String} route
  */
 export const add = (e, callback, toastStore, route) => {
+	/** @type {WeightTrackerEntry} */
+	const newEntry = {
+		sequence: e.detail.sequence,
+		added: e.detail.todayDateStr,
+		amount: e.detail.value
+	};
+
 	fetch(route, {
 		method: 'POST',
-		body: JSON.stringify({
-			weight: {
-				sequence: e.detail.sequence,
-				added: e.detail.todayDateStr,
-				amount: e.detail.value
-			}
-		}),
+		body: JSON.stringify({ weight: newEntry }),
 		headers: {
 			'Content-Type': 'application/json'
 		}
 	})
 		.then(async (response) => {
-			await callback(response);
+			if (response.status === 201) {
+				await callback(response);
 
-			showToastSuccess(toastStore, 'Successfully added weight.');
+				showToastSuccess(toastStore, 'Successfully added weight.');
+			} else {
+				throw Error(await response.json());
+			}
 		})
 		.catch((e) => showToastError(toastStore, e));
 };

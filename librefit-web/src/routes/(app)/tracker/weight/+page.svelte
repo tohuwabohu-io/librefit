@@ -71,8 +71,6 @@
 	}
 
 	const updateGoal = (e) => {
-		console.log(e);
-
 		let goal = e.detail.goal;
 
 		if (!currentGoal) {
