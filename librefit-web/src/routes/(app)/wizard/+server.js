@@ -14,10 +14,18 @@ export async function POST({ request, fetch, cookies }) {
 
 	if (peeked.tdee) {
 		const payload = await request.json();
-		const tdeeApi = api.calculateTdee;
 
 		/** @type {Response} */
-		response = await proxyFetch(fetch, tdeeApi, undefined, payload.tdee);
+		response = await proxyFetch(fetch, api.calculateTdee, undefined, payload.tdee).then(
+			async (response) => {
+				const calculationResult = await response.json();
+
+				return new Response(JSON.stringify(calculationResult), {
+					status: response.status,
+					statusText: response.statusText
+				});
+			}
+		);
 	} else if (peeked.goal || peeked.weight) {
 		response = weight_crud.POST({ request, fetch, cookies });
 	} else {

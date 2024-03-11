@@ -14,7 +14,7 @@
 	const currentGoal = getContext('currentGoal');
 
 	/** @type Tdee */
-	let calculationResult = null;
+	let calculationResult;
 
 	let calculationError;
 
@@ -31,7 +31,6 @@
 		}).then(async (response) => {
 			if (response.ok) {
 				calculationResult = await response.json();
-				console.log(calculationResult);
 			} else {
 				calculationError = true;
 			}
