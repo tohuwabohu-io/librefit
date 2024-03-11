@@ -1,4 +1,4 @@
-name: Build and publish docker images
+name: Build and deploy docker images
 on: workflow_dispatch
 permissions:
   packages: write
@@ -41,3 +41,19 @@ jobs:
 
       - name: Push librefit-web image
         run: docker push ghcr.io/tohuwabohu-io/librefit-web:latest
+
+      - name: Deploy librefit-service
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        run: flyctl deploy librefit-service/. --remote-only -i ghcr.io/tohuwabohu-io/librefit-service:latest
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          QUARKUS_DATASOURCE_PASSWORD: ${{ secrets.DB_PWD }}
+          QUARKUS_DATASOURCE_REACTIVE_URL: ${{ secrets.DB_URL }}
+          QUARKUS_DATASOURCE_USERNAME: ${{ secrets.DB_USER }}
+
+      - name: Deploy librefit-web
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        run: flyctl deploy librefit-web/. --remote-only -i ghcr.io/tohuwabohu-io/librefit-web:latest
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          API_BASE_PATH: ${{ secrets.API_BASE_PATH }}
