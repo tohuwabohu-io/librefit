@@ -1,8 +1,10 @@
-name: Build and publish docker images
+name: Build and deploy docker images
 on: workflow_dispatch
 permissions:
   packages: write
   contents: write
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_REGISTRY_TOKEN }}
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -27,6 +29,17 @@ jobs:
           username: ${{github.ACTOR}}
           password: ${{secrets.GITHUB_TOKEN}}
 
+      #77
+      # - name: Login to Fly.io Container Registry
+      #  uses: docker/login-action@v1
+      #  with:
+      #    registry: registry.fly.io
+      #    username: x
+      #    password: ${{ secrets.FLY_REGISTRY_TOKEN }}
+      
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        
       - name: Build librefit-service
         run: ./gradlew build -Dquarkus.package.type=jar
 
@@ -36,8 +49,24 @@ jobs:
       - name: Build librefit-web node image
         run: docker build -f librefit-web/Dockerfile -t ghcr.io/tohuwabohu-io/librefit-web:latest librefit-web/.
 
-      - name: Push librefit-service image
+      - name: Push librefit-service image to ghcr
         run: docker push ghcr.io/tohuwabohu-io/librefit-service:latest
 
-      - name: Push librefit-web image
+      - name: Push librefit-web image to ghcr
         run: docker push ghcr.io/tohuwabohu-io/librefit-web:latest
+
+      - name: Deploy librefit-service
+        #77-i ghcr.io/tohuwabohu-io/librefit-service:latest
+        run: |
+          flyctl deploy librefit-service/. --remote-only \
+          && fly secrets -a librefit-service --detach set \
+          QUARKUS_DATASOURCE_PASSWORD=${{ secrets.DB_PWD }} \
+          QUARKUS_DATASOURCE_REACTIVE_URL=${{ secrets.DB_URL }} \
+          QUARKUS_DATASOURCE_USERNAME=${{ secrets.DB_USER }}
+
+      - name: Deploy librefit-web
+        #77 -i ghcr.io/tohuwabohu-io/librefit-web:latest
+        run: |
+          flyctl deploy librefit-web/. --remote-only \
+          && fly secrets -a librefit-web --detach set \
+          API_BASE_PATH=${{ secrets.API_BASE_PATH }}
