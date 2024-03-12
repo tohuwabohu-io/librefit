@@ -59,7 +59,7 @@ jobs:
         #77-i ghcr.io/tohuwabohu-io/librefit-service:latest
         run: |
           flyctl deploy librefit-service/. --remote-only \
-          && fly secrets -a librefit-service --detach set \
+          && flyctl secrets -a librefit-service --detach set \
           QUARKUS_DATASOURCE_PASSWORD=${{ secrets.DB_PWD }} \
           QUARKUS_DATASOURCE_REACTIVE_URL=${{ secrets.DB_URL }} \
           QUARKUS_DATASOURCE_USERNAME=${{ secrets.DB_USER }}
@@ -68,5 +68,5 @@ jobs:
         #77 -i ghcr.io/tohuwabohu-io/librefit-web:latest
         run: |
           flyctl deploy librefit-web/. --remote-only \
-          && fly secrets -a librefit-web --detach set \
+          && flyctl secrets -a librefit-web --detach set \
           API_BASE_PATH=${{ secrets.API_BASE_PATH }}
