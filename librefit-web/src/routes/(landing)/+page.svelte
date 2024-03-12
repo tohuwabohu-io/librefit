@@ -37,11 +37,11 @@
 
 <section class="variant-ghost-surface h-full flex">
     <div class="container mx-auto p-12 space-y-8 self-center">
-        <div class="grid grid-cols-[auto_1fr_auto] xl:grid-cols-2 gap-4 align-middle">
+        <div class="md:grid md:grid-cols-[auto_1fr_auto] xl:grid-cols-2 flex flex-col gap-4 align-middle justify-items-center">
             <div class="flex flex-col gap-4">
-                <h1 class="font-logo">
-                    <span class="text-primary-500 text-9xl">Libre</span>
-                    <span class="text-secondary-500 text-9xl">Fit</span>
+                <h1 class="font-logo flex flex-row md:justify-start md:gap-4">
+                    <span class="text-primary-500 lg:text-9xl md:text-8xl text-7xl">Libre</span>
+                    <span class="text-secondary-500 lg:text-9xl md:text-8xl text-7xl">Fit</span>
                 </h1>
 
                 <div class="flex flex-col gap-4">
@@ -58,7 +58,7 @@
 
 
             </div>
-            <div class="w-2/3">
+            <div class="lg:w-2/3">
                 <div>
                     <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/login">
                         <ValidatedInput
@@ -84,7 +84,7 @@
                             {/if}
                         </div>
 
-                        <div class="flex justify-between">
+                        <div class="flex justify-between gap-4">
                             <button class="btn variant-filled-primary">
                                 <span>
                                     Login
@@ -94,12 +94,7 @@
                             </button>
 
                             <div class="flex flex-row gap-4">
-                                <p class="self-center text-sm unstyled">Not signed up yet?</p>
-                                <button class="btn variant-filled-secondary" on:click|preventDefault={showRegisterModal}>
-                                    <span>
-                                        Register
-                                    </span>
-                                </button>
+                                <a class="self-center text-sm unstyled" href="" on:click|preventDefault={showRegisterModal}>Not signed up yet?</a>
                             </div>
                         </div>
                     </form>
