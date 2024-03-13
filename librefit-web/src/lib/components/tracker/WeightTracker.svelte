@@ -14,6 +14,8 @@
 
     const dispatch = createEventDispatcher();
 
+    export let displayClass = '';
+
     const addWeight = (e) => {
         dispatch('addWeight', {
             date: todayDateStr,
@@ -76,7 +78,7 @@
     }
 </script>
 
-<div class="flex flex-col grow gap-4">
+<div class="flex flex-col grow gap-4 ${displayClass}">
     <div class="flex flex-col gap-4 justify-between">
         <div class="flex flex-col gap-4 text-center items-center justify-between">
             {#if $lastEntry}

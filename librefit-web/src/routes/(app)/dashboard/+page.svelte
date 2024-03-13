@@ -80,8 +80,8 @@
 			<h1>Good {getDaytimeGreeting(new Date())}, {$user.name}!</h1>
 			<h2>This is your daily summary.</h2>
 
-			<div class="flex lg:flex-row flex-col gap-8">
-				<div class="flex lg:flex-row flex-col gap-4 grow variant-ghost-surface rounded-xl p-4">
+			<div class="flex xl:flex-row flex-col gap-8">
+				<div class="flex xl:flex-row flex-col gap-4 grow variant-ghost-surface rounded-xl p-4">
 					<CalorieTracker entries={calorieTrackerEntries} categories={categoriesAsKeyValue}
 									on:addCalories={addCalories}
 									on:updateCalories={updateCalories}
@@ -89,17 +89,17 @@
 					/>
 				</div>
 				<div class="variant-ghost-surface rounded-xl p-4 md:flex md:flex-row">
-					<WeightTracker
+					<WeightTracker displayClass="md:w-1/2"
 							on:addWeight={addWeight}
 							on:updateGoal={setGoal}
 					/>
 
-					<CalorieDistribution bind:data={data} displayClass="flex xl:hidden max-sm:hidden"/>
+					<CalorieDistribution bind:data={data} displayClass="xl:hidden hidden md:flex md:flex-col md:w-1/2"/>
 				</div>
 			</div>
 
 			<div class="flex md:flex-row flex-col gap-8">
-				<CalorieDistribution bind:data={data} displayClass="flex flex-col md:max-lg:hidden variant-ghost-surface rounded-xl xl:w-1/4" />
+				<CalorieDistribution bind:data={data} displayClass="flex flex-col md:max-xl:hidden variant-ghost-surface rounded-xl xl:w-1/4" />
 
 				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4 object-fill xl:w-3/4">
 					{#await data.listWeight}
