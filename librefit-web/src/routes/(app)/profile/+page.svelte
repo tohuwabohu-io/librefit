@@ -52,7 +52,7 @@
 <section>
     <div class="container mx-auto p-8 space-y-8">
         <h1>Profile</h1>
-        <h2>Change your user settings.</h2>
+        <p>Change your user settings.</p>
 
         <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" use:enhance={({formData, cancel}) => {
             if (formData.get('avatar') === $user.avatar && formData.get('username') === $user.name) {

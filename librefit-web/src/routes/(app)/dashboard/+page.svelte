@@ -78,7 +78,7 @@
 	<div class="container mx-auto p-8 space-y-8">
 		{#if $user}
 			<h1>Good {getDaytimeGreeting(new Date())}, {$user.name}!</h1>
-			<h2>This is your daily summary.</h2>
+			<p>This is your daily summary.</p>
 
 			<div class="flex xl:flex-row flex-col gap-8">
 				<div class="flex xl:flex-row flex-col gap-4 grow variant-ghost-surface rounded-xl p-4">

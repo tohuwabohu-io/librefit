@@ -121,12 +121,12 @@
 
 <section>
 	<div class="container mx-auto p-8 space-y-8">
-		<h1 class="h1">TDEE Calculator</h1>
+		<h1>TDEE Calculator</h1>
 
 		{#if !calculationResult && !calculationError}
 			<TdeeStepper on:calculate={calculate}/>
 		{:else if !calculationError}
-			<h2 class="h2">Your result</h2>
+			<h2>Your result</h2>
 
 			<div class="table-container">
 				<table class="table table-compact">
@@ -164,7 +164,7 @@
 				</table>
 			</div>
 
-			<h2 class="h2">Body parameters</h2>
+			<h2>Body parameters</h2>
 
 			<div class="table-container">
 				<table class="table table-compact">
@@ -209,7 +209,7 @@
 			</div>
 
 
-			<h2 class="h2">Next steps</h2>
+			<h2>Next steps</h2>
 			<p>
 				Based on your input, your basal metabolic rate is {calculationResult.bmr}kcal. Your daily calorie
 				consumption to hold your weight should be around {calculationResult.tdee}kcal.

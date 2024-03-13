@@ -63,7 +63,7 @@
 
 <section>
     <div class="container mx-auto p-8 space-y-10">
-        <h1 class="font-logo">
+        <h1>
             <span class="text-primary-500">Sign</span>
             <span class="text-secondary-500">Up</span>
         </h1>
