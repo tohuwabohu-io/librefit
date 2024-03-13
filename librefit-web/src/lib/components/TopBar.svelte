@@ -8,7 +8,7 @@
 
 	export const showDrawer = (e) => {
 		drawerStore.open({
-			width: 'w-1/3'
+			width: 'xl:w-1/3 md:w-3/5 w-full'
 		});
 	}
 </script>
