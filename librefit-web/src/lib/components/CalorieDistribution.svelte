@@ -119,7 +119,7 @@
 
 </script>
 
-<div class="${displayClass} p-4 text-center justify-between ">
+<div class="{displayClass} p-4 text-center justify-between ">
     {#await data.listCt}
         <p>Loading...</p>
     {:then ctList}
