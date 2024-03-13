@@ -44,6 +44,10 @@
 
 </script>
 
+<svelte:head>
+    <title>LibreFit - Profile</title>
+</svelte:head>
+
 {#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-8">
@@ -84,10 +88,12 @@
             <div class="flex flex-col gap-4">
                 <span>Avatar</span>
 
-                <div class="flex flex-row gap-4 items-center">
-                    <Avatar src={selectedAvatar} initials="LU"/>
+                <div class="flex flex-row gap-4">
+                    <div>
+                        <Avatar src={selectedAvatar} initials="LU"/>
+                    </div>
 
-                    <div class="justify-center">
+                    <div class="justify-center self-center">
                         <button on:click|preventDefault={showAvatarPickerModal}
                                 class="btn variant-filled-secondary">Change</button>
                     </div>
