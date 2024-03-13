@@ -34,20 +34,24 @@
     }
 </script>
 
-<TrackerRadial entries={entries.map(e => e.amount)} />
-<div class="flex flex-col grow gap-4">
-    {#each entries as entry}
-        <TrackerInput {categories}
-                      value={entry.amount}
-                      dateStr={entry.added}
-                      sequence={entry.sequence}
-                      category={entry.category}
-                      on:add={addCalories}
-                      on:update={updateCalories}
-                      on:remove={deleteCalories}
-                      existing={entry.sequence !== undefined}
-                      disabled={entry.sequence !== undefined}
-                      unit={'kcal'}
-        />
-    {/each}
+<div class="flex md:flex-row flex-col grow gap-4">
+    <div class="self-center">
+        <TrackerRadial entries={entries.map(e => e.amount)} />
+    </div>
+    <div class="flex flex-col grow gap-4">
+        {#each entries as entry}
+            <TrackerInput {categories}
+                          value={entry.amount}
+                          dateStr={entry.added}
+                          sequence={entry.sequence}
+                          category={entry.category}
+                          on:add={addCalories}
+                          on:update={updateCalories}
+                          on:remove={deleteCalories}
+                          existing={entry.sequence !== undefined}
+                          disabled={entry.sequence !== undefined}
+                          unit={'kcal'}
+            />
+        {/each}
+    </div>
 </div>

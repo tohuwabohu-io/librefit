@@ -186,8 +186,8 @@
 			<h1>Good {getDaytimeGreeting(new Date())}, {$user.name}!</h1>
 			<h2>This is your daily summary.</h2>
 
-			<div class="flex flex-row gap-8">
-				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4">
+			<div class="flex md:flex-row flex-col gap-8">
+				<div class="flex md:flex-row flex-col gap-4 grow variant-ghost-surface rounded-xl p-4">
 					<CalorieTracker entries={calorieTrackerEntries} categories={categoriesAsKeyValue}
 									on:addCalories={addCalories}
 									on:updateCalories={updateCalories}
@@ -202,7 +202,7 @@
 				</div>
 			</div>
 
-			<div class="flex flex-row gap-8">
+			<div class="flex md:flex-row flex-col gap-8">
 				<div class="variant-ghost-surface rounded-xl p-4 flex flex-col text-center justify-between">
 					{#await data.listCt}
 						<p>Loading...</p>
