@@ -129,97 +129,82 @@
 			<h2 class="h2">Your result</h2>
 
 			<div class="table-container">
-				<table class="table table-hover">
-					<tr>
-						<td>
-							BMR (Basal Metabolic Rate)
-						</td>
-						<td>
-							<ValidatedInput unit="kcal" value={calculationResult.bmr} readOnly={true}/>
-						</td>
-					</tr>
+				<table class="table table-compact">
+					<thead>
+						<tr>
+							<th>Description</th>
+							<th colspan="2">Value</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Basal Metabolic Rate</td>
+							<td>kcal</td>
+							<td>{calculationResult.bmr}</td>
+						</tr>
 
-					<tr>
-						<td>
-							TDEE (Total Daily Energy Expediture)
-						</td>
-						<td>
-							<ValidatedInput unit="kcal" value={calculationResult.tdee} readOnly={true}/>
-						</td>
-					</tr>
+						<tr>
+							<td>Total Daily Energy Expediture</td>
+							<td>kcal</td>
+							<td>{calculationResult.tdee}</td>
+						</tr>
 
-					<tr>
-						<td>
-							Target deficit
-						</td>
-						<td>
-							<ValidatedInput unit="kcal" value={calculationResult.deficit} readOnly={true}/>
-						</td>
-					</tr>
+						<tr>
+							<td>Target deficit</td>
+							<td>kcal</td>
+							<td>{calculationResult.deficit}</td>
+						</tr>
 
-					<tr>
-						<td>
-							Target intake
-						</td>
-						<td>
-							<ValidatedInput unit="kcal" value={calculationResult.target} readOnly={true}/>
-						</td>
-					</tr>
+						<tr>
+							<td>Target intake</td>
+							<td>kcal</td>
+							<td>{calculationResult.target}</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 
 			<h2 class="h2">Body parameters</h2>
 
 			<div class="table-container">
-				<table class="table table-hover">
-					<tr>
-						<td>
-							Age
-						</td>
-						<td>
-							<ValidatedInput value={calculationResult.age} readOnly={true} />
-						</td>
-					</tr>
+				<table class="table table-compact">
+					<thead>
+						<tr>
+							<th>Description</th>
+							<th colspan="2">Value</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Age</td>
+							<td></td>
+							<td>{calculationResult.age}</td>
+						</tr>
 
-					<tr>
-						<td>
-							Height
-						</td>
-						<td>
-							<ValidatedInput unit="cm" value={calculationResult.height} readOnly={true}/>
-						</td>
-					</tr>
+						<tr>
+							<td>Height</td>
+							<td>cm</td>
+							<td>{calculationResult.height}</td>
+						</tr>
 
-					<tr>
-						<td>
-							Weight
-						</td>
-						<td>
-							<ValidatedInput unit="kg" value={calculationResult.weight} readOnly={true}/>
-						</td>
-					</tr>
+						<tr>
+							<td>Weight</td>
+							<td>kg</td>
+							<td>{calculationResult.weight}</td>
+						</tr>
 
-					<tr>
-						<td>
-							Body Mass Index
-						</td>
-						<td>
-							<ValidatedInput value={calculationResult.bmi} readOnly={true}/>
-						</td>
-					</tr>
+						<tr>
+							<td>Body Mass Index</td>
+							<td></td>
+							<td>{calculationResult.bmi}</td>
+						</tr>
 
-					<tr>
-						<td>
-							Classification
-						</td>
-						<td>
-							<select class="select" disabled bind:value={calculationResult.bmiCategory}>
-								{#each bmiCategories as bmiCategory}
-									<option value={bmiCategory.value}>{bmiCategory.label}</option>
-								{/each}
-							</select>
-						</td>
-					</tr>
+						<tr>
+							<td>Classification</td>
+							<td></td>
+							<td>{bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label}</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 
