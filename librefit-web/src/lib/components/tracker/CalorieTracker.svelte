@@ -34,7 +34,7 @@
     }
 </script>
 
-<div class="flex md:flex-row flex-col grow gap-4">
+<div class="flex lg:flex-row flex-col grow gap-4">
     <div class="self-center">
         <TrackerRadial entries={entries.map(e => e.amount)} />
     </div>
