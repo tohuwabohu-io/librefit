@@ -23,7 +23,7 @@
     }
 </script>
 
-<div class="flex flex-row gap-4">
+<div class="lg:flex lg:flex-row lg:gap-2 grid grid-cols-3 justify-items-center">
     {#each files as file}
         <Avatar src={file} on:click={() => avatarClicked(file)}
                 border="border-4 border-surface-300-600-token hover:!border-primary-500 {file === chosen ? '!border-primary-500' : ''}"

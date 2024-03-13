@@ -66,7 +66,7 @@
 						{convertDateStrToDisplayDateStr(dateStr)}
 					</svelte:fragment>
 					<svelte:fragment slot="content">
-						<div class="flex gap-4 justify-between">
+						<div class="flex lg:flex-row flex-col gap-4 grow">
 							{#if dateStr === todayStr && data.entryToday && !datesToEntries[dateStr]}
 								<CalorieTracker entries={data.entryToday} {categories}
 									on:addCalories={addEntry}

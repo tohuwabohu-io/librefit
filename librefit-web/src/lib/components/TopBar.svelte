@@ -8,14 +8,14 @@
 
 	export const showDrawer = (e) => {
 		drawerStore.open({
-			width: 'w-1/3'
+			width: 'xl:w-1/3 md:w-3/5 w-full'
 		});
 	}
 </script>
 
 <AppBar shadow="drop-shadow">
 	<svelte:fragment slot="lead">
-		<a href="/dashboard" class="font-logo text-2xl">
+		<a href="/dashboard" class="h1 text-2xl">
 			<span class="text-primary-500"> Libre </span>
 			<span class="text-secondary-500"> Fit </span>
 		</a>

@@ -14,6 +14,8 @@
 
     const dispatch = createEventDispatcher();
 
+    export let displayClass = '';
+
     const addWeight = (e) => {
         dispatch('addWeight', {
             date: todayDateStr,
@@ -76,41 +78,37 @@
     }
 </script>
 
-<div class="flex flex-col grow gap-4">
-    <div class="flex flex-col gap-4 justify-between">
-        <div class="flex flex-col gap-4 text-center items-center justify-between">
-            {#if $lastEntry}
-                <Scale width={100} height={100} />
+<div class="flex flex-col grow gap-4 text-center items-center self-center {displayClass}">
+    {#if $lastEntry}
+        <Scale width={100} height={100} />
 
-                <p>
-                    Current weight: {$lastEntry.amount}kg ({convertDateStrToDisplayDateStr($lastEntry.added)})
-                </p>
-            {:else}
-                <NoScale width={100} height={100} />
+        <p>
+            Current weight: {$lastEntry.amount}kg ({convertDateStrToDisplayDateStr($lastEntry.added)})
+        </p>
+    {:else}
+        <NoScale width={100} height={100} />
 
-                <p>
-                    Nothing tracked yet. Today is a good day to start!
-                </p>
-            {/if}
+        <p>
+            Nothing tracked yet. Today is a good day to start!
+        </p>
+    {/if}
 
-            {#if $currentGoal}
-                <p>
-                    Goal: {$currentGoal.targetWeight}kg @ ({convertDateStrToDisplayDateStr($currentGoal.endDate)})
-                </p>
-            {:else}
-                <p>
-                    No goal set up.
-                </p>
-            {/if}
+    {#if $currentGoal}
+        <p>
+            Goal: {$currentGoal.targetWeight}kg @ ({convertDateStrToDisplayDateStr($currentGoal.endDate)})
+        </p>
+    {:else}
+        <p>
+            No goal set up.
+        </p>
+    {/if}
 
-            <div class="btn-group variant-filled-primary">
-                <button on:click|preventDefault={showWeightModal}>
-                    Update weight
-                </button>
-                <button on:click|preventDefault={showGoalModal}>
-                    Update goal
-                </button>
-            </div>
-        </div>
+    <div class="btn-group variant-filled-primary">
+        <button on:click|preventDefault={showWeightModal}>
+            Update weight
+        </button>
+        <button on:click|preventDefault={showGoalModal}>
+            Update goal
+        </button>
     </div>
 </div>

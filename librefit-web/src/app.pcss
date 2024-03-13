@@ -27,14 +27,23 @@
 	}
 }
 
+:root [data-theme='librefit-theme'] {
+	--theme-font-family-base: Project Blackbird, sans-serif;
+	--theme-font-family-heading: Bombardier, sans-serif;
+}
+
 html,
 body {
 	@apply h-full overflow-hidden;
-	font-family: Project Blackbird, serif !important;
 }
 
 h1 {
 	font-size: 2.5em;
+	font-family: var(--theme-font-family-heading);
+}
+
+h2, h3 {
+	font-family: var(--theme-font-family-heading);
 }
 
 a, .hyperlink {
@@ -44,10 +53,6 @@ a, .hyperlink {
 
 a:hover, .hyperlink:hover {
 	color: rgb(var(--color-primary-500));
-}
-
-.font-logo {
-	font-family: Bombardier, serif !important;
 }
 
 .validation-error-text {

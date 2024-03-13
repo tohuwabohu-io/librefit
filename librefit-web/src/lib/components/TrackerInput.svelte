@@ -85,7 +85,7 @@
 	};
 </script>
 
-<div class="flex gap-2">
+<div class="flex flex-row gap-2">
 	<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
 		<div class="input-group-shim">{unit}</div>
 		<input type="number" placeholder="Amount..." bind:value {disabled} />

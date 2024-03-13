@@ -29,8 +29,8 @@ was born.
 - Gradle 7.6
 - Quarkus 3.5.0
 - Kotlin 1.9.0
-- SvelteKit 1.26.0
-- Skeleton 2.3.0 
+- SvelteKit 2.5.2
+- Skeleton 2.9.0 
 - Postgres 15.2
 - OpenAPI 3.0.3
 
