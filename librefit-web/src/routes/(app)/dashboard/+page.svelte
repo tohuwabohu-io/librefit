@@ -23,7 +23,6 @@
 
 	const user = getContext('user');
 	const weightTrackerEntry = getContext('lastWeight');
-	const currentGoal = getContext('currentGoal');
 
 	const toastStore = getToastStore();
 
@@ -89,16 +88,18 @@
 									on:deleteCalories={deleteCalories}
 					/>
 				</div>
-				<div class="variant-ghost-surface rounded-xl p-4">
+				<div class="variant-ghost-surface rounded-xl p-4 md:flex md:flex-row">
 					<WeightTracker
 							on:addWeight={addWeight}
 							on:updateGoal={setGoal}
 					/>
+
+					<CalorieDistribution bind:data={data} displayClass="flex xl:hidden max-sm:hidden"/>
 				</div>
 			</div>
 
 			<div class="flex md:flex-row flex-col gap-8">
-				<CalorieDistribution bind:data={data}/>
+				<CalorieDistribution bind:data={data} displayClass="flex flex-col md:max-lg:hidden variant-ghost-surface rounded-xl" />
 
 				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4">
 					{#await data.listWeight}

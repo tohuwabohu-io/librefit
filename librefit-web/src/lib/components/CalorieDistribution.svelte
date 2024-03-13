@@ -11,6 +11,7 @@
     Chart.register(...registerables);
 
     export let data;
+    export let displayClass = '';
 
     const currentGoal = getContext('currentGoal');
 
@@ -118,7 +119,7 @@
 
 </script>
 
-<div class="variant-ghost-surface rounded-xl p-4 flex flex-col text-center justify-between">
+<div class="${displayClass} p-4 text-center justify-between ">
     {#await data.listCt}
         <p>Loading...</p>
     {:then ctList}
