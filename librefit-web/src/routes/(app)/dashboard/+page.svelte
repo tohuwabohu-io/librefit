@@ -77,7 +77,9 @@
 <section>
 	<div class="container mx-auto p-8 space-y-8">
 		{#if $user}
-			<h1>Good {getDaytimeGreeting(new Date())}, {$user.name}!</h1>
+			{@const name = $user.name}
+
+			<h1>Good {getDaytimeGreeting(new Date())}{#if name}, {$user.name}!{:else}!{/if}</h1>
 			<p>This is your daily summary.</p>
 
 			<div class="flex xl:flex-row flex-col gap-8">
