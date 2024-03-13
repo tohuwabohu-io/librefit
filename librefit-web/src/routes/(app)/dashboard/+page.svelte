@@ -99,9 +99,9 @@
 			</div>
 
 			<div class="flex md:flex-row flex-col gap-8">
-				<CalorieDistribution bind:data={data} displayClass="flex flex-col md:max-lg:hidden variant-ghost-surface rounded-xl" />
+				<CalorieDistribution bind:data={data} displayClass="flex flex-col md:max-lg:hidden variant-ghost-surface rounded-xl xl:w-1/4" />
 
-				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4">
+				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4 object-fill xl:w-3/4">
 					{#await data.listWeight}
 						<p>Loading...</p>
 					{:then weightList}
