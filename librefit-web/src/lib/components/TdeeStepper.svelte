@@ -121,7 +121,7 @@
         </p>
 
         <div class="activity-level-container flex gap-4">
-            <RadioGroup class="btn-group-vertical" rounded="rounded-xl flex-none">
+            <RadioGroup flexDirection="flex-col" rounded="rounded-container-token">
                 {#each activityLevels as activityLevel}
                     <RadioItem
                             bind:group={tdee.activityLevel}
