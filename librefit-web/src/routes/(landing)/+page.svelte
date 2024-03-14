@@ -1,23 +1,20 @@
 <script>
-    import {setContext} from 'svelte';
-    import {writable} from 'svelte/store';
-    import ArrowRight from '$lib/assets/icons/arrow-right.svg?component';
     import Login from '$lib/assets/icons/login.svg?component';
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {getModalStore} from '@skeletonlabs/skeleton';
+    import {getModalStore, ProgressBar} from '@skeletonlabs/skeleton';
+    import {applyAction, enhance} from '$app/forms';
+    import {getFieldError} from '$lib/validation.js';
+    import {redirect} from '@sveltejs/kit';
 
-    const goal = writable();
     const modalStore = getModalStore();
-
-    $: goal.set({
-        targetCalories: 1923,
-        maximumCalories: 2401
-    });
-
-    setContext('currentGoal', goal);
 
     /** @type {import('./$types/').ActionData} */
     export let loginForm;
+
+    let progress = 0;
+    let progressClass = 'bg-surface-900';
+
+    let disabled = false;
 
     const showRegisterModal = () => {
         modalStore.trigger({
@@ -60,13 +57,33 @@
             </div>
             <div class="lg:w-2/3">
                 <div>
-                    <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/login">
+                    <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/login"
+                        on:submit={() => {
+                            progress = undefined;
+                            progressClass = 'bg-surface-900';
+                            disabled = true;
+                        }}
+                          use:enhance={() => {
+                        return async ({ result, update }) => {
+                          disabled = false;
+                          progress = 100;
+
+                          if (result.data?.errors) {
+                              progressClass = 'bg-error-500';
+                          } else {
+                              progressClass = 'bg-success-500';
+                          }
+
+                          await applyAction(result);
+                        };
+                    }}>
                         <ValidatedInput
                                 label="E-Mail"
                                 type="email"
                                 name="email"
                                 placeholder="Your E-Mail"
                                 required
+                                errorMessage={getFieldError(loginForm?.data, 'email')}
                         />
                         <ValidatedInput
                                 label="Password"
@@ -76,16 +93,8 @@
                                 required
                         />
 
-                        <div>
-                            {#if loginForm?.error}
-                                <p class="variant-glass-error variant-ringed-error p-4 rounded-full">
-                                    {loginForm.error}
-                                </p>
-                            {/if}
-                        </div>
-
                         <div class="flex justify-between gap-4">
-                            <button class="btn variant-filled-primary">
+                            <button class="btn variant-filled-primary" {disabled}>
                                 <span>
                                     Login
                                 </span>
@@ -94,9 +103,12 @@
                             </button>
 
                             <div class="flex flex-row gap-4">
-                                <a class="self-center text-sm unstyled" href="" on:click|preventDefault={showRegisterModal}>Not signed up yet?</a>
+                                <button class="hyperlink self-center text-sm"
+                                        on:click|preventDefault={showRegisterModal}>Not signed up yet?
+                                </button>
                             </div>
                         </div>
+                        <ProgressBar value={progress} max={100} meter={progressClass} track={progressClass + '/30'}/>
                     </form>
                 </div>
             </div>
