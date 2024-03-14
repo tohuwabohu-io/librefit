@@ -15,7 +15,7 @@ import java.util.*
 @Entity
 @NamedQueries(
     NamedQuery(name = "CalorieTrackerEntry.listDates",
-        query = "from CalorieTrackerEntry where userId = ?1 group by added, userId, sequence order by added, userId, sequence"
+        query = "from CalorieTrackerEntry where userId = ?1 group by added, userId, sequence order by added desc, userId, sequence"
     )
 )
 data class CalorieTrackerEntry (
