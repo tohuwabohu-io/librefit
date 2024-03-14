@@ -87,7 +87,7 @@
                 </a>
             </li>
             <li>
-                <a href="/import" class="{classesActive('/tracker/weight')}" on:click={() => drawerStore.close()}>
+                <a href="/import" class="{classesActive('/import')}" on:click={() => drawerStore.close()}>
                     <span><FileTypeCsv/></span>
                     <span class="flex-auto">
                         Import data
