@@ -11,6 +11,8 @@
     /** @type {import('./$types/').ActionData} */
     export let loginForm;
 
+    let status;
+
     let progress = 0;
     let progressClass = 'bg-surface-900';
 
@@ -25,6 +27,29 @@
             }
         });
     }
+
+    const indicate = () => {
+        progress = undefined;
+        progressClass = 'bg-surface-900';
+        disabled = true;
+    }
+
+    const handleResult = async (result, update) => {
+        update({ reset: false});
+
+        disabled = false;
+
+        if (result.data?.errors) {
+            progress = 100;
+            progressClass = 'bg-error-500';
+            status = result.data;
+        } else {
+            progressClass = 'bg-success-500';
+        }
+
+        await applyAction(result);
+    }
+
 </script>
 
 <svelte:head>
@@ -58,32 +83,17 @@
             <div class="lg:w-2/3">
                 <div>
                     <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/login"
-                        on:submit={() => {
-                            progress = undefined;
-                            progressClass = 'bg-surface-900';
-                            disabled = true;
-                        }}
-                          use:enhance={() => {
-                        return async ({ result, update }) => {
-                          disabled = false;
-                          progress = 100;
-
-                          if (result.data?.errors) {
-                              progressClass = 'bg-error-500';
-                          } else {
-                              progressClass = 'bg-success-500';
-                          }
-
-                          await applyAction(result);
-                        };
-                    }}>
+                        on:submit={indicate}
+                        use:enhance={() => {
+                            return async ({ result, update }) => handleResult(result, update)
+                        }}>
                         <ValidatedInput
                                 label="E-Mail"
                                 type="email"
                                 name="email"
                                 placeholder="Your E-Mail"
                                 required
-                                errorMessage={getFieldError(loginForm?.data, 'email')}
+                                errorMessage={getFieldError(status, 'email')}
                         />
                         <ValidatedInput
                                 label="Password"

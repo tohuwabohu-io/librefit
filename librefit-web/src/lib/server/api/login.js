@@ -16,16 +16,6 @@ export const login = async (event) => {
 
 	const response = await proxyFetch(event.fetch, userApi, undefined, libreUser);
 
-	/** @type ErrorResponse */
-	let error = {
-		errors: [
-			{
-				field: 'email',
-				message: 'An error occurred. Please try again later.'
-			}
-		]
-	};
-
 	if (response.status === 200) {
 		/** @type {AuthInfo} */
 		const auth = await response.json();
@@ -34,12 +24,12 @@ export const login = async (event) => {
 
 		throw redirect(303, '/dashboard');
 	} else if (response.status === 404) {
-		error.errors[0].message = 'User not found.';
-
-		return fail(404, error);
+		return fail(404, { errors: [{ field: 'email', message: 'User not found.' }] });
 	}
 
-	return fail(500, error);
+	return fail(500, {
+		errors: [{ field: 'email', message: 'An error occurred. Please try again later.' }]
+	});
 };
 
 /**
