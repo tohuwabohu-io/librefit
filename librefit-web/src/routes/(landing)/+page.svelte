@@ -4,19 +4,16 @@
     import {getModalStore, ProgressBar} from '@skeletonlabs/skeleton';
     import {applyAction, enhance} from '$app/forms';
     import {getFieldError} from '$lib/validation.js';
-    import {redirect} from '@sveltejs/kit';
+    import {Indicator} from '$lib/indicator.js';
 
     const modalStore = getModalStore();
 
     /** @type {import('./$types/').ActionData} */
     export let loginForm;
 
+    let indicator = new Indicator();
+
     let status;
-
-    let progress = 0;
-    let progressClass = 'bg-surface-900';
-
-    let disabled = false;
 
     const showRegisterModal = () => {
         modalStore.trigger({
@@ -28,23 +25,13 @@
         });
     }
 
-    const indicate = () => {
-        progress = undefined;
-        progressClass = 'bg-surface-900';
-        disabled = true;
-    }
-
     const handleResult = async (result, update) => {
         update({ reset: false});
 
-        disabled = false;
-
         if (result.data?.errors) {
-            progress = 100;
-            progressClass = 'bg-error-500';
-            status = result.data;
+            indicator = indicator.finishError();
         } else {
-            progressClass = 'bg-success-500';
+            indicator = indicator.finishSuccess();
         }
 
         await applyAction(result);
@@ -55,7 +42,6 @@
 <svelte:head>
     <title>LibreFit</title>
 </svelte:head>
-
 
 <section class="variant-ghost-surface h-full flex">
     <div class="container mx-auto p-12 space-y-8 self-center">
@@ -83,7 +69,7 @@
             <div class="lg:w-2/3">
                 <div>
                     <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/login"
-                        on:submit={indicate}
+                        on:submit={() => {indicator = indicator.start()}}
                         use:enhance={() => {
                             return async ({ result, update }) => handleResult(result, update)
                         }}>
@@ -104,7 +90,7 @@
                         />
 
                         <div class="flex justify-between gap-4">
-                            <button class="btn variant-filled-primary" {disabled}>
+                            <button class="btn variant-filled-primary" disabled={indicator.actorDisabled}>
                                 <span>
                                     Login
                                 </span>
@@ -118,7 +104,7 @@
                                 </button>
                             </div>
                         </div>
-                        <ProgressBar value={progress} max={100} meter={progressClass} track={progressClass + '/30'}/>
+                        <ProgressBar value={indicator.progress} max={100} meter={indicator.meter} track={indicator.track}/>
                     </form>
                 </div>
             </div>
