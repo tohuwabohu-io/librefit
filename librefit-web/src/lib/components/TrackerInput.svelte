@@ -24,12 +24,17 @@
 	let previous;
 	let changeAction;
 
+	let btnAdd, btnConfirm, btnCancel;
+
 	const add = () => {
+		btnAdd.disabled = true;
+
 		dispatch('add', {
 			sequence: sequence,
 			date: dateStr,
 			value: value,
-			category: category
+			category: category,
+			callback: () => { btnAdd.disabled = false }
 		});
 	};
 
@@ -49,29 +54,48 @@
 	const update = (e) => {
 		e.preventDefault();
 
+		btnConfirm.disabled = true;
+		btnCancel.disabled = true;
+
+		const reactivate = () => {
+			disabled = true;
+			editing = false;
+			btnConfirm.disabled = false;
+			btnCancel.disabled = false;
+		}
+
 		if (value !== previous.value || category !== previous.category) {
 			dispatch('update', {
 				sequence: sequence,
 				date: dateStr,
 				value: value,
-				category: category
+				category: category,
+				callback: reactivate
 			});
+		} else {
+			reactivate();
 		}
-
-		disabled = true;
-		editing = false;
 	};
 
 	const remove = (e) => {
 		e.preventDefault();
 
+		btnConfirm.disabled = true;
+		btnCancel.disabled = true;
+
+		const reactivate = () => {
+			disabled = true;
+			editing = false;
+			btnConfirm.disabled = false;
+			btnCancel.disabled = false;
+		}
+
 		dispatch('remove', {
 			sequence: sequence,
-			date: dateStr
+			date: dateStr,
+			target: btnConfirm,
+			callback: reactivate
 		});
-
-		disabled = true;
-		editing = false;
 	};
 
 	const discard = () => {
@@ -97,6 +121,7 @@
 			</select>
 		{/if}
 	</div>
+	<div class="flex flex-row gap-1">
 	{#if existing}
 		{#if !editing}
 			<button class="btn-icon variant-filled-secondary" on:click|preventDefault={change('update')}>
@@ -110,7 +135,7 @@
 				</span>
 			</button>
 		{:else}
-			<button
+			<button bind:this={btnConfirm}
 				class="btn-icon variant-ghost-primary"
 				on:click={changeAction === 'update' ? update : remove}
 			>
@@ -118,7 +143,7 @@
 					<Check/>
 				</span>
 			</button>
-			<button class="btn-icon variant-ghost-error" on:click|preventDefault={discard}>
+			<button bind:this={btnCancel} class="btn-icon variant-ghost-error" on:click|preventDefault={discard}>
 				<span>
 					{#if changeAction === 'update'}
 						<CancelEdit/>
@@ -131,7 +156,7 @@
 			</button>
 		{/if}
 	{:else}
-		<button class="btn-icon variant-filled-primary" on:click|preventDefault={add}>
+		<button bind:this={btnAdd} class="btn-icon variant-filled-primary" on:click|preventDefault={add}>
 			<span>
 				{#if unit === 'kcal'}
 					<AddKcal/>
@@ -143,4 +168,5 @@
 			</span>
 		</button>
 	{/if}
+	</div>
 </div>

@@ -11,12 +11,20 @@ const indicator = {
 	progress: 0,
 	/** assign to disabled property of component that started the interaction */
 	actorDisabled: false,
+	/** set in start on demand, will be reset after finish */
+	actor: undefined,
 	/**
+	 * @param [actor]
 	 * @return {indicator}
 	 */
-	start: function () {
+	start: function (actor) {
 		this.progress = undefined;
 		this.actorDisabled = true;
+
+		if (actor) {
+			actor.disabled = true;
+			this.actor = actor;
+		}
 
 		return this;
 	},
@@ -42,6 +50,11 @@ const indicator = {
 		this.progress = 100;
 		this.actorDisabled = false;
 
+		if (this.actor) {
+			this.actor.disabled = false;
+			this.actor = undefined;
+		}
+
 		return this;
 	},
 	/**
@@ -50,6 +63,11 @@ const indicator = {
 	reset: function () {
 		this.progress = 0;
 		this.meter = defaultProgressClass;
+
+		if (this.actor) {
+			this.actor.disabled = false;
+			this.actor = undefined;
+		}
 
 		return this;
 	}

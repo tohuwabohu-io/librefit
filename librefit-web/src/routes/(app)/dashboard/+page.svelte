@@ -23,18 +23,25 @@
 
 	const user = getContext('user');
 	const weightTrackerEntry = getContext('lastWeight');
+	const indicator = getContext('indicator');
 
 	const toastStore = getToastStore();
 
 	const addCalories = (e) => {
+		$indicator = $indicator.start(e.detail.target);
+
 		ct_crud.addEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
 	};
 
 	const updateCalories = (e) => {
+		$indicator = $indicator.start(e.detail.target);
+
 		ct_crud.updateEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
 	};
 
 	const deleteCalories = (e) => {
+		$indicator = $indicator.start(e.detail.target);
+
 		ct_crud.deleteEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard', 'type=ct');
 	};
 
@@ -46,11 +53,14 @@
 
 	};
 
-	const loadCalorieTrackerEntries = async (added) => {
+	const loadCalorieTrackerEntries = async (added, trackerCallback) => {
 		const response = await fetch(`/dashboard?type=ct&added=${added}`, {method: 'GET'});
 		const result = response.json();
 
 		calorieTrackerEntries = await result;
+
+		$indicator = $indicator.finish();
+		trackerCallback();
 
 		if (response.ok) {
 			return result;
