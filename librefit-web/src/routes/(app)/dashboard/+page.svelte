@@ -68,18 +68,19 @@
 	};
 
 	const loadCalorieTrackerEntries = async (added, trackerCallback) => {
-		const response = await fetch(`/dashboard?type=ct&added=${added}`, {method: 'GET'});
-		const result = response.json();
-
-		calorieTrackerEntries = await result;
-
 		$indicator = $indicator.finish();
 		trackerCallback();
 
-		if (response.ok) {
-			return result;
-		} else {
-			throw new Error(await result);
+		if (added) {
+			const response = await fetch(`/dashboard?type=ct&added=${added}`, {method: 'GET'});
+
+			const result = response.json();
+
+			calorieTrackerEntries = await result;
+
+			if (!response.ok) {
+				throw new Error(await result);
+			}
 		}
 	}
 

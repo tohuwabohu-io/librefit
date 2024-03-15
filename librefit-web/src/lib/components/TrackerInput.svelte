@@ -58,10 +58,12 @@
 		btnCancel.disabled = true;
 
 		const reactivate = () => {
+			if (editing) {
+				btnConfirm.disabled = false;
+				btnCancel.disabled = false;
+			}
 			disabled = true;
 			editing = false;
-			btnConfirm.disabled = false;
-			btnCancel.disabled = false;
 		}
 
 		if (value !== previous.value || category !== previous.category) {
@@ -84,10 +86,12 @@
 		btnCancel.disabled = true;
 
 		const reactivate = () => {
+			if (editing) {
+				btnConfirm.disabled = false;
+				btnCancel.disabled = false;
+			}
 			disabled = true;
 			editing = false;
-			btnConfirm.disabled = false;
-			btnCancel.disabled = false;
 		}
 
 		dispatch('remove', {

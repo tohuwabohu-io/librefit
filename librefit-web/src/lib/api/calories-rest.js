@@ -1,6 +1,6 @@
 import { showToastError, showToastSuccess } from '$lib/toast.js';
 import { Category } from '$lib/api/model.js';
-import { categoriesAsKeyValue, getCategoryValueAsKey } from '$lib/util.js';
+import { getCategoryValueAsKey } from '$lib/util.js';
 
 /**
  * @param event
@@ -34,7 +34,8 @@ export const addEntry = (event, callback, toastStore, route) => {
 		})
 		.catch((e) => {
 			showToastError(toastStore, e);
-			event.detail.callback();
+
+			callback(undefined, event.detail.callback);
 		});
 };
 
@@ -69,7 +70,8 @@ export const updateEntry = (event, callback, toastStore, route) => {
 		})
 		.catch((e) => {
 			showToastError(toastStore, e);
-			event.detail.callback();
+
+			callback(undefined, event.detail.callback);
 		});
 };
 
@@ -103,6 +105,7 @@ export const deleteEntry = (event, callback, toastStore, route, params) => {
 		})
 		.catch((e) => {
 			showToastError(toastStore, e);
-			event.detail.callback();
+
+			callback(undefined, event.detail.callback);
 		});
 };
