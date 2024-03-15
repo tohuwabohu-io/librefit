@@ -1,10 +1,13 @@
 <script>
-	import {AppBar, Avatar, getDrawerStore} from '@skeletonlabs/skeleton';
+	import {AppBar, Avatar, getDrawerStore, ProgressBar} from '@skeletonlabs/skeleton';
 	import {getContext} from 'svelte';
 	const drawerStore = getDrawerStore();
 
 	const user = getContext('user');
 	$: user;
+
+	const indicator = getContext('indicator');
+	$: indicator;
 
 	export const showDrawer = (e) => {
 		drawerStore.open({
@@ -13,6 +16,7 @@
 	}
 </script>
 
+<ProgressBar height="h-1" rounded="rounded-none" value={$indicator.progress} meter={$indicator.meter} track={$indicator.track}/>
 <AppBar shadow="drop-shadow">
 	<svelte:fragment slot="lead">
 		<a href="/dashboard" class="h1 text-2xl">

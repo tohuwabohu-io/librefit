@@ -16,15 +16,22 @@
     const user = getContext('user');
     $: user;
 
+    const indicator = getContext('indicator');
+    $: indicator;
+
     $: classesActive = (href) => (href === $page.url.pathname ? '!bg-primary-500' : '');
 
     const dispatch = createEventDispatcher();
 
-    export const logout = (e) => {
+    const logout = (e) => {
         drawerStore.close();
         goto('/logout')
 
         dispatch('logout');
+    }
+
+    const navigate = () => {
+        drawerStore.close();
     }
 </script>
 
@@ -47,7 +54,7 @@
     <nav class="list-nav">
         <ul>
             <li>
-                <a href="/dashboard" class="{classesActive('/dashboard')}" on:click={() => drawerStore.close()}>
+                <a href="/dashboard" class="{classesActive('/dashboard')}" on:click={navigate}>
                     <span><Dashboard/></span>
                     <span class="flex-auto">
                         Dashboard
@@ -55,7 +62,7 @@
                 </a>
             </li>
             <li>
-                <a href="/profile" class="{classesActive('/profile')}" on:click={() => drawerStore.close()}>
+                <a href="/profile" class="{classesActive('/profile')}" on:click={navigate}>
                     <span><User/></span>
                     <span class="flex-auto">
                         Profile
@@ -63,7 +70,7 @@
                 </a>
             </li>
             <li>
-                <a href="/wizard" class="{classesActive('/wizard')}" on:click={() => drawerStore.close()}>
+                <a href="/wizard" class="{classesActive('/wizard')}" on:click={navigate}>
                     <span><Wand/></span>
                     <span class="flex-auto">
                         Wizard
@@ -71,7 +78,7 @@
                 </a>
             </li>
             <li>
-                <a href="/tracker/calories" class="{classesActive('/tracker/calories')}" on:click={() => drawerStore.close()}>
+                <a href="/tracker/calories" class="{classesActive('/tracker/calories')}" on:click={navigate}>
                     <span><Food/></span>
                     <span class="flex-auto">
                         Calorie Tracker
@@ -79,7 +86,7 @@
                 </a>
             </li>
             <li>
-                <a href="/tracker/weight" class="{classesActive('/tracker/weight')}" on:click={() => drawerStore.close()}>
+                <a href="/tracker/weight" class="{classesActive('/tracker/weight')}" on:click={navigate}>
                     <span><Scale/></span>
                     <span class="flex-auto">
                         Weight Tracker
@@ -87,7 +94,7 @@
                 </a>
             </li>
             <li>
-                <a href="/import" class="{classesActive('/import')}" on:click={() => drawerStore.close()}>
+                <a href="/import" class="{classesActive('/import')}" on:click={navigate}>
                     <span><FileTypeCsv/></span>
                     <span class="flex-auto">
                         Import data
