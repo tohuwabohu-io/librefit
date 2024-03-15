@@ -1,6 +1,6 @@
 import { api } from '$lib/server/api/index.js';
 import { proxyFetch } from '$lib/server/api/util.js';
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
 import * as dateUtil from 'date-fns';
 
 export const login = async (event) => {
@@ -23,11 +23,13 @@ export const login = async (event) => {
 		setAuthInfo(auth, event.cookies);
 
 		throw redirect(303, '/dashboard');
+	} else if (response.status === 404) {
+		return fail(404, { errors: [{ field: 'email', message: 'User not found.' }] });
 	}
 
-	return {
-		error: 'Invalid username or password.'
-	};
+	return fail(500, {
+		errors: [{ field: 'email', message: 'An error occurred. Please try again later.' }]
+	});
 };
 
 /**

@@ -2,7 +2,8 @@
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {applyAction, enhance} from '$app/forms';
     import {getFieldError, validateEmail, validatePassword, validatePasswordConfirmation, validateTos} from '$lib/validation.js';
-    import {getModalStore} from '@skeletonlabs/skeleton';
+    import {getModalStore, ProgressBar} from '@skeletonlabs/skeleton';
+    import { Indicator } from '$lib/indicator.js';
 
     const modalStore = getModalStore();
 
@@ -15,6 +16,8 @@
     let pwdInput;
 
     let status;
+
+    let indicator = new Indicator();
 
     const emailValidation = (e) => {
         const msg = validateEmail(e.value);
@@ -68,11 +71,17 @@
             <span class="text-secondary-500">Up</span>
         </h1>
 
-        <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/register" use:enhance={() => {
+        <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/register" on:submit={() => {indicator = indicator.start()}} use:enhance={() => {
 			return async ({ result, update }) => {
 			  update({ reset: false });
 
               status = result.data;
+
+              if (status?.errors) {
+                  indicator = indicator.finishError();
+              } else {
+                  indicator = indicator.finishSuccess();
+              }
 
               await applyAction(result);
 			};
@@ -157,7 +166,7 @@
                         <a href="/login" class="self-center text-sm unstyled">Already registered?</a>
                     </div>
 
-                    <button class="btn variant-filled-primary">Register</button>
+                    <button class="btn variant-filled-primary" disabled={indicator.actorDisabled}>Register</button>
                 </div>
             {:else}
                 <div class="flex justify-between">
@@ -165,6 +174,7 @@
                     <button class="btn variant-filled-primary">Register</button>
                 </div>
             {/if}
+            <ProgressBar value={indicator.progress} max={100} meter={indicator.meter} track={indicator.track}/>
         </form>
     </div>
 </section>

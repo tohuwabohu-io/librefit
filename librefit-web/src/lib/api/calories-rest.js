@@ -1,19 +1,19 @@
 import { showToastError, showToastSuccess } from '$lib/toast.js';
 import { Category } from '$lib/api/model.js';
-import { categoriesAsKeyValue, getCategoryValueAsKey } from '$lib/util.js';
+import { getCategoryValueAsKey } from '$lib/util.js';
 
 /**
- * @param e
+ * @param event
  * @param {Function} callback
  * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
  * @param {String} route
  */
-export const addEntry = (e, callback, toastStore, route) => {
+export const addEntry = (event, callback, toastStore, route) => {
 	/** @type {CalorieTrackerEntry} */
 	const newEntry = {
-		added: e.detail.date,
-		amount: e.detail.value,
-		category: e.detail.category
+		added: event.detail.date,
+		amount: event.detail.value,
+		category: event.detail.category
 	};
 
 	fetch(route, {
@@ -21,7 +21,7 @@ export const addEntry = (e, callback, toastStore, route) => {
 		body: JSON.stringify(newEntry)
 	})
 		.then(async (_) => {
-			await callback(newEntry.added);
+			await callback(newEntry.added, event.detail.callback);
 
 			showToastSuccess(
 				toastStore,
@@ -32,22 +32,26 @@ export const addEntry = (e, callback, toastStore, route) => {
 				}.`
 			);
 		})
-		.catch((e) => showToastError(toastStore, e));
+		.catch((e) => {
+			showToastError(toastStore, e);
+
+			callback(undefined, event.detail.callback);
+		});
 };
 
 /**
- * @param e
+ * @param event
  * @param {Function} callback
  * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
  * @param {String} route
  */
-export const updateEntry = (e, callback, toastStore, route) => {
+export const updateEntry = (event, callback, toastStore, route) => {
 	/** @type {CalorieTrackerEntry} */
 	const entry = {
-		sequence: e.detail.sequence,
-		added: e.detail.date,
-		amount: e.detail.value,
-		category: e.detail.category
+		sequence: event.detail.sequence,
+		added: event.detail.date,
+		amount: event.detail.value,
+		category: event.detail.category
 	};
 
 	fetch(route, {
@@ -55,7 +59,8 @@ export const updateEntry = (e, callback, toastStore, route) => {
 		body: JSON.stringify(entry)
 	})
 		.then(async (_) => {
-			await callback(entry.added);
+			await callback(entry.added, event.detail.callback);
+
 			showToastSuccess(
 				toastStore,
 				`Successfully updated ${
@@ -63,23 +68,27 @@ export const updateEntry = (e, callback, toastStore, route) => {
 				}`
 			);
 		})
-		.catch((e) => showToastError(toastStore, e));
+		.catch((e) => {
+			showToastError(toastStore, e);
+
+			callback(undefined, event.detail.callback);
+		});
 };
 
 /**
- * @param e
+ * @param event
  * @param {Function} callback
  * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
  * @param {String} route
  * @param {String} [params]
  */
-export const deleteEntry = (e, callback, toastStore, route, params) => {
+export const deleteEntry = (event, callback, toastStore, route, params) => {
 	let query = route;
 
 	if (params === undefined) {
-		query += `?sequence=${e.detail.sequence}&added=${e.detail.date}`;
+		query += `?sequence=${event.detail.sequence}&added=${event.detail.date}`;
 	} else {
-		query += `?${params}&sequence=${e.detail.sequence}&added=${e.detail.date}`;
+		query += `?${params}&sequence=${event.detail.sequence}&added=${event.detail.date}`;
 	}
 
 	fetch(query, {
@@ -87,12 +96,16 @@ export const deleteEntry = (e, callback, toastStore, route, params) => {
 	})
 		.then(async (response) => {
 			if (response.status === 200) {
-				await callback(e.detail.date);
+				await callback(event.detail.date, event.detail.callback);
 
 				showToastSuccess(toastStore, 'Deletion successful.');
 			} else {
 				throw Error(await response.json());
 			}
 		})
-		.catch((e) => showToastError(toastStore, e));
+		.catch((e) => {
+			showToastError(toastStore, e);
+
+			callback(undefined, event.detail.callback);
+		});
 };

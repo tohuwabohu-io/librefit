@@ -9,6 +9,8 @@
 	import {writable} from 'svelte/store';
 	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
 	import TosModal from '$lib/components/modal/TosModal.svelte';
+	import {Indicator} from '$lib/indicator.js';
+	import {afterNavigate, beforeNavigate} from '$app/navigation';
 
 	initializeStores();
 
@@ -35,18 +37,33 @@
 	const user = writable();
 	const lastWeightTrackerEntry = writable();
 	const currentGoal = writable();
+	const indicator = writable();
 
 	$: user.set(data.userData);
 	$: lastWeightTrackerEntry.set(data.lastWeight);
 	$: currentGoal.set(data.currentGoal);
+	$: indicator.set(new Indicator());
 
 	setContext('user', user);
 	setContext('lastWeight', lastWeightTrackerEntry);
 	setContext('currentGoal', currentGoal);
+	setContext('indicator', indicator);
 
 	const logout = () => {
 		user.set(null);
 	}
+
+	beforeNavigate(() => {
+		$indicator = $indicator.start();
+	})
+
+	afterNavigate(() => {
+		$indicator = $indicator.finish();
+
+		setTimeout(() => {
+			$indicator = $indicator.hide();
+		}, 1000);
+	})
 </script>
 
 <Toast position={'tr'}/>

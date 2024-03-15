@@ -13,7 +13,9 @@
         dispatch('addCalories', {
             date: e.detail.date,
             value: e.detail.value,
-            category: e.detail.category
+            category: e.detail.category,
+            target: e.detail.target,
+            callback: e.detail.callback
         });
     }
 
@@ -22,14 +24,18 @@
             sequence: e.detail.sequence,
             date: e.detail.date,
             value: e.detail.value,
-            category: e.detail.category
+            category: e.detail.category,
+            target: e.detail.target,
+            callback: e.detail.callback
         })
     }
 
     const deleteCalories = (e) => {
         dispatch('deleteCalories', {
             sequence: e.detail.sequence,
-            date: e.detail.date
+            date: e.detail.date,
+            target: e.detail.target,
+            callback: e.detail.callback
         })
     }
 </script>

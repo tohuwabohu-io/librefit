@@ -35,3 +35,15 @@ export const showToastInfo = (toastStore, toastMessage) => {
 		autohide: true
 	});
 };
+
+/**
+ * @param {import('@skeletonlabs/skeleton').ToastStore} toastStore
+ * @param {String} warning
+ */
+export const showToastWarning = (toastStore, warning) => {
+	toastStore.trigger({
+		message: warning,
+		background: 'variant-filled-warning',
+		autohide: true
+	});
+};

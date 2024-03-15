@@ -1,23 +1,19 @@
 <script>
-    import {setContext} from 'svelte';
-    import {writable} from 'svelte/store';
-    import ArrowRight from '$lib/assets/icons/arrow-right.svg?component';
     import Login from '$lib/assets/icons/login.svg?component';
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {getModalStore} from '@skeletonlabs/skeleton';
+    import {getModalStore, ProgressBar} from '@skeletonlabs/skeleton';
+    import {applyAction, enhance} from '$app/forms';
+    import {getFieldError} from '$lib/validation.js';
+    import {Indicator} from '$lib/indicator.js';
 
-    const goal = writable();
     const modalStore = getModalStore();
-
-    $: goal.set({
-        targetCalories: 1923,
-        maximumCalories: 2401
-    });
-
-    setContext('currentGoal', goal);
 
     /** @type {import('./$types/').ActionData} */
     export let loginForm;
+
+    let indicator = new Indicator();
+
+    let status;
 
     const showRegisterModal = () => {
         modalStore.trigger({
@@ -28,12 +24,24 @@
             }
         });
     }
+
+    const handleResult = async (result, update) => {
+        update({ reset: false});
+
+        if (result.data?.errors) {
+            indicator = indicator.finishError();
+        } else {
+            indicator = indicator.finishSuccess();
+        }
+
+        await applyAction(result);
+    }
+
 </script>
 
 <svelte:head>
     <title>LibreFit</title>
 </svelte:head>
-
 
 <section class="variant-ghost-surface h-full flex">
     <div class="container mx-auto p-12 space-y-8 self-center">
@@ -60,13 +68,18 @@
             </div>
             <div class="lg:w-2/3">
                 <div>
-                    <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/login">
+                    <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/login"
+                        on:submit={() => {indicator = indicator.start()}}
+                        use:enhance={() => {
+                            return async ({ result, update }) => handleResult(result, update)
+                        }}>
                         <ValidatedInput
                                 label="E-Mail"
                                 type="email"
                                 name="email"
                                 placeholder="Your E-Mail"
                                 required
+                                errorMessage={getFieldError(status, 'email')}
                         />
                         <ValidatedInput
                                 label="Password"
@@ -76,16 +89,8 @@
                                 required
                         />
 
-                        <div>
-                            {#if loginForm?.error}
-                                <p class="variant-glass-error variant-ringed-error p-4 rounded-full">
-                                    {loginForm.error}
-                                </p>
-                            {/if}
-                        </div>
-
                         <div class="flex justify-between gap-4">
-                            <button class="btn variant-filled-primary">
+                            <button class="btn variant-filled-primary" disabled={indicator.actorDisabled}>
                                 <span>
                                     Login
                                 </span>
@@ -94,9 +99,12 @@
                             </button>
 
                             <div class="flex flex-row gap-4">
-                                <a class="self-center text-sm unstyled" href="" on:click|preventDefault={showRegisterModal}>Not signed up yet?</a>
+                                <button class="hyperlink self-center text-sm"
+                                        on:click|preventDefault={showRegisterModal}>Not signed up yet?
+                                </button>
                             </div>
                         </div>
+                        <ProgressBar value={indicator.progress} max={100} meter={indicator.meter} track={indicator.track}/>
                     </form>
                 </div>
             </div>

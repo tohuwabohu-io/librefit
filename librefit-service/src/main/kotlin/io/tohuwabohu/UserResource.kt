@@ -58,7 +58,7 @@ class UserResource(val userRepository: LibreUserRepository,
     fun register(libreUser: LibreUser): Uni<Response> {
         libreUser.registered = LocalDateTime.now()
 
-        Log.info("Registering a new user=$libreUser")
+        Log.info("Registering a new user=${libreUser.email}")
 
         return userRepository.createUser(libreUser).chain { user -> activationRepository.createAccountActivation(user!!.id!!) }
             .onItem().transform { Response.ok(libreUser).status(Response.Status.CREATED).build() }

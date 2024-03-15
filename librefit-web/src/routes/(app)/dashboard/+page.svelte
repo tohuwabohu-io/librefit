@@ -9,6 +9,8 @@
 	import {Chart, registerables} from 'chart.js';
 	import {Line} from 'svelte-chartjs';
 	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
+	import {validateAmount} from '$lib/validation.js';
+	import {showToastWarning} from '$lib/toast.js';
 
 	Chart.register(...registerables);
 
@@ -23,18 +25,37 @@
 
 	const user = getContext('user');
 	const weightTrackerEntry = getContext('lastWeight');
+	const indicator = getContext('indicator');
 
 	const toastStore = getToastStore();
 
 	const addCalories = (e) => {
-		ct_crud.addEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
+		const amountMessage = validateAmount(e.detail.value);
+
+		if (!amountMessage) {
+			$indicator = $indicator.start(e.detail.target);
+			ct_crud.addEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
+		} else {
+			showToastWarning(toastStore, amountMessage);
+			e.detail.callback(true);
+		}
 	};
 
 	const updateCalories = (e) => {
-		ct_crud.updateEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
+		const amountMessage = validateAmount(e.detail.value);
+
+		if (!amountMessage) {
+			$indicator = $indicator.start(e.detail.target);
+			ct_crud.updateEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
+		} else {
+			showToastWarning(toastStore, amountMessage);
+			e.detail.callback(true);
+		}
 	};
 
 	const deleteCalories = (e) => {
+		$indicator = $indicator.start(e.detail.target);
+
 		ct_crud.deleteEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard', 'type=ct');
 	};
 
@@ -46,16 +67,24 @@
 
 	};
 
-	const loadCalorieTrackerEntries = async (added) => {
-		const response = await fetch(`/dashboard?type=ct&added=${added}`, {method: 'GET'});
-		const result = response.json();
+	const loadCalorieTrackerEntries = async (added, trackerCallback) => {
+		$indicator = $indicator.finish();
+		setTimeout(() => {
+			$indicator = $indicator.hide();
+		}, 500);
 
-		calorieTrackerEntries = await result;
+		trackerCallback(added === undefined);
 
-		if (response.ok) {
-			return result;
-		} else {
-			throw new Error(await result);
+		if (added) {
+			const response = await fetch(`/dashboard?type=ct&added=${added}`, {method: 'GET'});
+
+			const result = response.json();
+
+			calorieTrackerEntries = await result;
+
+			if (!response.ok) {
+				throw new Error(await result);
+			}
 		}
 	}
 
