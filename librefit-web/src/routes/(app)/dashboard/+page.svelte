@@ -9,6 +9,8 @@
 	import {Chart, registerables} from 'chart.js';
 	import {Line} from 'svelte-chartjs';
 	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
+	import {validateAmount} from '$lib/validation.js';
+	import {showToastWarning} from '$lib/toast.js';
 
 	Chart.register(...registerables);
 
@@ -28,15 +30,27 @@
 	const toastStore = getToastStore();
 
 	const addCalories = (e) => {
-		$indicator = $indicator.start(e.detail.target);
+		const amountMessage = validateAmount(e.detail.value);
 
-		ct_crud.addEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
+		if (!amountMessage) {
+			$indicator = $indicator.start(e.detail.target);
+			ct_crud.addEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
+		} else {
+			showToastWarning(toastStore, amountMessage);
+			e.detail.callback();
+		}
 	};
 
 	const updateCalories = (e) => {
-		$indicator = $indicator.start(e.detail.target);
+		const amountMessage = validateAmount(e.detail.value);
 
-		ct_crud.updateEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
+		if (!amountMessage) {
+			$indicator = $indicator.start(e.detail.target);
+			ct_crud.updateEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
+		} else {
+			showToastWarning(toastStore, amountMessage);
+			e.detail.callback();
+		}
 	};
 
 	const deleteCalories = (e) => {

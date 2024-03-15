@@ -85,6 +85,16 @@ export const validateTos = (tosAccepted) => {
 };
 
 /**
+ * @param amount
+ * @return {string}
+ */
+export const validateAmount = (amount) => {
+	if (!amount || amount <= 0) {
+		return 'Please enter a valid amount.';
+	}
+};
+
+/**
  * @param errorResponse {ErrorResponse | { success: boolean} | FormData}
  * @param fieldName {String}
  * @return {undefined | String}
