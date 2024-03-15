@@ -110,9 +110,9 @@
 </script>
 
 <div class="flex flex-row gap-2">
-	<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-		<div class="input-group-shim">{unit}</div>
-		<input type="number" placeholder="Amount..." bind:value {disabled} />
+	<div class="input-group max-2xl:md:input-group-divider grid-cols-[auto_1fr_auto]">
+		<div class="input-group-shim max-sm:!pr-1">{unit}</div>
+		<input class="input" type="number" placeholder="Amount..." bind:value {disabled} />
 		{#if categories}
 			<select {disabled} bind:value={category}>
 				{#each categories as category}
