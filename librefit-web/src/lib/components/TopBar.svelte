@@ -16,7 +16,8 @@
 	}
 </script>
 
-<ProgressBar height="h-1" rounded="rounded-none" value={$indicator.progress} meter={$indicator.meter} track={$indicator.track}/>
+<ProgressBar class={$indicator.invisible} height="h-1" rounded="rounded-none"
+			 value={$indicator.progress} meter={$indicator.meter} track={$indicator.track}/>
 <AppBar shadow="drop-shadow">
 	<svelte:fragment slot="lead">
 		<a href="/dashboard" class="h1 text-2xl">

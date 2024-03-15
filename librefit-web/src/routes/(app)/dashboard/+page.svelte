@@ -37,7 +37,7 @@
 			ct_crud.addEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
 		} else {
 			showToastWarning(toastStore, amountMessage);
-			e.detail.callback();
+			e.detail.callback(true);
 		}
 	};
 
@@ -49,7 +49,7 @@
 			ct_crud.updateEntry(e, loadCalorieTrackerEntries, toastStore, '/dashboard');
 		} else {
 			showToastWarning(toastStore, amountMessage);
-			e.detail.callback();
+			e.detail.callback(true);
 		}
 	};
 
@@ -69,6 +69,10 @@
 
 	const loadCalorieTrackerEntries = async (added, trackerCallback) => {
 		$indicator = $indicator.finish();
+		setTimeout(() => {
+			$indicator = $indicator.hide();
+		}, 500);
+
 		trackerCallback(added === undefined);
 
 		if (added) {

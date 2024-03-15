@@ -59,6 +59,10 @@
 
 	afterNavigate(() => {
 		$indicator = $indicator.finish();
+
+		setTimeout(() => {
+			$indicator = $indicator.hide();
+		}, 1000);
 	})
 </script>
 

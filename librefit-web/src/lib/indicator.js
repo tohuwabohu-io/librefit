@@ -13,6 +13,7 @@ const indicator = {
 	actorDisabled: false,
 	/** set in start on demand, will be reset after finish */
 	actor: undefined,
+	invisible: '',
 	/**
 	 * @param [actor]
 	 * @return {indicator}
@@ -20,6 +21,7 @@ const indicator = {
 	start: function (actor) {
 		this.progress = undefined;
 		this.actorDisabled = true;
+		this.invisible = '';
 
 		if (actor) {
 			actor.disabled = true;
@@ -54,6 +56,11 @@ const indicator = {
 			this.actor.disabled = false;
 			this.actor = undefined;
 		}
+
+		return this;
+	},
+	hide: function () {
+		this.invisible = 'invisible';
 
 		return this;
 	},
