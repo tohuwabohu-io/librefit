@@ -69,7 +69,7 @@
 
 	const loadCalorieTrackerEntries = async (added, trackerCallback) => {
 		$indicator = $indicator.finish();
-		trackerCallback();
+		trackerCallback(added === undefined);
 
 		if (added) {
 			const response = await fetch(`/dashboard?type=ct&added=${added}`, {method: 'GET'});

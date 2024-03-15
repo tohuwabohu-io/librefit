@@ -57,25 +57,16 @@
 		btnConfirm.disabled = true;
 		btnCancel.disabled = true;
 
-		const reactivate = () => {
-			if (editing) {
-				btnConfirm.disabled = false;
-				btnCancel.disabled = false;
-			}
-			disabled = true;
-			editing = false;
-		}
-
 		if (value !== previous.value || category !== previous.category) {
 			dispatch('update', {
 				sequence: sequence,
 				date: dateStr,
 				value: value,
 				category: category,
-				callback: reactivate
+				callback: postAction
 			});
 		} else {
-			reactivate();
+			postAction();
 		}
 	};
 
@@ -85,20 +76,11 @@
 		btnConfirm.disabled = true;
 		btnCancel.disabled = true;
 
-		const reactivate = () => {
-			if (editing) {
-				btnConfirm.disabled = false;
-				btnCancel.disabled = false;
-			}
-			disabled = true;
-			editing = false;
-		}
-
 		dispatch('remove', {
 			sequence: sequence,
 			date: dateStr,
 			target: btnConfirm,
-			callback: reactivate
+			callback: postAction
 		});
 	};
 
@@ -111,6 +93,19 @@
 			category = previous.category;
 		}
 	};
+
+	const postAction = (error) => {
+		if (editing) {
+			btnConfirm.disabled = false;
+			btnCancel.disabled = false;
+		}
+
+		if (error) discard();
+		else {
+			disabled = true;
+			editing = false;
+		}
+	}
 </script>
 
 <div class="flex flex-row gap-2">
