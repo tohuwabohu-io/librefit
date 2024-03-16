@@ -26,7 +26,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
 import java.util.*
 
-@Path("/tracker/calories")
+@Path("/api/tracker/calories")
 @RequestScoped
 class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerRepository) {
     @Inject

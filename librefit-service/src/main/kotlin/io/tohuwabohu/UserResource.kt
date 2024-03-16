@@ -28,7 +28,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDateTime
 import java.util.*
 
-@Path("/user")
+@Path("/api/user")
 @RequestScoped
 class UserResource(val userRepository: LibreUserRepository,
                    val authRepository: AuthRepository,
@@ -55,6 +55,7 @@ class UserResource(val userRepository: LibreUserRepository,
         )]),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "postUserRegister")
     fun register(libreUser: LibreUser): Uni<Response> {
         libreUser.registered = LocalDateTime.now()
 
@@ -85,6 +86,7 @@ class UserResource(val userRepository: LibreUserRepository,
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "postUserLogin")
     fun login(libreUser: LibreUser): Uni<Response> {
         return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password).flatMap { user ->
             authRepository.addSession(
@@ -108,6 +110,7 @@ class UserResource(val userRepository: LibreUserRepository,
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "postUserLogout")
     fun logout(@Context securityContext: SecurityContext, authInfo: AuthInfo): Uni<Response> {
         Log.info("Logout user ${jwt.name}")
 
@@ -137,6 +140,7 @@ class UserResource(val userRepository: LibreUserRepository,
         APIResponse(responseCode = "403", description = "Forbidden"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "postUserRefresh")
     fun refreshToken(authInfo: AuthInfo): Uni<Response> {
         return authRepository.findSession(authInfo.refreshToken)
             .flatMap { authSession -> userRepository.findById(authSession!!.userId) }.chain { user ->
@@ -230,6 +234,7 @@ class UserResource(val userRepository: LibreUserRepository,
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "activateUser")
     fun activate(activationId: String): Uni<Response> {
         Log.info("Activating user profile $activationId")
 

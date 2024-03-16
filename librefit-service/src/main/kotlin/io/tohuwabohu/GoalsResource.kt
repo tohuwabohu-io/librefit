@@ -24,7 +24,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
 import java.util.*
 
-@Path("/goals")
+@Path("/api/goals")
 class GoalsResource(val goalsRepository: GoalsRepository) {
     @Inject
     lateinit var jwt: JsonWebToken
