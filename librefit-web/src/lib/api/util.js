@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/public';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
+import { goto } from '$app/navigation';
 
 /**
  * @param {function} fetchApi
@@ -58,10 +59,6 @@ export const proxyFetch = async (fetchApi, api, data) => {
 
 		response = await call;
 
-		if (response.statusCode === 401) {
-			response = await fetchApi(env.PUBLIC_API_BASE_PATH + api.refresh);
-		}
-
 		console.log(
 			`${method} ${path} statusCode=${response.status} statusText=${response.statusText}`
 		);
@@ -74,6 +71,8 @@ export const proxyFetch = async (fetchApi, api, data) => {
 
 		response = new Response();
 	}
+
+	if (response.status === 401) throw redirect(303, '/?expired');
 
 	return response;
 };

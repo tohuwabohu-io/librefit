@@ -7,6 +7,7 @@
     import {goto} from '$app/navigation';
     import {getContext} from 'svelte';
     import {login} from '$lib/api/user.js';
+    import {page} from '$app/stores';
 
     const modalStore = getModalStore();
 
@@ -14,6 +15,16 @@
 
     let indicator = new Indicator();
     let status;
+
+    const expired = $page.url.searchParams.get('expired');
+
+    if (expired) {
+        status = {
+            errors: [{
+                field: 'email', message: 'Your session expired. Please login again.'
+            }]
+        }
+    }
 
     const handleLogin = async (event) => {
         status = undefined;
