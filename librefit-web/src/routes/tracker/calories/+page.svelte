@@ -1,12 +1,13 @@
 <script>
 	import {Accordion, AccordionItem, getToastStore} from '@skeletonlabs/skeleton';
-	import {convertDateStrToDisplayDateStr, getCategoryValueAsKey, getDateAsStr} from '$lib/util.js';
 	import {Category} from '$lib/api/model.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import * as ct_crud from '$lib/api/tracker.js';
 	import {validateAmount} from '$lib/validation.js';
 	import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
 	import {getContext} from 'svelte';
+    import {getCategoryValueAsKey} from '$lib/enum.js';
+    import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);

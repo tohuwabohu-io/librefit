@@ -1,9 +1,9 @@
 <script>
     import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
-    import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/util.js';
     import {createEventDispatcher, getContext} from 'svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
+    import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
 
     const currentGoal = getContext('currentGoal');
     const lastEntry = getContext('lastWeight')

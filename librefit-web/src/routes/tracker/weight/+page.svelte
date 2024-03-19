@@ -1,12 +1,13 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-	import {DataViews, enumKeys, paintWeightTrackerEntries} from '$lib/util.js';
+	import {paintWeightTrackerEntries} from '$lib/chart.js';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
 	import {showToastError} from '$lib/toast.js';
 	import {getContext} from 'svelte';
 	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
 	import {listWeightFiltered} from '$lib/api/tracker.js';
+	import {DataViews, enumKeys} from '$lib/enum.js';
 
 	Chart.register(...registerables);
 

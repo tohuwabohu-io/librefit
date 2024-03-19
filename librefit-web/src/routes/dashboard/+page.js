@@ -1,8 +1,8 @@
 import { api } from '$lib/api/index.js';
 import { proxyFetch } from '$lib/api/util.js';
-import { getDateAsStr } from '$lib/util.js';
 import * as dateUtil from 'date-fns';
 import { Category } from '$lib/api/model.js';
+import { getDateAsStr } from '$lib/date.js';
 
 /** @type {import('./$types').PageLoad} */
 export const load = async ({ fetch }) => {

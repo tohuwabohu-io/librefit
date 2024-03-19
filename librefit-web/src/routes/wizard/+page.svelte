@@ -2,11 +2,12 @@
 	import TdeeStepper from '$lib/components/TdeeStepper.svelte';
 	import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
 	import {showToastError, showToastSuccess} from '$lib/toast.js';
-	import {bmiCategoriesAsKeyValue, getDateAsStr} from '$lib/util.js';
 	import * as dateUtil from 'date-fns';
 	import {getContext} from 'svelte';
 	import {proxyFetch} from '$lib/api/util.js';
 	import {api} from '$lib/api/index.js';
+    import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
+    import {getDateAsStr} from '$lib/date.js';
 
 	const modalStore = getModalStore();
 	const toastStore = getToastStore();

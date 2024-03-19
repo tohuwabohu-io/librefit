@@ -1,12 +1,8 @@
 <script>
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {
-		categoriesAsKeyValue,
-		DataViews,
-		getCategoryValueAsKey,
-		getDaytimeGreeting,
 		paintWeightTrackerEntries
-	} from '$lib/util.js';
+	} from '$lib/chart.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import {getToastStore} from '@skeletonlabs/skeleton';
 	import {addCalories, addWeight, deleteCalories, updateCalories} from '$lib/api/tracker.js';
@@ -17,6 +13,8 @@
 	import {validateAmount} from '$lib/validation.js';
 	import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
 	import {Category} from '$lib/api/model.js';
+    import {categoriesAsKeyValue, DataViews, getCategoryValueAsKey} from '$lib/enum.js';
+    import {getDaytimeGreeting} from '$lib/date.js';
 
 	Chart.register(...registerables);
 

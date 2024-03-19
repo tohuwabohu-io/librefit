@@ -1,7 +1,8 @@
 <script>
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
-    import { getDateAsStr } from '$lib/util';
+
+    import {getDateAsStr} from '$lib/date.js';
 
     const today = new Date();
 

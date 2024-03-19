@@ -1,7 +1,7 @@
 import { api } from '$lib/api/index.js';
 import { proxyFetch } from '$lib/api/util.js';
-import { getDateAsStr } from '$lib/util.js';
 import { Category } from '$lib/api/model.js';
+import { getDateAsStr } from '$lib/date.js';
 
 export const load = async ({ fetch, cookies }) => {
 	const loadCtDateApi = api.listCalorieTrackerDates;

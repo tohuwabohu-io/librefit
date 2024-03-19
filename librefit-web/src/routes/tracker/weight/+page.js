@@ -1,6 +1,7 @@
 import { api } from '$lib/api/index.js';
 import { proxyFetch } from '$lib/api/util.js';
-import { getDateAsStr } from '$lib/util.js';
+
+import { getDateAsStr } from '$lib/date.js';
 
 export const load = async ({ fetch }) => {
 	const listWeightApi = api.listWeightTrackerEntriesRange;
