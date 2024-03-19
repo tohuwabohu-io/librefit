@@ -8,6 +8,7 @@ import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.printAuthenticationInfo
 import io.tohuwabohu.security.validateToken
+import jakarta.annotation.security.RolesAllowed
 import jakarta.inject.Inject
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
@@ -25,12 +26,13 @@ import java.time.LocalDate
 import java.util.*
 
 @Path("/api/goals")
-class GoalsResource(val goalsRepository: GoalsRepository) {
+class GoalsResource(private val goalsRepository: GoalsRepository) {
     @Inject
     lateinit var jwt: JsonWebToken
 
     @POST
     @Path("/create")
+    @RolesAllowed("User", "Admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
@@ -67,6 +69,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
 
     @PUT
     @Path("/update")
+    @RolesAllowed("User", "Admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
@@ -96,6 +99,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
 
     @GET
     @Path("/read/{date}/{sequence:\\d+}")
+    @RolesAllowed("User", "Admin")
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [
@@ -126,6 +130,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
 
     @DELETE
     @Path("/delete/{date}/{sequence:\\d+}")
+    @RolesAllowed("User", "Admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
@@ -153,6 +158,7 @@ class GoalsResource(val goalsRepository: GoalsRepository) {
 
     @GET
     @Path("/last")
+    @RolesAllowed("User", "Admin")
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(

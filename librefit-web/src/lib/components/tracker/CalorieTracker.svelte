@@ -2,7 +2,6 @@
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import TrackerRadial from '$lib/components/TrackerRadial.svelte';
     import {createEventDispatcher} from 'svelte';
-    import {getDateAsStr} from '$lib/util.js';
 
     export let entries;
     export let categories;

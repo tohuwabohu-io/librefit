@@ -28,7 +28,7 @@ import java.util.*
 
 @Path("/api/tracker/calories")
 @RequestScoped
-class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerRepository) {
+class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTrackerRepository) {
     @Inject
     lateinit var jwt: JsonWebToken
 

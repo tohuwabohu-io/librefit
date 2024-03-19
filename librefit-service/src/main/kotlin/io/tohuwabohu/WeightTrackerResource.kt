@@ -26,7 +26,7 @@ import java.time.LocalDate
 import java.util.*
 
 @Path("/api/tracker/weight")
-class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository) {
+class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRepository) {
     @Inject
     lateinit var jwt: JsonWebToken
 

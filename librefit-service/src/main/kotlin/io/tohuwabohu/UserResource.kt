@@ -30,9 +30,11 @@ import java.util.*
 
 @Path("/api/user")
 @RequestScoped
-class UserResource(val userRepository: LibreUserRepository,
-                   val authRepository: AuthRepository,
-                   val activationRepository: AccountActivationRepository) {
+class UserResource(
+    private val userRepository: LibreUserRepository,
+    private val authRepository: AuthRepository,
+    private val activationRepository: AccountActivationRepository
+) {
     @Inject
     lateinit var jwt: JsonWebToken
 
@@ -49,10 +51,12 @@ class UserResource(val userRepository: LibreUserRepository,
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(responseCode = "200", description = "OK"),
-        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = ErrorResponse::class),
-        )]),
+        APIResponse(
+            responseCode = "400", description = "Bad Request", content = [Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = ErrorResponse::class),
+            )]
+        ),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(operationId = "postUserRegister")
@@ -61,7 +65,8 @@ class UserResource(val userRepository: LibreUserRepository,
 
         Log.info("Registering a new user=${libreUser.email}")
 
-        return userRepository.createUser(libreUser).chain { user -> activationRepository.createAccountActivation(user!!.id!!) }
+        return userRepository.createUser(libreUser)
+            .chain { user -> activationRepository.createAccountActivation(user!!.id!!) }
             .onItem().transform { Response.ok(libreUser).status(Response.Status.CREATED).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
@@ -71,23 +76,22 @@ class UserResource(val userRepository: LibreUserRepository,
     @Path("/login")
     @PermitAll
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK", content = [
-            Content(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(
+            responseCode = "400", description = "Bad Request", content = [Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = AuthInfo::class)
-            )
-        ]),
-        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = ErrorResponse::class),
-        )]),
+                schema = Schema(implementation = ErrorResponse::class),
+            )]
+        ),
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(operationId = "postUserLogin")
-    fun login(libreUser: LibreUser): Uni<Response> {
+    fun login(
+        libreUser: LibreUser
+    ): Uni<Response> {
         return userRepository.findByEmailAndPassword(libreUser.email, libreUser.password).flatMap { user ->
             authRepository.addSession(
                 userId = user!!.id!!,
@@ -95,10 +99,18 @@ class UserResource(val userRepository: LibreUserRepository,
                 refresh = generateRefreshToken(ttlMinutesRefresh.toInt())
             )
         }.onItem().transform { authenticationResponse ->
-            Response.ok(authenticationResponse).build()
+            Response.ok()
+                .header(
+                    "set-cookie",
+                    "auth=${authenticationResponse.accessToken}; HttpOnly; SameSite=Strict Secure; Path=/; max-age=${ttlMinutesAccess.toInt() * 60}"
+                )
+                .header(
+                    "set-cookie",
+                    "refresh=${authenticationResponse.refreshToken}; HttpOnly; SameSite=Strict; Secure; Path=/; max-age=${ttlMinutesRefresh.toInt() * 60}"
+                ).build()
         }.onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
-        .onFailure().invoke{ e -> Log.error(e) }
-        .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
     @POST
@@ -118,25 +130,22 @@ class UserResource(val userRepository: LibreUserRepository,
 
         return authRepository.invalidateSession(authInfo.refreshToken)
             .onItem().transform { _ -> Response.ok().build() }
-            .onFailure().invoke{ e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
     @POST
     @Path("/refresh")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK", content = [
-            Content(
+        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(
+            responseCode = "400", description = "Bad Request", content = [Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = LibreUser::class)
-            )
-        ]),
-        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = ErrorResponse::class)
-        )]),
+                schema = Schema(implementation = ErrorResponse::class)
+            )]
+        ),
         APIResponse(responseCode = "403", description = "Forbidden"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
@@ -145,14 +154,25 @@ class UserResource(val userRepository: LibreUserRepository,
         return authRepository.findSession(authInfo.refreshToken)
             .flatMap { authSession -> userRepository.findById(authSession!!.userId) }.chain { user ->
                 authRepository.invalidateSession(authInfo.refreshToken)
-                    .flatMap { authRepository.addSession(
-                        userId = user.id!!,
-                        access = generateAccessToken(user, ttlMinutesAccess.toInt()),
-                        refresh = generateRefreshToken(ttlMinutesRefresh.toInt())
-                    ) }
-        }.onItem().transform { authenticationResponse -> Response.ok(authenticationResponse).build() }
-            .onFailure().invoke{ e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+                    .flatMap {
+                        authRepository.addSession(
+                            userId = user.id!!,
+                            access = generateAccessToken(user, ttlMinutesAccess.toInt()),
+                            refresh = generateRefreshToken(ttlMinutesRefresh.toInt())
+                        )
+                    }
+            }.onItem().transform { authenticationResponse ->
+                Response.ok()
+                    .header(
+                        "set-cookie",
+                        "auth=${authenticationResponse.accessToken}; HttpOnly; Secure; Path=/; max-age=${ttlMinutesAccess.toInt() * 60}"
+                    )
+                    .header(
+                        "set-cookie",
+                        "refresh=${authenticationResponse.refreshToken}; HttpOnly; Secure; Path=/; max-age=${ttlMinutesRefresh.toInt() * 60}"
+                    ).build()
+            }.onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
     @GET
@@ -160,17 +180,21 @@ class UserResource(val userRepository: LibreUserRepository,
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("User", "Admin")
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK", content = [
-            Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = LibreUser::class)
-            )
-        ]),
+        APIResponse(
+            responseCode = "200", description = "OK", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = LibreUser::class)
+                )
+            ]
+        ),
         APIResponse(responseCode = "404", description = "Not Found"),
-        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = ErrorResponse::class)
-        )]),
+        APIResponse(
+            responseCode = "400", description = "Bad Request", content = [Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = ErrorResponse::class)
+            )]
+        ),
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
@@ -184,8 +208,8 @@ class UserResource(val userRepository: LibreUserRepository,
                 Response.ok(user).build()
             }
             .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
-            .onFailure().invoke{ e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
     @POST
@@ -194,17 +218,21 @@ class UserResource(val userRepository: LibreUserRepository,
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed("User", "Admin")
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK", content = [
-            Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = LibreUser::class)
-            )
-        ]),
+        APIResponse(
+            responseCode = "200", description = "OK", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = LibreUser::class)
+                )
+            ]
+        ),
         APIResponse(responseCode = "404", description = "Not Found"),
-        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
-            mediaType = "application/json",
-            schema = Schema(implementation = ErrorResponse::class)
-        )]),
+        APIResponse(
+            responseCode = "400", description = "Bad Request", content = [Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = ErrorResponse::class)
+            )]
+        ),
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
@@ -222,7 +250,7 @@ class UserResource(val userRepository: LibreUserRepository,
                 Response.ok(updated).build()
             }
             .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 
     @GET
@@ -239,9 +267,10 @@ class UserResource(val userRepository: LibreUserRepository,
         Log.info("Activating user profile $activationId")
 
         return activationRepository.findByActivationId(activationId).onItem().ifNotNull().call { activation ->
-            userRepository.activateUser(activation!!.userId!!).chain { _ -> activationRepository.deleteEntry(activation.getPrimaryKey()) }
+            userRepository.activateUser(activation!!.userId!!)
+                .chain { _ -> activationRepository.deleteEntry(activation.getPrimaryKey()) }
         }.onItem().transform { _ -> Response.ok().build() }
-        .onFailure().invoke { e -> Log.error(e) }
-        .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 }

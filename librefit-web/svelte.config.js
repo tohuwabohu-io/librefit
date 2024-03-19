@@ -18,7 +18,16 @@ const config = {
 	},
 
 	kit: {
-		adapter: adapter()
+		adapter: adapter({
+			fallback: 'index.html',
+			pages: 'build',
+			assets: 'build',
+			precompress: false,
+			strict: true
+		}),
+		paths: {
+			relative: false
+		}
 	}
 };
 

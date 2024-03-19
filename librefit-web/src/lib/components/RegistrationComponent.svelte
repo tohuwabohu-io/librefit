@@ -1,23 +1,43 @@
 <script>
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {applyAction, enhance} from '$app/forms';
     import {getFieldError, validateEmail, validatePassword, validatePasswordConfirmation, validateTos} from '$lib/validation.js';
     import {getModalStore, ProgressBar} from '@skeletonlabs/skeleton';
     import { Indicator } from '$lib/indicator.js';
+
+    import {registerUser} from '$lib/api/user.js';
 
     const modalStore = getModalStore();
 
     export let isModal = false;
     export let onCancel = () => {};
 
-    /** @type {import('./$types/').ActionData} */
-    export let form;
-
     let pwdInput;
-
     let status;
 
     let indicator = new Indicator();
+
+    const handleSubmit = async (event) => {
+        status = undefined;
+
+        indicator = indicator.reset();
+        indicator = indicator.start();
+
+        const formData = new FormData(event.currentTarget);
+
+        await registerUser(formData).then(async response => {
+            if (response.success) {
+                status = response;
+                indicator = indicator.finishSuccess();
+            } else {
+                status = response.data;
+                throw response;
+            }
+        }).catch(e => {
+            indicator = indicator.finishError();
+
+            console.error(e);
+        });
+    }
 
     const emailValidation = (e) => {
         const msg = validateEmail(e.value);
@@ -71,21 +91,8 @@
             <span class="text-secondary-500">Up</span>
         </h1>
 
-        <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" action="?/register" on:submit={() => {indicator = indicator.start()}} use:enhance={() => {
-			return async ({ result, update }) => {
-			  update({ reset: false });
-
-              status = result.data;
-
-              if (status?.errors) {
-                  indicator = indicator.finishError();
-              } else {
-                  indicator = indicator.finishSuccess();
-              }
-
-              await applyAction(result);
-			};
-		  }}>
+        <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST"
+              on:submit|preventDefault={handleSubmit}>
             <ValidatedInput
                     name="email"
                     type="email"
@@ -153,7 +160,7 @@
                             Successfully signed up! You can <button class="hyperlink" on:click|preventDefault={onCancel}>close</button> this window now.
                         </p>
                     {/if}
-                {:else if status?.errors}
+                {:else if status?.errors || status?.error}
                     <p class="variant-glass-error variant-ringed-error p-4 rounded-full">
                         Error during registration.
                     </p>
