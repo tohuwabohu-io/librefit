@@ -14,10 +14,7 @@ import jakarta.enterprise.context.RequestScoped
 import jakarta.inject.Inject
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
-import jakarta.ws.rs.core.Context
-import jakarta.ws.rs.core.MediaType
-import jakarta.ws.rs.core.Response
-import jakarta.ws.rs.core.SecurityContext
+import jakarta.ws.rs.core.*
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.eclipse.microprofile.openapi.annotations.Operation
@@ -37,6 +34,9 @@ class UserResource(
 ) {
     @Inject
     lateinit var jwt: JsonWebToken
+
+    @ConfigProperty(name = "mp.jwt.token.cookie")
+    private lateinit var jwtCookieName: String
 
     @ConfigProperty(name = "libreuser.tokens.access.expiration.minutes", defaultValue = "25")
     private lateinit var ttlMinutesAccess: String
@@ -118,20 +118,27 @@ class UserResource(
     @Produces(MediaType.TEXT_PLAIN)
     @RolesAllowed("User", "Admin")
     @APIResponses(
-        APIResponse(responseCode = "200", description = "OK"),
+        APIResponse(responseCode = "204", description = "No Content"),
         APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(operationId = "postUserLogout")
-    fun logout(@Context securityContext: SecurityContext, authInfo: AuthInfo): Uni<Response> {
+    fun logout(@Context securityContext: SecurityContext): Uni<Response> {
         Log.info("Logout user ${jwt.name}")
 
         printAuthenticationInfo(jwt, securityContext)
-
-        return authRepository.invalidateSession(authInfo.refreshToken)
-            .onItem().transform { _ -> Response.ok().build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+/*
+        if (securityContext.userPrincipal != null) {
+            // TODO refresh token is deactivated for now
+            return authRepository.invalidateSession("")
+                .onItem().transform { _ -> Response.ok().build() }
+                .onFailure().invoke { e -> Log.error(e) }
+                .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+        }
+*/
+        return Uni.createFrom().item(Response.noContent().cookie(
+            NewCookie.Builder(jwtCookieName).path("/").maxAge(0).build()
+        ).build())
     }
 
     @POST
@@ -163,13 +170,12 @@ class UserResource(
                     }
             }.onItem().transform { authenticationResponse ->
                 Response.ok()
-                    .header(
-                        "set-cookie",
-                        "auth=${authenticationResponse.accessToken}; HttpOnly; Secure; Path=/; max-age=${ttlMinutesAccess.toInt() * 60}"
-                    )
-                    .header(
-                        "set-cookie",
-                        "refresh=${authenticationResponse.refreshToken}; HttpOnly; Secure; Path=/; max-age=${ttlMinutesRefresh.toInt() * 60}"
+                    .cookie(NewCookie.Builder(jwtCookieName).value(authenticationResponse.accessToken)
+                        .httpOnly(true).secure(true).path("/").maxAge(ttlMinutesAccess.toInt() * 60)
+                        .build())
+                    .cookie(NewCookie.Builder("refresh").value(authenticationResponse.refreshToken)
+                        .httpOnly(true).secure(true).path("/").maxAge(ttlMinutesRefresh.toInt() * 60)
+                        .build()
                     ).build()
             }.onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }

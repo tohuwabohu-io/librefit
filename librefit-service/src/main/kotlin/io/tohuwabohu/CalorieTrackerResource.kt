@@ -83,6 +83,8 @@ class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTracke
     )
     @Operation(operationId = "updateCalorieTrackerEntry")
     fun update(@Context securityContext: SecurityContext, @Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
+        calorieTracker.userId = UUID.fromString(jwt.name)
+
         Log.info("Updating calorie tracker entry $calorieTracker")
 
         printAuthenticationInfo(jwt, securityContext)
