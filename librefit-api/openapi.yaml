@@ -1,0 +1,1244 @@
+---
+openapi: 3.0.3
+info:
+  title: librefit-service API
+  version: 1.0.0-SNAPSHOT
+servers:
+- url: http://localhost:8080
+  description: Auto generated value
+- url: http://0.0.0.0:8080
+  description: Auto generated value
+paths:
+  /api/goals/create:
+    post:
+      tags:
+      - Goals Resource
+      operationId: createGoal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Goal'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/goals/delete/{date}/{sequence}:
+    delete:
+      tags:
+      - Goals Resource
+      operationId: deleteGoal
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/goals/last:
+    get:
+      tags:
+      - Goals Resource
+      operationId: findLastGoal
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/goals/read/{date}/{sequence}:
+    get:
+      tags:
+      - Goals Resource
+      operationId: readGoal
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/goals/update:
+    put:
+      tags:
+      - Goals Resource
+      operationId: updateGoal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Goal'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/import/bulk:
+    post:
+      tags:
+      - Import Resource
+      operationId: postImportBulk
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - fileName
+              type: object
+              properties:
+                fileName:
+                  type: string
+                config:
+                  $ref: '#/components/schemas/ImportConfig'
+                file:
+                  $ref: '#/components/schemas/FileUpload'
+            encoding:
+              fileName:
+                contentType: text/csv
+              file:
+                contentType: application/octet-stream
+              config:
+                contentType: application/json
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}:
+    get:
+      tags:
+      - Tdee Resource
+      operationId: calculateTdee
+      parameters:
+      - name: activityLevel
+        in: path
+        required: true
+        schema:
+          format: float
+          type: number
+      - name: age
+        in: path
+        required: true
+        schema:
+          format: int32
+          type: integer
+      - name: calculationGoal
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CalculationGoal'
+      - name: height
+        in: path
+        required: true
+        schema:
+          format: int32
+          type: integer
+      - name: sex
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CalculationSex'
+      - name: weeklyDifference
+        in: path
+        required: true
+        schema:
+          format: float
+          type: number
+      - name: weight
+        in: path
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tdee'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /api/tracker/calories/create:
+    post:
+      tags:
+      - Calorie Tracker Resource
+      operationId: createCalorieTrackerEntry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalorieTrackerEntry'
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/calories/delete/{date}/{sequence}:
+    delete:
+      tags:
+      - Calorie Tracker Resource
+      operationId: deleteCalorieTrackerEntry
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/calories/list/dates:
+    get:
+      tags:
+      - Calorie Tracker Resource
+      operationId: listCalorieTrackerDates
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocalDate'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/calories/list/{dateFrom}/{dateTo}:
+    get:
+      tags:
+      - Calorie Tracker Resource
+      operationId: listCalorieTrackerEntriesRange
+      parameters:
+      - name: dateFrom
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: dateTo
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalorieTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/calories/list/{date}:
+    get:
+      tags:
+      - Calorie Tracker Resource
+      operationId: listCalorieTrackerEntriesForDate
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalorieTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/calories/read/{date}/{sequence}:
+    get:
+      tags:
+      - Calorie Tracker Resource
+      operationId: readCalorieTrackerEntry
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalorieTrackerEntry'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/calories/update:
+    put:
+      tags:
+      - Calorie Tracker Resource
+      operationId: updateCalorieTrackerEntry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalorieTrackerEntry'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/weight/create:
+    post:
+      tags:
+      - Weight Tracker Resource
+      operationId: createWeightTrackerEntry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeightTrackerEntry'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/weight/delete/{date}/{sequence}:
+    delete:
+      tags:
+      - Weight Tracker Resource
+      operationId: deleteWeightTrackerEntry
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/weight/last:
+    get:
+      tags:
+      - Weight Tracker Resource
+      operationId: findLastWeightTrackerEntry
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/weight/list/{dateFrom}/{dateTo}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      operationId: listWeightTrackerEntriesRange
+      parameters:
+      - name: dateFrom
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: dateTo
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeightTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/weight/list/{date}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      operationId: listWeightTrackerEntries
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeightTrackerEntry'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/weight/read/{date}/{sequence}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      operationId: readWeightTrackerEntry
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightTrackerEntry'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/tracker/weight/update:
+    put:
+      tags:
+      - Weight Tracker Resource
+      operationId: updateWeightTrackerEntry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeightTrackerEntry'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/user/activate/{activationId}:
+    get:
+      tags:
+      - User Resource
+      operationId: activateUser
+      parameters:
+      - name: activationId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain: {}
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /api/user/login:
+    post:
+      tags:
+      - User Resource
+      operationId: postUserLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibreUser'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain: {}
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /api/user/logout:
+    post:
+      tags:
+      - User Resource
+      operationId: postUserLogout
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+        "401":
+          description: Not Authorized
+      security:
+      - SecurityScheme: []
+  /api/user/read:
+    get:
+      tags:
+      - User Resource
+      operationId: readUserInfo
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibreUser'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/user/refresh:
+    post:
+      tags:
+      - User Resource
+      operationId: postUserRefresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthInfo'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain: {}
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server Error
+  /api/user/register:
+    post:
+      tags:
+      - User Resource
+      operationId: postUserRegister
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibreUser'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+  /api/user/update:
+    post:
+      tags:
+      - User Resource
+      operationId: updateUserInfo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibreUser'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibreUser'
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+components:
+  schemas:
+    AuthInfo:
+      required:
+      - accessToken
+      - refreshToken
+      type: object
+      properties:
+        accessToken:
+          type: string
+        accessExpires:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+        refreshToken:
+          type: string
+        refreshExpires:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+    BmiCategory:
+      enum:
+      - UNDERWEIGHT
+      - STANDARD_WEIGHT
+      - OVERWEIGHT
+      - OBESE
+      - SEVERELY_OBESE
+      type: string
+    CalculationGoal:
+      enum:
+      - GAIN
+      - LOSS
+      type: string
+    CalculationSex:
+      enum:
+      - MALE
+      - FEMALE
+      type: string
+    CalorieTrackerEntry:
+      required:
+      - added
+      - amount
+      - category
+      type: object
+      properties:
+        userId:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+        added:
+          $ref: '#/components/schemas/LocalDate'
+        sequence:
+          format: int64
+          type: integer
+          nullable: true
+        amount:
+          format: float
+          minimum: 0
+          type: number
+        category:
+          $ref: '#/components/schemas/Category'
+        updated:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+        description:
+          type: string
+          nullable: true
+    Category:
+      enum:
+      - BREAKFAST
+      - LUNCH
+      - DINNER
+      - SNACK
+      - UNSET
+      type: string
+    ErrorDescription:
+      required:
+      - field
+      - message
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    ErrorResponse:
+      required:
+      - errors
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDescription'
+    FileUpload:
+      type: object
+    Goal:
+      required:
+      - added
+      - initialWeight
+      - targetWeight
+      - startDate
+      - endDate
+      type: object
+      properties:
+        userId:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+        added:
+          $ref: '#/components/schemas/LocalDate'
+        sequence:
+          format: int64
+          type: integer
+          nullable: true
+        initialWeight:
+          format: float
+          minimum: 0
+          type: number
+        targetWeight:
+          format: float
+          minimum: 0
+          type: number
+        startDate:
+          $ref: '#/components/schemas/LocalDate'
+        endDate:
+          $ref: '#/components/schemas/LocalDate'
+        targetCalories:
+          format: float
+          minimum: 0
+          type: number
+          nullable: true
+        maximumCalories:
+          format: float
+          minimum: 0
+          type: number
+          nullable: true
+        updated:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+    ImportConfig:
+      required:
+      - datePattern
+      type: object
+      properties:
+        datePattern:
+          type: string
+        headerLength:
+          format: int32
+          type: integer
+        drop:
+          type: boolean
+        updateCalorieTracker:
+          type: boolean
+        updateWeightTracker:
+          type: boolean
+    LibreUser:
+      required:
+      - email
+      - password
+      - role
+      type: object
+      properties:
+        id:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+        email:
+          type: string
+        password:
+          minLength: 1
+          type: string
+        role:
+          type: string
+        name:
+          type: string
+          nullable: true
+        registered:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+        lastLogin:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+        avatar:
+          type: string
+          nullable: true
+        activated:
+          type: boolean
+    LocalDate:
+      format: date
+      type: string
+      example: 2022-03-10
+    LocalDateTime:
+      format: date-time
+      type: string
+      example: 2022-03-10T12:15:50
+    Tdee:
+      required:
+      - age
+      - sex
+      - weight
+      - height
+      - weeklyDifference
+      - calculationGoal
+      - tdee
+      - bmiCategory
+      - targetBmi
+      - durationDays
+      type: object
+      properties:
+        age:
+          maximum: 99
+          minimum: 18
+          type: number
+        sex:
+          $ref: '#/components/schemas/CalculationSex'
+        weight:
+          maximum: 300
+          minimum: 30
+          type: number
+        height:
+          maximum: 300
+          minimum: 30
+          type: number
+        activityLevel:
+          format: float
+          type: number
+        weeklyDifference:
+          maximum: 7
+          minimum: 0
+          type: number
+        calculationGoal:
+          $ref: '#/components/schemas/CalculationGoal'
+        bmr:
+          format: float
+          type: number
+        tdee:
+          type: number
+        deficit:
+          format: float
+          type: number
+        target:
+          format: float
+          type: number
+        bmi:
+          format: float
+          type: number
+        bmiCategory:
+          $ref: '#/components/schemas/BmiCategory'
+        targetBmi:
+          type: array
+          items:
+            format: int32
+            type: integer
+        targetWeight:
+          format: float
+          type: number
+        durationDays:
+          type: number
+    UUID:
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+      type: string
+    WeightTrackerEntry:
+      required:
+      - added
+      type: object
+      properties:
+        userId:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+        added:
+          $ref: '#/components/schemas/LocalDate'
+        sequence:
+          format: int64
+          type: integer
+          nullable: true
+        amount:
+          format: float
+          minimum: 0
+          type: number
+        updated:
+          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalDateTime'
+          nullable: true
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      description: Authentication
+      scheme: bearer
+      bearerFormat: JWT
