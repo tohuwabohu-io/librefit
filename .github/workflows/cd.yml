@@ -1,4 +1,4 @@
-name: Build and deploy docker images
+name: Deploy
 on: workflow_dispatch
 permissions:
   packages: write
@@ -40,22 +40,18 @@ jobs:
       - name: Setup flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
         
-      - name: Build librefit-service
-        run: ./gradlew build -Dquarkus.package.type=jar
+      - name: Build librefit
+        run: |
+          echo "PUBLIC_API_BASE_PATH=${{ secrets.API_BASE_PATH }}" > librefit-web/.env.production &&
+          ./gradlew build -Dquarkus.package.type=jar
 
-      - name: Build librefit-service jvm image
-        run: docker build -f librefit-service/src/main/docker/Dockerfile.jvm -t ghcr.io/tohuwabohu-io/librefit-service:latest librefit-service/.
+      - name: Build librefit jvm image
+        run: docker build -f librefit-service/src/main/docker/Dockerfile.jvm -t ghcr.io/tohuwabohu-io/librefit:latest librefit-service/.
 
-      - name: Build librefit-web node image
-        run: docker build -f librefit-web/Dockerfile -t ghcr.io/tohuwabohu-io/librefit-web:latest librefit-web/.
+      - name: Push librefit jvm image to ghcr
+        run: docker push ghcr.io/tohuwabohu-io/librefit:latest
 
-      - name: Push librefit-service image to ghcr
-        run: docker push ghcr.io/tohuwabohu-io/librefit-service:latest
-
-      - name: Push librefit-web image to ghcr
-        run: docker push ghcr.io/tohuwabohu-io/librefit-web:latest
-
-      - name: Deploy librefit-service
+      - name: Deploy librefit
         #77-i ghcr.io/tohuwabohu-io/librefit-service:latest
         run: |
           flyctl deploy librefit-service/. --remote-only \
@@ -63,10 +59,3 @@ jobs:
           QUARKUS_DATASOURCE_PASSWORD=${{ secrets.DB_PWD }} \
           QUARKUS_DATASOURCE_REACTIVE_URL=${{ secrets.DB_URL }} \
           QUARKUS_DATASOURCE_USERNAME=${{ secrets.DB_USER }}
-
-      - name: Deploy librefit-web
-        #77 -i ghcr.io/tohuwabohu-io/librefit-web:latest
-        run: |
-          flyctl deploy librefit-web/. --remote-only \
-          && flyctl secrets set -a librefit-web --detach \
-          API_BASE_PATH=${{ secrets.API_BASE_PATH }}

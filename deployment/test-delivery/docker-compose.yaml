@@ -24,7 +24,7 @@ services:
       - librefit-network
 
   service:
-    image: librefit-service:latest
+    image: librefit:latest
     restart: always
     hostname: librefit-service
     container_name: librefit-service
