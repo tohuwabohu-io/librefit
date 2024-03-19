@@ -49,6 +49,10 @@
             console.error(e);
 
             status = e.data;
+
+            if (!status) {
+                status = {errors: [{field: 'email', message: 'An error occurred. Please try again later.' }]}
+            }
         });
     }
 
@@ -62,6 +66,10 @@
         });
     }
 </script>
+
+<svelte:head>
+    <title>LibreFit</title>
+</svelte:head>
 
 <section class="variant-ghost-surface h-full flex">
     <div class="container mx-auto p-12 space-y-8 self-center">

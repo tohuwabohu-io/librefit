@@ -1,6 +1,5 @@
 import { env } from '$env/dynamic/public';
 import { error, redirect } from '@sveltejs/kit';
-import { goto } from '$app/navigation';
 
 /**
  * @param {function} fetchApi
@@ -50,24 +49,33 @@ export const proxyFetch = async (fetchApi, api, data) => {
 	}
 
 	if (!call) {
-		console.log(`method ${api.method} not implemented`);
+		if (import.meta.env.MODE === 'development') {
+			console.log(`method ${api.method} not implemented`);
+		}
+
 		throw error(405);
 	}
 
 	try {
-		console.log(`${method} ${env.PUBLIC_API_BASE_PATH + path}`);
+		if (import.meta.env.MODE === 'development') {
+			console.log(`${method} ${env.PUBLIC_API_BASE_PATH + path}`);
+		}
 
 		response = await call;
 
-		console.log(
-			`${method} ${path} statusCode=${response.status} statusText=${response.statusText}`
-		);
+		if (import.meta.env.MODE === 'development') {
+			console.log(
+				`${method} ${path} statusCode=${response.status} statusText=${response.statusText}`
+			);
+		}
 	} catch (e) {
-		console.error(
-			`${method} ${path} statusCode=${response.status} statusText=${response.statusText}`
-		);
+		if (import.meta.env.MODE === 'development') {
+			console.error(
+				`${method} ${path} statusCode=${response.status} statusText=${response.statusText}`
+			);
+		}
 
-		console.log(e);
+		console.error(e);
 
 		response = new Response();
 	}
