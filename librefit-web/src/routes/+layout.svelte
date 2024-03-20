@@ -49,7 +49,7 @@
 	setContext('currentGoal', currentGoal);
 	setContext('lastWeight', lastWeight);
 
-	const logout = () => {ü
+	const logout = () => {
 		user.set(null);
 	}
 
