@@ -8,12 +8,16 @@
 	import {getContext} from 'svelte';
     import {getCategoryValueAsKey} from '$lib/enum.js';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
+	import {goto} from '$app/navigation';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
 
 	const toastStore = getToastStore();
 	const indicator = getContext('indicator');
+	const user = getContext('user');
+
+	if (!$user) goto('/');
 
 	export let data;
 
@@ -116,6 +120,7 @@
 	<title>LibreFit - Calorie Tracker</title>
 </svelte:head>
 
+{#if $user}
 <section>
 	<div class="container mx-auto p-8 space-y-10">
 		{#if data.availableDates}
@@ -158,3 +163,4 @@
 		{/if}
 	</div>
 </section>
+{/if}

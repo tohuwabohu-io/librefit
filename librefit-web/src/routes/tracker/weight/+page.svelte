@@ -8,11 +8,15 @@
 	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
 	import {listWeightFiltered} from '$lib/api/tracker.js';
 	import {DataViews, enumKeys} from '$lib/enum.js';
+	import {goto} from '$app/navigation';
 
 	Chart.register(...registerables);
 
 	const toastStore = getToastStore();
 	const indicator = getContext('indicator');
+	const user = getContext('user');
+
+	if (!$user) goto('/');
 
 	export let filter = DataViews.Month;
 
@@ -68,6 +72,7 @@
 	<title>LibreFit - Weight Tracker</title>
 </svelte:head>
 
+{#if $user}
 <section>
 	<div class="container mx-auto p-8 space-y-10">
 		<div class="flex flex-col gap-4">
@@ -95,3 +100,4 @@
 		</div>
 	</div>
 </section>
+{/if}

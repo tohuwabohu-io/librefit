@@ -8,6 +8,7 @@
 	import {api} from '$lib/api/index.js';
     import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
     import {getDateAsStr} from '$lib/date.js';
+	import {goto} from '$app/navigation';
 
 	const modalStore = getModalStore();
 	const toastStore = getToastStore();
@@ -15,6 +16,9 @@
 	const lastWeightEntry = getContext('lastWeight');
 	const currentGoal = getContext('currentGoal');
 	const indicator = getContext('indicator');
+	const user = getContext('user');
+
+	if (!$user) goto('/');
 
 	/** @type Tdee */
 	let calculationResult;
@@ -98,6 +102,7 @@
 	<title>LibreFit - TDEE Wizard</title>
 </svelte:head>
 
+{#if $user}
 <section>
 	<div class="container mx-auto p-8 space-y-8">
 		<h1>TDEE Calculator</h1>
@@ -240,6 +245,4 @@
 		{/if}
 	</div>
 </section>
-
-<style>
-</style>
+{/if}

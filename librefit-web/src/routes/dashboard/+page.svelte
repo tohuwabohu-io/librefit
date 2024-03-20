@@ -15,6 +15,7 @@
 	import {Category} from '$lib/api/model.js';
     import {categoriesAsKeyValue, DataViews, getCategoryValueAsKey} from '$lib/enum.js';
     import {getDaytimeGreeting} from '$lib/date.js';
+	import {goto} from '$app/navigation';
 
 	Chart.register(...registerables);
 
@@ -31,6 +32,8 @@
 	const indicator = getContext('indicator');
 
 	const toastStore = getToastStore();
+
+	if (!$user) goto('/');
 
 	const onAddCalories = async (event) => {
 		const amountMessage = validateAmount(event.detail.value);
@@ -120,6 +123,7 @@
 	<title>LibreFit - Dashboard</title>
 </svelte:head>
 
+{#if $user}
 <section>
 	<div class="container mx-auto p-8 space-y-8">
 		{#if $user}
@@ -162,3 +166,4 @@
 		{/if}
 	</div>
 </section>
+{/if}

@@ -5,8 +5,11 @@
     import {showToastError, showToastInfo, showToastSuccess, showToastWarning} from '$lib/toast.js';
     import {updateProfile} from '$lib/api/user.js';
     import {getFieldError} from '$lib/validation.js';
+    import {goto} from '$app/navigation';
 
     const user = getContext('user');
+    if (!$user) goto('/');
+
     $: user;
 
     const indicator = getContext('indicator');

@@ -6,9 +6,13 @@
     import FileUpload from '$lib/assets/icons/file-upload.svg?component';
     import {getContext} from 'svelte';
     import {startImport} from '$lib/api/tracker.js';
+    import {goto} from '$app/navigation';
 
     const toastStore = getToastStore();
     const indicator = getContext('indicator');
+    const user = getContext('user');
+
+    if (!$user) goto('/');
 
     /** @type Array */
     const radioOptions = [
@@ -44,9 +48,11 @@
 </script>
 
 <svelte:head>
+
     <title>LibreFit - CSV Import</title>
 </svelte:head>
 
+{#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-8">
         <h1>Import</h1>
@@ -130,3 +136,4 @@
         </form>
     </div>
 </section>
+{/if}
