@@ -4,7 +4,7 @@ node_modules
 /.svelte-kit
 /package
 !.env
-.env.*
+!.env.production
 !.env.example
 
 # Ignore files for PNPM, NPM and YARN

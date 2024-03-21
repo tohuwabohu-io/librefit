@@ -10,7 +10,6 @@ import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
-import io.tohuwabohu.crud.AuthInfo
 import io.tohuwabohu.crud.LibreUser
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
@@ -228,135 +227,21 @@ class UserResourceTest {
             statusCode(201)
         }
 
-        val authInfo = Given {
+        Given {
             header("Content-Type", "application/json")
             body(user("auth-test1@test.dev"))
         } When {
             post("/login")
         } Then {
             statusCode(200)
-        } Extract {
-            body().`as`(AuthInfo::class.java)
         }
 
         Given {
             header("Content-Type", "application/json")
-            body(AuthInfo(accessToken = "", refreshToken = authInfo.refreshToken))
         } When {
             post("/logout")
         } Then {
-            statusCode(200)
-        }
-    }
-
-    @Test
-    @TestSecurity(user = "11e45d14-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    fun `should login a user 4 times and invalidate the oldest refresh token`() {
-        Given {
-            header("Content-Type", ContentType.JSON)
-            body(user("auth-test2@test.dev"))
-        } When {
-            post("/register")
-        } Then {
-            statusCode(201)
-        }
-
-        val authInfo1 = Given {
-            header("Content-Type", "application/json")
-            body(user("auth-test2@test.dev"))
-        } When {
-            post("/login")
-        } Then {
-            statusCode(200)
-        } Extract {
-            body().`as`(AuthInfo::class.java)
-        }
-
-        Given {
-            header("Content-Type", "application/json")
-            body(user("auth-test2@test.dev"))
-        } When {
-            post("/login")
-        } Then {
-            statusCode(200)
-        }
-
-        Given {
-            header("Content-Type", "application/json")
-            body(user("auth-test2@test.dev"))
-        } When {
-            post("/login")
-        } Then {
-            statusCode(200)
-        } Extract {
-            body().`as`(AuthInfo::class.java)
-        }
-
-        Given {
-            header("Content-Type", "application/json")
-            body(user("auth-test2@test.dev"))
-        } When {
-            post("/login")
-        } Then {
-            statusCode(200)
-        } Extract {
-            body().`as`(AuthInfo::class.java)
-        }
-
-        Given {
-            header("Content-Type", "application/json")
-            body(AuthInfo(accessToken = "", refreshToken = authInfo1.refreshToken))
-        } When {
-            post("/refresh")
-        } Then {
-            statusCode(403)
-        }
-    }
-
-    @Test
-    @TestSecurity(user = "11e45d14-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    fun `should login a user and rotate the refresh token`() {
-        Given {
-            header("Content-Type", ContentType.JSON)
-            body(user("auth-test3@test.dev"))
-        } When {
-            post("/register")
-        } Then {
-            statusCode(201)
-        }
-
-        val authInfo1 = Given {
-            header("Content-Type", "application/json")
-            body(user("auth-test3@test.dev"))
-        } When {
-            post("/login")
-        } Then {
-            statusCode(200)
-        } Extract {
-            body().`as`(AuthInfo::class.java)
-        }
-
-        val authInfo2 = Given {
-            header("Content-Type", "application/json")
-            body(authInfo1)
-        } When {
-            post("/refresh")
-        } Then {
-            statusCode(200)
-        } Extract {
-            body().`as`(AuthInfo::class.java)
-        }
-
-        assert(authInfo1.accessToken != authInfo2.accessToken)
-        assert(authInfo1.refreshToken != authInfo2.refreshToken)
-
-        Given {
-            header("Content-Type", "application/json")
-            body(authInfo1)
-        } When {
-            post("/refresh")
-        } Then {
-            statusCode(403)
+            statusCode(204)
         }
     }
 
@@ -375,7 +260,7 @@ class UserResourceTest {
             statusCode(201)
         }
 
-        val authInfo = Given {
+        val cookies = Given {
             header("Content-Type", ContentType.JSON)
             body(user)
         } When {
@@ -383,11 +268,11 @@ class UserResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(AuthInfo::class.java)
+            detailedCookies()
         }
 
         Given {
-            header("Authorization", "Bearer ${authInfo.accessToken}")
+            cookie(cookies.get("auth"))
         } When {
             get("/read")
         } Then {
@@ -396,6 +281,12 @@ class UserResourceTest {
             body("avatar", equalTo(user.avatar))
             body("name", equalTo(user.name))
             body("password", equalTo(""))
+        }
+
+        When {
+            get("/read")
+        } Then {
+            statusCode(401)
         }
     }
 

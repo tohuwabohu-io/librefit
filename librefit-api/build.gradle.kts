@@ -27,7 +27,6 @@ tasks.register<JavaExec>("ApiCodegen") {
 
     doFirst {
         project.mkdir("${project.projectDir}/rest/lib/api")
-        project.mkdir("${project.projectDir}/rest/lib/server/api")
     }
 
     doLast {

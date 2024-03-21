@@ -9,7 +9,7 @@ servers:
 - url: http://0.0.0.0:8080
   description: Auto generated value
 paths:
-  /goals/create:
+  /api/goals/create:
     post:
       tags:
       - Goals Resource
@@ -36,7 +36,11 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/delete/{date}/{sequence}:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/goals/delete/{date}/{sequence}:
     delete:
       tags:
       - Goals Resource
@@ -70,7 +74,11 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/last:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/goals/last:
     get:
       tags:
       - Goals Resource
@@ -92,7 +100,11 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/read/{date}/{sequence}:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/goals/read/{date}/{sequence}:
     get:
       tags:
       - Goals Resource
@@ -128,7 +140,11 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /goals/update:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/goals/update:
     put:
       tags:
       - Goals Resource
@@ -155,10 +171,15 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-  /import/bulk:
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/import/bulk:
     post:
       tags:
       - Import Resource
+      operationId: postImportBulk
       requestBody:
         content:
           multipart/form-data:
@@ -199,7 +220,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}:
+  /api/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}:
     get:
       tags:
       - Tdee Resource
@@ -260,7 +281,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
-  /tracker/calories/create:
+  /api/tracker/calories/create:
     post:
       tags:
       - Calorie Tracker Resource
@@ -291,7 +312,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/calories/delete/{date}/{sequence}:
+  /api/tracker/calories/delete/{date}/{sequence}:
     delete:
       tags:
       - Calorie Tracker Resource
@@ -329,7 +350,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/calories/list/dates:
+  /api/tracker/calories/list/dates:
     get:
       tags:
       - Calorie Tracker Resource
@@ -357,7 +378,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/calories/list/{dateFrom}/{dateTo}:
+  /api/tracker/calories/list/{dateFrom}/{dateTo}:
     get:
       tags:
       - Calorie Tracker Resource
@@ -396,7 +417,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/calories/list/{date}:
+  /api/tracker/calories/list/{date}:
     get:
       tags:
       - Calorie Tracker Resource
@@ -430,7 +451,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/calories/read/{date}/{sequence}:
+  /api/tracker/calories/read/{date}/{sequence}:
     get:
       tags:
       - Calorie Tracker Resource
@@ -470,7 +491,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/calories/update:
+  /api/tracker/calories/update:
     put:
       tags:
       - Calorie Tracker Resource
@@ -501,7 +522,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/create:
+  /api/tracker/weight/create:
     post:
       tags:
       - Weight Tracker Resource
@@ -532,7 +553,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/delete/{date}/{sequence}:
+  /api/tracker/weight/delete/{date}/{sequence}:
     delete:
       tags:
       - Weight Tracker Resource
@@ -570,7 +591,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/last:
+  /api/tracker/weight/last:
     get:
       tags:
       - Weight Tracker Resource
@@ -596,7 +617,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/list/{dateFrom}/{dateTo}:
+  /api/tracker/weight/list/{dateFrom}/{dateTo}:
     get:
       tags:
       - Weight Tracker Resource
@@ -635,7 +656,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/list/{date}:
+  /api/tracker/weight/list/{date}:
     get:
       tags:
       - Weight Tracker Resource
@@ -669,7 +690,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/read/{date}/{sequence}:
+  /api/tracker/weight/read/{date}/{sequence}:
     get:
       tags:
       - Weight Tracker Resource
@@ -709,7 +730,7 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /tracker/weight/update:
+  /api/tracker/weight/update:
     put:
       tags:
       - Weight Tracker Resource
@@ -740,10 +761,11 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /user/activate/{activationId}:
+  /api/user/activate/{activationId}:
     get:
       tags:
       - User Resource
+      operationId: activateUser
       parameters:
       - name: activationId
         in: path
@@ -761,10 +783,11 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /user/login:
+  /api/user/login:
     post:
       tags:
       - User Resource
+      operationId: postUserLogin
       requestBody:
         content:
           application/json:
@@ -774,9 +797,7 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthInfo'
+            text/plain: {}
         "400":
           description: Bad Request
           content:
@@ -787,31 +808,25 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-  /user/logout:
+  /api/user/logout:
     post:
       tags:
       - User Resource
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthInfo'
+      operationId: postUserLogout
       responses:
-        "200":
-          description: OK
-          content:
-            text/plain: {}
+        "204":
+          description: No Content
         "404":
           description: Not Found
         "500":
           description: Internal Server Error
-        "401":
-          description: Not Authorized
         "403":
           description: Not Allowed
+        "401":
+          description: Not Authorized
       security:
       - SecurityScheme: []
-  /user/read:
+  /api/user/read:
     get:
       tags:
       - User Resource
@@ -839,10 +854,11 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /user/refresh:
+  /api/user/refresh:
     post:
       tags:
       - User Resource
+      operationId: postUserRefresh
       requestBody:
         content:
           application/json:
@@ -852,9 +868,7 @@ paths:
         "200":
           description: OK
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LibreUser'
+            text/plain: {}
         "400":
           description: Bad Request
           content:
@@ -865,10 +879,11 @@ paths:
           description: Forbidden
         "500":
           description: Internal Server Error
-  /user/register:
+  /api/user/register:
     post:
       tags:
       - User Resource
+      operationId: postUserRegister
       requestBody:
         content:
           application/json:
@@ -887,7 +902,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
-  /user/update:
+  /api/user/update:
     post:
       tags:
       - User Resource

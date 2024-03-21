@@ -357,7 +357,7 @@ class CalorieTrackerResourceTest {
             Claim(key = "email", value = "test@libre.fitness"),
         ]
     )
-    fun `should fail with 401`() {
+    fun `should fail with 404`() {
         val userId = UUID.fromString("85b6a2e4-7fb3-11ee-b962-0242ac120002") // unrelated user's data
 
         val entry = entry(userId)
@@ -368,7 +368,7 @@ class CalorieTrackerResourceTest {
         } When {
             put("/update")
         } Then {
-            statusCode(401)
+            statusCode(404)
         }
     }
 

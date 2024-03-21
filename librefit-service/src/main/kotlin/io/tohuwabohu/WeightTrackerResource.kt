@@ -25,8 +25,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
 import java.util.*
 
-@Path("/tracker/weight")
-class WeightTrackerResource(val weightTrackerRepository: WeightTrackerRepository) {
+@Path("/api/tracker/weight")
+class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRepository) {
     @Inject
     lateinit var jwt: JsonWebToken
 

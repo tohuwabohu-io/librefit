@@ -21,6 +21,7 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.SecurityContext
 import org.eclipse.microprofile.jwt.JsonWebToken
+import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
@@ -31,7 +32,7 @@ import org.jboss.resteasy.reactive.multipart.FileUpload
 import java.time.format.DateTimeParseException
 import java.util.*
 
-@Path("/import")
+@Path("/api/import")
 @RequestScoped
 class ImportResource(private val importHelper: ImportHelper) {
 
@@ -52,6 +53,7 @@ class ImportResource(private val importHelper: ImportHelper) {
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
+    @Operation(operationId = "postImportBulk")
     fun bulk(@Context securityContext: SecurityContext,
              @RestForm @PartType("text/csv") fileName: String,
              @RestForm @PartType("application/json") config: ImportConfig,

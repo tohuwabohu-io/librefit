@@ -26,9 +26,9 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
 import java.util.*
 
-@Path("/tracker/calories")
+@Path("/api/tracker/calories")
 @RequestScoped
-class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerRepository) {
+class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTrackerRepository) {
     @Inject
     lateinit var jwt: JsonWebToken
 
@@ -83,6 +83,8 @@ class CalorieTrackerResource(val calorieTrackerRepository: CalorieTrackerReposit
     )
     @Operation(operationId = "updateCalorieTrackerEntry")
     fun update(@Context securityContext: SecurityContext, @Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
+        calorieTracker.userId = UUID.fromString(jwt.name)
+
         Log.info("Updating calorie tracker entry $calorieTracker")
 
         printAuthenticationInfo(jwt, securityContext)

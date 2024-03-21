@@ -24,7 +24,7 @@ services:
       - librefit-network
 
   service:
-    image: librefit-service:latest
+    image: librefit:latest
     restart: always
     hostname: librefit-service
     container_name: librefit-service
@@ -40,15 +40,15 @@ services:
       db:
         condition: service_healthy
 
-  web:
-    image: librefit-web:latest
-    container_name: librefit-web
-    hostname: librefit-web
-    restart: always
-    environment:
-      - ORIGIN=http://localhost:3000
-      - API_BASE_PATH=http://librefit-service:8080
-    ports:
-      - '3000:3000'
-    networks:
-      - librefit-network
+  #web:
+  #  image: librefit-web:latest
+  #  container_name: librefit-web
+  #  hostname: librefit-web
+  #  restart: always
+  #  environment:
+  #    - ORIGIN=http://localhost:3000
+  #    - API_BASE_PATH=http://librefit-service:8080
+  #  ports:
+  #    - '3000:3000'
+  #  networks:
+  #    - librefit-network
