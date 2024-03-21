@@ -42,7 +42,7 @@ jobs:
         
       - name: Build librefit
         run: |
-          echo "PUBLIC_API_BASE_PATH=${{ vars.API_BASE_PATH }}" > librefit-web/.env.production &&
+          echo "PUBLIC_API_BASE_PATH=${{ vars.API_BASE_PATH }}" > librefit-web/.env &&
           ./gradlew build -Dquarkus.package.type=native
 
       - name: Build librefit native-micro image
