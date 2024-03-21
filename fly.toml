@@ -7,7 +7,7 @@ app = 'librefit'
 primary_region = 'ams'
 
 [build]
-  dockerfile = 'src/main/docker/Dockerfile.jvm'
+  dockerfile = 'src/main/docker/Dockerfile.native-micro'
 
 [http_service]
   internal_port = 8080
