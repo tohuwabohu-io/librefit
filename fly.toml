@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for librefit-service on 2024-03-10T09:52:44+01:00
+# fly.toml app configuration file generated for librefit on 2024-03-21T17:16:32+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -7,7 +7,7 @@ app = 'librefit'
 primary_region = 'ams'
 
 [build]
-  dockerfile = 'src/main/docker/Dockerfile.jvm'
+  image = 'ghcr.io/tohuwabohu-io/librefit:latest'
 
 [http_service]
   internal_port = 8080

@@ -42,11 +42,11 @@ jobs:
         
       - name: Build librefit
         run: |
-          echo "PUBLIC_API_BASE_PATH=${{ secrets.API_BASE_PATH }}" > librefit-web/.env.production &&
-          ./gradlew build -Dquarkus.package.type=jar
+          echo "PUBLIC_API_BASE_PATH=${{ vars.API_BASE_PATH }}" > librefit-web/.env.production &&
+          ./gradlew build -Dquarkus.package.type=native
 
       - name: Build librefit jvm image
-        run: docker build -f librefit-service/src/main/docker/Dockerfile.jvm -t ghcr.io/tohuwabohu-io/librefit:latest librefit-service/.
+        run: docker build -f librefit-service/src/main/docker/Dockerfile.native-micro -t ghcr.io/tohuwabohu-io/librefit:latest librefit-service/.
 
       - name: Push librefit jvm image to ghcr
         run: docker push ghcr.io/tohuwabohu-io/librefit:latest
@@ -54,8 +54,8 @@ jobs:
       - name: Deploy librefit
         #77-i ghcr.io/tohuwabohu-io/librefit-service:latest
         run: |
-          flyctl deploy librefit-service/. --remote-only \
-          && flyctl secrets set -a librefit-service --detach \
+          flyctl deploy -i ghcr.io/tohuwabohu-io/librefit:latest -a librefit --image-label librefit:latest --remote-only \
+          && flyctl secrets set -a librefit --detach \
           QUARKUS_DATASOURCE_PASSWORD=${{ secrets.DB_PWD }} \
           QUARKUS_DATASOURCE_REACTIVE_URL=${{ secrets.DB_URL }} \
           QUARKUS_DATASOURCE_USERNAME=${{ secrets.DB_USER }}
