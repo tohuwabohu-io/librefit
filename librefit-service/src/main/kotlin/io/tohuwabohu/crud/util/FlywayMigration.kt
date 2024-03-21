@@ -1,12 +1,17 @@
 package io.tohuwabohu.crud.util
 
+import io.quarkus.arc.Arc
+import io.quarkus.flyway.runtime.FlywayContainerProducer
+import io.quarkus.flyway.runtime.QuarkusPathLocationScanner
 import io.quarkus.logging.Log
 import io.quarkus.runtime.StartupEvent
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.flywaydb.core.Flyway
+import java.io.File
 import java.util.*
+import javax.sql.DataSource
 
 
 /**
@@ -29,14 +34,24 @@ class FlywayMigration {
     @ConfigProperty(name = "quarkus.datasource.password")
     private lateinit var datasourcePassword: String
 
+    @ConfigProperty(name = "librefit.flyway.migration.files")
+    private lateinit var flywayMigrationFiles: List<String>
+
     fun runFlywayMigration(@Observes event: StartupEvent?) {
         val migrate = migrateAtStart.isPresent && migrateAtStart.get()
 
         Log.info("Checking migration... flag is set to $migrate.")
 
         if (migrate) {
-            val flyway =
-                Flyway.configure().dataSource("jdbc:$datasourceUrl", datasourceUsername, datasourcePassword).load()
+            Log.info("Flyway migration files set to $flywayMigrationFiles")
+
+            QuarkusPathLocationScanner.setApplicationMigrationFiles(flywayMigrationFiles)
+
+            val ds: DataSource = Flyway.configure().dataSource("jdbc:$datasourceUrl", datasourceUsername, datasourcePassword).dataSource
+            val flywayProducer = Arc.container().instance(FlywayContainerProducer::class.java).get()
+
+            val flywayContainer = flywayProducer.createFlyway(ds, "<default>", true, true)
+            val flyway = flywayContainer.flyway
             flyway.migrate()
         }
     }
