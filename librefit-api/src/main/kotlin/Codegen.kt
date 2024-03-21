@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
 
 fun writeJs(out: String, enums: List<Enum>, refs: List<Ref>, schemas: List<Schema>, operations: Map<String, Operation>) {
     val modelOut = File("$out/api/model.js")
-    val apiOut = File("$out/server/api/index.js")
+    val apiOut = File("$out/api/index.js")
 
     if (modelOut.exists()) {
         modelOut.delete()
