@@ -29,31 +29,43 @@ jobs:
           username: ${{github.ACTOR}}
           password: ${{secrets.GITHUB_TOKEN}}
 
-      #77
-      # - name: Login to Fly.io Container Registry
-      #  uses: docker/login-action@v1
-      #  with:
-      #    registry: registry.fly.io
-      #    username: x
-      #    password: ${{ secrets.FLY_REGISTRY_TOKEN }}
-      
       - name: Setup flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
-        
+
+      - name: Create next version
+        uses: StephaneBour/actions-calver@master
+        id: calver
+        with:
+          date_format: '%Y.%m.%d'
+          release: true
+          release_branch: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build librefit
+        env:
+          VERSION: ${{ steps.calver.outputs.release }}
         run: |
-          rm librefit-web/.env && echo "PUBLIC_API_BASE_PATH=${{ vars.API_BASE_PATH }}" > librefit-web/.env &&
-          cat librefit-web/.env && ./gradlew build -Dquarkus.package.type=native
+          rm librefit-web/.env \
+          && echo "PUBLIC_API_BASE_PATH=${{ vars.API_BASE_PATH }}" > librefit-web/.env \
+          && echo "PUBLIC_VERSION=${{ VERSION }} >> librefit-web/.env \
+          && ./gradlew build -Dquarkus.package.type=native -Dversion=${{ VERSION }}
 
       - name: Build librefit native-micro image
-        run: docker build -f librefit-service/src/main/docker/Dockerfile.native-micro -t ghcr.io/tohuwabohu-io/librefit:latest librefit-service/.
+        env:
+          VERSION: ${{ steps.calver.outputs.release }}
+        run: |
+          docker build -f librefit-service/src/main/docker/Dockerfile.native-micro \
+          -t ghcr.io/tohuwabohu-io/librefit:${{ VERSION }} librefit-service/.
 
       - name: Push librefit jvm native-micro image to ghcr
-        run: docker push ghcr.io/tohuwabohu-io/librefit:latest
+        run: docker push ghcr.io/tohuwabohu-io/librefit:${{ VERSION }}
 
       - name: Deploy librefit
+        env:
+          VERSION: ${{ steps.calver.outputs.release }}
         run: |
-          flyctl deploy -a librefit -i ghcr.io/tohuwabohu-io/librefit:latest --local-only --no-cache \
+          flyctl deploy -a librefit -i ghcr.io/tohuwabohu-io/librefit:${{ VERSION }} --image-label ${{ VERSION }} --local-only --no-cache \
           && flyctl secrets set -a librefit --detach \
           QUARKUS_DATASOURCE_PASSWORD=${{ secrets.DB_PWD }} \
           QUARKUS_DATASOURCE_REACTIVE_URL=${{ secrets.DB_URL }} \

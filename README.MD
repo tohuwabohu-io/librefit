@@ -8,7 +8,7 @@
 
 ---
 
-![Coverage](https://raw.githubusercontent.com/tohuwabohu-io/librefit/badges/jacoco.svg)
+![GitHub Release](https://img.shields.io/github/v/release/tohuwabohu-io/librefit) ![Coverage](https://raw.githubusercontent.com/tohuwabohu-io/librefit/badges/jacoco.svg)
 
 LibreFit is my hobby project that allows you to calculate your TDEE (Total Daily Energy Expenditure) based on your body
 metrics, create goals for weight loss or weight gain from that and encourages you to track your daily calorie intake.
@@ -28,6 +28,7 @@ was born.
 
 - Gradle 7.6
 - Quarkus 3.5.0
+- Quinoa 2.3.5
 - Kotlin 1.9.0
 - SvelteKit 2.5.2
 - Skeleton 2.9.0 
@@ -87,6 +88,9 @@ For more details, see [librefit-service/README.md](https://github.com/tohuwabohu
 
 ### librefit-web
 
+By default, librefit-service handles vite to serve directly from quarkus. If you prefer to run the modules separately,
+set `%dev.quarkus.quinoa=false` in `application.properties`. 
+
 You can either provide a node installation yourself or let gradle handle it for you. Gradle will download a [node 21.7.0](https://nodejs.org/en/blog/release/v21.7.0) 
 environment for this project to use.
 
@@ -103,7 +107,11 @@ cd librefit-web && npm run dev
 For more commands, please see [librefit-web/package.json](https://github.com/tohuwabohu-io/librefit/blob/main/librefit-web/package.json) 
 and also [librefit-web/README.md](https://github.com/tohuwabohu-io/librefit/blob/main/librefit-web/README.md).
 
+## Attribution
+The avatars were created with hotpot: https://hotpot.ai/art-generator
+
 ## Contribute
 
 If you have any suggestions, impediments or things that absolutely annoy you, please refer to the issue tracker linked
 at the top of this document. When you are interested in participating in development, feel free to contact me.
+
