@@ -1,6 +1,6 @@
 {
 	"name": "librefit-web",
-	"version": "0.0.1",
+	"version": "PREVIEW",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
