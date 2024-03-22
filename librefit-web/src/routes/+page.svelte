@@ -8,6 +8,7 @@
     import {getContext} from 'svelte';
     import {login} from '$lib/api/user.js';
     import {page} from '$app/stores';
+    import { env } from '$env/dynamic/public';
 
     const modalStore = getModalStore();
 
@@ -87,9 +88,14 @@
                     <p>
                         Define goals. See progress. Build habits.
                     </p>
-                    <p class="text-xs">
-                        Your FOSS calorie tracker!
-                    </p>
+                    <div class="flex flex-row justify-between">
+                        <p class="text-xs">
+                            Your FOSS calorie tracker!
+                        </p>
+                        <p class="text-xs">
+                            <a href="https://github.com/tohuwabohu-io/librefit">Version { env.PUBLIC_VERSION }</a>
+                        </p>
+                    </div>
                 </div>
             </div>
             <div class="lg:w-2/3">
