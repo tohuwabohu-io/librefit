@@ -15,6 +15,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.persistence.*
 import jakarta.validation.Validator
+import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotEmpty
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.hibernate.validator.constraints.Length
@@ -35,6 +36,8 @@ data class LibreUser (
 
     @Username
     @Column(unique = true, nullable = false)
+    @field:Email(message = "Please enter a valid e-mail address.", regexp = "^\\S+@\\S+\\.\\S+\$")
+    @field:NotEmpty(message = "The provided e-mail address is empty.")
     var email: String,
 
     @Password(PasswordType.CLEAR) // <-- automatic encryption with annotation does not work due to a bug
