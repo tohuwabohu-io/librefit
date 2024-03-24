@@ -1,3 +1,6 @@
+/** @type RegExp */
+const emailRegex = /^\S+@\S+\.\S+$/;
+
 /**
  * @param {any} fields
  * @return {ErrorResponse | undefined}
@@ -39,7 +42,7 @@ export const validateFields = (fields) => {
  * @returns {String | null}
  */
 export const validateEmail = (email) => {
-	if (email === null || email.indexOf('@') <= 0 || email.length <= 4) {
+	if (!email || !email.trim().match(emailRegex)) {
 		return 'Please enter a valid email address.';
 	}
 
