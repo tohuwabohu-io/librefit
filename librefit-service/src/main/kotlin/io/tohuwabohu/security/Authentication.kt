@@ -39,7 +39,7 @@ fun generateAccessToken(user: LibreUser, ttlMinutes: Int): Pair<String, LocalDat
     val expiresAt = System.currentTimeMillis() / 1000 + (ttlMinutes * 60)
     val expirationDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAt * 1000), ZoneId.systemDefault())
 
-    val jwtString = Jwt.issuer("https://libre.fitness/")
+    val jwtString = Jwt.issuer("https://libre.fit/")
         .upn(user.id.toString())
         .claim(Claims.email, user.email)
         .claim(Claims.nickname, user.name)
@@ -54,6 +54,6 @@ fun generateRefreshToken(ttlMinutes: Int): Pair<String, LocalDateTime> {
     val expiresAt = System.currentTimeMillis() / 1000 + (ttlMinutes * 60)
     val expirationDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAt * 1000), ZoneId.systemDefault())
 
-    return Pair(Jwt.issuer("https://libre.fitness/").expiresAt(expiresAt).sign(),
+    return Pair(Jwt.issuer("https://libre.fit/").expiresAt(expiresAt).sign(),
         expirationDate)
 }
