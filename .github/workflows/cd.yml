@@ -46,7 +46,7 @@ jobs:
         run: |
           rm librefit-web/.env \
           && echo "PUBLIC_API_BASE_PATH=${{ vars.API_BASE_PATH }}" > librefit-web/.env \
-          && echo "PUBLIC_VERSION=${{ steps.calver.outputs.release }} >> librefit-web/.env \
+          && echo "PUBLIC_VERSION=${{ steps.calver.outputs.release }}" >> librefit-web/.env \
           && ./gradlew build -Dquarkus.package.type=native -Dversion=${{ steps.calver.outputs.release }}
 
       - name: Build librefit native-micro image
