@@ -298,7 +298,7 @@ class CalorieTrackerResourceTest {
         val dates = Given {
             header("Content-Type", ContentType.JSON)
         } When {
-            get("/list/dates")
+            get("/list/dates/$yesterday/$today")
         } Then {
             statusCode(200)
         } Extract {
