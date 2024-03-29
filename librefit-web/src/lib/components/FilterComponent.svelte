@@ -8,7 +8,7 @@
     const today = new Date();
 
     let toDateStr = getDateAsStr(today);
-    let fromDateStr = getDateAsStr(subDays(today, 7));
+    let fromDateStr = getDateAsStr(subDays(today, 6));
 
     let filterSelection = 'w';
     const filterOptions = [
@@ -19,10 +19,10 @@
 
     const onFilter = () => {
         if (filterSelection === 'w') {
-            fromDateStr = getDateAsStr(subDays(today, 7));
+            fromDateStr = getDateAsStr(subDays(today, 6));
             toDateStr = getDateAsStr(today);
         } else if (filterSelection === 'm') {
-            fromDateStr = getDateAsStr(subDays(today, 31));
+            fromDateStr = getDateAsStr(subDays(today, 30));
             toDateStr = getDateAsStr(today);
         }
 
