@@ -79,7 +79,7 @@ export const listCaloriesForDate = (date) => {
 };
 
 export const listCalorieTrackerDatesRange = (dateFrom, dateTo) => {
-	const loadCtDateApi = api.listCalorieTrackerDates;
+	const loadCtDateApi = api.listCalorieTrackerDatesRange;
 
 	return proxyFetch(fetch, loadCtDateApi, {
 		dateFrom: dateFrom,
