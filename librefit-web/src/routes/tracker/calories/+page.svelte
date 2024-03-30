@@ -176,7 +176,7 @@
 						<svelte:fragment slot="content">
 							<div class="flex lg:flex-row flex-col gap-4 grow">
 								{#if datesToEntries[dateStr]}
-									<CalorieTracker entries={data.entryToday} {categories}
+									<CalorieTracker entries={datesToEntries[dateStr]} {categories}
 										on:addCalories={addEntry}
 										on:updateCalories={updateEntry}
 										on:deleteCalories={deleteEntry}
