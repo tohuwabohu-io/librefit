@@ -127,25 +127,29 @@
 	};
 
 	const loadEntries = async (added) => {
-		$indicator = $indicator.start();
+		if (!datesToEntries[added]) {
+			$indicator = $indicator.start();
 
-		await listCaloriesForDate(added).then(async response => {
-			datesToEntries[added] = await response;
-		}).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
+			await listCaloriesForDate(added).then(async response => {
+				datesToEntries[added] = await response;
+			}).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
+		}
 	}
 
 	const onFilterChanged = async (event) => {
-		$indicator = $indicator.start();
-
 		const fromDateStr = event.detail.from;
 		const toDateStr = event.detail.to;
 
-		await listCalorieTrackerDatesRange(fromDateStr, toDateStr).then(async response => {
-			if (response.ok) {
-				availableDates = await response.json();
-				paginationSettings.size = availableDates.length;
-			} else throw response
-		}).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()});
+		if (fromDateStr && toDateStr) {
+			$indicator = $indicator.start();
+
+			await listCalorieTrackerDatesRange(fromDateStr, toDateStr).then(async response => {
+				if (response.ok) {
+					availableDates = await response.json();
+					paginationSettings.size = availableDates.length;
+				} else throw response
+			}).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()});
+		}
 	}
 </script>
 
@@ -163,13 +167,13 @@
 		{#if data.availableDates}
 			{#each paginatedSource as dateStr}
 			<Accordion class="variant-ghost-surface rounded-xl">
-				<AccordionItem id={dateStr} open={dateStr === todayStr} on:toggle|once={loadEntries(dateStr)}>
+				<AccordionItem id={dateStr} on:toggle={loadEntries(dateStr)}>
 					<svelte:fragment slot="summary">
 						{convertDateStrToDisplayDateStr(dateStr)}
 					</svelte:fragment>
 					<svelte:fragment slot="content">
 						<div class="flex lg:flex-row flex-col gap-4 grow">
-							{#if dateStr === todayStr && data.entryToday && !datesToEntries[dateStr]}
+							{#if datesToEntries[dateStr]}
 								<CalorieTracker entries={data.entryToday} {categories}
 									on:addCalories={addEntry}
 									on:updateCalories={updateEntry}
