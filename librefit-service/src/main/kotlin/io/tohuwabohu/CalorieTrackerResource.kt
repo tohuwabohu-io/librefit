@@ -153,7 +153,7 @@ class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTracke
     }
 
     @GET
-    @Path("/list/dates")
+    @Path("/list/dates/{dateFrom}/{dateTo}")
     @RolesAllowed("User", "Admin")
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
@@ -170,11 +170,11 @@ class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTracke
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @Operation(operationId = "listCalorieTrackerDates")
-    fun listDates(@Context securityContext: SecurityContext): Uni<Response> {
+    @Operation(operationId = "listCalorieTrackerDatesRange")
+    fun listDates(@Context securityContext: SecurityContext, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
-        return calorieTrackerRepository.listDatesForUser(UUID.fromString(jwt.name))
+        return calorieTrackerRepository.listDatesForUser(UUID.fromString(jwt.name), dateFrom, dateTo)
             .onItem().transform { Response.ok(it).build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }

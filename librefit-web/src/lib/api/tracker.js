@@ -77,6 +77,16 @@ export const listCaloriesForDate = (date) => {
 		}
 	);
 };
+
+export const listCalorieTrackerDatesRange = (dateFrom, dateTo) => {
+	const loadCtDateApi = api.listCalorieTrackerDatesRange;
+
+	return proxyFetch(fetch, loadCtDateApi, {
+		dateFrom: dateFrom,
+		dateTo: dateTo
+	});
+};
+
 /**
  * @param event
  */

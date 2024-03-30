@@ -350,11 +350,22 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /api/tracker/calories/list/dates:
+  /api/tracker/calories/list/dates/{dateFrom}/{dateTo}:
     get:
       tags:
       - Calorie Tracker Resource
-      operationId: listCalorieTrackerDates
+      operationId: listCalorieTrackerDatesRange
+      parameters:
+      - name: dateFrom
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: dateTo
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
       responses:
         "200":
           description: OK
@@ -1112,6 +1123,7 @@ components:
           - $ref: '#/components/schemas/UUID'
           nullable: true
         email:
+          minLength: 1
           type: string
         password:
           minLength: 1
