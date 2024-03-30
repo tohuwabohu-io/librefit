@@ -156,6 +156,8 @@
 {#if $user}
 <section>
 	<div class="container mx-auto p-8 space-y-10">
+		<h1>History</h1>
+
 		<FilterComponent on:change={onFilterChanged}/>
 
 		{#if data.availableDates}
