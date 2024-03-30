@@ -10,6 +10,7 @@
 	import {goto} from '$app/navigation';
 	import FilterComponent from '$lib/components/FilterComponent.svelte';
 	import { addCalories, updateCalories, deleteCalories, listCaloriesForDate, listCalorieTrackerDatesRange} from '$lib/api/tracker.js';
+	import FoodOff from '$lib/assets/icons/food-off.svg';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
@@ -165,46 +166,59 @@
 		<FilterComponent on:change={onFilterChanged}/>
 
 		{#if data.availableDates}
-			{#each paginatedSource as dateStr}
-			<Accordion class="variant-ghost-surface rounded-xl">
-				<AccordionItem id={dateStr} on:toggle={loadEntries(dateStr)}>
-					<svelte:fragment slot="summary">
-						{convertDateStrToDisplayDateStr(dateStr)}
-					</svelte:fragment>
-					<svelte:fragment slot="content">
-						<div class="flex lg:flex-row flex-col gap-4 grow">
-							{#if datesToEntries[dateStr]}
-								<CalorieTracker entries={data.entryToday} {categories}
-									on:addCalories={addEntry}
-									on:updateCalories={updateEntry}
-									on:deleteCalories={deleteEntry}
-								/>
-							{:else}
-								{#await datesToEntries[dateStr]}
-									<p>... loading</p>
-								{:then entries}
-									{#if entries}
-										<CalorieTracker {entries} {categories}
-											on:addCalories={addEntry}
-											on:updateCalories={updateEntry}
-											on:deleteCalories={deleteEntry}
-										/>
-									{/if}
-								{:catch error}
-									<p>{error}</p>
-								{/await}
-							{/if}
-						</div>
-					</svelte:fragment>
-				</AccordionItem>
-			</Accordion>
-			{/each}
+			{#if availableDates.length > 0}
+				{#each paginatedSource as dateStr}
+				<Accordion class="variant-ghost-surface rounded-xl">
+					<AccordionItem id={dateStr} on:toggle={loadEntries(dateStr)}>
+						<svelte:fragment slot="summary">
+							{convertDateStrToDisplayDateStr(dateStr)}
+						</svelte:fragment>
+						<svelte:fragment slot="content">
+							<div class="flex lg:flex-row flex-col gap-4 grow">
+								{#if datesToEntries[dateStr]}
+									<CalorieTracker entries={data.entryToday} {categories}
+										on:addCalories={addEntry}
+										on:updateCalories={updateEntry}
+										on:deleteCalories={deleteEntry}
+									/>
+								{:else}
+									{#await datesToEntries[dateStr]}
+										<p>... loading</p>
+									{:then entries}
+										{#if entries}
+											<CalorieTracker {entries} {categories}
+												on:addCalories={addEntry}
+												on:updateCalories={updateEntry}
+												on:deleteCalories={deleteEntry}
+											/>
+										{/if}
+									{:catch error}
+										<p>{error}</p>
+									{/await}
+								{/if}
+							</div>
+						</svelte:fragment>
+					</AccordionItem>
+				</Accordion>
+				{/each}
 
-			<Paginator
-					bind:settings={paginationSettings}
-					showFirstLastButtons={false}
-					showPreviousNextButtons={true}
-			/>
+				<Paginator
+						bind:settings={paginationSettings}
+						showFirstLastButtons={false}
+						showPreviousNextButtons={true}
+				/>
+			{:else}
+				<div class="flex flex-col items-center text-center gap-4">
+					<FoodOff width={100} height={100}/>
+					<p>
+						Insufficient data to render your history. Start tracking now on the <a href="/dashboard">Dashboard</a>!
+					</p>
+					<p>
+						Are you trying to add tracking data for the past? Don't worry, the <a href="/import">CSV Import</a>
+						is the right tool for that.
+					</p>
+				</div>
+			{/if}
 		{:else}
 			{data.error}
 		{/if}
