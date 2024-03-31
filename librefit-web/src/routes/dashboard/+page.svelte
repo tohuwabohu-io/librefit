@@ -21,12 +21,14 @@
 
 	const lastWeightTrackerEntry = getContext('lastWeight');
 	const currentGoal = getContext('currentGoal');
+	const foodCategories = getContext('foodCategories');
 
 	export let data;
 
 	$: lastWeightTrackerEntry.set(data.lastWeight);
 	$: currentGoal.set(data.currentGoal);
 	$: calorieTrackerEntries = data.lastCt;
+	$: foodCategories.set(data.foodCategories);
 
 	const user = getContext('user');
 	const indicator = getContext('indicator');
