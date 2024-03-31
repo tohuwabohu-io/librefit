@@ -281,6 +281,34 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal Server Error
+  /api/tracker/calories/categories/list:
+    get:
+      tags:
+      - Calorie Tracker Resource
+      operationId: listFoodCategories
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FoodCategory'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
   /api/tracker/calories/create:
     post:
       tags:
@@ -831,10 +859,10 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-        "403":
-          description: Not Allowed
         "401":
           description: Not Authorized
+        "403":
+          description: Not Allowed
       security:
       - SecurityScheme: []
   /api/user/read:
@@ -1047,6 +1075,18 @@ components:
             $ref: '#/components/schemas/ErrorDescription'
     FileUpload:
       type: object
+    FoodCategory:
+      required:
+      - shortvalue
+      - longvalue
+      type: object
+      properties:
+        shortvalue:
+          type: string
+        longvalue:
+          type: string
+        visible:
+          type: boolean
     Goal:
       required:
       - added
