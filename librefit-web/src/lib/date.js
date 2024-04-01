@@ -77,3 +77,20 @@ export const getDaytimeGreeting = (date) => {
 		return Daytime.Day;
 	}
 };
+
+/** @param date {Date} */
+export const getDaytimeFoodCategory = (date) => {
+	const hours = dateUtil.getHours(date);
+
+	if (hours >= 0 && hours <= 4) {
+		return 's';
+	} else if (hours >= 5 && hours <= 11) {
+		return 'b';
+	} else if (hours >= 12 && hours <= 15) {
+		return 'l';
+	} else if ((hours) => 16 && hours <= 20) {
+		return 'd';
+	} else {
+		return 't';
+	}
+};

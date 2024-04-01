@@ -4,7 +4,6 @@
     import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
     import Check from '$lib/assets/icons/check.svg?component';
     import {PolarArea} from 'svelte-chartjs';
-    import {Category} from '$lib/api/model.js';
     import {Chart, registerables} from 'chart.js';
     import {getContext} from 'svelte';
 
@@ -14,6 +13,9 @@
     export let displayClass = '';
 
     const currentGoal = getContext('currentGoal');
+
+    /** @type Array<FoodCategory> */
+    const foodCategories = getContext('foodCategories');
 
     /**
      * @param {Array<CalorieTrackerEntry>} entries
@@ -25,14 +27,14 @@
         const averageCategoryIntake = getAverageCategoryIntake(entries)
 
         if (averageCategoryIntake != null) {
-            for (let cat of Object.keys(Category)) {
-                const averageIntake = averageCategoryIntake.get(cat);
+            $foodCategories.forEach(cat => {
+                const averageIntake = averageCategoryIntake.get(cat.shortvalue);
 
                 if (averageIntake > 0) {
-                    values.push(averageCategoryIntake.get(cat));
-                    labels.push(cat);
+                    values.push(averageCategoryIntake.get(cat.shortvalue));
+                    labels.push(cat.longvalue);
                 }
-            }
+            });
         }
 
         return {
@@ -61,16 +63,15 @@
             const sum = nonEmpty.map(e => e.amount).reduce((a, b) => a + b);
             const dailyAverage = getAverageDailyIntake(entries);
 
-            for (let cat of Object.keys(Category)) {
-                const catEntries = nonEmpty.filter(e => e.category === Category[cat]);
+            $foodCategories.forEach(cat => {
+                const catEntries = nonEmpty.filter(e => e.category === cat.shortvalue);
 
                 if (catEntries.length > 0) {
                     const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
 
                     catMap.set(cat, Math.round(dailyAverage * (catSum / sum)));
                 }
-
-            }
+            });
 
             return catMap;
         }

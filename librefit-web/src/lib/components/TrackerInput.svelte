@@ -8,13 +8,18 @@
 	import Check from '$lib/assets/icons/check.svg?component';
 	import CancelDelete from '$lib/assets/icons/trash-off.svg?component';
 	import CancelEdit from '$lib/assets/icons/pencil-off.svg?component';
-	import {Category} from '$lib/api/model.js';
+	import {getDaytimeFoodCategory} from '$lib/date.js';
 
 	export let value, dateStr, sequence;
 	export let existing = false;
 	export let disabled = false;
-	export let categories = null;
-	export let category = Category.Unset;
+
+	/** @type Array<FoodCategory> */
+	export let categories;
+
+	/** @type FoodCategory */
+	export let category = categories.filter(c => c.shortvalue === getDaytimeFoodCategory(new Date()))[0];
+
 	export let unit;
 
 	const dispatch = createEventDispatcher();
@@ -115,7 +120,7 @@
 		{#if categories}
 			<select {disabled} bind:value={category}>
 				{#each categories as category}
-					<option value={category.value}>{category.label}</option>
+					<option value={category.shortvalue}>{category.longvalue}</option>
 				{/each}
 			</select>
 		{/if}

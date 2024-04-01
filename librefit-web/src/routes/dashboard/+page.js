@@ -1,8 +1,7 @@
 import { api } from '$lib/api/index.js';
 import { proxyFetch } from '$lib/api/util.js';
 import * as dateUtil from 'date-fns';
-import { Category } from '$lib/api/model.js';
-import { getDateAsStr } from '$lib/date.js';
+import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.js';
 
 /** @type {import('./$types').PageLoad} */
 export const load = async ({ fetch }) => {
@@ -42,7 +41,7 @@ export const load = async ({ fetch }) => {
 		const blankEntry = {
 			added: getDateAsStr(today),
 			amount: 0,
-			category: Category.Unset
+			category: getDaytimeFoodCategory(today)
 		};
 
 		ctList.unshift(blankEntry);

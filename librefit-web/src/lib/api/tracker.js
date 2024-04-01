@@ -1,9 +1,8 @@
-import { Category } from '$lib/api/model.js';
 import { proxyFetch } from '$lib/api/util.js';
 import { api } from '$lib/api/index.js';
 import { fail } from '@sveltejs/kit';
 import { DataViews } from '$lib/enum.js';
-import { getDateAsStr } from '$lib/date.js';
+import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.js';
 
 /**
  * @param event
@@ -64,7 +63,7 @@ export const listCaloriesForDate = (date) => {
 	const blankEntry = {
 		added: date,
 		amount: 0,
-		category: Category.Unset
+		category: getDaytimeFoodCategory(date)
 	};
 
 	return proxyFetch(fetch, api.listCalorieTrackerEntriesForDate, { date: date }).then(
