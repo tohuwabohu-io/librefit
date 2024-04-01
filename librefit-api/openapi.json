@@ -1530,7 +1530,7 @@
             "type" : "number"
           },
           "category" : {
-            "$ref" : "#/components/schemas/Category"
+            "type" : "string"
           },
           "updated" : {
             "type" : "string",
@@ -1544,10 +1544,6 @@
             "nullable" : true
           }
         }
-      },
-      "Category" : {
-        "enum" : [ "BREAKFAST", "LUNCH", "DINNER", "SNACK", "UNSET" ],
-        "type" : "string"
       },
       "ErrorDescription" : {
         "required" : [ "field", "message" ],
