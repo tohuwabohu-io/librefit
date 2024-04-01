@@ -294,7 +294,7 @@ insert into goal (user_id, added, sequence, start_date, end_date, initial_weight
 
 insert into food_category (shortvalue, longvalue, visible)
 values ('b', 'Breakfast', true),
-       ('l', 'lunch', true),
+       ('l', 'Lunch', true),
        ('d', 'Dinner', true),
        ('s', 'Snack', true),
        ('t', 'Treat', true),

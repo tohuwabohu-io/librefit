@@ -11,7 +11,6 @@ import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.CalorieTrackerEntry
-import io.tohuwabohu.crud.Category
 import io.tohuwabohu.crud.FoodCategory
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
@@ -150,7 +149,7 @@ class CalorieTrackerResourceTest {
         }
 
         created.amount = 200f
-        created.category = Category.LUNCH
+        created.category = "l"
 
         val updated = Given {
             header("Content-Type", ContentType.JSON)
@@ -456,7 +455,7 @@ class CalorieTrackerResourceTest {
     private fun entry(userId: UUID): CalorieTrackerEntry {
         val entry = CalorieTrackerEntry(
             amount = 100f,
-            category = Category.SNACK,
+            category = "s",
         )
 
         entry.userId = userId

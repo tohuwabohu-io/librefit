@@ -10,7 +10,7 @@ alter table food_category
 
 insert into food_category (shortvalue, longvalue, visible)
     values ('b', 'Breakfast', true),
-           ('l', 'lunch', true),
+           ('l', 'Lunch', true),
            ('d', 'Dinner', true),
            ('s', 'Snack', true),
            ('t', 'Treat', true),

@@ -1,7 +1,6 @@
 package io.tohuwabohu.crud
 
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
@@ -24,9 +23,8 @@ data class CalorieTrackerEntry (
     @field:Min(value = 0, message = "The amount of calories must not be less than zero.")
     var amount: Float = 0f,
 
-    @Convert(converter = CalorieTrackerCategoryConverter::class)
     @Column(nullable = false)
-    var category: Category = Category.UNSET,
+    var category: String,
 
     var updated: LocalDateTime? = null,
     var description: String? = null
@@ -37,10 +35,6 @@ data class CalorieTrackerEntry (
     }
 }
 
-
-enum class Category {
-    BREAKFAST, LUNCH, DINNER, SNACK, UNSET;
-}
 
 @ApplicationScoped
 class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>() {

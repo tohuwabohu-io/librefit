@@ -2,7 +2,6 @@ package io.tohuwabohu.crud
 
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.converter.CalorieTrackerCategoryConverter
 import io.tohuwabohu.crud.error.ErrorDescription
 import io.tohuwabohu.crud.error.ValidationError
 import jakarta.enterprise.context.ApplicationScoped
@@ -14,8 +13,6 @@ import java.util.*
 
 private const val defaultDatePattern = "d-MMM-yyyy"
 private const val defaultHeaderLength = 2
-
-private val converter = CalorieTrackerCategoryConverter()
 
 @ApplicationScoped
 class ImportHelper(val calorieTrackerRepository: CalorieTrackerRepository, val weightTrackerRepository: WeightTrackerRepository) {
@@ -74,7 +71,7 @@ class ImportHelper(val calorieTrackerRepository: CalorieTrackerRepository, val w
                 if (entry.value.isNotEmpty()) {
                     val calorieTrackerEntry = CalorieTrackerEntry(
                         amount = parseFloat(entry.value),
-                        category = converter.convertToEntityAttribute(entry.key)
+                        category = entry.key
                     )
 
                     calorieTrackerEntry.added = parsedDate;

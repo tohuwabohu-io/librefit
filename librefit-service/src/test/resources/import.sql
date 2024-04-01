@@ -6,7 +6,7 @@ insert into account_activation values (CURRENT_DATE, 2, CURRENT_DATE + 14, '1171
 
 insert into food_category (shortvalue, longvalue, visible)
 values ('b', 'Breakfast', true),
-       ('l', 'lunch', true),
+       ('l', 'Lunch', true),
        ('d', 'Dinner', true),
        ('s', 'Snack', true),
        ('t', 'Treat', true),
