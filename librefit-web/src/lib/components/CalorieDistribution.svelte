@@ -24,7 +24,8 @@
         const labels = [];
         const values = [];
 
-        const averageCategoryIntake = getAverageCategoryIntake(entries)
+        const averageCategoryIntake = getAverageCategoryIntake(entries);
+
 
         if (averageCategoryIntake != null) {
             $foodCategories.forEach(cat => {
@@ -69,7 +70,7 @@
                 if (catEntries.length > 0) {
                     const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
 
-                    catMap.set(cat, Math.round(dailyAverage * (catSum / sum)));
+                    catMap.set(cat.shortvalue, Math.round(dailyAverage * (catSum / sum)));
                 }
             });
 
@@ -142,14 +143,14 @@
                     {#if $currentGoal}
                         {@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
                         <span>
-										{#if targetAverageRatio <= 1}
-											<Check color="rgb(var(--color-primary-700))"/>
-										{:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
-											<Overflow1 color="rgb(var(--color-warning-500))"/>
-										{:else}
-											<Overflow2 color="rgb(var(--color-error-500))"/>
-										{/if}
-									</span>
+                            {#if targetAverageRatio <= 1}
+                                <Check color="rgb(var(--color-primary-700))"/>
+                            {:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
+                                <Overflow1 color="rgb(var(--color-warning-500))"/>
+                            {:else}
+                                <Overflow2 color="rgb(var(--color-error-500))"/>
+                            {/if}
+                        </span>
                     {/if}
                 </div>
 
