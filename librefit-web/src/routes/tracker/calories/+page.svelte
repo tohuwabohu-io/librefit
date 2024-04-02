@@ -16,6 +16,7 @@
 	const toastStore = getToastStore();
 	const indicator = getContext('indicator');
 	const user = getContext('user');
+	const foodCategories = getContext('foodCategories');
 
 	if (!$user) goto('/');
 
@@ -161,7 +162,7 @@
 						<svelte:fragment slot="content">
 							<div class="flex lg:flex-row flex-col gap-4 grow">
 								{#if datesToEntries[dateStr]}
-									<CalorieTracker entries={datesToEntries[dateStr]} {categories}
+									<CalorieTracker entries={datesToEntries[dateStr]} categories={$foodCategories}
 										on:addCalories={addEntry}
 										on:updateCalories={updateEntry}
 										on:deleteCalories={deleteEntry}
@@ -171,7 +172,7 @@
 										<p>... loading</p>
 									{:then entries}
 										{#if entries}
-											<CalorieTracker {entries} {categories}
+											<CalorieTracker {entries} categories={$foodCategories}
 												on:addCalories={addEntry}
 												on:updateCalories={updateEntry}
 												on:deleteCalories={deleteEntry}
