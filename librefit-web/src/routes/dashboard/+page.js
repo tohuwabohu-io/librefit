@@ -1,6 +1,6 @@
 import { api } from '$lib/api/index.js';
 import { proxyFetch } from '$lib/api/util.js';
-import * as dateUtil from 'date-fns';
+import { subMonths } from 'date-fns';
 import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.js';
 
 /** @type {import('./$types').PageLoad} */
@@ -21,12 +21,12 @@ export const load = async ({ fetch }) => {
 	const lastCtResponse = await proxyFetch(fetch, ctTodayApi, { date: getDateAsStr(today) });
 
 	const listWeightResponse = await proxyFetch(fetch, weightApi, {
-		dateFrom: getDateAsStr(dateUtil.subMonths(today, 1)),
+		dateFrom: getDateAsStr(subMonths(today, 1)),
 		dateTo: getDateAsStr(today)
 	});
 
 	const listCtResponse = await proxyFetch(fetch, ctRangeApi, {
-		dateFrom: getDateAsStr(dateUtil.subMonths(today, 1)),
+		dateFrom: getDateAsStr(subMonths(today, 1)),
 		dateTo: getDateAsStr(today)
 	});
 

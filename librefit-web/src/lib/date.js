@@ -1,35 +1,35 @@
-import * as dateUtil from 'date-fns';
+import { getHours, format, parse } from 'date-fns';
 
 export const default_date_format = 'yyyy-MM-dd'; // used for internal storage and fetch requests
 export const display_date_format = 'dd.MM.yyyy'; // used for display only
 /**
  * @param {number | Date} d
- * @param {string | undefined} [format]
+ * @param {string | undefined} [displayFormat]
  */
-export function getDateAsStr(d, format) {
-	if (!format) {
-		format = default_date_format;
+export function getDateAsStr(d, displayFormat) {
+	if (!displayFormat) {
+		displayFormat = default_date_format;
 	}
-	return dateUtil.format(d, format.valueOf());
+	return format(d, displayFormat.valueOf());
 }
 
 /**
  * @param {string} str
- * @param {string | undefined} [format]
+ * @param {string | undefined} [dateFormat]
  */
-export function parseStringAsDate(str, format) {
-	if (!format) {
-		format = default_date_format;
+export function parseStringAsDate(str, dateFormat) {
+	if (!dateFormat) {
+		dateFormat = default_date_format;
 	}
-	return dateUtil.parse(str.valueOf(), format.valueOf(), new Date());
+	return parse(str.valueOf(), dateFormat.valueOf(), new Date());
 }
 
 /**
  * @param {String} str
- * @param {String | undefined} [format]
+ * @param {String | undefined} [displayFormat]
  */
-export function convertDateStrToDisplayDateStr(str, format) {
-	const date = parseStringAsDate(str, format);
+export function convertDateStrToDisplayDateStr(str, displayFormat) {
+	const date = parseStringAsDate(str, displayFormat);
 	return getDisplayDateAsStr(date);
 }
 
@@ -43,7 +43,7 @@ export const getDisplayDateAsStr = (
 	if (locale) {
 		return new Intl.DateTimeFormat(locale.valueOf()).format(d);
 	} else {
-		return dateUtil.format(d, display_date_format);
+		return format(d, display_date_format);
 	}
 };
 /**
@@ -61,7 +61,7 @@ export const Daytime = {
  * @param date {Date}
  */
 export const getDaytimeGreeting = (date) => {
-	const hours = dateUtil.getHours(date);
+	const hours = getHours(date);
 
 	if (hours >= 0 && hours <= 4) {
 		return Daytime.Night;
@@ -80,7 +80,7 @@ export const getDaytimeGreeting = (date) => {
 
 /** @param date {Date} */
 export const getDaytimeFoodCategory = (date) => {
-	const hours = dateUtil.getHours(date);
+	const hours = getHours(date);
 
 	if (hours >= 0 && hours <= 4) {
 		return 's';
