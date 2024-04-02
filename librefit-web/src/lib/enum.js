@@ -1,4 +1,4 @@
-import { BmiCategory, Category } from '$lib/api/model.js';
+import { BmiCategory } from '$lib/api/model.js';
 
 /**
  * @readonly
@@ -9,15 +9,7 @@ export const DataViews = {
 	Month: 'MONTH',
 	Year: 'YEAR'
 };
-/**
- * @type {{label: String, value: String}[]}
- */
-export const categoriesAsKeyValue = Object.keys(Category).map((key) => {
-	return {
-		label: key,
-		value: Category[key]
-	};
-});
+
 /**
  * @type {{label: String, value: String}[]}
  */
@@ -27,13 +19,6 @@ export const bmiCategoriesAsKeyValue = Object.keys(BmiCategory).map((key) => {
 		value: BmiCategory[key]
 	};
 });
-/**
- * @param {Category} category
- * @returns {String}
- */
-export const getCategoryValueAsKey = (category) => {
-	return categoriesAsKeyValue.filter((cat) => cat.value === category).map((cat) => cat.label)[0];
-};
 
 /**
  * @param {{}} obj

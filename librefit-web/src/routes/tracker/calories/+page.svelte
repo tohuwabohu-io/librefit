@@ -1,11 +1,9 @@
 <script>
 	import {Accordion, AccordionItem, getToastStore, Paginator} from '@skeletonlabs/skeleton';
-	import {Category} from '$lib/api/model.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import {validateAmount} from '$lib/validation.js';
 	import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
 	import {getContext} from 'svelte';
-	import {getCategoryValueAsKey} from '$lib/enum.js';
 	import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
 	import {goto} from '$app/navigation';
 	import FilterComponent from '$lib/components/FilterComponent.svelte';
@@ -18,6 +16,7 @@
 	const toastStore = getToastStore();
 	const indicator = getContext('indicator');
 	const user = getContext('user');
+	const foodCategories = getContext('foodCategories');
 
 	if (!$user) goto('/');
 
@@ -48,13 +47,6 @@
 		paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 	);
 
-	const categories = Object.keys(Category).map((key) => {
-		return {
-			label: key,
-			value: Category[key]
-		};
-	});
-
 	const addEntry = async (event) => {
 		const amountMessage = validateAmount(event.detail.value);
 
@@ -68,11 +60,7 @@
 
 				showToastSuccess(
 					toastStore,
-					`Successfully added ${
-						event.detail.category !== Category.Unset
-							? getCategoryValueAsKey(event.detail.category)
-							: 'calories'
-					}.`
+					`Successfully added ${event.detail.category.longvalue}.`
 				);
 
 			}).catch((e) => {
@@ -98,9 +86,7 @@
 
 				showToastSuccess(
 					toastStore,
-					`Successfully updated ${
-							event.detail.category !== Category.Unset ? getCategoryValueAsKey(event.detail.category) : 'calories'
-					}`
+					`Successfully updated ${event.detail.category.longvalue}`
 				);
 			}).catch((e) => {
 				showToastError(toastStore, e);
@@ -176,7 +162,7 @@
 						<svelte:fragment slot="content">
 							<div class="flex lg:flex-row flex-col gap-4 grow">
 								{#if datesToEntries[dateStr]}
-									<CalorieTracker entries={datesToEntries[dateStr]} {categories}
+									<CalorieTracker entries={datesToEntries[dateStr]} categories={$foodCategories}
 										on:addCalories={addEntry}
 										on:updateCalories={updateEntry}
 										on:deleteCalories={deleteEntry}
@@ -186,7 +172,7 @@
 										<p>... loading</p>
 									{:then entries}
 										{#if entries}
-											<CalorieTracker {entries} {categories}
+											<CalorieTracker {entries} categories={$foodCategories}
 												on:addCalories={addEntry}
 												on:updateCalories={updateEntry}
 												on:deleteCalories={deleteEntry}

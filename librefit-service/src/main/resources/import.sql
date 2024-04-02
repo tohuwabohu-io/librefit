@@ -291,3 +291,11 @@ values (CURRENT_DATE - 30, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97),
 
 insert into goal (user_id, added, sequence, start_date, end_date, initial_weight, target_weight, target_calories, maximum_calories )
     values ('b21291e5-db51-4a52-a997-25f4021c0ac6', CURRENT_DATE - 58, 1, CURRENT_DATE - 58, CURRENT_DATE + 307, 104, 77, 1849, 2398);
+
+insert into food_category (shortvalue, longvalue, visible)
+values ('b', 'Breakfast', true),
+       ('l', 'Lunch', true),
+       ('d', 'Dinner', true),
+       ('s', 'Snack', true),
+       ('t', 'Treat', true),
+       ('u', 'Unset', false);

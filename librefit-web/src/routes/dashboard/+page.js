@@ -1,8 +1,7 @@
 import { api } from '$lib/api/index.js';
 import { proxyFetch } from '$lib/api/util.js';
-import * as dateUtil from 'date-fns';
-import { Category } from '$lib/api/model.js';
-import { getDateAsStr } from '$lib/date.js';
+import { subMonths } from 'date-fns';
+import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.js';
 
 /** @type {import('./$types').PageLoad} */
 export const load = async ({ fetch }) => {
@@ -16,17 +15,18 @@ export const load = async ({ fetch }) => {
 	const ctTodayApi = api.listCalorieTrackerEntriesForDate;
 	const weightApi = api.listWeightTrackerEntriesRange;
 	const ctRangeApi = api.listCalorieTrackerEntriesRange;
+	const listFoodCategoriesApi = api.listFoodCategories;
 
 	const user = await proxyFetch(fetch, userApi);
 	const lastCtResponse = await proxyFetch(fetch, ctTodayApi, { date: getDateAsStr(today) });
 
 	const listWeightResponse = await proxyFetch(fetch, weightApi, {
-		dateFrom: getDateAsStr(dateUtil.subMonths(today, 1)),
+		dateFrom: getDateAsStr(subMonths(today, 1)),
 		dateTo: getDateAsStr(today)
 	});
 
 	const listCtResponse = await proxyFetch(fetch, ctRangeApi, {
-		dateFrom: getDateAsStr(dateUtil.subMonths(today, 1)),
+		dateFrom: getDateAsStr(subMonths(today, 1)),
 		dateTo: getDateAsStr(today)
 	});
 
@@ -41,7 +41,7 @@ export const load = async ({ fetch }) => {
 		const blankEntry = {
 			added: getDateAsStr(today),
 			amount: 0,
-			category: Category.Unset
+			category: getDaytimeFoodCategory(today)
 		};
 
 		ctList.unshift(blankEntry);
@@ -49,6 +49,7 @@ export const load = async ({ fetch }) => {
 
 	const lastWeightResponse = await proxyFetch(fetch, lastWeightApi);
 	const lastGoalResponse = await proxyFetch(fetch, goalApi);
+	const foodCategoryResponse = await proxyFetch(fetch, listFoodCategoriesApi);
 
 	if (user.ok) {
 		return {
@@ -57,7 +58,8 @@ export const load = async ({ fetch }) => {
 			currentGoal: lastGoalResponse.ok ? await lastGoalResponse.json() : undefined,
 			lastCt: ctList,
 			listWeight: listWeightResponse.ok ? await listWeightResponse.json() : undefined,
-			listCt: listCtResponse ? listCtResponse.json() : undefined
+			listCt: listCtResponse ? listCtResponse.json() : undefined,
+			foodCategories: await foodCategoryResponse.json()
 		};
 	}
 };

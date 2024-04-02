@@ -12,21 +12,23 @@
 	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
 	import {validateAmount} from '$lib/validation.js';
 	import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
-	import {Category} from '$lib/api/model.js';
-    import {categoriesAsKeyValue, DataViews, getCategoryValueAsKey} from '$lib/enum.js';
+    import { DataViews } from '$lib/enum.js';
     import {getDaytimeGreeting} from '$lib/date.js';
 	import {goto} from '$app/navigation';
+	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
 
 	Chart.register(...registerables);
 
 	const lastWeightTrackerEntry = getContext('lastWeight');
 	const currentGoal = getContext('currentGoal');
+	const foodCategories = getContext('foodCategories');
 
 	export let data;
 
 	$: lastWeightTrackerEntry.set(data.lastWeight);
 	$: currentGoal.set(data.currentGoal);
 	$: calorieTrackerEntries = data.lastCt;
+	$: foodCategories.set(data.foodCategories);
 
 	const user = getContext('user');
 	const indicator = getContext('indicator');
@@ -46,11 +48,7 @@
 
 				showToastSuccess(
 					toastStore,
-					`Successfully added ${
-						event.detail.category !== Category.Unset
-							? getCategoryValueAsKey(event.detail.category)
-							: 'calories'
-					}.`
+					`Successfully added ${getFoodCategoryLongvalue($foodCategories, event.detail.category)}.`
 				);
 
 			}).catch((e) => {
@@ -77,9 +75,7 @@
 
 				showToastSuccess(
 					toastStore,
-					`Successfully updated ${
-						event.detail.category !== Category.Unset ? getCategoryValueAsKey(event.detail.category) : 'calories'
-					}`
+					`Successfully updated ${getFoodCategoryLongvalue($foodCategories, event.detail.category)}.`
 				);
 			}).catch((e) => {
 				showToastError(toastStore, e);
@@ -134,7 +130,7 @@
 
 			<div class="flex xl:flex-row flex-col gap-8">
 				<div class="flex xl:flex-row flex-col gap-4 grow variant-ghost-surface rounded-xl p-4">
-					<CalorieTracker entries={calorieTrackerEntries} categories={categoriesAsKeyValue}
+					<CalorieTracker entries={calorieTrackerEntries} categories={$foodCategories}
 									on:addCalories={onAddCalories}
 									on:updateCalories={onUpdateCalories}
 									on:deleteCalories={onDeleteCalories}

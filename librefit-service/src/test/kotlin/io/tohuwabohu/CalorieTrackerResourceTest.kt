@@ -11,7 +11,7 @@ import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.CalorieTrackerEntry
-import io.tohuwabohu.crud.Category
+import io.tohuwabohu.crud.FoodCategory
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -149,7 +149,7 @@ class CalorieTrackerResourceTest {
         }
 
         created.amount = 200f
-        created.category = Category.LUNCH
+        created.category = "l"
 
         val updated = Given {
             header("Content-Type", ContentType.JSON)
@@ -427,10 +427,35 @@ class CalorieTrackerResourceTest {
         assert(entries.map { it.sequence }.isNotEmpty())
     }
 
+    @Test
+    @TestSecurity(user = "f31a553b-7fb2-11ee-b962-0242ac120002", roles = ["User"])
+    fun `should return all categories`() {
+        val expectedCategories = listOf(
+            FoodCategory("b", "Breakfast"),
+            FoodCategory("l", "Lunch"),
+            FoodCategory("d", "Dinner"),
+            FoodCategory("s", "Snack"),
+            FoodCategory("t", "Treat"))
+
+        val returnedCategories = When {
+            get("/categories/list")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Array<FoodCategory>::class.java)
+        }
+
+        val shortcodes = returnedCategories.map { it.shortvalue }
+
+        expectedCategories.forEach { category -> assert(shortcodes.contains(category.shortvalue)) }
+
+        assert(!shortcodes.contains("u"))
+    }
+
     private fun entry(userId: UUID): CalorieTrackerEntry {
         val entry = CalorieTrackerEntry(
             amount = 100f,
-            category = Category.SNACK,
+            category = "s",
         )
 
         entry.userId = userId

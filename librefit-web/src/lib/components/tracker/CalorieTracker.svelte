@@ -4,6 +4,8 @@
     import {createEventDispatcher} from 'svelte';
 
     export let entries;
+
+    /** @type Array<FoodCategory> */
     export let categories;
 
     const dispatch = createEventDispatcher();

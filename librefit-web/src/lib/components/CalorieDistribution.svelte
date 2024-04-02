@@ -4,7 +4,6 @@
     import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
     import Check from '$lib/assets/icons/check.svg?component';
     import {PolarArea} from 'svelte-chartjs';
-    import {Category} from '$lib/api/model.js';
     import {Chart, registerables} from 'chart.js';
     import {getContext} from 'svelte';
 
@@ -15,6 +14,9 @@
 
     const currentGoal = getContext('currentGoal');
 
+    /** @type Array<FoodCategory> */
+    const foodCategories = getContext('foodCategories');
+
     /**
      * @param {Array<CalorieTrackerEntry>} entries
      */
@@ -22,17 +24,18 @@
         const labels = [];
         const values = [];
 
-        const averageCategoryIntake = getAverageCategoryIntake(entries)
+        const averageCategoryIntake = getAverageCategoryIntake(entries);
+
 
         if (averageCategoryIntake != null) {
-            for (let cat of Object.keys(Category)) {
-                const averageIntake = averageCategoryIntake.get(cat);
+            $foodCategories.forEach(cat => {
+                const averageIntake = averageCategoryIntake.get(cat.shortvalue);
 
                 if (averageIntake > 0) {
-                    values.push(averageCategoryIntake.get(cat));
-                    labels.push(cat);
+                    values.push(averageCategoryIntake.get(cat.shortvalue));
+                    labels.push(cat.longvalue);
                 }
-            }
+            });
         }
 
         return {
@@ -61,16 +64,15 @@
             const sum = nonEmpty.map(e => e.amount).reduce((a, b) => a + b);
             const dailyAverage = getAverageDailyIntake(entries);
 
-            for (let cat of Object.keys(Category)) {
-                const catEntries = nonEmpty.filter(e => e.category === Category[cat]);
+            $foodCategories.forEach(cat => {
+                const catEntries = nonEmpty.filter(e => e.category === cat.shortvalue);
 
                 if (catEntries.length > 0) {
                     const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
 
-                    catMap.set(cat, Math.round(dailyAverage * (catSum / sum)));
+                    catMap.set(cat.shortvalue, Math.round(dailyAverage * (catSum / sum)));
                 }
-
-            }
+            });
 
             return catMap;
         }
@@ -141,14 +143,14 @@
                     {#if $currentGoal}
                         {@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
                         <span>
-										{#if targetAverageRatio <= 1}
-											<Check color="rgb(var(--color-primary-700))"/>
-										{:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
-											<Overflow1 color="rgb(var(--color-warning-500))"/>
-										{:else}
-											<Overflow2 color="rgb(var(--color-error-500))"/>
-										{/if}
-									</span>
+                            {#if targetAverageRatio <= 1}
+                                <Check color="rgb(var(--color-primary-700))"/>
+                            {:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
+                                <Overflow1 color="rgb(var(--color-warning-500))"/>
+                            {:else}
+                                <Overflow2 color="rgb(var(--color-error-500))"/>
+                            {/if}
+                        </span>
                     {/if}
                 </div>
 
