@@ -2,7 +2,7 @@ import { proxyFetch } from '$lib/api/util.js';
 import { api } from '$lib/api/index.js';
 import { fail } from '@sveltejs/kit';
 import { DataViews } from '$lib/enum.js';
-import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.js';
+import { getDateAsStr, getDaytimeFoodCategory, parseStringAsDate } from '$lib/date.js';
 
 /**
  * @param event
@@ -57,16 +57,17 @@ export const deleteCalories = (event) => {
 	});
 };
 
-export const listCaloriesForDate = (date) => {
+/** @param dateStr {string} */
+export const listCaloriesForDate = (dateStr) => {
 	// add a blank entry for new input
 	/** @type {CalorieTrackerEntry} */
 	const blankEntry = {
-		added: date,
+		added: dateStr,
 		amount: 0,
-		category: getDaytimeFoodCategory(date)
+		category: getDaytimeFoodCategory(parseStringAsDate(dateStr))
 	};
 
-	return proxyFetch(fetch, api.listCalorieTrackerEntriesForDate, { date: date }).then(
+	return proxyFetch(fetch, api.listCalorieTrackerEntriesForDate, { date: dateStr }).then(
 		async (response) => {
 			/** @type {Array<CalorieTrackerEntry>} */
 			const ctList = await response.json();
