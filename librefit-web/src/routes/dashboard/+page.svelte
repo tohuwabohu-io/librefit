@@ -22,20 +22,30 @@
 	const lastWeightTrackerEntry = getContext('lastWeight');
 	const currentGoal = getContext('currentGoal');
 	const foodCategories = getContext('foodCategories');
+	const ctList = getContext('ctList');
 
 	export let data;
 
 	$: lastWeightTrackerEntry.set(data.lastWeight);
 	$: currentGoal.set(data.currentGoal);
-	$: calorieTrackerEntries = data.lastCt;
+	$: ctList.set(data.listCt);
 	$: foodCategories.set(data.foodCategories);
 
+	$: ctListRecent = data.lastCt;
+	$: wtList = data.listWeight;
+
+	let wtChart;
+	$: if (wtList) {
+		wtChart = paintWeightTrackerEntries(wtList, new Date(), DataViews.Month);
+	}
+
 	const user = getContext('user');
+
 	const indicator = getContext('indicator');
 
 	const toastStore = getToastStore();
-
 	if (!$user) goto('/');
+
 
 	const onAddCalories = async (event) => {
 		const amountMessage = validateAmount(event.detail.value);
@@ -44,7 +54,7 @@
 			await addCalories(event).then(async response => {
 				event.detail.callback();
 
-				calorieTrackerEntries = await response;
+				ctListRecent = await response;
 
 				showToastSuccess(
 					toastStore,
@@ -71,7 +81,7 @@
 			await updateCalories(event).then(async response => {
 				event.detail.callback();
 
-				calorieTrackerEntries = await response;
+				ctListRecent = await response;
 
 				showToastSuccess(
 					toastStore,
@@ -93,7 +103,7 @@
 		await deleteCalories(event).then(async response => {
 			event.detail.callback();
 
-			calorieTrackerEntries = await response;
+			ctListRecent = await response;
 
 			showToastSuccess(toastStore, `Deletion successful.`);
 		}).catch((e) => {
@@ -130,7 +140,7 @@
 
 			<div class="flex xl:flex-row flex-col gap-8">
 				<div class="flex xl:flex-row flex-col gap-4 grow variant-ghost-surface rounded-xl p-4">
-					<CalorieTracker entries={calorieTrackerEntries} categories={$foodCategories}
+					<CalorieTracker entries={ctListRecent} categories={$foodCategories}
 									on:addCalories={onAddCalories}
 									on:updateCalories={onUpdateCalories}
 									on:deleteCalories={onDeleteCalories}
@@ -142,21 +152,17 @@
 							on:updateGoal={setGoal}
 					/>
 
-					<CalorieDistribution bind:data={data} displayClass="xl:hidden hidden md:flex md:flex-col md:w-1/2"/>
+					<CalorieDistribution bind:ctList={$ctList} displayClass="xl:hidden hidden md:flex md:flex-col md:w-1/2"/>
 				</div>
 			</div>
 
 			<div class="flex md:flex-row flex-col gap-8">
-				<CalorieDistribution bind:data={data} displayClass="flex flex-col md:max-xl:hidden variant-ghost-surface rounded-xl xl:w-1/4" />
+				<CalorieDistribution bind:ctList={$ctList} displayClass="flex flex-col md:max-xl:hidden variant-ghost-surface rounded-xl xl:w-1/4" />
 
 				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4 object-fill xl:w-3/4">
-					{#await data.listWeight}
-						<p>Loading...</p>
-					{:then weightList}
-						{@const meta = paintWeightTrackerEntries(weightList, new Date(), DataViews.Month)}
-
-						<Line options={meta.chartOptions} data={meta.chartData}/>
-					{/await}
+					{#if wtChart}
+						<Line options={wtChart.chartOptions} data={wtChart.chartData}/>
+					{/if}
 				</div>
 			</div>
 		{/if}

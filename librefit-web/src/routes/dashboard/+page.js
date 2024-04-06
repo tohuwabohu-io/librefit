@@ -58,7 +58,7 @@ export const load = async ({ fetch }) => {
 			currentGoal: lastGoalResponse.ok ? await lastGoalResponse.json() : undefined,
 			lastCt: ctList,
 			listWeight: listWeightResponse.ok ? await listWeightResponse.json() : undefined,
-			listCt: listCtResponse ? listCtResponse.json() : undefined,
+			listCt: listCtResponse ? await listCtResponse.json() : undefined,
 			foodCategories: await foodCategoryResponse.json()
 		};
 	}

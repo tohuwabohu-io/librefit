@@ -42,6 +42,7 @@
 	const currentGoal = writable();
 	const lastWeight = writable();
 	const foodCategories = writable();
+	const ctList = writable();
 
 	$: indicator.set(new Indicator());
 
@@ -50,6 +51,7 @@
 	setContext('currentGoal', currentGoal);
 	setContext('lastWeight', lastWeight);
 	setContext('foodCategories', foodCategories);
+	setContext('ctList', ctList);
 
 	const logout = () => {
 		user.set(null);

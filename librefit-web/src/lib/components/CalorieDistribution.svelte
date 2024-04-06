@@ -9,7 +9,7 @@
 
     Chart.register(...registerables);
 
-    export let data;
+    export let ctList;
     export let displayClass = '';
 
     const currentGoal = getContext('currentGoal');
@@ -122,9 +122,7 @@
 </script>
 
 <div class="{displayClass} p-4 text-center justify-between ">
-    {#await data.listCt}
-        <p>Loading...</p>
-    {:then ctList}
+    {#if ctList}
         {@const data = getData(ctList)}
         {@const options = getConfig(data)}
         {@const dailyAverage = getAverageDailyIntake(ctList)}
@@ -169,5 +167,5 @@
         </div>
 
         <button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>
-    {/await}
+    {/if}
 </div>
