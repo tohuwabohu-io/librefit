@@ -87,6 +87,13 @@ export const listCalorieTrackerDatesRange = (dateFrom, dateTo) => {
 	});
 };
 
+export const listCalorieTrackerEntriesRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listCalorieTrackerEntriesRange, {
+		dateFrom: dateFrom,
+		dateTo: dateTo
+	});
+};
+
 /**
  * @param event
  */
@@ -160,6 +167,13 @@ export const listWeightFiltered = (filter) => {
 	return proxyFetch(fetch, api.listWeightTrackerEntriesRange, {
 		dateFrom: getDateAsStr(fromDate),
 		dateTo: getDateAsStr(toDate)
+	});
+};
+
+export const listWeightRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listWeightTrackerEntriesRange, {
+		dateFrom: dateFrom,
+		dateTo: dateTo
 	});
 };
 
