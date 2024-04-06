@@ -21,13 +21,10 @@ export const load = async ({ fetch }) => {
 	const listFoodCategoriesApi = api.listFoodCategories;
 
 	const user = await proxyFetch(fetch, userApi);
-	const lastCtResponse = await listCaloriesForDate(getDateAsStr(today));
-	const listWeightResponse = await listWeightRange(getDateAsStr(lastMonth), getDateAsStr(today));
+	const lastCtResponse = await listCaloriesForDate(today);
+	const listWeightResponse = await listWeightRange(lastMonth, today);
 
-	const listCtResponse = await listCalorieTrackerEntriesRange(
-		getDateAsStr(lastMonth),
-		getDateAsStr(today)
-	);
+	const listCtResponse = await listCalorieTrackerEntriesRange(lastMonth, today);
 
 	const lastWeightResponse = await proxyFetch(fetch, lastWeightApi);
 	const lastGoalResponse = await proxyFetch(fetch, goalApi);

@@ -4,7 +4,7 @@
 	import {validateAmount} from '$lib/validation.js';
 	import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
 	import {getContext} from 'svelte';
-	import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
+	import {convertDateStrToDisplayDateStr, getDateAsStr, parseStringAsDate} from '$lib/date.js';
 	import {goto} from '$app/navigation';
 	import FilterComponent from '$lib/components/FilterComponent.svelte';
 	import { addCalories, updateCalories, deleteCalories, listCaloriesForDate, listCalorieTrackerDatesRange} from '$lib/api/tracker.js';
@@ -113,11 +113,14 @@
 		}).finally(() => {$indicator = $indicator.finish()})
 	};
 
+	/**
+	 * @param added {string}
+	 */
 	const loadEntries = async (added) => {
 		if (!datesToEntries[added]) {
 			$indicator = $indicator.start();
 
-			await listCaloriesForDate(added).then(async response => {
+			await listCaloriesForDate(parseStringAsDate(added)).then(async response => {
 				datesToEntries[added] = await response;
 			}).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
 		}
