@@ -1,4 +1,3 @@
-import { getDateAsStr } from '$lib/date.js';
 import { listCaloriesForDate, listCalorieTrackerDatesRange } from '$lib/api/tracker.js';
 import { subDays } from 'date-fns';
 
