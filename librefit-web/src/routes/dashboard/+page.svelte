@@ -5,7 +5,7 @@
 	} from '$lib/chart.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import {getToastStore} from '@skeletonlabs/skeleton';
-	import {addCalories, addWeight, deleteCalories, updateCalories} from '$lib/api/tracker.js';
+	import {addCalories, addWeight, deleteCalories, updateCalories, listCalorieTrackerEntriesRange, listWeightRange} from '$lib/api/tracker.js';
 	import {getContext} from 'svelte';
 	import {Chart, registerables} from 'chart.js';
 	import {Line} from 'svelte-chartjs';
@@ -16,6 +16,7 @@
     import {getDaytimeGreeting} from '$lib/date.js';
 	import {goto} from '$app/navigation';
 	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
+	import {subMonths} from 'date-fns';
 
 	Chart.register(...registerables);
 
@@ -32,12 +33,7 @@
 	$: foodCategories.set(data.foodCategories);
 
 	$: ctListRecent = data.lastCt;
-	$: wtList = data.listWeight;
-
-	let wtChart;
-	$: if (wtList) {
-		wtChart = paintWeightTrackerEntries(wtList, new Date(), DataViews.Month);
-	}
+	$: wtChart = paintWeightTrackerEntries(data.listWeight, today, DataViews.Month);
 
 	const user = getContext('user');
 
@@ -46,6 +42,8 @@
 	const toastStore = getToastStore();
 	if (!$user) goto('/');
 
+	const today = new Date();
+	const lastMonth = subMonths(today, 1);
 
 	const onAddCalories = async (event) => {
 		const amountMessage = validateAmount(event.detail.value);
@@ -61,7 +59,7 @@
 					`Successfully added ${getFoodCategoryLongvalue($foodCategories, event.detail.category)}.`
 				);
 
-			}).catch((e) => {
+			}).then(refreshCalorieDistribution).catch((e) => {
 				showToastError(toastStore, e);
 				event.detail.callback(true);
 			}).finally(() => {$indicator = $indicator.finish()})
@@ -87,7 +85,7 @@
 					toastStore,
 					`Successfully updated ${getFoodCategoryLongvalue($foodCategories, event.detail.category)}.`
 				);
-			}).catch((e) => {
+			}).then(refreshCalorieDistribution).catch((e) => {
 				showToastError(toastStore, e);
 				event.detail.callback(true);
 			}).finally(() => $indicator = $indicator.finish());
@@ -106,7 +104,7 @@
 			ctListRecent = await response;
 
 			showToastSuccess(toastStore, `Deletion successful.`);
-		}).catch((e) => {
+		}).then(refreshCalorieDistribution).catch((e) => {
 			showToastError(toastStore, e);
 			event.detail.callback(true);
 		}).finally(() => {$indicator = $indicator.finish()})
@@ -117,7 +115,23 @@
 
 		await addWeight(event).then(async response => {
 			lastWeightTrackerEntry.set(await response.json());
-		}).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
+		}).then(refreshWeightChart).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
+	}
+
+	const refreshCalorieDistribution = async () => {
+		const calorieTrackerRangeResponse = await listCalorieTrackerEntriesRange(lastMonth, today);
+
+		if (calorieTrackerRangeResponse.ok) {
+			ctList.set(await calorieTrackerRangeResponse.json());
+		}
+	}
+
+	const refreshWeightChart = async () => {
+		const weightRangeResponse = await listWeightRange(lastMonth, today);
+
+		if (weightRangeResponse.ok) {
+			wtChart = paintWeightTrackerEntries(await weightRangeResponse.json(), today, DataViews.Month);
+		}
 	}
 
 	const setGoal = (e) => {

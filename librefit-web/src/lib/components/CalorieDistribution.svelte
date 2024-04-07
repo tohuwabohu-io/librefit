@@ -12,10 +12,23 @@
     export let ctList;
     export let displayClass = '';
 
+    let chartData, chartOptions, dailyAverage;
+
     const currentGoal = getContext('currentGoal');
 
     /** @type Array<FoodCategory> */
     const foodCategories = getContext('foodCategories');
+
+    /**
+     * @param {Array<CalorieTrackerEntry>} entries
+     */
+    const refreshChart = (entries) => {
+        chartData = getData(entries);
+        chartOptions = getConfig(chartData);
+        dailyAverage = getAverageDailyIntake(entries);
+    }
+
+    $: ctList, refreshChart(ctList);
 
     /**
      * @param {Array<CalorieTrackerEntry>} entries
@@ -123,13 +136,9 @@
 
 <div class="{displayClass} p-4 text-center justify-between ">
     {#if ctList}
-        {@const data = getData(ctList)}
-        {@const options = getConfig(data)}
-        {@const dailyAverage = getAverageDailyIntake(ctList)}
-
         <h3 class="h3">Average distribution</h3>
 
-        <PolarArea {options} {data}/>
+        <PolarArea options={chartOptions} data={chartData}/>
 
         <div>
             <div class="w-full grid grid-cols-[auto_1fr_auto]">
