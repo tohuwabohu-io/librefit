@@ -17,7 +17,7 @@ export const addCalories = (event) => {
 
 	return proxyFetch(fetch, api.createCalorieTrackerEntry, newEntry).then(async (response) => {
 		if (response.ok) {
-			return listCaloriesForDate(newEntry.added);
+			return listCaloriesForDate(parseStringAsDate(newEntry.added));
 		} else throw response;
 	});
 };
@@ -36,7 +36,7 @@ export const updateCalories = (event) => {
 
 	return proxyFetch(fetch, api.updateCalorieTrackerEntry, entry).then(async (response) => {
 		if (response.ok) {
-			return listCaloriesForDate(entry.added);
+			return listCaloriesForDate(parseStringAsDate(entry.added));
 		} else throw response;
 	});
 };
@@ -52,22 +52,25 @@ export const deleteCalories = (event) => {
 
 	return proxyFetch(fetch, api.deleteCalorieTrackerEntry, params).then(async (response) => {
 		if (response.ok) {
-			return listCaloriesForDate(params.date);
+			return listCaloriesForDate(parseStringAsDate(params.date));
 		} else throw response;
 	});
 };
 
-/** @param dateStr {string} */
-export const listCaloriesForDate = (dateStr) => {
+/**
+ * @param date {Date}
+ * @return {Promise}
+ */
+export const listCaloriesForDate = (date) => {
 	// add a blank entry for new input
 	/** @type {CalorieTrackerEntry} */
 	const blankEntry = {
-		added: dateStr,
+		added: date,
 		amount: 0,
-		category: getDaytimeFoodCategory(parseStringAsDate(dateStr))
+		category: getDaytimeFoodCategory(date)
 	};
 
-	return proxyFetch(fetch, api.listCalorieTrackerEntriesForDate, { date: dateStr }).then(
+	return proxyFetch(fetch, api.listCalorieTrackerEntriesForDate, { date: getDateAsStr(date) }).then(
 		async (response) => {
 			/** @type {Array<CalorieTrackerEntry>} */
 			const ctList = await response.json();
@@ -78,12 +81,29 @@ export const listCaloriesForDate = (dateStr) => {
 	);
 };
 
+/**
+ * @param dateFrom {Date}
+ * @param dateTo {Date}
+ * @return {Promise}
+ */
 export const listCalorieTrackerDatesRange = (dateFrom, dateTo) => {
 	const loadCtDateApi = api.listCalorieTrackerDatesRange;
 
 	return proxyFetch(fetch, loadCtDateApi, {
-		dateFrom: dateFrom,
-		dateTo: dateTo
+		dateFrom: getDateAsStr(dateFrom),
+		dateTo: getDateAsStr(dateTo)
+	});
+};
+
+/**
+ * @param dateFrom {Date}
+ * @param dateTo {Date}
+ * @return {Promise}
+ */
+export const listCalorieTrackerEntriesRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listCalorieTrackerEntriesRange, {
+		dateFrom: getDateAsStr(dateFrom),
+		dateTo: getDateAsStr(dateTo)
 	});
 };
 
@@ -104,6 +124,7 @@ export const addWeight = (event) => {
 		} else throw response;
 	});
 };
+
 /**
  * @param event
  */
@@ -120,6 +141,7 @@ export const updateWeight = (event) => {
 		} else throw response;
 	});
 };
+
 /**
  * @param event
  */
@@ -160,6 +182,19 @@ export const listWeightFiltered = (filter) => {
 	return proxyFetch(fetch, api.listWeightTrackerEntriesRange, {
 		dateFrom: getDateAsStr(fromDate),
 		dateTo: getDateAsStr(toDate)
+	});
+};
+
+/**
+ *
+ * @param dateFrom {Date}
+ * @param dateTo {Date}
+ * @return {Promise}
+ */
+export const listWeightRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listWeightTrackerEntriesRange, {
+		dateFrom: getDateAsStr(dateFrom),
+		dateTo: getDateAsStr(dateTo)
 	});
 };
 

@@ -1,51 +1,30 @@
 import { api } from '$lib/api/index.js';
 import { proxyFetch } from '$lib/api/util.js';
 import { subMonths } from 'date-fns';
-import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.js';
+import { getDateAsStr } from '$lib/date.js';
+import {
+	listCaloriesForDate,
+	listCalorieTrackerEntriesRange,
+	listWeightRange
+} from '$lib/api/tracker.js';
 
 /** @type {import('./$types').PageLoad} */
 export const load = async ({ fetch }) => {
 	const userApi = api.readUserInfo;
 
 	const today = new Date();
+	const lastMonth = subMonths(today, 1);
 
 	// return dashboard relevant data
 	const lastWeightApi = api.findLastWeightTrackerEntry;
 	const goalApi = api.findLastGoal;
-	const ctTodayApi = api.listCalorieTrackerEntriesForDate;
-	const weightApi = api.listWeightTrackerEntriesRange;
-	const ctRangeApi = api.listCalorieTrackerEntriesRange;
 	const listFoodCategoriesApi = api.listFoodCategories;
 
 	const user = await proxyFetch(fetch, userApi);
-	const lastCtResponse = await proxyFetch(fetch, ctTodayApi, { date: getDateAsStr(today) });
+	const lastCtResponse = await listCaloriesForDate(today);
+	const listWeightResponse = await listWeightRange(lastMonth, today);
 
-	const listWeightResponse = await proxyFetch(fetch, weightApi, {
-		dateFrom: getDateAsStr(subMonths(today, 1)),
-		dateTo: getDateAsStr(today)
-	});
-
-	const listCtResponse = await proxyFetch(fetch, ctRangeApi, {
-		dateFrom: getDateAsStr(subMonths(today, 1)),
-		dateTo: getDateAsStr(today)
-	});
-
-	/** @type Array<CalorieTrackerEntry> */
-	const ctList = [];
-
-	if (lastCtResponse.ok) {
-		ctList.push(...(await lastCtResponse.json()));
-
-		// add a blank entry for new input
-		/** @type {CalorieTrackerEntry} */
-		const blankEntry = {
-			added: getDateAsStr(today),
-			amount: 0,
-			category: getDaytimeFoodCategory(today)
-		};
-
-		ctList.unshift(blankEntry);
-	}
+	const listCtResponse = await listCalorieTrackerEntriesRange(lastMonth, today);
 
 	const lastWeightResponse = await proxyFetch(fetch, lastWeightApi);
 	const lastGoalResponse = await proxyFetch(fetch, goalApi);
@@ -56,9 +35,9 @@ export const load = async ({ fetch }) => {
 			userData: await user.json(),
 			lastWeight: lastWeightResponse.ok ? await lastWeightResponse.json() : undefined,
 			currentGoal: lastGoalResponse.ok ? await lastGoalResponse.json() : undefined,
-			lastCt: ctList,
+			lastCt: lastCtResponse,
 			listWeight: listWeightResponse.ok ? await listWeightResponse.json() : undefined,
-			listCt: listCtResponse ? listCtResponse.json() : undefined,
+			listCt: listCtResponse ? await listCtResponse.json() : undefined,
 			foodCategories: await foodCategoryResponse.json()
 		};
 	}

@@ -4,10 +4,9 @@ import { subDays } from 'date-fns';
 
 export const load = async ({ fetch }) => {
 	const today = new Date();
-	const todayDateStr = getDateAsStr(today);
-	const fromDateStr = getDateAsStr(subDays(today, 6));
-	const ctDateResponse = await listCalorieTrackerDatesRange(fromDateStr, todayDateStr);
-	const listCtForDateResponse = await listCaloriesForDate(todayDateStr);
+	const fromDate = subDays(today, 6);
+	const ctDateResponse = await listCalorieTrackerDatesRange(fromDate, today);
+	const listCtForDateResponse = await listCaloriesForDate(today);
 
 	if (ctDateResponse.ok && listCtForDateResponse) {
 		/** @type {Array<String>} */
