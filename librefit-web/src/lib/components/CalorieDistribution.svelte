@@ -129,6 +129,9 @@
                     }
                 }
             },
+            animation: {
+                duration: 0
+            }
         };
     }
 

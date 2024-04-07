@@ -133,6 +133,9 @@ export const paintWeightTrackerEntries = (entries, date, filter) => {
 						suggestedMin: Math.min(...noNaN) - 2.5,
 						suggestedMax: Math.max(...noNaN) + 2.5
 					}
+				},
+				animation: {
+					duration: 0
 				}
 			}
 		};
