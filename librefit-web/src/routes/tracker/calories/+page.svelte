@@ -152,10 +152,10 @@
 	<div class="container mx-auto p-8 space-y-10">
 		<h1>History</h1>
 
-		<FilterComponent on:change={onFilterChanged}/>
-
 		{#if data.availableDates}
 			{#if availableDates.length > 0}
+				<FilterComponent on:change={onFilterChanged}/>
+
 				{#each paginatedSource as dateStr}
 				<Accordion class="variant-ghost-surface rounded-xl">
 					<AccordionItem id={dateStr} on:toggle={loadEntries(dateStr)}>

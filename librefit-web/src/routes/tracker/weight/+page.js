@@ -1,5 +1,5 @@
 import { subDays } from 'date-fns';
-import { listWeightRange, listWeightTrackerDatesRange } from '$lib/api/tracker.js';
+import { listWeightRange } from '$lib/api/tracker.js';
 
 export const load = async ({ fetch }) => {
 	const today = new Date();

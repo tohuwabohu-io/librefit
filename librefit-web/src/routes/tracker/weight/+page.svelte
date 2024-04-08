@@ -8,6 +8,7 @@
     import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import {validateAmount} from '$lib/validation.js';
+    import {convertDateStrToDisplayDateStr} from '$lib/date.js';
 
     const toastStore = getToastStore();
     const indicator = getContext('indicator');
@@ -141,7 +142,7 @@
                             <tr>
                                 <td>
                                     <span class="align-middle">
-                                        {entry.added}
+                                        {convertDateStrToDisplayDateStr(entry.added)}
                                     </span>
                                 </td>
                                 <td>
