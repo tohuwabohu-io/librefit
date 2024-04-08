@@ -211,6 +211,16 @@ export const listWeightRange = (dateFrom, dateTo) => {
 };
 
 /**
+ * @param date {Date}
+ * @return {Promise}
+ */
+export const listWeightForDate = (date) => {
+	return proxyFetch(fetch, api.listWeightTrackerEntries, {
+		date: date
+	});
+};
+
+/**
  * @param formData {FormData}
  * @return {Promise}
  */
