@@ -186,6 +186,18 @@ export const listWeightFiltered = (filter) => {
 };
 
 /**
+ * @param dateFrom {Date}
+ * @param dateTo {Date}
+ * @return {Promise}
+ */
+export const listWeightTrackerDatesRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listWeightTrackerDatesRange, {
+		dateFrom: getDateAsStr(dateFrom),
+		dateTo: getDateAsStr(dateTo)
+	});
+};
+
+/**
  *
  * @param dateFrom {Date}
  * @param dateTo {Date}

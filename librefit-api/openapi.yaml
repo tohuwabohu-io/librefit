@@ -656,6 +656,45 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
+  /api/tracker/weight/list/dates/{dateFrom}/{dateTo}:
+    get:
+      tags:
+      - Weight Tracker Resource
+      operationId: listWeightTrackerDatesRange
+      parameters:
+      - name: dateFrom
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      - name: dateTo
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/LocalDate'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocalDate'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
   /api/tracker/weight/list/{dateFrom}/{dateTo}:
     get:
       tags:
@@ -859,10 +898,10 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-        "401":
-          description: Not Authorized
         "403":
           description: Not Allowed
+        "401":
+          description: Not Authorized
       security:
       - SecurityScheme: []
   /api/user/read:

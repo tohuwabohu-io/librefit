@@ -155,6 +155,34 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
             .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 
     @GET
+    @Path("/list/dates/{dateFrom}/{dateTo}")
+    @RolesAllowed("User", "Admin")
+    @Produces(MediaType.APPLICATION_JSON)
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = Array<LocalDate>::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "401", description = "Unauthorized"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    @Operation(operationId = "listWeightTrackerDatesRange")
+    fun listDates(@Context securityContext: SecurityContext, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
+        printAuthenticationInfo(jwt, securityContext)
+
+        return weightTrackerRepository.listDatesForUser(UUID.fromString(jwt.name), dateFrom, dateTo)
+            .onItem().transform { Response.ok(it).build() }
+            .onFailure().invoke { throwable -> Log.error(throwable) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+    }
+
+    @GET
     @Path("/list/{date}")
     @RolesAllowed("User", "Admin")
     @APIResponses(

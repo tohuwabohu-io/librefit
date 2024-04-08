@@ -362,6 +362,57 @@ class WeightTrackerResourceTest {
     }
 
     @Test
+    @TestSecurity(user = "534662cc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
+    @JwtSecurity(
+        claims = [
+            Claim(key = "email", value = "test@libre.fitness"),
+        ]
+    )
+    fun `should create three entries and return two dates`() {
+        val userId = UUID.fromString("534662cc-7fb3-11ee-b962-0242ac120002")
+
+        val today = LocalDate.now()
+        val yesterday = today.minusDays(1)
+
+        val entry1 = entry(userId)
+        entry1.added = today
+
+        val entry2 = entry(userId)
+        entry2.added = today
+
+        val entry3 = entry(userId)
+        entry3.added = yesterday
+
+        listOf(entry1, entry2, entry3).forEach { entry ->
+            Given {
+                header("Content-Type", ContentType.JSON)
+                body(entry)
+            } When {
+                post("/create")
+            } Then {
+                statusCode(201)
+            }
+        }
+
+        val dates = Given {
+            header("Content-Type", ContentType.JSON)
+        } When {
+            get("/list/dates/$yesterday/$today")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(Array<LocalDate>::class.java)
+        }
+
+        assert(dates.contains(today))
+        assert(dates.contains(yesterday))
+
+        assert(dates.count { date -> date == today } == 1)
+        assert(dates.count { date -> date == yesterday } == 1)
+    }
+
+
+    @Test
     @TestSecurity(user = "410a1496-7fc7-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
         claims = [
