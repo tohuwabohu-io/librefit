@@ -18,7 +18,7 @@
 	export let categories;
 
 	/** @type FoodCategory */
-	export let category = categories.filter(c => c.shortvalue === getDaytimeFoodCategory(new Date()))[0];
+	export let category = categories ? categories.filter(c => c.shortvalue === getDaytimeFoodCategory(new Date()))[0] : undefined;
 
 	export let unit;
 
