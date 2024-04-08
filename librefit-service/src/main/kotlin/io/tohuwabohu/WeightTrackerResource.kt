@@ -87,6 +87,8 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         operationId = "updateWeightTrackerEntry"
     )
     fun update(@Context securityContext: SecurityContext, @Valid weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
+        weightTrackerEntry.userId = UUID.fromString(jwt.name)
+
         Log.info("Updating weight tracker entry $weightTrackerEntry")
 
         printAuthenticationInfo(jwt, securityContext)
@@ -116,7 +118,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         operationId = "deleteWeightTrackerEntry"
     )
     fun delete(@Context securityContext: SecurityContext, date: LocalDate, sequence: Long): Uni<Response> {
-         Log.info("Delete weight tracker entry with added=$date sequence=$sequence")
+        Log.info("Delete weight tracker entry with added=$date sequence=$sequence")
 
         printAuthenticationInfo(jwt, securityContext)
 

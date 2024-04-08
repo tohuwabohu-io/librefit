@@ -1,12 +1,15 @@
 <script>
     import FilterComponent from '$lib/components/FilterComponent.svelte';
     import {getContext} from 'svelte';
-    import {listWeightForDate, listWeightRange} from '$lib/api/tracker.js';
-    import {showToastError} from '$lib/toast.js';
+    import {deleteWeight, listWeightForDate, listWeightRange, updateWeight} from '$lib/api/tracker.js';
+    import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
     import {goto} from '$app/navigation';
-    import {Paginator} from '@skeletonlabs/skeleton';
+    import {getToastStore, Paginator} from '@skeletonlabs/skeleton';
     import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
+    import TrackerInput from '$lib/components/TrackerInput.svelte';
+    import {validateAmount} from '$lib/validation.js';
 
+    const toastStore = getToastStore();
     const indicator = getContext('indicator');
     const user = getContext('user');
 
@@ -65,7 +68,51 @@
             }).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
         }
     }
+
+    const updateWeightEntry = async (event) => {
+        const amountMessage = validateAmount(event.detail.value);
+
+        if (!amountMessage) {
+            $indicator = $indicator.start(event.detail.target);
+
+            await updateWeight(event).then(async response => {
+                event.detail.callback();
+
+//                datesToEntries[event.detail.date] = await response;
+
+                showToastSuccess(
+                    toastStore,
+                    `Successfully updated ${event.detail.category.longvalue}`
+                );
+            }).catch((e) => {
+                showToastError(toastStore, e);
+                event.detail.callback(true);
+            }).finally(() => $indicator = $indicator.finish());
+        } else {
+            showToastWarning(toastStore, amountMessage);
+            event.detail.callback(true);
+        }
+    }
+
+    const deleteWeightEntry = async (event) => {
+        $indicator = $indicator.start(event.detail.target);
+
+        await deleteWeight(event).then(async _ => {
+            event.detail.callback();
+
+            showToastSuccess(toastStore, `Deletion successful.`);
+        }).catch((e) => {
+            showToastError(toastStore, e);
+            event.detail.callback(true);
+        }).finally(() => {$indicator = $indicator.finish()})
+    }
 </script>
+
+<style>
+    td {
+        vertical-align: middle !important;
+    }
+</style>
 
 <svelte:head>
     <title>LibreFit - Weight Tracker</title>
@@ -79,10 +126,10 @@
         {#if data.wtList}
             {#if wtList.length > 0}
                 <div class=" overflow-x-auto space-y-2">
-                    <header class="flex justify-between gap-4">
+                    <header>
                         <FilterComponent on:change={onFilterChanged} />
                     </header>
-                    <table class="table table-hover table-compact table-auto w-full ">
+                    <table class="table table-hover table-compact table-auto w-full align-middle">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -92,8 +139,23 @@
                         <tbody>
                         {#each paginatedSource as entry}
                             <tr>
-                                <td>{entry.added}</td>
-                                <td>{entry.amount}</td>
+                                <td>
+                                    <span class="align-middle">
+                                        {entry.added}
+                                    </span>
+                                </td>
+                                <td>
+                                    <TrackerInput
+                                                  value={entry.amount}
+                                                  dateStr={entry.added}
+                                                  sequence={entry.sequence}
+                                                  category={entry.category}
+                                                  on:update={updateWeightEntry}
+                                                  on:remove={deleteWeightEntry}
+                                                  existing={entry.sequence !== undefined}
+                                                  disabled={entry.sequence !== undefined}
+                                                  unit={'kg'}/>
+                                </td>
                             </tr>
                         {/each}
                         </tbody>
