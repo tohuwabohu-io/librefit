@@ -28,8 +28,8 @@
 
         if (filterSelection !== 'c') {
             dispatch('change', {
-                from: fromDateStr,
-                to: toDateStr
+                from: parseStringAsDate(fromDateStr),
+                to: parseStringAsDate(toDateStr)
             });
         }
     }
@@ -41,13 +41,13 @@
         // can't swap without triggering another change event
         if (fromDate > toDate) {
             dispatch('change', {
-                from: toDateStr,
-                to: fromDateStr
+                from: toDate,
+                to: fromDate
             });
         } else {
             dispatch('change', {
-                from: fromDateStr,
-                to: toDateStr
+                from: fromDate,
+                to: toDate
             });
         }
     }
