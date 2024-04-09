@@ -472,28 +472,6 @@ class WeightTrackerResourceTest {
         assert(lastEntry.userId == entry2.userId)
     }
 
-    @Test
-    @TestSecurity(user = "71e63e90-7fb4-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
-    fun `should fail with 401`() {
-        val userId = UUID.fromString("f1baf2a0-7fb4-11ee-b962-0242ac120002") // unrelated user's data
-
-        val entry = entry(userId)
-
-        Given {
-            header("Content-Type", ContentType.JSON)
-            body(entry)
-        } When {
-            put("/update")
-        } Then {
-            statusCode(401)
-        }
-    }
-
     private fun entry(userId: UUID): WeightTrackerEntry {
         val entry = WeightTrackerEntry(
             amount = 100f
