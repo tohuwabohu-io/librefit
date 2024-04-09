@@ -10,7 +10,7 @@ import { getDateAsStr, getDaytimeFoodCategory, parseStringAsDate } from '$lib/da
 export const addCalories = (event) => {
 	/** @type {CalorieTrackerEntry} */
 	const newEntry = {
-		added: event.detail.date,
+		added: event.detail.dateStr,
 		amount: event.detail.value,
 		category: event.detail.category
 	};
@@ -29,7 +29,7 @@ export const updateCalories = (event) => {
 	/** @type {CalorieTrackerEntry} */
 	const entry = {
 		sequence: event.detail.sequence,
-		added: event.detail.date,
+		added: event.detail.dateStr,
 		amount: event.detail.value,
 		category: event.detail.category
 	};
@@ -47,7 +47,7 @@ export const updateCalories = (event) => {
 export const deleteCalories = (event) => {
 	const params = {
 		sequence: event.detail.sequence,
-		date: event.detail.date
+		date: event.detail.dateStr
 	};
 
 	return proxyFetch(fetch, api.deleteCalorieTrackerEntry, params).then(async (response) => {
@@ -65,7 +65,7 @@ export const listCaloriesForDate = (date) => {
 	// add a blank entry for new input
 	/** @type {CalorieTrackerEntry} */
 	const blankEntry = {
-		added: date,
+		added: getDateAsStr(date),
 		amount: 0,
 		category: getDaytimeFoodCategory(date)
 	};
@@ -114,7 +114,7 @@ export const addWeight = (event) => {
 	/** @type {WeightTrackerEntry} */
 	const newEntry = {
 		sequence: event.detail.sequence,
-		added: event.detail.todayDateStr,
+		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
@@ -131,7 +131,7 @@ export const addWeight = (event) => {
 export const updateWeight = (event) => {
 	const entry = {
 		sequence: event.detail.sequence,
-		date: event.detail.date,
+		date: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
@@ -148,7 +148,7 @@ export const updateWeight = (event) => {
 export const deleteWeight = (event) => {
 	const params = {
 		sequence: event.detail.sequence,
-		date: event.detail.date
+		date: event.detail.dateStr
 	};
 
 	return proxyFetch(fetch, api.deleteWeightTrackerEntry, params).then(async (response) => {

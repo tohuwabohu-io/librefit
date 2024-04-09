@@ -78,13 +78,6 @@
 
             await updateWeight(event).then(async response => {
                 event.detail.callback();
-
-//                datesToEntries[event.detail.date] = await response;
-
-                showToastSuccess(
-                    toastStore,
-                    `Successfully updated ${event.detail.category.longvalue}`
-                );
             }).catch((e) => {
                 showToastError(toastStore, e);
                 event.detail.callback(true);

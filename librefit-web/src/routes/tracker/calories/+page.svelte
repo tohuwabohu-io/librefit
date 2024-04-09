@@ -9,6 +9,7 @@
 	import FilterComponent from '$lib/components/FilterComponent.svelte';
 	import { addCalories, updateCalories, deleteCalories, listCaloriesForDate, listCalorieTrackerDatesRange} from '$lib/api/tracker.js';
 	import FoodOff from '$lib/assets/icons/food-off.svg';
+	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
@@ -56,11 +57,11 @@
 			await addCalories(event).then(async response => {
 				event.detail.callback();
 
-				datesToEntries[event.detail.date] = await response;
+				datesToEntries[event.detail.dateStr] = await response;
 
 				showToastSuccess(
 					toastStore,
-					`Successfully added ${event.detail.category.longvalue}.`
+					`Successfully added ${getFoodCategoryLongvalue($foodCategories, event.detail.category)}.`
 				);
 
 			}).catch((e) => {
@@ -82,11 +83,11 @@
 			await updateCalories(event).then(async response => {
 				event.detail.callback();
 
-				datesToEntries[event.detail.date] = await response;
+				datesToEntries[event.detail.dateStr] = await response;
 
 				showToastSuccess(
 					toastStore,
-					`Successfully updated ${event.detail.category.longvalue}`
+					`Successfully updated ${getFoodCategoryLongvalue($foodCategories, event.detail.category)}.`
 				);
 			}).catch((e) => {
 				showToastError(toastStore, e);
@@ -104,7 +105,7 @@
 		await deleteCalories(event).then(async response => {
 			event.detail.callback();
 
-			datesToEntries[event.detail.date] = await response;
+			datesToEntries[event.detail.dateStr] = await response;
 
 			showToastSuccess(toastStore, `Deletion successful.`);
 		}).catch((e) => {

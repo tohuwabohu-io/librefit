@@ -36,7 +36,7 @@
 
 		dispatch('add', {
 			sequence: sequence,
-			date: dateStr,
+			dateStr: dateStr,
 			value: value,
 			category: category,
 			callback: () => { btnAdd.disabled = false }
@@ -65,7 +65,7 @@
 		if (value !== previous.value || category !== previous.category) {
 			dispatch('update', {
 				sequence: sequence,
-				date: dateStr,
+				dateStr: dateStr,
 				value: value,
 				category: category,
 				callback: postAction
@@ -83,7 +83,7 @@
 
 		dispatch('remove', {
 			sequence: sequence,
-			date: dateStr,
+			dateStr: dateStr,
 			target: btnConfirm,
 			callback: postAction
 		});
