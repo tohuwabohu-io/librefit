@@ -129,17 +129,14 @@ export const addWeight = (event) => {
  * @param event
  */
 export const updateWeight = (event) => {
+	/** @type WeightTrackerEntry */
 	const entry = {
 		sequence: event.detail.sequence,
-		date: event.detail.dateStr,
+		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
-	return proxyFetch(fetch, api.updateWeightTrackerEntry, entry).then(async (response) => {
-		if (response.ok) {
-			return proxyFetch(fetch, api.listWeightTrackerEntries, { date: entry.added });
-		} else throw response;
-	});
+	return proxyFetch(fetch, api.updateWeightTrackerEntry, entry);
 };
 
 /**
@@ -151,11 +148,7 @@ export const deleteWeight = (event) => {
 		date: event.detail.dateStr
 	};
 
-	return proxyFetch(fetch, api.deleteWeightTrackerEntry, params).then(async (response) => {
-		if (response.ok) {
-			return proxyFetch(fetch, api.listWeightTrackerEntries, { date: params.date });
-		} else throw response;
-	});
+	return proxyFetch(fetch, api.deleteWeightTrackerEntry, params);
 };
 
 /**

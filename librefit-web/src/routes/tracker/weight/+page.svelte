@@ -9,6 +9,7 @@
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import {validateAmount} from '$lib/validation.js';
     import {convertDateStrToDisplayDateStr} from '$lib/date.js';
+    import {subDays} from 'date-fns';
 
     const toastStore = getToastStore();
     const indicator = getContext('indicator');
@@ -20,6 +21,9 @@
 
     let wtList = [];
     let paginatedSource = [];
+
+    let toDate = new Date();
+    let fromDate = subDays(toDate, 6);
 
     $: wtList;
 
@@ -40,34 +44,23 @@
     );
 
     const onFilterChanged = async (event) => {
-        const fromDate = event.detail.from;
-        const toDate = event.detail.to;
-
-        console.log(event);
+        fromDate = event.detail.from;
+        toDate = event.detail.to;
 
         if (fromDate && toDate) {
-            $indicator = $indicator.start();
-
-            await listWeightRange(fromDate, toDate).then(async response => {
-                if (response.ok) {
-                    wtList = await response.json();
-                    paginationSettings.size = wtList.length;
-                } else throw response
-            }).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
+            await reload(fromDate, toDate);
         }
     }
 
-    /**
-     * @param added {string}
-     */
-    const loadEntries = async (added) => {
-        if (!datesToEntries[added]) {
-            $indicator = $indicator.start();
+    const reload = async (fromDate, toDate) => {
+        $indicator = $indicator.start();
 
-            await listWeightForDate(parseStringAsDate(added)).then(async response => {
-                datesToEntries[added] = await response;
-            }).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
-        }
+        await listWeightRange(fromDate, toDate).then(async response => {
+            if (response.ok) {
+                wtList = await response.json();
+                paginationSettings.size = wtList.length;
+            } else throw response
+        }).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
     }
 
     const updateWeightEntry = async (event) => {
@@ -78,6 +71,12 @@
 
             await updateWeight(event).then(async response => {
                 event.detail.callback();
+
+                if (response.ok) {
+                    showToastSuccess(toastStore, 'Successfully updated weight.')
+
+                    await reload(fromDate, toDate);
+                }
             }).catch((e) => {
                 showToastError(toastStore, e);
                 event.detail.callback(true);
@@ -95,6 +94,8 @@
             event.detail.callback();
 
             showToastSuccess(toastStore, `Deletion successful.`);
+
+            await reload(fromDate, toDate);
         }).catch((e) => {
             showToastError(toastStore, e);
             event.detail.callback(true);
