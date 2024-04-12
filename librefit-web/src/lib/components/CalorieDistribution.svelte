@@ -12,6 +12,7 @@
     export let ctList;
     export let displayClass = '';
     export let displayHeader = true;
+    export let displayHistory = true;
 
     let chartData, chartOptions, dailyAverage;
 
@@ -179,6 +180,6 @@
             </div>
         </div>
 
-        <button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>
+        {#if displayHistory}<button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>{/if}
     {/if}
 </div>

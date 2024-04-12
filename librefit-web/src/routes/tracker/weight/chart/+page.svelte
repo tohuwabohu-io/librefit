@@ -60,6 +60,10 @@
 {#if $user}
 <section>
 	<div class="container mx-auto p-8 space-y-10">
+		<h1>
+			Weight Progress
+		</h1>
+
 		<div class="flex flex-col gap-4">
 			<RadioGroup>
 				{#each enumKeys(DataViews) as dataView}

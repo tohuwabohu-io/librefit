@@ -9,7 +9,9 @@
     import GitHub from '$lib/assets/icons/github.svg?component';
     import Food from '$lib/assets/icons/food.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
-    import FileTypeCsv from '$lib/assets/icons/file-type-csv.svg';
+    import FileTypeCsv from '$lib/assets/icons/file-type-csv.svg?component';
+    import ChartLine from '$lib/assets/icons/chart-line.svg?component';
+    import PieChart from '$lib/assets/icons/chart-pie-4.svg';
 
     const drawerStore = getDrawerStore();
 
@@ -94,12 +96,32 @@
                 </a>
             </li>
             <li>
+                <a href="/tracker/calories/distribution" class="{classesActive('/tracker/calories/distribution')}" on:click={navigate}>
+                    <span class="badge-icon variant-glass-surface">
+                        <PieChart/>
+                    </span>
+                    <span class="flex-auto">
+                        Calorie Distribution
+                    </span>
+                </a>
+            </li>
+            <li>
                 <a href="/tracker/weight" class="{classesActive('/tracker/weight')}" on:click={navigate}>
                     <span class="badge-icon variant-glass-surface">
                         <Scale/>
                     </span>
                     <span class="flex-auto">
                         Weight Tracker
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="/tracker/weight/chart" class="{classesActive('/tracker/weight/chart')}" on:click={navigate}>
+                    <span class="badge-icon variant-glass-surface">
+                        <ChartLine/>
+                    </span>
+                    <span class="flex-auto">
+                        Weight Progress
                     </span>
                 </a>
             </li>
