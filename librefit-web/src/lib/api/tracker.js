@@ -108,6 +108,33 @@ export const listCalorieTrackerEntriesRange = (dateFrom, dateTo) => {
 };
 
 /**
+ * @param filter {DataViews}
+ */
+export const listCaloriesFiltered = (filter) => {
+	const fromDate = new Date();
+	const toDate = new Date();
+
+	switch (filter) {
+		case DataViews.Week:
+			fromDate.setDate(fromDate.getDate() - 7);
+			break;
+		case DataViews.Month:
+			fromDate.setMonth(fromDate.getMonth() - 1);
+			break;
+		case DataViews.Year:
+			fromDate.setFullYear(fromDate.getFullYear() - 1);
+			break;
+		default:
+			break;
+	}
+
+	return proxyFetch(fetch, api.listCalorieTrackerEntriesRange, {
+		dateFrom: getDateAsStr(fromDate),
+		dateTo: getDateAsStr(toDate)
+	});
+};
+
+/**
  * @param event
  */
 export const addWeight = (event) => {
@@ -152,7 +179,7 @@ export const deleteWeight = (event) => {
 };
 
 /**
- * @param filter {DataView}
+ * @param filter {DataViews}
  */
 export const listWeightFiltered = (filter) => {
 	const fromDate = new Date();

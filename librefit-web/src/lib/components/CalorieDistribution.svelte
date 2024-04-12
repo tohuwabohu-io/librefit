@@ -11,6 +11,7 @@
 
     export let ctList;
     export let displayClass = '';
+    export let displayHeader = true;
 
     let chartData, chartOptions, dailyAverage;
 
@@ -139,7 +140,7 @@
 
 <div class="{displayClass} p-4 text-center justify-between ">
     {#if ctList}
-        <h3 class="h3">Average distribution</h3>
+        {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
 
         <PolarArea options={chartOptions} data={chartData}/>
 
