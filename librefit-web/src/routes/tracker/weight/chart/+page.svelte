@@ -28,9 +28,6 @@
 	let entries;
 	let chartData, chartOptions;
 
-	const currentGoal = getContext('currentGoal');
-	const lastEntry = getContext('lastWeight')
-
 	const loadEntriesFiltered = async () => {
 		$indicator = $indicator.start();
 
@@ -53,18 +50,6 @@
 		entries = data.entries;
 
 		paint(data.entries);
-	}
-
-	// TODO unused
-	const add = (e) => {
-	}
-
-	// TODO unused
-	const update = (e) => {
-	}
-
-	// TODO unused
-	const remove = (e) => {
 	}
 </script>
 
