@@ -17,6 +17,8 @@
 	import {goto} from '$app/navigation';
 	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
 	import {subMonths} from 'date-fns';
+	import NoFood from '$lib/assets/icons/food-off.svg?component';
+	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
 
 	Chart.register(...registerables);
 
@@ -168,16 +170,36 @@
 							on:updateGoal={setGoal}
 					/>
 
-					<CalorieDistribution bind:ctList={$ctList} displayClass="xl:hidden hidden md:flex md:flex-col md:w-1/2"/>
+					<div class="xl:hidden hidden md:flex md:flex-col md:w-1/2 justify-center items-center">
+						{#if $ctList.length > 0}
+							<CalorieDistribution bind:ctList={$ctList} />
+						{:else}
+							<div>
+								<NoFood height={100} width={100}/>
+							</div>
+						{/if}
+					</div>
 				</div>
 			</div>
 
 			<div class="flex md:flex-row flex-col gap-8">
-				<CalorieDistribution bind:ctList={$ctList} displayClass="flex flex-col md:max-xl:hidden variant-ghost-surface rounded-xl xl:w-1/4" />
+				<div class="flex flex-col md:max-xl:hidden variant-ghost-surface rounded-xl xl:w-1/4 justify-center items-center">
+					{#if $ctList.length > 0 }
+						<CalorieDistribution bind:ctList={$ctList} />
+					{:else}
+						<div>
+							<NoFood height={100} width={100}/>
+						</div>
+					{/if}
+				</div>
 
-				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4 object-fill xl:w-3/4">
-					{#if wtChart}
+				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4 object-fill xl:w-3/4 justify-center items-center">
+					{#if wtChart && data.listWeight.length > 0}
 						<Line options={wtChart.chartOptions} data={wtChart.chartData}/>
+					{:else}
+						<div>
+							<ScaleOff width={100} height={100} class="self-center"/>
+						</div>
 					{/if}
 				</div>
 			</div>
