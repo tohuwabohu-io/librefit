@@ -60,7 +60,7 @@
                 wtList = await response.json();
                 paginationSettings.size = wtList.length;
             } else throw response
-        }).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
+        }).catch((e) => { showToastError(toastStore, e) }).finally(() => $indicator = $indicator.finish())
     }
 
     const updateWeightEntry = async (event) => {
@@ -99,7 +99,7 @@
         }).catch((e) => {
             showToastError(toastStore, e);
             event.detail.callback(true);
-        }).finally(() => {$indicator = $indicator.finish()})
+        }).finally(() => $indicator = $indicator.finish())
     }
 </script>
 

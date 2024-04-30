@@ -57,7 +57,7 @@ const indicator = {
 			this.actor = undefined;
 		}
 
-		return this;
+		return this.hide();
 	},
 	hide: function () {
 		this.invisible = 'invisible';

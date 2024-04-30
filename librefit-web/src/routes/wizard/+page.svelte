@@ -94,7 +94,7 @@
 			if (response.ok) {
 				lastWeightEntry.set(await response.json());
 			}
-		}).catch((error) => showToastError(toastStore, error)).finally(() => { $indicator = $indicator.finish() })
+		}).catch((error) => showToastError(toastStore, error)).finally(() => $indicator = $indicator.finish())
 	}
 </script>
 

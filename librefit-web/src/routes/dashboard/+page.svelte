@@ -66,7 +66,7 @@
 			}).then(refreshCalorieDistribution).catch((e) => {
 				showToastError(toastStore, e);
 				event.detail.callback(true);
-			}).finally(() => {$indicator = $indicator.finish()})
+			}).finally(() => $indicator = $indicator.finish())
 
 		} else {
 			showToastWarning(toastStore, amountMessage);
@@ -111,7 +111,7 @@
 		}).then(refreshCalorieDistribution).catch((e) => {
 			showToastError(toastStore, e);
 			event.detail.callback(true);
-		}).finally(() => {$indicator = $indicator.finish()})
+		}).finally(() => $indicator = $indicator.finish())
 	};
 
 	const onAddWeight = async (event) => {

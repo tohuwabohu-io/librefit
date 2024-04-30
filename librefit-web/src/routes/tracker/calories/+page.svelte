@@ -67,7 +67,7 @@
 			}).catch((e) => {
 				showToastError(toastStore, e);
 				event.detail.callback(true);
-			}).finally(() => {$indicator = $indicator.finish()})
+			}).finally(() => $indicator = $indicator.finish())
 		} else {
 			showToastWarning(toastStore, amountMessage);
 			event.detail.callback();
@@ -111,7 +111,7 @@
 		}).catch((e) => {
 			showToastError(toastStore, e);
 			event.detail.callback(true);
-		}).finally(() => {$indicator = $indicator.finish()})
+		}).finally(() => $indicator = $indicator.finish())
 	};
 
 	/**
@@ -123,7 +123,7 @@
 
 			await listCaloriesForDate(parseStringAsDate(added)).then(async response => {
 				datesToEntries[added] = await response;
-			}).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()})
+			}).catch((e) => { showToastError(toastStore, e) }).finally(() => $indicator = $indicator.finish())
 		}
 	}
 
@@ -139,7 +139,7 @@
 					availableDates = await response.json();
 					paginationSettings.size = availableDates.length;
 				} else throw response
-			}).catch((e) => { showToastError(toastStore, e) }).finally(() => {$indicator = $indicator.finish()});
+			}).catch((e) => { showToastError(toastStore, e) }).finally(() => $indicator = $indicator.finish())
 		}
 	}
 </script>
