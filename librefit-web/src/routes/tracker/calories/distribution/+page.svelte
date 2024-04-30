@@ -84,7 +84,7 @@
                 {/each}
             </RadioGroup>
 
-            {#if $ctList }
+            {#if $ctList.length > 0 }
                 <div class="flex flex-col lg:flex-row gap-4">
                     <CalorieDistribution displayClass="lg:w-2/5" ctList={chartData} displayHeader={false} displayHistory={false}/>
 
