@@ -83,13 +83,14 @@ export function createWeightChart(view, start, entries) {
 export function createWeightChartDataset(weight) {
 	return {
 		label: 'Weight (kg)',
-		borderColor: 'rgb(14 165 233)',
+		borderColor: 'rgb(36 44 70)',
 		options: {
 			fill: false,
 			interaction: {
 				intersect: false
 			},
-			radius: 0
+			radius: 0,
+			tension: 0.1
 		},
 		spanGaps: true,
 		data: weight
