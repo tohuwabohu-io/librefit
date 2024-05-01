@@ -1,5 +1,5 @@
-import * as dateUtil from 'date-fns';
-import * as dateLocales from 'date-fns/locale/index.js';
+import { sub, format } from 'date-fns';
+import { enGB } from 'date-fns/locale';
 import { DataViews } from '$lib/enum.js';
 import { getDateAsStr, parseStringAsDate } from '$lib/date.js';
 
@@ -13,27 +13,27 @@ export function createWeightChart(view, start, entries) {
 	const data = [];
 	const begin = 1;
 	let end;
-	let format;
+	let displayFormat;
 	let duration;
 	switch (view) {
 		case DataViews.Year:
 			end = 12;
-			format = 'LLLL yyyy';
+			displayFormat = 'LLLL yyyy';
 			duration = { months: 1 };
 			break;
 		case DataViews.Month:
 			end = new Date(start.getFullYear(), start.getMonth(), 0).getDate();
-			format = 'dd.LL';
+			displayFormat = 'dd.LL';
 			duration = { days: 1 };
 			break;
 		case DataViews.Week:
 			end = 7;
-			format = 'EEEEEE';
+			displayFormat = 'EEEEEE';
 			duration = { days: 1 };
 			break;
 		default:
 			end = 1;
-			format = 'dd';
+			displayFormat = 'dd';
 			duration = {};
 			break;
 	}
@@ -71,8 +71,8 @@ export function createWeightChart(view, start, entries) {
 		} else {
 			data[j] = NaN;
 		}
-		legend[j] = dateUtil.format(tmpDate, format.valueOf(), { locale: dateLocales.enGB });
-		tmpDate = dateUtil.sub(tmpDate, duration);
+		legend[j] = format(tmpDate, displayFormat.valueOf(), { locale: enGB });
+		tmpDate = sub(tmpDate, duration);
 	}
 	return { legend, data };
 }
@@ -133,6 +133,9 @@ export const paintWeightTrackerEntries = (entries, date, filter) => {
 						suggestedMin: Math.min(...noNaN) - 2.5,
 						suggestedMax: Math.max(...noNaN) + 2.5
 					}
+				},
+				animation: {
+					duration: 0
 				}
 			}
 		};

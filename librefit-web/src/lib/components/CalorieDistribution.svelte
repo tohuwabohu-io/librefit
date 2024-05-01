@@ -4,16 +4,33 @@
     import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
     import Check from '$lib/assets/icons/check.svg?component';
     import {PolarArea} from 'svelte-chartjs';
-    import {Category} from '$lib/api/model.js';
     import {Chart, registerables} from 'chart.js';
     import {getContext} from 'svelte';
 
     Chart.register(...registerables);
 
-    export let data;
+    export let ctList;
     export let displayClass = '';
+    export let displayHeader = true;
+    export let displayHistory = true;
+
+    let chartData, chartOptions, dailyAverage;
 
     const currentGoal = getContext('currentGoal');
+
+    /** @type Array<FoodCategory> */
+    const foodCategories = getContext('foodCategories');
+
+    /**
+     * @param {Array<CalorieTrackerEntry>} entries
+     */
+    const refreshChart = (entries) => {
+        chartData = getData(entries);
+        chartOptions = getConfig(chartData);
+        dailyAverage = getAverageDailyIntake(entries);
+    }
+
+    $: ctList, refreshChart(ctList);
 
     /**
      * @param {Array<CalorieTrackerEntry>} entries
@@ -22,17 +39,18 @@
         const labels = [];
         const values = [];
 
-        const averageCategoryIntake = getAverageCategoryIntake(entries)
+        const averageCategoryIntake = getAverageCategoryIntake(entries);
+
 
         if (averageCategoryIntake != null) {
-            for (let cat of Object.keys(Category)) {
-                const averageIntake = averageCategoryIntake.get(cat);
+            $foodCategories.forEach(cat => {
+                const averageIntake = averageCategoryIntake.get(cat.shortvalue);
 
                 if (averageIntake > 0) {
-                    values.push(averageCategoryIntake.get(cat));
-                    labels.push(cat);
+                    values.push(averageCategoryIntake.get(cat.shortvalue));
+                    labels.push(cat.longvalue);
                 }
-            }
+            });
         }
 
         return {
@@ -61,16 +79,15 @@
             const sum = nonEmpty.map(e => e.amount).reduce((a, b) => a + b);
             const dailyAverage = getAverageDailyIntake(entries);
 
-            for (let cat of Object.keys(Category)) {
-                const catEntries = nonEmpty.filter(e => e.category === Category[cat]);
+            $foodCategories.forEach(cat => {
+                const catEntries = nonEmpty.filter(e => e.category === cat.shortvalue);
 
                 if (catEntries.length > 0) {
                     const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
 
-                    catMap.set(cat, Math.round(dailyAverage * (catSum / sum)));
+                    catMap.set(cat.shortvalue, Math.round(dailyAverage * (catSum / sum)));
                 }
-
-            }
+            });
 
             return catMap;
         }
@@ -114,22 +131,19 @@
                     }
                 }
             },
+            animation: {
+                duration: 0
+            }
         };
     }
 
 </script>
 
 <div class="{displayClass} p-4 text-center justify-between ">
-    {#await data.listCt}
-        <p>Loading...</p>
-    {:then ctList}
-        {@const data = getData(ctList)}
-        {@const options = getConfig(data)}
-        {@const dailyAverage = getAverageDailyIntake(ctList)}
+    {#if ctList}
+        {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
 
-        <h3 class="h3">Average distribution</h3>
-
-        <PolarArea {options} {data}/>
+        <PolarArea options={chartOptions} data={chartData}/>
 
         <div>
             <div class="w-full grid grid-cols-[auto_1fr_auto]">
@@ -141,14 +155,14 @@
                     {#if $currentGoal}
                         {@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
                         <span>
-										{#if targetAverageRatio <= 1}
-											<Check color="rgb(var(--color-primary-700))"/>
-										{:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
-											<Overflow1 color="rgb(var(--color-warning-500))"/>
-										{:else}
-											<Overflow2 color="rgb(var(--color-error-500))"/>
-										{/if}
-									</span>
+                            {#if targetAverageRatio <= 1}
+                                <Check color="rgb(var(--color-primary-700))"/>
+                            {:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
+                                <Overflow1 color="rgb(var(--color-warning-500))"/>
+                            {:else}
+                                <Overflow2 color="rgb(var(--color-error-500))"/>
+                            {/if}
+                        </span>
                     {/if}
                 </div>
 
@@ -166,6 +180,6 @@
             </div>
         </div>
 
-        <button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>
-    {/await}
+        {#if displayHistory}<button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>{/if}
+    {/if}
 </div>

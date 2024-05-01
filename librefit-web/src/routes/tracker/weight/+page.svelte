@@ -1,103 +1,184 @@
 <script>
-	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-	import {paintWeightTrackerEntries} from '$lib/chart.js';
-	import {Line} from 'svelte-chartjs';
-	import {Chart, registerables} from 'chart.js';
-	import {showToastError} from '$lib/toast.js';
-	import {getContext} from 'svelte';
-	import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
-	import {listWeightFiltered} from '$lib/api/tracker.js';
-	import {DataViews, enumKeys} from '$lib/enum.js';
-	import {goto} from '$app/navigation';
+    import FilterComponent from '$lib/components/FilterComponent.svelte';
+    import {getContext} from 'svelte';
+    import {deleteWeight, listWeightForDate, listWeightRange, updateWeight} from '$lib/api/tracker.js';
+    import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
+    import {goto} from '$app/navigation';
+    import {getToastStore, Paginator} from '@skeletonlabs/skeleton';
+    import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
+    import TrackerInput from '$lib/components/TrackerInput.svelte';
+    import {validateAmount} from '$lib/validation.js';
+    import {convertDateStrToDisplayDateStr} from '$lib/date.js';
+    import {subDays} from 'date-fns';
 
-	Chart.register(...registerables);
+    const toastStore = getToastStore();
+    const indicator = getContext('indicator');
+    const user = getContext('user');
 
-	const toastStore = getToastStore();
-	const indicator = getContext('indicator');
-	const user = getContext('user');
+    if (!$user) goto('/');
 
-	if (!$user) goto('/');
+    export let data;
 
-	export let filter = DataViews.Month;
+    let wtList = [];
+    let paginatedSource = [];
 
-	/** @type import('./$types').PageData */
-	export let data;
+    let toDate = new Date();
+    let fromDate = subDays(toDate, 6);
 
-	const today = new Date();
+    $: wtList;
 
-	let entries;
-	let chartData, chartOptions;
+    let paginationSettings = {
+        page: 0,
+        limit: 7,
+        size: data.wtList.length,
+        amounts: [1, 7, 14, 31],
+    }
 
-	const currentGoal = getContext('currentGoal');
-	const lastEntry = getContext('lastWeight')
+    $: if (data) {
+        wtList = data.wtList;
+    }
 
-	const loadEntriesFiltered = async () => {
-		$indicator = $indicator.start();
+    $: paginatedSource = wtList.slice(
+        paginationSettings.page * paginationSettings.limit,
+        paginationSettings.page * paginationSettings.limit + paginationSettings.limit
+    );
 
-		await listWeightFiltered(filter).then(async (result) => {
-			/** @type Array<WeightTrackerEntry> */
-			entries = await result.json();
+    const onFilterChanged = async (event) => {
+        fromDate = event.detail.from;
+        toDate = event.detail.to;
 
-			paint(entries);
-		}).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
-	}
+        if (fromDate && toDate) {
+            await reload(fromDate, toDate);
+        }
+    }
 
-	const paint = (entries) => {
-		const paintMeta = paintWeightTrackerEntries(entries, today, filter);
+    const reload = async (fromDate, toDate) => {
+        $indicator = $indicator.start();
 
-		chartData = paintMeta.chartData;
-		chartOptions = paintMeta.chartOptions;
-	}
+        await listWeightRange(fromDate, toDate).then(async response => {
+            if (response.ok) {
+                wtList = await response.json();
+                paginationSettings.size = wtList.length;
+            } else throw response
+        }).catch((e) => { showToastError(toastStore, e) }).finally(() => $indicator = $indicator.finish())
+    }
 
-	$: if (data && data.entries) {
-		entries = data.entries;
+    const updateWeightEntry = async (event) => {
+        const amountMessage = validateAmount(event.detail.value);
 
-		paint(data.entries);
-	}
+        if (!amountMessage) {
+            $indicator = $indicator.start(event.detail.target);
 
-	// TODO unused
-	const add = (e) => {
-	}
+            await updateWeight(event).then(async response => {
+                event.detail.callback();
 
-	// TODO unused
-	const update = (e) => {
-	}
+                if (response.ok) {
+                    showToastSuccess(toastStore, 'Successfully updated weight.')
 
-	// TODO unused
-	const remove = (e) => {
-	}
+                    await reload(fromDate, toDate);
+                }
+            }).catch((e) => {
+                showToastError(toastStore, e);
+                event.detail.callback(true);
+            }).finally(() => $indicator = $indicator.finish());
+        } else {
+            showToastWarning(toastStore, amountMessage);
+            event.detail.callback(true);
+        }
+    }
+
+    const deleteWeightEntry = async (event) => {
+        $indicator = $indicator.start(event.detail.target);
+
+        await deleteWeight(event).then(async _ => {
+            event.detail.callback();
+
+            showToastSuccess(toastStore, `Deletion successful.`);
+
+            await reload(fromDate, toDate);
+        }).catch((e) => {
+            showToastError(toastStore, e);
+            event.detail.callback(true);
+        }).finally(() => $indicator = $indicator.finish())
+    }
 </script>
 
+<style>
+    td {
+        vertical-align: middle !important;
+    }
+</style>
+
 <svelte:head>
-	<title>LibreFit - Weight Tracker</title>
+    <title>LibreFit - Weight Tracker</title>
 </svelte:head>
 
 {#if $user}
 <section>
-	<div class="container mx-auto p-8 space-y-10">
-		<div class="flex flex-col gap-4">
-			<RadioGroup>
-				{#each enumKeys(DataViews) as dataView}
-					<RadioItem bind:group={filter}
-							   name="justify"
-							   value={DataViews[dataView]}
-							   on:change={loadEntriesFiltered}>
-						{dataView}
-					</RadioItem>
-				{/each}
-			</RadioGroup>
+    <div class="container mx-auto p-8 space-y-10">
+        <h1>History</h1>
 
-			{#if chartData }
-				<Line data={chartData} options={chartOptions} />
-			{:else}
-				<div class="flex flex-col items-center text-center gap-4">
-					<NoScale width={100} height={100}/>
-					<p>
-						Insufficient data to render your history.
-					</p>
-				</div>
-			{/if}
-		</div>
-	</div>
+        {#if data.wtList}
+            {#if wtList.length > 0}
+                <div class=" overflow-x-auto space-y-2">
+                    <header>
+                        <FilterComponent on:change={onFilterChanged} />
+                    </header>
+                    <table class="table table-hover table-compact table-auto w-full align-middle">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {#each paginatedSource as entry}
+                            <tr>
+                                <td>
+                                    <span class="align-middle">
+                                        {convertDateStrToDisplayDateStr(entry.added)}
+                                    </span>
+                                </td>
+                                <td>
+                                    <TrackerInput
+                                                  value={entry.amount}
+                                                  dateStr={entry.added}
+                                                  sequence={entry.sequence}
+                                                  category={entry.category}
+                                                  on:update={updateWeightEntry}
+                                                  on:remove={deleteWeightEntry}
+                                                  existing={entry.sequence !== undefined}
+                                                  disabled={entry.sequence !== undefined}
+                                                  unit={'kg'}/>
+                                </td>
+                            </tr>
+                        {/each}
+                        </tbody>
+                    </table>
+                    <footer>
+                        <!-- <RowCount {handler} /> -->
+                        <Paginator
+                                bind:settings={paginationSettings}
+                                showFirstLastButtons={false}
+                                showPreviousNextButtons={true}
+                        />
+                    </footer>
+                </div>
+            {:else}
+                <div class="flex flex-col items-center text-center gap-4">
+                    <ScaleOff width={100} height={100}/>
+                    <p>
+                        Insufficient data to render your history. Start tracking now on the <a href="/dashboard">Dashboard</a>!
+                    </p>
+                    <p>
+                        Are you trying to add tracking data for the past? Don't worry, the <a href="/import">CSV Import</a>
+                        is the right tool for that.
+                    </p>
+                </div>
+            {/if}
+        {:else}
+            {data.error}
+        {/if}
+    </div>
 </section>
 {/if}

@@ -18,23 +18,8 @@
 
     const addWeight = (e) => {
         dispatch('addWeight', {
-            date: todayDateStr,
+            dateStr: todayDateStr,
             value: e.detail.value
-        });
-    }
-
-    const updateWeight = (e) => {
-        dispatch('updateWeight', {
-            sequence: lastEntry.sequence,
-            date: lastEntry.added,
-            value: e.detail.value
-        });
-    }
-
-    const deleteWeight = (e) => {
-        dispatch('deleteWeight', {
-            sequence: e.detail.sequence,
-            date: e.detail.date
         });
     }
 
@@ -50,11 +35,7 @@
             component: 'weightModal',
             response: (e) => {
                 if (e) {
-                    if (lastEntry && lastEntry.added === todayDateStr) {
-                        updateWeight(e);
-                    } else {
-                        addWeight(e);
-                    }
+                    addWeight(e);
                 }
 
                 modalStore.close();

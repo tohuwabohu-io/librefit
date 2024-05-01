@@ -4,6 +4,8 @@ import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.CalorieTrackerEntry
 import io.tohuwabohu.crud.CalorieTrackerRepository
+import io.tohuwabohu.crud.FoodCategory
+import io.tohuwabohu.crud.FoodCategoryRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.security.printAuthenticationInfo
@@ -28,7 +30,10 @@ import java.util.*
 
 @Path("/api/tracker/calories")
 @RequestScoped
-class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTrackerRepository) {
+class CalorieTrackerResource(
+    private val calorieTrackerRepository: CalorieTrackerRepository,
+    private val foodCategoryRepository: FoodCategoryRepository
+) {
     @Inject
     lateinit var jwt: JsonWebToken
 
@@ -153,7 +158,7 @@ class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTracke
     }
 
     @GET
-    @Path("/list/dates")
+    @Path("/list/dates/{dateFrom}/{dateTo}")
     @RolesAllowed("User", "Admin")
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
@@ -170,11 +175,11 @@ class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTracke
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @Operation(operationId = "listCalorieTrackerDates")
-    fun listDates(@Context securityContext: SecurityContext): Uni<Response> {
+    @Operation(operationId = "listCalorieTrackerDatesRange")
+    fun listDates(@Context securityContext: SecurityContext, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         printAuthenticationInfo(jwt, securityContext)
 
-        return calorieTrackerRepository.listDatesForUser(UUID.fromString(jwt.name))
+        return calorieTrackerRepository.listDatesForUser(UUID.fromString(jwt.name), dateFrom, dateTo)
             .onItem().transform { Response.ok(it).build() }
             .onFailure().invoke { throwable -> Log.error(throwable) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
@@ -234,6 +239,35 @@ class CalorieTrackerResource(private val calorieTrackerRepository: CalorieTracke
 
         return calorieTrackerRepository.listEntriesForUserAndDateRange(UUID.fromString(jwt.name), dateFrom, dateTo)
             .onItem().transform { list -> Response.ok(list).build() }
+            .onFailure().invoke { e -> Log.error(e) }
+            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+    }
+
+    @GET
+    @Path("/categories/list")
+    @RolesAllowed("User", "Admin")
+    @APIResponses(
+        APIResponse(responseCode = "200", description = "OK", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = Array<FoodCategory>::class)
+            )
+        ]),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = ErrorResponse::class)
+        )]),
+        APIResponse(responseCode = "401", description = "Unauthorized"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+        operationId = "listFoodCategories"
+    )
+    fun listCategories(@Context securityContext: SecurityContext): Uni<Response> {
+        printAuthenticationInfo(jwt, securityContext)
+
+        return foodCategoryRepository.listVisibleCategories().onItem().transform { list -> Response.ok(list).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }

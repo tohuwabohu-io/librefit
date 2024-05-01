@@ -1,9 +1,8 @@
-import { Category } from '$lib/api/model.js';
 import { proxyFetch } from '$lib/api/util.js';
 import { api } from '$lib/api/index.js';
 import { fail } from '@sveltejs/kit';
 import { DataViews } from '$lib/enum.js';
-import { getDateAsStr } from '$lib/date.js';
+import { getDateAsStr, getDaytimeFoodCategory, parseStringAsDate } from '$lib/date.js';
 
 /**
  * @param event
@@ -11,14 +10,14 @@ import { getDateAsStr } from '$lib/date.js';
 export const addCalories = (event) => {
 	/** @type {CalorieTrackerEntry} */
 	const newEntry = {
-		added: event.detail.date,
+		added: event.detail.dateStr,
 		amount: event.detail.value,
 		category: event.detail.category
 	};
 
 	return proxyFetch(fetch, api.createCalorieTrackerEntry, newEntry).then(async (response) => {
 		if (response.ok) {
-			return listCaloriesForDate(newEntry.added);
+			return listCaloriesForDate(parseStringAsDate(newEntry.added));
 		} else throw response;
 	});
 };
@@ -30,14 +29,14 @@ export const updateCalories = (event) => {
 	/** @type {CalorieTrackerEntry} */
 	const entry = {
 		sequence: event.detail.sequence,
-		added: event.detail.date,
+		added: event.detail.dateStr,
 		amount: event.detail.value,
 		category: event.detail.category
 	};
 
 	return proxyFetch(fetch, api.updateCalorieTrackerEntry, entry).then(async (response) => {
 		if (response.ok) {
-			return listCaloriesForDate(entry.added);
+			return listCaloriesForDate(parseStringAsDate(entry.added));
 		} else throw response;
 	});
 };
@@ -48,26 +47,30 @@ export const updateCalories = (event) => {
 export const deleteCalories = (event) => {
 	const params = {
 		sequence: event.detail.sequence,
-		date: event.detail.date
+		date: event.detail.dateStr
 	};
 
 	return proxyFetch(fetch, api.deleteCalorieTrackerEntry, params).then(async (response) => {
 		if (response.ok) {
-			return listCaloriesForDate(params.date);
+			return listCaloriesForDate(parseStringAsDate(params.date));
 		} else throw response;
 	});
 };
 
+/**
+ * @param date {Date}
+ * @return {Promise}
+ */
 export const listCaloriesForDate = (date) => {
 	// add a blank entry for new input
 	/** @type {CalorieTrackerEntry} */
 	const blankEntry = {
-		added: date,
+		added: getDateAsStr(date),
 		amount: 0,
-		category: Category.Unset
+		category: getDaytimeFoodCategory(date)
 	};
 
-	return proxyFetch(fetch, api.listCalorieTrackerEntriesForDate, { date: date }).then(
+	return proxyFetch(fetch, api.listCalorieTrackerEntriesForDate, { date: getDateAsStr(date) }).then(
 		async (response) => {
 			/** @type {Array<CalorieTrackerEntry>} */
 			const ctList = await response.json();
@@ -77,6 +80,60 @@ export const listCaloriesForDate = (date) => {
 		}
 	);
 };
+
+/**
+ * @param dateFrom {Date}
+ * @param dateTo {Date}
+ * @return {Promise}
+ */
+export const listCalorieTrackerDatesRange = (dateFrom, dateTo) => {
+	const loadCtDateApi = api.listCalorieTrackerDatesRange;
+
+	return proxyFetch(fetch, loadCtDateApi, {
+		dateFrom: getDateAsStr(dateFrom),
+		dateTo: getDateAsStr(dateTo)
+	});
+};
+
+/**
+ * @param dateFrom {Date}
+ * @param dateTo {Date}
+ * @return {Promise}
+ */
+export const listCalorieTrackerEntriesRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listCalorieTrackerEntriesRange, {
+		dateFrom: getDateAsStr(dateFrom),
+		dateTo: getDateAsStr(dateTo)
+	});
+};
+
+/**
+ * @param filter {DataViews}
+ */
+export const listCaloriesFiltered = (filter) => {
+	const fromDate = new Date();
+	const toDate = new Date();
+
+	switch (filter) {
+		case DataViews.Week:
+			fromDate.setDate(fromDate.getDate() - 7);
+			break;
+		case DataViews.Month:
+			fromDate.setMonth(fromDate.getMonth() - 1);
+			break;
+		case DataViews.Year:
+			fromDate.setFullYear(fromDate.getFullYear() - 1);
+			break;
+		default:
+			break;
+	}
+
+	return proxyFetch(fetch, api.listCalorieTrackerEntriesRange, {
+		dateFrom: getDateAsStr(fromDate),
+		dateTo: getDateAsStr(toDate)
+	});
+};
+
 /**
  * @param event
  */
@@ -84,7 +141,7 @@ export const addWeight = (event) => {
 	/** @type {WeightTrackerEntry} */
 	const newEntry = {
 		sequence: event.detail.sequence,
-		added: event.detail.todayDateStr,
+		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
@@ -94,40 +151,35 @@ export const addWeight = (event) => {
 		} else throw response;
 	});
 };
+
 /**
  * @param event
  */
 export const updateWeight = (event) => {
+	/** @type WeightTrackerEntry */
 	const entry = {
 		sequence: event.detail.sequence,
-		date: event.detail.date,
+		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
-	return proxyFetch(fetch, api.updateWeightTrackerEntry, entry).then(async (response) => {
-		if (response.ok) {
-			return proxyFetch(fetch, api.listWeightTrackerEntries, { date: entry.added });
-		} else throw response;
-	});
+	return proxyFetch(fetch, api.updateWeightTrackerEntry, entry);
 };
+
 /**
  * @param event
  */
 export const deleteWeight = (event) => {
 	const params = {
 		sequence: event.detail.sequence,
-		date: event.detail.date
+		date: event.detail.dateStr
 	};
 
-	return proxyFetch(fetch, api.deleteWeightTrackerEntry, params).then(async (response) => {
-		if (response.ok) {
-			return proxyFetch(fetch, api.listWeightTrackerEntries, { date: params.date });
-		} else throw response;
-	});
+	return proxyFetch(fetch, api.deleteWeightTrackerEntry, params);
 };
 
 /**
- * @param filter {DataView}
+ * @param filter {DataViews}
  */
 export const listWeightFiltered = (filter) => {
 	const fromDate = new Date();
@@ -150,6 +202,41 @@ export const listWeightFiltered = (filter) => {
 	return proxyFetch(fetch, api.listWeightTrackerEntriesRange, {
 		dateFrom: getDateAsStr(fromDate),
 		dateTo: getDateAsStr(toDate)
+	});
+};
+
+/**
+ * @param dateFrom {Date}
+ * @param dateTo {Date}
+ * @return {Promise}
+ */
+export const listWeightTrackerDatesRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listWeightTrackerDatesRange, {
+		dateFrom: getDateAsStr(dateFrom),
+		dateTo: getDateAsStr(dateTo)
+	});
+};
+
+/**
+ *
+ * @param dateFrom {Date}
+ * @param dateTo {Date}
+ * @return {Promise}
+ */
+export const listWeightRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listWeightTrackerEntriesRange, {
+		dateFrom: getDateAsStr(dateFrom),
+		dateTo: getDateAsStr(dateTo)
+	});
+};
+
+/**
+ * @param date {Date}
+ * @return {Promise}
+ */
+export const listWeightForDate = (date) => {
+	return proxyFetch(fetch, api.listWeightTrackerEntries, {
+		date: date
 	});
 };
 

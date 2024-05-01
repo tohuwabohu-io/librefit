@@ -9,7 +9,9 @@
     import GitHub from '$lib/assets/icons/github.svg?component';
     import Food from '$lib/assets/icons/food.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
-    import FileTypeCsv from '$lib/assets/icons/file-type-csv.svg';
+    import FileTypeCsv from '$lib/assets/icons/file-type-csv.svg?component';
+    import ChartLine from '$lib/assets/icons/chart-line.svg?component';
+    import PieChart from '$lib/assets/icons/chart-pie-4.svg';
 
     const drawerStore = getDrawerStore();
 
@@ -19,7 +21,7 @@
     const indicator = getContext('indicator');
     $: indicator;
 
-    $: classesActive = (href) => (href === $page.url.pathname ? '!bg-primary-500' : '');
+    $: classesActive = (href) => (href === $page.url.pathname ? '!variant-soft-primary' : '');
 
     const dispatch = createEventDispatcher();
 
@@ -55,7 +57,9 @@
         <ul>
             <li>
                 <a href="/dashboard" class="{classesActive('/dashboard')}" on:click={navigate}>
-                    <span><Dashboard/></span>
+                    <span class="badge-icon variant-glass-surface">
+                        <Dashboard/>
+                    </span>
                     <span class="flex-auto">
                         Dashboard
                     </span>
@@ -63,7 +67,9 @@
             </li>
             <li>
                 <a href="/profile" class="{classesActive('/profile')}" on:click={navigate}>
-                    <span><User/></span>
+                    <span class="badge-icon variant-glass-surface">
+                        <User/>
+                    </span>
                     <span class="flex-auto">
                         Profile
                     </span>
@@ -71,7 +77,9 @@
             </li>
             <li>
                 <a href="/wizard" class="{classesActive('/wizard')}" on:click={navigate}>
-                    <span><Wand/></span>
+                    <span class="badge-icon variant-glass-surface">
+                        <Wand/>
+                    </span>
                     <span class="flex-auto">
                         Wizard
                     </span>
@@ -79,23 +87,49 @@
             </li>
             <li>
                 <a href="/tracker/calories" class="{classesActive('/tracker/calories')}" on:click={navigate}>
-                    <span><Food/></span>
+                    <span class="badge-icon variant-glass-surface">
+                        <Food/>
+                    </span>
                     <span class="flex-auto">
                         Calorie Tracker
                     </span>
                 </a>
             </li>
             <li>
+                <a href="/tracker/calories/distribution" class="{classesActive('/tracker/calories/distribution')}" on:click={navigate}>
+                    <span class="badge-icon variant-glass-surface">
+                        <PieChart/>
+                    </span>
+                    <span class="flex-auto">
+                        Calorie Distribution
+                    </span>
+                </a>
+            </li>
+            <li>
                 <a href="/tracker/weight" class="{classesActive('/tracker/weight')}" on:click={navigate}>
-                    <span><Scale/></span>
+                    <span class="badge-icon variant-glass-surface">
+                        <Scale/>
+                    </span>
                     <span class="flex-auto">
                         Weight Tracker
                     </span>
                 </a>
             </li>
             <li>
+                <a href="/tracker/weight/chart" class="{classesActive('/tracker/weight/chart')}" on:click={navigate}>
+                    <span class="badge-icon variant-glass-surface">
+                        <ChartLine/>
+                    </span>
+                    <span class="flex-auto">
+                        Weight Progress
+                    </span>
+                </a>
+            </li>
+            <li>
                 <a href="/import" class="{classesActive('/import')}" on:click={navigate}>
-                    <span><FileTypeCsv/></span>
+                    <span class="badge-icon variant-glass-surface">
+                        <FileTypeCsv/>
+                    </span>
                     <span class="flex-auto">
                         Import data
                     </span>
@@ -103,7 +137,9 @@
             </li>
             <li>
                 <a href="https://github.com/tohuwabohu-io/librefit" target="_blank">
-                    <span><GitHub/></span>
+                    <span class="badge-icon variant-glass-surface">
+                        <GitHub/>
+                    </span>
                     <span class="flex-auto">
                         GitHub
                     </span>

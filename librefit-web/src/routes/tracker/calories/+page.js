@@ -1,43 +1,19 @@
-import { api } from '$lib/api/index.js';
-import { proxyFetch } from '$lib/api/util.js';
-import { Category } from '$lib/api/model.js';
-import { getDateAsStr } from '$lib/date.js';
+import { listCaloriesForDate, listCalorieTrackerDatesRange } from '$lib/api/tracker.js';
+import { subDays } from 'date-fns';
 
-export const load = async ({ fetch, cookies }) => {
-	const loadCtDateApi = api.listCalorieTrackerDates;
-	const listCtForDateApi = api.listCalorieTrackerEntriesForDate;
+export const load = async ({ fetch }) => {
+	const today = new Date();
+	const fromDate = subDays(today, 6);
+	const ctDateResponse = await listCalorieTrackerDatesRange(fromDate, today);
+	const listCtForDateResponse = await listCaloriesForDate(today);
 
-	const ctDateResponse = await proxyFetch(fetch, loadCtDateApi);
-	const listCtForDateResponse = await proxyFetch(fetch, listCtForDateApi, {
-		date: getDateAsStr(new Date()) // today
-	});
-
-	if (ctDateResponse.status === 200 && listCtForDateResponse.status === 200) {
-		const todayStr = getDateAsStr(new Date());
-
+	if (ctDateResponse.ok && listCtForDateResponse) {
 		/** @type {Array<String>} */
 		const availableDates = await ctDateResponse.json();
 
-		/** @type {Array<CalorieTrackerEntry>} */
-		const ctList = await listCtForDateResponse.json();
-
-		// add a blank entry for new input
-		/** @type {CalorieTrackerEntry} */
-		const blankEntry = {
-			added: todayStr,
-			amount: 0,
-			category: Category.Unset
-		};
-
-		ctList.unshift(blankEntry);
-
-		if (availableDates.indexOf(todayStr) < 0) {
-			availableDates.unshift(todayStr);
-		}
-
 		return {
 			availableDates: availableDates,
-			entryToday: ctList
+			entryToday: listCtForDateResponse
 		};
 	} else {
 		return { error: 'An error has occured. Please try again later.' };
