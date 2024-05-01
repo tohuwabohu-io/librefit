@@ -157,14 +157,14 @@
 			<p>This is your daily summary.</p>
 
 			<div class="flex xl:flex-row flex-col gap-8">
-				<div class="flex xl:flex-row flex-col gap-4 grow variant-ghost-surface rounded-xl p-4">
+				<div class="card flex xl:flex-row flex-col gap-4 grow p-4">
 					<CalorieTracker entries={ctListRecent} categories={$foodCategories}
 									on:addCalories={onAddCalories}
 									on:updateCalories={onUpdateCalories}
 									on:deleteCalories={onDeleteCalories}
 					/>
 				</div>
-				<div class="variant-ghost-surface rounded-xl p-4 md:flex md:flex-row">
+				<div class="card p-4 md:flex md:flex-row">
 					<WeightTracker displayClass="md:w-1/2"
 							on:addWeight={onAddWeight}
 							on:updateGoal={setGoal}
@@ -183,7 +183,7 @@
 			</div>
 
 			<div class="flex md:flex-row flex-col gap-8">
-				<div class="flex flex-col md:max-xl:hidden variant-ghost-surface rounded-xl xl:w-1/4 justify-center items-center">
+				<div class="flex flex-col md:max-xl:hidden card xl:w-1/4 justify-center items-center">
 					{#if $ctList.length > 0 }
 						<CalorieDistribution bind:ctList={$ctList} />
 					{:else}
@@ -193,7 +193,7 @@
 					{/if}
 				</div>
 
-				<div class="flex flex-row gap-4 grow variant-ghost-surface rounded-xl p-4 object-fill xl:w-3/4 justify-center items-center">
+				<div class="flex flex-row gap-4 grow card p-4 object-fill xl:w-3/4 justify-center items-center">
 					{#if wtChart && data.listWeight.length > 0}
 						<Line options={wtChart.chartOptions} data={wtChart.chartData}/>
 					{:else}
