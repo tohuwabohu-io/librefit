@@ -81,16 +81,25 @@ export function createWeightChart(view, start, entries) {
  * @param {any} weight
  */
 export function createWeightChartDataset(weight) {
+	const style = getComputedStyle(document.body);
+	const elemHtmlClasses = document.documentElement.classList;
+
+	let lineColor = style.getPropertyValue('--color-surface-500');
+
+	if (elemHtmlClasses.contains('dark')) {
+		lineColor = style.getPropertyValue('--color-surface-200');
+	}
+
 	return {
 		label: 'Weight (kg)',
-		borderColor: 'rgb(36 44 70)',
+		borderColor: `rgb(${lineColor})`,
 		options: {
 			fill: false,
 			interaction: {
 				intersect: false
 			},
 			radius: 0,
-			tension: 0.1
+			tension: 1
 		},
 		spanGaps: true,
 		data: weight
