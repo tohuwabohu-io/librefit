@@ -6,6 +6,7 @@
     import {PolarArea} from 'svelte-chartjs';
     import {Chart, registerables} from 'chart.js';
     import {getContext} from 'svelte';
+    import {observeToggle} from '$lib/theme-toggle.js';
 
     Chart.register(...registerables);
 
@@ -32,6 +33,10 @@
 
     $: ctList, refreshChart(ctList);
 
+    observeToggle(document.documentElement, (node) => {
+        refreshChart(ctList);
+    });
+
     /**
      * @param {Array<CalorieTrackerEntry>} entries
      */
@@ -45,7 +50,7 @@
 
         if (elemHtmlClasses.contains('dark')) {
             borderColor = style.getPropertyValue('--color-surface-500');
-            labelColor = style.getPropertyValue('--color-surface-900');
+            labelColor = style.getPropertyValue('--color-surface-800');
             labelTextColor = style.getPropertyValue('--color-surface-100');
         }
 
