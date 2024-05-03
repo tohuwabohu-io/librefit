@@ -1,6 +1,6 @@
 <script>
     import {page} from '$app/stores';
-    import {Avatar, getDrawerStore} from '@skeletonlabs/skeleton';
+    import {Avatar, getDrawerStore, LightSwitch, SlideToggle} from '@skeletonlabs/skeleton';
     import {goto} from '$app/navigation';
     import {createEventDispatcher, getContext} from 'svelte';
     import Dashboard from '$lib/assets/icons/dashboard.svg?component';
@@ -39,17 +39,23 @@
 
 {#if $user}
 <div class="container mx-auto p-8 space-y-10">
-    <div class="flex flex-row gap-6">
-        <span>
-            <Avatar src={$user.avatar} initials="LU" width="w-16"/>
-        </span>
-        <div class="flex flex-col justify-evenly">
-            <p>
-                {$user.email}
-            </p>
-            <p>
-                {$user.name}
-            </p>
+    <div class="flex flex-row gap-6 justify-between">
+        <div class="flex flex-row gap-6">
+            <span>
+                <Avatar src={$user.avatar} initials="LU" width="w-16"/>
+            </span>
+            <div class="flex flex-col justify-evenly">
+                <p>
+                    {$user.email}
+                </p>
+                <p>
+                    {$user.name}
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <LightSwitch/>
         </div>
     </div>
 

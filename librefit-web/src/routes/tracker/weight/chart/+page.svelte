@@ -9,6 +9,7 @@
 	import {listWeightFiltered} from '$lib/api/tracker.js';
 	import {DataViews, enumKeys} from '$lib/enum.js';
 	import {goto} from '$app/navigation';
+	import {observeToggle} from '$lib/theme-toggle.js';
 
 	Chart.register(...registerables);
 
@@ -27,6 +28,8 @@
 
 	let entries;
 	let chartData, chartOptions;
+
+	observeToggle(document.documentElement, () => paint(entries));
 
 	const loadEntriesFiltered = async () => {
 		$indicator = $indicator.start();
