@@ -45,7 +45,7 @@
 
         if (elemHtmlClasses.contains('dark')) {
             borderColor = style.getPropertyValue('--color-surface-500');
-            labelColor = style.getPropertyValue('--color-surface-800');
+            labelColor = style.getPropertyValue('--color-surface-900');
             labelTextColor = style.getPropertyValue('--color-surface-100');
         }
 
