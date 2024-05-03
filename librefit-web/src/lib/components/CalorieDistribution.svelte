@@ -33,7 +33,7 @@
 
     $: ctList, refreshChart(ctList);
 
-    observeToggle(document.documentElement, (node) => {
+    observeToggle(document.documentElement, () => {
         refreshChart(ctList);
     });
 

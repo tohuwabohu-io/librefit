@@ -19,6 +19,7 @@
 	import {subMonths} from 'date-fns';
 	import NoFood from '$lib/assets/icons/food-off.svg?component';
 	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
+	import {observeToggle} from '$lib/theme-toggle.js';
 
 	Chart.register(...registerables);
 
@@ -35,7 +36,8 @@
 	$: foodCategories.set(data.foodCategories);
 
 	$: ctListRecent = data.lastCt;
-	$: wtChart = paintWeightTrackerEntries(data.listWeight, today, DataViews.Month);
+	$: wtListRecent = data.listWeight;
+	$: wtChart = paintWeightTrackerEntries(wtListRecent, today, DataViews.Month);
 
 	const user = getContext('user');
 
@@ -46,6 +48,8 @@
 
 	const today = new Date();
 	const lastMonth = subMonths(today, 1);
+
+	observeToggle(document.documentElement, () => repaintWeightChart());
 
 	const onAddCalories = async (event) => {
 		const amountMessage = validateAmount(event.detail.value);
@@ -134,8 +138,14 @@
 		const weightRangeResponse = await listWeightRange(lastMonth, today);
 
 		if (weightRangeResponse.ok) {
-			wtChart = paintWeightTrackerEntries(await weightRangeResponse.json(), today, DataViews.Month);
+			wtListRecent = await weightRangeResponse.json();
+
+			repaintWeightChart();
 		}
+	}
+
+	const repaintWeightChart = () => {
+		wtChart = paintWeightTrackerEntries(wtListRecent, today, DataViews.Month);
 	}
 
 	const setGoal = (e) => {
