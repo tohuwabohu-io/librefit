@@ -5,8 +5,8 @@ export const librefitTheme = {
 		'--theme-font-family-base':
 			"Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,\n\t\t'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',\n\t\t'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 		'--theme-font-family-heading': 'system-ui',
-		'--theme-font-color-base': '0 0 0',
-		'--theme-font-color-dark': '255 255 255',
+		'--theme-font-color-base': '36 44 70',
+		'--theme-font-color-dark': '219 222 233',
 		'--theme-rounded-base': '9999px',
 		'--theme-rounded-container': '8px',
 		'--theme-border-base': '1px',
