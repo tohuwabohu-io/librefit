@@ -81,15 +81,25 @@ export function createWeightChart(view, start, entries) {
  * @param {any} weight
  */
 export function createWeightChartDataset(weight) {
+	const style = getComputedStyle(document.body);
+	const elemHtmlClasses = document.documentElement.classList;
+
+	let lineColor = style.getPropertyValue('--color-surface-500');
+
+	if (elemHtmlClasses.contains('dark')) {
+		lineColor = style.getPropertyValue('--color-surface-200');
+	}
+
 	return {
 		label: 'Weight (kg)',
-		borderColor: 'rgb(14 165 233)',
+		borderColor: `rgb(${lineColor})`,
 		options: {
 			fill: false,
 			interaction: {
 				intersect: false
 			},
-			radius: 0
+			radius: 0,
+			tension: 1
 		},
 		spanGaps: true,
 		data: weight
@@ -115,6 +125,19 @@ const up = (
  * @param {DataViews} filter
  */
 export const paintWeightTrackerEntries = (entries, date, filter) => {
+	const style = getComputedStyle(document.body);
+	const elemHtmlClasses = document.documentElement.classList;
+
+	let borderColor = style.getPropertyValue('--color-surface-200');
+	let labelColor = style.getPropertyValue('--color-surface-100');
+	let labelTextColor = style.getPropertyValue('--color-surface-900');
+
+	if (elemHtmlClasses.contains('dark')) {
+		borderColor = style.getPropertyValue('--color-surface-500');
+		labelColor = style.getPropertyValue('--color-surface-800');
+		labelTextColor = style.getPropertyValue('--color-surface-100');
+	}
+
 	const noNaN = entries.map((entry) => entry.amount);
 
 	if (noNaN.length > 0) {
@@ -131,7 +154,22 @@ export const paintWeightTrackerEntries = (entries, date, filter) => {
 				scales: {
 					y: {
 						suggestedMin: Math.min(...noNaN) - 2.5,
-						suggestedMax: Math.max(...noNaN) + 2.5
+						suggestedMax: Math.max(...noNaN) + 2.5,
+						ticks: {
+							color: `rgb(${labelTextColor})`
+						}
+					},
+					x: {
+						ticks: {
+							color: `rgb(${labelTextColor})`
+						}
+					}
+				},
+				plugins: {
+					legend: {
+						labels: {
+							color: `rgb(${labelTextColor})`
+						}
 					}
 				},
 				animation: {

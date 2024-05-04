@@ -6,6 +6,7 @@
     import {PolarArea} from 'svelte-chartjs';
     import {Chart, registerables} from 'chart.js';
     import {getContext} from 'svelte';
+    import {observeToggle} from '$lib/theme-toggle.js';
 
     Chart.register(...registerables);
 
@@ -14,7 +15,7 @@
     export let displayHeader = true;
     export let displayHistory = true;
 
-    let chartData, chartOptions, dailyAverage;
+    let polarAreaChart, dailyAverage;
 
     const currentGoal = getContext('currentGoal');
 
@@ -25,22 +26,38 @@
      * @param {Array<CalorieTrackerEntry>} entries
      */
     const refreshChart = (entries) => {
-        chartData = getData(entries);
-        chartOptions = getConfig(chartData);
+        polarAreaChart = getData(entries);
+
         dailyAverage = getAverageDailyIntake(entries);
     }
 
     $: ctList, refreshChart(ctList);
 
+    observeToggle(document.documentElement, () => {
+        refreshChart(ctList);
+    });
+
     /**
      * @param {Array<CalorieTrackerEntry>} entries
      */
     const getData = (entries) => {
+        const style = getComputedStyle(document.body);
+        const elemHtmlClasses = document.documentElement.classList;
+
+        let borderColor = style.getPropertyValue('--color-surface-200');
+        let labelColor = displayHistory ? style.getPropertyValue('--color-surface-100') : style.getPropertyValue('--color-surface-50')
+        let labelTextColor = style.getPropertyValue('--color-surface-900')
+
+        if (elemHtmlClasses.contains('dark')) {
+            borderColor = style.getPropertyValue('--color-surface-500');
+            labelColor = displayHistory ? style.getPropertyValue('--color-surface-800') : style.getPropertyValue('--color-surface-900');
+            labelTextColor = style.getPropertyValue('--color-surface-100');
+        }
+
         const labels = [];
         const values = [];
 
         const averageCategoryIntake = getAverageCategoryIntake(entries);
-
 
         if (averageCategoryIntake != null) {
             $foodCategories.forEach(cat => {
@@ -54,19 +71,45 @@
         }
 
         return {
-            labels: labels,
-            datasets: [{
-                label: '∅ kcal',
-                data: values,
-                hoverOffset: 4,
-                backgroundColor: [
-                    'rgb(182 200 0 / .3)',
-                    'rgb(140 67 210 / .3)',
-                    'rgb(14 165 233 / .3)',
-                    'rgb(234 179 8 / .3)',
-                    'rgb(165 29 45 / .3)'
-                ]
-            }]
+            chartData: {
+                labels: labels,
+                datasets: [{
+                    label: '∅ kcal',
+                    data: values,
+                    hoverOffset: 4,
+                    backgroundColor: [
+                        `rgb(${style.getPropertyValue('--color-primary-500')} / .7)`,
+                        `rgb(${style.getPropertyValue('--color-secondary-500')} / .7)`,
+                        `rgb(${style.getPropertyValue('--color-tertiary-500')} / .7)`,
+                        `rgb(${style.getPropertyValue('--color-warning-500')} / .7)`,
+                        `rgb(${style.getPropertyValue('--color-error-500')} / .7)`
+                    ],
+                    borderColor: `rgb(${borderColor})`
+                }]
+            },
+            chartOptions: {
+                plugins: {
+                    title: {
+                        display: false,
+                        align: 'center',
+                        text: 'Last 7 days'
+                    },
+                    legend: {
+                        align: 'center',
+                        labels: {
+                            color: `rgb(${labelTextColor})`
+                        }
+                    }
+                },
+                scales: {
+                    r: {
+                        ticks: {
+                            backdropColor: `rgb(${labelColor})`,
+                            color: `rgb(${labelTextColor})`
+                        },
+                    }
+                }
+            }
         };
     }
 
@@ -113,37 +156,13 @@
 
         return 0;
     }
-
-
-    const getConfig = (chartData) => {
-        return {
-            type: 'polarArea',
-            data: chartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Chart.js Polar Area Chart'
-                    }
-                }
-            },
-            animation: {
-                duration: 0
-            }
-        };
-    }
-
 </script>
 
 <div class="{displayClass} p-4 text-center justify-between ">
     {#if ctList}
         {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
 
-        <PolarArea options={chartOptions} data={chartData}/>
+        <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
         <div>
             <div class="w-full grid grid-cols-[auto_1fr_auto]">
@@ -180,6 +199,9 @@
             </div>
         </div>
 
-        {#if displayHistory}<button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>{/if}
+        {#if displayHistory}
+            <button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history
+            </button>
+        {/if}
     {/if}
 </div>

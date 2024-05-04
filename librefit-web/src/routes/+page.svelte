@@ -72,7 +72,7 @@
     <title>LibreFit</title>
 </svelte:head>
 
-<section class="variant-ghost-surface h-full flex">
+<section class="h-full flex">
     <div class="container mx-auto p-12 space-y-8 self-center">
         <div class="md:grid md:grid-cols-[auto_1fr_auto] xl:grid-cols-2 flex flex-col gap-4 align-middle justify-items-center">
             <div class="flex flex-col gap-4">

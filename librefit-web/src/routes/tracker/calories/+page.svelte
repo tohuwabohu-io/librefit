@@ -158,7 +158,7 @@
 				<FilterComponent on:change={onFilterChanged}/>
 
 				{#each paginatedSource as dateStr}
-				<Accordion class="variant-ghost-surface rounded-xl">
+				<Accordion class="card rounded-xl">
 					<AccordionItem id={dateStr} on:toggle={loadEntries(dateStr)}>
 						<svelte:fragment slot="summary">
 							{convertDateStrToDisplayDateStr(dateStr)}
