@@ -45,12 +45,12 @@
         const elemHtmlClasses = document.documentElement.classList;
 
         let borderColor = style.getPropertyValue('--color-surface-200');
-        let labelColor = style.getPropertyValue('--color-surface-100');
+        let labelColor = displayHistory ? style.getPropertyValue('--color-surface-100') : style.getPropertyValue('--color-surface-50')
         let labelTextColor = style.getPropertyValue('--color-surface-900')
 
         if (elemHtmlClasses.contains('dark')) {
             borderColor = style.getPropertyValue('--color-surface-500');
-            labelColor = style.getPropertyValue('--color-surface-800');
+            labelColor = displayHistory ? style.getPropertyValue('--color-surface-800') : style.getPropertyValue('--color-surface-900');
             labelTextColor = style.getPropertyValue('--color-surface-100');
         }
 
@@ -103,11 +103,6 @@
                 },
                 scales: {
                     r: {
-                        pointLabels: {
-                            font: {
-                                size: 100
-                            }
-                        },
                         ticks: {
                             backdropColor: `rgb(${labelColor})`,
                             color: `rgb(${labelTextColor})`
