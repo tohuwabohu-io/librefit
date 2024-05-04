@@ -22,7 +22,7 @@ tasks.register<JavaExec>("ApiCodegen") {
 
     classpath = sourceSets.test.get().runtimeClasspath
 
-    main = "io.tohuwabohu.librefit.api.codegen.ApiCodegen"
+    mainClass.set("io.tohuwabohu.librefit.api.codegen.ApiCodegen")
     args = listOf("${project.projectDir}/openapi.json", "${project.projectDir}/rest/lib")
 
     doFirst {
