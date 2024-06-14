@@ -12,7 +12,7 @@ import java.util.*
 
 @Entity
 @NamedQueries(
-    NamedQuery(name = "WeightTrackerEntry.findLast", query = "from WeightTrackerEntry where userId = ?1 order by added desc, sequence desc, userId limit 1"),
+    NamedQuery(name = "WeightTrackerEntry.findLast", query = "from WeightTrackerEntry where userId = ?1 order by sequence desc, added desc, userId limit 1"),
     NamedQuery(name = "WeightTrackerEntry.listDates",
         query = "from WeightTrackerEntry where userId = ?1 and added between ?2 and ?3 group by added, userId, sequence order by added desc, userId, sequence"
     )
