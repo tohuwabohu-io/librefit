@@ -13,7 +13,7 @@ import java.util.*
 
 @Entity
 @NamedQueries(
-    NamedQuery(name = "Goal.findLast", query = "from Goal where userId = ?1 order by added desc, sequence desc, userId limit 1")
+    NamedQuery(name = "Goal.findLast", query = "from Goal where userId = ?1 order by sequence desc, added desc, userId limit 1")
 )
 data class Goal(
     @field:NotNull(message = "The initial weight of your goal must not be empty.")
