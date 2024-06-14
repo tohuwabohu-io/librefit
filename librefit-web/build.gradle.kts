@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "2.0.0"
     id("com.github.node-gradle.node") version "3.5.1"
 }
 

@@ -37,3 +37,6 @@ nb-configuration.xml
 
 # Keypairs
 *.pem
+
+# kotlin compiler log
+.kotlin
