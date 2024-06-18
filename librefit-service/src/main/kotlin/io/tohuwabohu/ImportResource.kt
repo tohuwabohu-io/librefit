@@ -1,6 +1,7 @@
 package io.tohuwabohu;
 
 import io.quarkus.logging.Log
+import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.ImportConfig
 import io.tohuwabohu.crud.ImportHelper
@@ -8,10 +9,8 @@ import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import io.tohuwabohu.crud.error.transformDateTimeParseException
 import io.tohuwabohu.crud.error.transformNumberFormatException
-import io.tohuwabohu.security.printAuthenticationInfo
 import jakarta.annotation.security.RolesAllowed
 import jakarta.enterprise.context.RequestScoped
-import jakarta.inject.Inject
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
@@ -19,8 +18,6 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import jakarta.ws.rs.core.SecurityContext
-import org.eclipse.microprofile.jwt.JsonWebToken
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
@@ -35,10 +32,6 @@ import java.util.*
 @Path("/api/import")
 @RequestScoped
 class ImportResource(private val importHelper: ImportHelper) {
-
-    @Inject
-    private lateinit var jwt: JsonWebToken
-
     @POST
     @Path("/bulk")
     @RolesAllowed("User", "Admin")
@@ -54,14 +47,12 @@ class ImportResource(private val importHelper: ImportHelper) {
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(operationId = "postImportBulk")
-    fun bulk(@Context securityContext: SecurityContext,
+    fun bulk(@Context securityIdentity: SecurityIdentity,
              @RestForm @PartType("text/csv") fileName: String,
              @RestForm @PartType("application/json") config: ImportConfig,
              @RestForm @PartType("application/octet-stream") file: FileUpload
     ): Uni<Response> {
-        printAuthenticationInfo(jwt, securityContext)
-
-        val userId = UUID.fromString(jwt.name)
+        val userId = UUID.fromString(securityIdentity.principal.name)
 
         return importHelper.readCsv(file.uploadedFile().toFile(), config)
             .chain { csv -> importHelper.import(userId, csv) }
