@@ -48,8 +48,8 @@ export const login = async (formData) => {
 
 	if (response.status === 200) {
 		return proxyFetch(fetch, userApi);
-	} else if (response.status === 404) {
-		return fail(404, { errors: [{ field: 'email', message: 'User not found.' }] });
+	} else if (response.status === 401) {
+		return fail(401, { errors: [{ field: 'email', message: 'User not found.' }] });
 	}
 
 	return fail(response.status, {
