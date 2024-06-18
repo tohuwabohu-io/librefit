@@ -6,7 +6,6 @@ import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.security.UnauthorizedException
-import io.quarkus.security.credential.PasswordCredential
 import io.quarkus.security.jpa.Password
 import io.quarkus.security.jpa.Roles
 import io.quarkus.security.jpa.UserDefinition
@@ -99,9 +98,9 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
     }
 
     @WithTransaction
-    fun findByEmailAndPassword(email: String, passwordCredential: PasswordCredential): Uni<LibreUser?> =
+    fun findByEmailAndPassword(email: String, password: String): Uni<LibreUser?> =
         findByEmail(email).onItem().ifNotNull().invoke (Unchecked.consumer { user ->
-            if (!BcryptUtil.matches(passwordCredential.password.joinToString(""), user!!.password)) {
+            if (!BcryptUtil.matches(password, user!!.password)) {
                 throw EntityNotFoundException()
             }
         }).onItem().ifNull().failWith(EntityNotFoundException())
@@ -110,8 +109,8 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
      * Update 2 fields only: avatar, name
      */
     @WithTransaction
-    fun updateUser(libreUser: LibreUser, passwordCredential: PasswordCredential, userId: UUID): Uni<LibreUser?> {
-        return findByEmailAndPassword(libreUser.email, passwordCredential).map (Unchecked.function { user ->
+    fun updateUser(libreUser: LibreUser, userId: UUID): Uni<LibreUser?> {
+        return findByEmailAndPassword(libreUser.email, libreUser.password).map (Unchecked.function { user ->
 
             if (user!!.id != userId) {
                 throw UnauthorizedException()
@@ -123,15 +122,6 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
             user.name = libreUser.name
 
             Panache.getSession().call { s -> s.merge(user)}
-        }
-    }
-
-    @WithTransaction
-    fun activateUser(userId: UUID): Uni<LibreUser> {
-        return findById(userId).call { user ->
-            user.activated = true
-
-            Panache.getSession().call { s -> s.merge(user) }
         }
     }
 }

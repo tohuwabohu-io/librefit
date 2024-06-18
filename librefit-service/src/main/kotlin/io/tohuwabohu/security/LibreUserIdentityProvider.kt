@@ -1,5 +1,6 @@
 package io.tohuwabohu.security
 
+import io.quarkus.logging.Log
 import io.quarkus.security.identity.AuthenticationRequestContext
 import io.quarkus.security.identity.IdentityProvider
 import io.quarkus.security.identity.SecurityIdentity
@@ -25,15 +26,16 @@ class LibreUserIdentityProvider(private val libreUserRepository: LibreUserReposi
         request: UsernamePasswordAuthenticationRequest,
         authenticationRequestContext: AuthenticationRequestContext
     ): Uni<SecurityIdentity> {
-        return libreUserRepository.findByEmailAndPassword(request.username, request.password)
+        return libreUserRepository.findByEmailAndPassword(request.username, request.password.password.joinToString(""))
             .onItem().transform { libreUser ->
                 QuarkusSecurityIdentity.builder()
                     .setPrincipal(QuarkusPrincipal(libreUser!!.id.toString()))
-                    .addCredential(request.password)
                     .addRole(libreUser.role)
                     .setAnonymous(false)
-                    .build()
-            }
+                    .build() as SecurityIdentity
+            }.onFailure().invoke { e -> Log.error(e) }
+            .onFailure()
+            .recoverWithItem(QuarkusSecurityIdentity.builder().setAnonymous(true).build() as SecurityIdentity)
     }
 
     override fun priority(): Int {
@@ -49,8 +51,10 @@ class TrustedLibreUserIdentityProvider(private val libreUserRepository: LibreUse
                 .setPrincipal(QuarkusPrincipal(libreUser!!.id.toString()))
                 .addRole(libreUser.role)
                 .setAnonymous(false)
-                .build()
-        }
+                .build() as SecurityIdentity
+        }.onFailure().invoke { e -> Log.error(e) }
+            .onFailure()
+            .recoverWithItem(QuarkusSecurityIdentity.builder().setAnonymous(true).build() as SecurityIdentity)
     }
 
     override fun priority(): Int {
