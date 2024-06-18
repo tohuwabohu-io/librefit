@@ -3,18 +3,14 @@ package io.tohuwabohu
 import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
 import io.quarkus.security.credential.PasswordCredential
-import io.quarkus.security.identity.CurrentIdentityAssociation
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.AccountActivationRepository
-import io.tohuwabohu.crud.AuthRepository
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import jakarta.annotation.security.PermitAll
 import jakarta.annotation.security.RolesAllowed
-import jakarta.inject.Inject
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
@@ -35,13 +31,8 @@ import java.util.*
 
 @Path("/api/user")
 class UserResource(
-    private val userRepository: LibreUserRepository,
-    private val authRepository: AuthRepository,
-    private val activationRepository: AccountActivationRepository
+    private val userRepository: LibreUserRepository
 ) {
-    @Inject
-    lateinit var currentIdentityAssociation: CurrentIdentityAssociation
-
     @ConfigProperty(name = "quarkus.http.auth.form.cookie-name")
     lateinit var cookieName: String
 
@@ -67,7 +58,6 @@ class UserResource(
         Log.info("Registering a new user=${libreUser.email}")
 
         return userRepository.createUser(libreUser)
-            .chain { user -> activationRepository.createAccountActivation(user!!.id!!) }
             .onItem().transform { Response.ok(libreUser).status(Response.Status.CREATED).build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
@@ -202,28 +192,6 @@ class UserResource(
                 updated!!.password = ""
                 Response.ok(updated).build()
             }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
-    }
-
-    @GET
-    @Path("/activate/{activationId}")
-    @PermitAll
-    @Produces(MediaType.TEXT_PLAIN)
-    @APIResponses(
-        APIResponse(responseCode = "200", description = "OK"),
-        APIResponse(responseCode = "400", description = "Bad Request"),
-        APIResponse(responseCode = "404", description = "Not Found"),
-        APIResponse(responseCode = "500", description = "Internal Server Error")
-    )
-    @Operation(operationId = "activateUser")
-    fun activate(activationId: String): Uni<Response> {
-        Log.info("Activating user profile $activationId")
-
-        return activationRepository.findByActivationId(activationId).onItem().ifNotNull().call { activation ->
-            userRepository.activateUser(activation!!.userId!!)
-                .chain { _ -> activationRepository.deleteEntry(activation.getPrimaryKey()) }
-        }.onItem().transform { _ -> Response.ok().build() }
             .onFailure().invoke { e -> Log.error(e) }
             .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
