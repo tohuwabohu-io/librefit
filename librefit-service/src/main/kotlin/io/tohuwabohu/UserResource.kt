@@ -2,7 +2,6 @@ package io.tohuwabohu
 
 import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
-import io.quarkus.security.credential.PasswordCredential
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.LibreUser
@@ -76,7 +75,7 @@ class UserResource(
                 schema = Schema(implementation = ErrorResponse::class),
             )]
         ),
-        APIResponse(responseCode = "404", description = "Not Found"),
+        APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(operationId = "postUserLogin")
@@ -131,7 +130,6 @@ class UserResource(
                 )
             ]
         ),
-        APIResponse(responseCode = "404", description = "Not Found"),
         APIResponse(
             responseCode = "400", description = "Bad Request", content = [Content(
                 mediaType = "application/json",
@@ -186,7 +184,6 @@ class UserResource(
         Log.info("Update user profile $libreUser")
 
         return userRepository.updateUser(libreUser,
-            securityIdentity.getCredential(PasswordCredential::class.java),
             UUID.fromString(securityIdentity.principal.name)
         ).onItem().ifNotNull().transform { updated ->
                 updated!!.password = ""
