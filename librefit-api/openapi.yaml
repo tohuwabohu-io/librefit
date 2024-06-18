@@ -868,9 +868,22 @@ paths:
       operationId: postUserLogin
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/LibreUser'
+              required:
+              - email
+              - password
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            encoding:
+              password:
+                contentType: text/plain
+              email:
+                contentType: text/plain
       responses:
         "200":
           description: OK
@@ -886,6 +899,12 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
   /api/user/logout:
     post:
       tags:
@@ -898,10 +917,10 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-        "403":
-          description: Not Allowed
         "401":
           description: Not Authorized
+        "403":
+          description: Not Allowed
       security:
       - SecurityScheme: []
   /api/user/read:
@@ -932,31 +951,6 @@ paths:
           description: Not Allowed
       security:
       - SecurityScheme: []
-  /api/user/refresh:
-    post:
-      tags:
-      - User Resource
-      operationId: postUserRefresh
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthInfo'
-      responses:
-        "200":
-          description: OK
-          content:
-            text/plain: {}
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        "403":
-          description: Forbidden
-        "500":
-          description: Internal Server Error
   /api/user/register:
     post:
       tags:
@@ -1015,26 +1009,6 @@ paths:
       - SecurityScheme: []
 components:
   schemas:
-    AuthInfo:
-      required:
-      - accessToken
-      - refreshToken
-      type: object
-      properties:
-        accessToken:
-          type: string
-        accessExpires:
-          type: string
-          allOf:
-          - $ref: '#/components/schemas/LocalDateTime'
-          nullable: true
-        refreshToken:
-          type: string
-        refreshExpires:
-          type: string
-          allOf:
-          - $ref: '#/components/schemas/LocalDateTime'
-          nullable: true
     BmiCategory:
       enum:
       - UNDERWEIGHT
@@ -1319,9 +1293,3 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalDateTime'
           nullable: true
-  securitySchemes:
-    SecurityScheme:
-      type: http
-      description: Authentication
-      scheme: bearer
-      bearerFormat: JWT
