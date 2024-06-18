@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/public';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 /**
  * @param {function} fetchApi
@@ -80,7 +80,7 @@ export const proxyFetch = async (fetchApi, api, data) => {
 		response = new Response();
 	}
 
-	if (response.status === 401) throw redirect(303, '/?expired');
+	if (response.status === 401) window.location.replace('/?expired');
 
 	return response;
 };
