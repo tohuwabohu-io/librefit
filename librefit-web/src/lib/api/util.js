@@ -80,7 +80,7 @@ export const proxyFetch = async (fetchApi, api, data) => {
 		response = new Response();
 	}
 
-	if (response.status === 401) window.location.replace('/?expired');
+	if (response.status === 401) window.location.replace('/?session_expired=true');
 
 	return response;
 };

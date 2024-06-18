@@ -17,14 +17,10 @@
     let indicator = new Indicator();
     let status;
 
-    const expired = $page.url.searchParams.get('expired');
+    const expired = $page.url.searchParams.get('session_expired');
 
     if (expired) {
-        status = {
-            errors: [{
-                field: 'email', message: 'Your session expired. Please login again.'
-            }]
-        }
+        status = {errors: [{field: 'email', message: 'Your session expired. Please log in again.' }]}
     }
 
     const handleLogin = async (event) => {
