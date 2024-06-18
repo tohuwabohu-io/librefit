@@ -44,13 +44,7 @@ export const login = async (formData) => {
 	const loginApi = api.postUserLogin;
 	const userApi = api.readUserInfo;
 
-	/** @type import('$lib/api/index.js').LibreUser */
-	const libreUser = {
-		email: String(formData.get('email')),
-		password: String(formData.get('password'))
-	};
-
-	const response = await proxyFetch(fetch, loginApi, libreUser);
+	const response = await proxyFetch(fetch, loginApi, formData);
 
 	if (response.status === 200) {
 		return proxyFetch(fetch, userApi);
