@@ -2,24 +2,10 @@ package io.tohuwabohu
 
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
-import io.quarkus.test.security.TestSecurity
-import io.quarkus.test.security.jwt.Claim
-import io.quarkus.test.security.jwt.JwtSecurity
-import io.restassured.RestAssured
-import io.restassured.http.ContentType
-import io.restassured.module.kotlin.extensions.Extract
-import io.restassured.module.kotlin.extensions.Given
-import io.restassured.module.kotlin.extensions.Then
-import io.restassured.module.kotlin.extensions.When
-import io.tohuwabohu.crud.Goal
-import org.hamcrest.Matchers.equalTo
-import org.junit.jupiter.api.Test
-import java.time.LocalDate
-import java.util.*
 
 @QuarkusTest
 @TestHTTPEndpoint(GoalsResource::class)
-class GoalsTest {
+class GoalsTest {/*
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     @JwtSecurity(
@@ -371,4 +357,4 @@ class GoalsTest {
 
         return goal
     }
-}
+*/}

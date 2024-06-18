@@ -4,8 +4,6 @@ import io.quarkus.test.TestReactiveTransaction
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
-import io.quarkus.test.security.jwt.Claim
-import io.quarkus.test.security.jwt.JwtSecurity
 import io.quarkus.test.vertx.RunOnVertxContext
 import io.quarkus.test.vertx.UniAsserter
 import io.restassured.module.kotlin.extensions.Given
@@ -21,7 +19,6 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*
 
-
 @QuarkusTest
 @TestHTTPEndpoint(ImportResource::class)
 class ImportResourceTest {
@@ -33,11 +30,6 @@ class ImportResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120001", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fit"),
-        ]
-    )
     @TestReactiveTransaction
     @RunOnVertxContext
     fun `should upload and append tracker entries`(uniAsserter: UniAsserter) {
@@ -68,11 +60,6 @@ class ImportResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ef-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test2@libre.fit")
-        ]
-    )
     @TestReactiveTransaction
     @RunOnVertxContext
     fun `should upload and drop duplicate tracker entries`(uniAsserter: UniAsserter) {
@@ -118,11 +105,6 @@ class ImportResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120003", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test3@libre.fit")
-        ]
-    )
     @TestReactiveTransaction
     @RunOnVertxContext
     fun `should upload and fail input parsing`(uniAsserter: UniAsserter) {
@@ -189,11 +171,6 @@ class ImportResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120004", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test4@libre.fit")
-        ]
-    )
     @TestReactiveTransaction
     @RunOnVertxContext
     fun `should upload and fail input validation`(uniAsserter: UniAsserter) {
@@ -241,11 +218,6 @@ class ImportResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120005", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test5libre.fit")
-        ]
-    )
     @TestReactiveTransaction
     @RunOnVertxContext
     fun `should upload and fail due to wrong header count`(uniAsserter: UniAsserter) {
@@ -278,11 +250,6 @@ class ImportResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120006", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test6libre.fit")
-        ]
-    )
     @TestReactiveTransaction
     @RunOnVertxContext
     fun `should upload and update calorie tracker exclusively`(uniAsserter: UniAsserter) {
@@ -315,11 +282,6 @@ class ImportResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120007", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test7libre.fit")
-        ]
-    )
     @TestReactiveTransaction
     @RunOnVertxContext
     fun `should upload and update weight tracker exclusively`(uniAsserter: UniAsserter) {
@@ -352,11 +314,6 @@ class ImportResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120008", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test8libre.fit")
-        ]
-    )
     @TestReactiveTransaction
     @RunOnVertxContext
     fun `should upload and fail due to unselected importer`(uniAsserter: UniAsserter) {
