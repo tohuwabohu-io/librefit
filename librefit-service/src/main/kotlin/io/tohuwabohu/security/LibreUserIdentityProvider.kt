@@ -12,6 +12,7 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.LibreUserRepository
 import jakarta.enterprise.context.ApplicationScoped
 import org.hibernate.reactive.mutiny.Mutiny
+import java.util.*
 
 @ApplicationScoped
 class LibreUserIdentityProvider(private val libreUserRepository: LibreUserRepository) :
@@ -43,7 +44,7 @@ class LibreUserIdentityProvider(private val libreUserRepository: LibreUserReposi
 @ApplicationScoped
 class TrustedLibreUserIdentityProvider(private val libreUserRepository: LibreUserRepository) : JpaReactiveTrustedIdentityProvider() {
     override fun authenticate(session: Mutiny.Session, request: TrustedAuthenticationRequest): Uni<SecurityIdentity> {
-        return libreUserRepository.findByEmail(request.principal).onItem().transform { libreUser ->
+        return libreUserRepository.findById(UUID.fromString(request.principal)).onItem().transform { libreUser ->
             QuarkusSecurityIdentity.builder()
                 .setPrincipal(QuarkusPrincipal(libreUser!!.id.toString()))
                 .addRole(libreUser.role)
