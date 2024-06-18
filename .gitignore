@@ -40,3 +40,6 @@ nb-configuration.xml
 
 # kotlin compiler log
 .kotlin
+
+# quarkus
+.quarkus
