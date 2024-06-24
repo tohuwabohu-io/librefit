@@ -12,6 +12,7 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.LibreUserRepository
 import jakarta.annotation.Priority
 import jakarta.enterprise.context.ApplicationScoped
+import java.util.*
 
 @ApplicationScoped
 @Priority(IdentityProvider.SYSTEM_FIRST)
@@ -27,7 +28,10 @@ class TrustedLibreUserIdentityProvider(private val libreUserRepository: LibreUse
         request: TrustedAuthenticationRequest,
         context: AuthenticationRequestContext
     ): Uni<SecurityIdentity> {
-        return libreUserRepository.findByEmail(request.principal).onItem().transform { libreUser ->
+        val finder = if (request.principal.contains("@")) libreUserRepository.findByEmail(request.principal)
+            else libreUserRepository.findById(UUID.fromString(request.principal))
+
+        return finder.onItem().transform { libreUser ->
             QuarkusSecurityIdentity.builder()
                 .setPrincipal(QuarkusPrincipal(libreUser!!.id.toString()))
                 .addRole(libreUser.role)
