@@ -195,7 +195,7 @@
 			<div class="flex md:flex-row flex-col gap-8">
 				<div class="flex flex-col md:max-xl:hidden card xl:w-1/4 justify-center items-center">
 					{#if $ctList.length > 0 }
-						<CalorieDistribution bind:ctList={$ctList} />
+						<CalorieDistribution displayClass="flex flex-col" bind:ctList={$ctList} />
 					{:else}
 						<div>
 							<NoFood height={100} width={100}/>

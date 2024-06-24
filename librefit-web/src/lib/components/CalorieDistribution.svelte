@@ -158,7 +158,7 @@
     }
 </script>
 
-<div class="{displayClass} p-4 text-center justify-between ">
+<div class="{displayClass} p-4 gap-4 text-center justify-evenly">
     {#if ctList}
         {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
 
