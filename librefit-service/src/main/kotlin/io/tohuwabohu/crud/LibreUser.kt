@@ -6,7 +6,10 @@ import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.security.UnauthorizedException
-import io.quarkus.security.jpa.*
+import io.quarkus.security.jpa.Password
+import io.quarkus.security.jpa.Roles
+import io.quarkus.security.jpa.UserDefinition
+import io.quarkus.security.jpa.Username
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.unchecked.Unchecked
 import io.tohuwabohu.crud.error.ErrorDescription
@@ -17,16 +20,14 @@ import jakarta.persistence.*
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotEmpty
-import org.eclipse.microprofile.jwt.JsonWebToken
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Cacheable
 @UserDefinition
 @NamedQueries(
-    NamedQuery(name = "findByEmailAndPassword", query = "from LibreUser where email = ?1 and password = ?2")
+    NamedQuery(name = "LibreUser.findByEmail", query = "from LibreUser where email = ?1")
 )
 data class LibreUser (
     @Id
@@ -40,7 +41,7 @@ data class LibreUser (
     @field:NotEmpty(message = "The provided e-mail address is empty.")
     var email: String,
 
-    @Password(PasswordType.CLEAR) // <-- automatic encryption with annotation does not work due to a bug
+    @Password // <-- automatic encryption with annotation does not work due to a bug
     @Column(nullable = false)
     @field:NotEmpty(message = "The provided password is empty.")
     @field:Length(min = 6, message = "Chosen password must be at least 6 characters long.")
@@ -73,7 +74,9 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
     @Inject
     private lateinit var validator: Validator
 
-    fun findByEmail(email: String): Uni<LibreUser?> = find("email = ?1", email).firstResult()
+    fun findByEmail(email: String): Uni<LibreUser?> {
+        return find("#LibreUser.findByEmail", email).firstResult()
+    }
 
     fun createUser(user: LibreUser): Uni<LibreUser?> {
         return findByEmail(user.email)
@@ -105,10 +108,10 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
      * Update 2 fields only: avatar, name
      */
     @WithTransaction
-    fun updateUser(libreUser: LibreUser, jwt: JsonWebToken): Uni<LibreUser?> {
+    fun updateUser(libreUser: LibreUser, userId: UUID): Uni<LibreUser?> {
         return findByEmailAndPassword(libreUser.email, libreUser.password).map (Unchecked.function { user ->
 
-            if (user!!.id != UUID.fromString(jwt.name)) {
+            if (user!!.id != userId) {
                 throw UnauthorizedException()
             }
 
@@ -118,15 +121,6 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
             user.name = libreUser.name
 
             Panache.getSession().call { s -> s.merge(user)}
-        }
-    }
-
-    @WithTransaction
-    fun activateUser(userId: UUID): Uni<LibreUser> {
-        return findById(userId).call { user ->
-            user.activated = true
-
-            Panache.getSession().call { s -> s.merge(user) }
         }
     }
 }

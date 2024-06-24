@@ -3,8 +3,6 @@ package io.tohuwabohu
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
-import io.quarkus.test.security.jwt.Claim
-import io.quarkus.test.security.jwt.JwtSecurity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import io.restassured.module.kotlin.extensions.Extract
@@ -12,7 +10,7 @@ import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.Goal
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.*
@@ -22,11 +20,6 @@ import java.util.*
 class GoalsTest {
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create an entry`() {
         Given {
             header("Content-Type", ContentType.JSON)
@@ -40,11 +33,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create two entries`() {
         val created1 = Given {
             header("Content-Type", ContentType.JSON)
@@ -73,11 +61,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail on creation`() {
         var faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
 
@@ -108,11 +91,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create and read an entry`() {
         val created = Given {
             header("Content-Type", ContentType.JSON)
@@ -144,11 +122,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "410a1496-7fc7-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create, update and read an entry`() {
         val goal = goal(userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
 
@@ -189,11 +162,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "9f93b4fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail on update`() {
         Given {
             header("Content-Type", ContentType.JSON)
@@ -208,11 +176,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create and delete an entry`() {
         val created = Given {
             header("Content-Type", ContentType.JSON)
@@ -234,11 +197,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail on delete`() {
         val goalId = 123L
 
@@ -251,11 +209,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create and delete an entry and fail on read`() {
         val created = Given {
             header("Content-Type", ContentType.JSON)
@@ -283,11 +236,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "1171b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail on finding last entry`() {
         When {
             get("/last")
@@ -298,11 +246,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "07225bfc-7fb4-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create two entries and find the last`() {
         val goal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
         goal.initialWeight = 100f
@@ -336,11 +279,6 @@ class GoalsTest {
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail with 401`() {
         val userId = UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002") // unrelated user's data
 
@@ -352,7 +290,7 @@ class GoalsTest {
         } When {
             put("/update")
         } Then {
-            statusCode(401)
+            statusCode(404)
         }
     }
 

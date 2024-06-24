@@ -22,9 +22,8 @@ dependencies {
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-flyway")
+    implementation("io.quarkus:quarkus-security")
     implementation("io.quarkus:quarkus-security-jpa-reactive")
-    implementation("io.quarkus:quarkus-smallrye-jwt")
-    implementation("io.quarkus:quarkus-smallrye-jwt-build")
     implementation("io.quarkus:quarkus-hibernate-validator")
     implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
     implementation("io.quarkus:quarkus-reactive-pg-client")
@@ -34,12 +33,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-resteasy-reactive")
+    testImplementation("io.quarkus:quarkus-test-security")
     testImplementation("io.quarkus:quarkus-jacoco")
-    testImplementation("io.quarkus:quarkus-junit5:3.6.3")
-    testImplementation("io.quarkus:quarkus-junit5-mockito:3.6.3")
-    testImplementation("io.rest-assured:rest-assured:5.3.2")
+    testImplementation("io.quarkus:quarkus-junit5:3.9.2")
+    testImplementation("io.rest-assured:rest-assured:5.4.0")
     testImplementation("io.rest-assured:kotlin-extensions:5.3.2")
-    testImplementation("io.quarkus:quarkus-test-security-jwt")
     testImplementation("io.quarkus:quarkus-test-vertx")
 }
 
@@ -62,16 +60,4 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         jvmTarget = JvmTarget.JVM_17
         javaParameters = true
     }
-}
-
-tasks.register("generateKeypair") {
-    doFirst {
-        exec {
-            commandLine("./generate-keypair.sh")
-        }
-    }
-}
-
-tasks.testClasses {
-    dependsOn("generateKeypair")
 }
