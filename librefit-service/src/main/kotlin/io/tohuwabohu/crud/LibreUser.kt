@@ -97,7 +97,6 @@ class LibreUserRepository : PanacheRepositoryBase<LibreUser, UUID> {
             }).chain { new -> persistAndFlush(new!!) }
     }
 
-    @WithTransaction
     fun findByEmailAndPassword(email: String, password: String): Uni<LibreUser?> =
         findByEmail(email).onItem().ifNotNull().invoke (Unchecked.consumer { user ->
             if (!BcryptUtil.matches(password, user!!.password)) {
