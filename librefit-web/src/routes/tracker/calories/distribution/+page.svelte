@@ -7,7 +7,7 @@
     import {listCaloriesFiltered} from '$lib/api/tracker.js';
     import {showToastError} from '$lib/toast.js';
     import NoFood from '$lib/assets/icons/food-off.svg?component'
-    import {getFoodCategoryLongvalue} from '$lib/api/category.js';
+    import {getFoodCategoryLongvalue, skimCategories} from '$lib/api/category.js';
 
     const toastStore = getToastStore();
 
@@ -19,22 +19,20 @@
     if (!$user) goto('/');
 
     let filter = DataViews.Month;
-    let chartData = $ctList;
+    let filteredData = $ctList;
 
-    $: chartData;
+    let categories = skimCategories($ctList);
+
+    $: filteredData;
+    $: categories;
 
     const loadEntriesFiltered = async () => {
         $indicator = $indicator.start();
 
         await listCaloriesFiltered(filter).then(async (result) => {
             /** @type Array<WeightTrackerEntry> */
-            chartData = await result.json();
+            filteredData = await result.json();
         }).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
-    }
-
-    /** @param calorieTrackerEntries {Array<CalorieTrackerEntry>} */
-    const skimCategories = (calorieTrackerEntries) => {
-        return new Set(calorieTrackerEntries.map(entry => entry.category))
     }
 
     /**
@@ -85,41 +83,41 @@
             </RadioGroup>
 
             {#if $ctList.length > 0 }
-                <div class="flex flex-col lg:flex-row gap-4">
-                    <CalorieDistribution displayClass="lg:w-2/5" ctList={chartData} displayHeader={false} displayHistory={false}/>
+                <div class="flex flex-col lg:flex-row gap-2">
+                    <CalorieDistribution displayClass="lg:w-1/4" ctList={filteredData} displayHeader={false} displayHistory={false}/>
 
-                    <div class="table-container lg:w-3/5 w-full flex flex-col grow align-middle self-center">
+                    <div class="lg:w-3/5 w-full flex flex-col grow align-middle self-center">
                         <h2 class="h2">Last {filter.toLowerCase()}:</h2>
-                        <table>
-                        {#each skimCategories($ctList) as category}
-                            <h3 class="h3">{getFoodCategoryLongvalue($foodCategories, category)}</h3>
-                                <tr>
-                                    <td>
-                                        Average
-                                    </td>
-                                    <td>
-                                        kcal {calculateAverage($ctList, category)}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Minimum
-                                    </td>
-                                    <td>
-                                        kcal {findMinimum($ctList, category)}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Maximum
-                                    </td>
-                                    <td>
-                                        kcal {findMaximum($ctList, category)}
-                                    </td>
-                                </tr>
-
-                        {/each}
-                        </table>
+                        <div class="table-container">
+                            <table class="table table-hover table-compact table-auto w-full align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Avg.</th>
+                                        <th>Min.</th>
+                                        <th>Max.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {#each categories as category}
+                                        <tr>
+                                            <td>
+                                                {getFoodCategoryLongvalue($foodCategories, category)}
+                                            </td>
+                                            <td>
+                                                kcal {calculateAverage(filteredData, category)}
+                                            </td>
+                                            <td>
+                                                kcal {findMinimum(filteredData, category)}
+                                            </td>
+                                            <td>
+                                                kcal {findMaximum(filteredData, category)}
+                                            </td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             {:else}

@@ -158,19 +158,18 @@
     }
 </script>
 
-<div class="{displayClass} p-4 text-center justify-between ">
+<div class="{displayClass} p-4 gap-4 text-center justify-evenly">
     {#if ctList}
         {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
 
         <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
         <div>
-            <div class="w-full grid grid-cols-[auto_1fr_auto]">
-                <div>&empty; daily intake:</div>
-                <div>
+            <div class="w-full grid grid-cols-2 gap-2">
+                <div class="text-right">&empty; daily intake:</div>
+                <div class="flex flex-row text">
                     ~{dailyAverage}kcal
-                </div>
-                <div>
+
                     {#if $currentGoal}
                         {@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
                         <span>
@@ -186,14 +185,11 @@
                 </div>
 
                 {#if $currentGoal}
-                    <div>
+                    <div class="text-right">
                         &empty; target intake:
                     </div>
-                    <div>
+                    <div class="text-left">
                         ~{$currentGoal.targetCalories}kcal
-                    </div>
-                    <div>
-
                     </div>
                 {/if}
             </div>
