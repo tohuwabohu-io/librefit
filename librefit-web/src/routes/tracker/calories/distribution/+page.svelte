@@ -83,41 +83,41 @@
             </RadioGroup>
 
             {#if $ctList.length > 0 }
-                <div class="flex flex-col lg:flex-row gap-4">
-                    <CalorieDistribution displayClass="lg:w-2/5" ctList={filteredData} displayHeader={false} displayHistory={false}/>
+                <div class="flex flex-col lg:flex-row gap-2">
+                    <CalorieDistribution displayClass="lg:w-1/4" ctList={filteredData} displayHeader={false} displayHistory={false}/>
 
                     <div class="lg:w-3/5 w-full flex flex-col grow align-middle self-center">
                         <h2 class="h2">Last {filter.toLowerCase()}:</h2>
-                        <table>
-                        {#each categories as category}
-                            <h3 class="h3">{getFoodCategoryLongvalue($foodCategories, category)}</h3>
-                                <tr>
-                                    <td>
-                                        Average
-                                    </td>
-                                    <td>
-                                        kcal {calculateAverage(filteredData, category)}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Minimum
-                                    </td>
-                                    <td>
-                                        kcal {findMinimum(filteredData, category)}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Maximum
-                                    </td>
-                                    <td>
-                                        kcal {findMaximum(filteredData, category)}
-                                    </td>
-                                </tr>
-
-                        {/each}
-                        </table>
+                        <div class="table-container">
+                            <table class="table table-hover table-compact table-auto w-full align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Avg.</th>
+                                        <th>Min.</th>
+                                        <th>Max.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {#each categories as category}
+                                        <tr>
+                                            <td>
+                                                {getFoodCategoryLongvalue($foodCategories, category)}
+                                            </td>
+                                            <td>
+                                                kcal {calculateAverage(filteredData, category)}
+                                            </td>
+                                            <td>
+                                                kcal {findMinimum(filteredData, category)}
+                                            </td>
+                                            <td>
+                                                kcal {findMaximum(filteredData, category)}
+                                            </td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             {:else}
