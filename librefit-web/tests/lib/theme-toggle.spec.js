@@ -1,5 +1,5 @@
 import { expect, describe, it, vi } from 'vitest';
-import { observeToggle } from './theme-toggle';
+import { observeToggle } from '$lib/theme-toggle.js';
 
 describe('themeToggle', () => {
 	/**

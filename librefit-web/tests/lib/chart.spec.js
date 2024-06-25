@@ -1,4 +1,8 @@
-import { createWeightChart, createWeightChartDataset, paintWeightTrackerEntries } from './chart';
+import {
+	createWeightChart,
+	createWeightChartDataset,
+	paintWeightTrackerEntries
+} from '$lib/chart.js';
 import { describe, expect, it, vi } from 'vitest';
 import { DataViews } from '$lib/enum.js';
 

@@ -1,6 +1,6 @@
 // Importing the required dependencies
 import { expect, describe, it } from 'vitest';
-import { validateFields } from './validation';
+import { validateFields } from '$lib/validation.js';
 
 describe('validateFields', () => {
 	it('should return undefined when all fields are valid', () => {
