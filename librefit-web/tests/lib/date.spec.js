@@ -8,7 +8,7 @@ import {
 	getDaytimeFoodCategory,
 	default_date_format,
 	display_date_format
-} from './date';
+} from '$lib/date.js';
 import { describe, it, expect } from 'vitest';
 
 describe('getDateAsStr function', () => {
