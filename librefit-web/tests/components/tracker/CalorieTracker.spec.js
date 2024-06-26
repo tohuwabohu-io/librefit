@@ -1,8 +1,7 @@
-import { render, fireEvent, cleanup, screen } from '@testing-library/svelte';
-import { afterEach, expect, describe, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 import { tick } from 'svelte';
-import * as addMultiEvent from 'chart.js/helpers';
 
 /**
  * @vitest-environment jsdom
@@ -10,7 +9,17 @@ import * as addMultiEvent from 'chart.js/helpers';
 describe('CalorieTracker.svelte component', () => {
 	afterEach(() => cleanup());
 
-	it('should render a pristine component and add two entries', async () => {
+	/*
+	 * Expectations:
+	 *  - render an empty component with one empty entry (number of TrackerInput components: 1)
+	 *  - change default data, click 'add'
+	 *  - addCalories must have been triggered once
+	 *  - addCalories must fire event with changed data
+	 *  - add a new empty entry on top (number of TrackerInput components: 2)
+	 *  - repeat process
+	 *  - number of TrackerInput components must equal to 3
+	 */
+	it('should render a pristine component, add two entries and grow', async () => {
 		const mockData = {
 			categories: [
 				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
@@ -38,6 +47,7 @@ describe('CalorieTracker.svelte component', () => {
 				category: 'd'
 			});
 
+			// component won't add element by itself as the page would reload the whole dataset
 			// add new entry -> list expands
 			component.$set({ entries: mockData.entries });
 		});
@@ -63,7 +73,6 @@ describe('CalorieTracker.svelte component', () => {
 		await tick();
 
 		expect(addMock).toHaveBeenCalledTimes(1);
-
 		expect(addEvent).toEqual({
 			callback: expect.any(Function),
 			target: undefined,
@@ -90,6 +99,127 @@ describe('CalorieTracker.svelte component', () => {
 			dateStr: '2022-02-02',
 			category: 'b',
 			value: 700
+		});
+
+		expect(screen.getAllByRole('spinbutton', { name: 'amount' }).length).toStrictEqual(3);
+	});
+
+	/*
+	 * Expectations
+	 * 	- render component with two entries filled and one empty (number of TrackerInput components: 3)
+	 *  - for the 2nd entry (lunch), click 'delete' and confirm
+	 *  - deleteCalories must have been triggered once
+	 *  - deleteCalories must fire event with entry data that shall be deleted
+	 *  - number of TrackerInput components must equal to 2
+	 *  - repeat process for dinner (the new 2nd entry)
+	 *  - number of TrackerInput components must equal to 1
+	 */
+	it('should render a filled component, remove two entries and shrink', async () => {
+		const lunch = { added: '2022-02-02', amount: 500, sequence: 1, category: 'l' };
+		const dinner = { added: '2022-02-02', amount: 500, sequence: 2, category: 'd' };
+		const empty = { added: '2022-02-02', sequence: undefined, category: 'l' };
+
+		const mockData = {
+			categories: [
+				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
+				{ shortvalue: 'l', longvalue: 'Lunch', visible: true },
+				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
+			],
+			entries: [empty, lunch, dinner]
+		};
+
+		const { component } = render(CalorieTracker, { ...mockData });
+
+		let deleteEvent;
+		const deleteMock = vi.fn((event) => {
+			deleteEvent = event.detail;
+
+			// component won't remove element by itself as the page would reload the whole dataset
+			const index = mockData.entries.findIndex((entry) => entry.sequence === event.detail.sequence);
+			mockData.entries.splice(index, 1);
+			component.$set({ entries: mockData.entries });
+		});
+
+		await component.$on('deleteCalories', deleteMock);
+
+		// the empty entry does not have a delete button, so the index shifts by -1
+		const deleteButton = screen.getAllByRole('button', { name: 'delete' })[0];
+		await fireEvent.click(deleteButton);
+
+		const confirmButton = screen.getByRole('button', { name: 'confirm' });
+		await fireEvent.click(confirmButton);
+		await tick();
+
+		expect(deleteMock).toHaveBeenCalledTimes(1);
+		expect(deleteEvent).toEqual({
+			callback: expect.any(Function),
+			target: confirmButton,
+			sequence: 1,
+			dateStr: '2022-02-02'
+		});
+
+		expect(mockData.entries.length).toStrictEqual(2);
+
+		await fireEvent.click(deleteButton);
+		await fireEvent.click(confirmButton);
+		await tick();
+
+		expect(deleteMock).toHaveBeenCalledTimes(2);
+		expect(deleteEvent).toEqual({
+			callback: expect.any(Function),
+			target: confirmButton,
+			sequence: 2,
+			dateStr: '2022-02-02'
+		});
+
+		expect(screen.getAllByRole('spinbutton', { name: 'amount' }).length).toStrictEqual(1);
+	});
+
+	/*
+	 * Expectations
+	 *  - render component with one entry filled and one empty (number of TrackerInput components: 2)
+	 *  - for the filled entry click 'update' and confirm
+	 *  - updateCalories must have been triggered once
+	 *  - updateCalories must fire event with changed entry
+	 */
+	it('should render a filled component and update one entry', async () => {
+		const breakfast = { added: '2022-02-02', amount: 500, sequence: 1, category: 'b' };
+		const empty = { added: '2022-02-02', sequence: undefined, category: 'l' };
+
+		const mockData = {
+			categories: [
+				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
+				{ shortvalue: 'l', longvalue: 'Lunch', visible: true },
+				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
+			],
+			entries: [empty, breakfast]
+		};
+
+		const { component } = render(CalorieTracker, { ...mockData });
+
+		let updateEvent;
+		const updateMock = vi.fn((event) => {
+			updateEvent = event.detail;
+			mockData.entries[event.detail.sequence] = event.detail;
+			component.$set({ entries: mockData.entries });
+		});
+
+		await component.$on('updateCalories', updateMock);
+
+		await fireEvent.click(screen.getByRole('button', { name: 'edit' }));
+		await fireEvent.input(screen.getAllByRole('spinbutton', { name: 'amount' })[1], {
+			target: { value: 600 }
+		});
+		await fireEvent.click(screen.getByRole('button', { name: 'confirm' }));
+		await tick();
+
+		expect(updateMock).toHaveBeenCalledTimes(1);
+		expect(updateEvent).toEqual({
+			callback: expect.any(Function),
+			sequence: 1,
+			dateStr: '2022-02-02',
+			category: 'b',
+			value: 600
 		});
 	});
 });
