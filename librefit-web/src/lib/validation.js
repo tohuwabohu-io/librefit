@@ -22,7 +22,7 @@ export const validateFields = (fields) => {
 
 	if (inputErrors.length > 0) {
 		/** @type {Array<ErrorDescription>} */
-		const errorDescriptions = inputValidation.map(([inputField, validationMessage]) => {
+		const errorDescriptions = inputErrors.map(([inputField, validationMessage]) => {
 			return {
 				field: inputField,
 				message: validationMessage

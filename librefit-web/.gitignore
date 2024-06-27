@@ -10,3 +10,4 @@ vite.config.ts.timestamp-*
 /.cache/
 src/lib/api/index.js
 src/lib/api/model.js
+coverage/

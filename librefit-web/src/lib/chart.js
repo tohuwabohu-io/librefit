@@ -128,13 +128,13 @@ export const paintWeightTrackerEntries = (entries, date, filter) => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 
-	let borderColor = style.getPropertyValue('--color-surface-200');
-	let labelColor = style.getPropertyValue('--color-surface-100');
+	// let borderColor = style.getPropertyValue('--color-surface-200');
+	// let labelColor = style.getPropertyValue('--color-surface-100');
 	let labelTextColor = style.getPropertyValue('--color-surface-900');
 
 	if (elemHtmlClasses.contains('dark')) {
-		borderColor = style.getPropertyValue('--color-surface-500');
-		labelColor = style.getPropertyValue('--color-surface-800');
+		// borderColor = style.getPropertyValue('--color-surface-500');
+		// labelColor = style.getPropertyValue('--color-surface-800');
 		labelTextColor = style.getPropertyValue('--color-surface-100');
 	}
 

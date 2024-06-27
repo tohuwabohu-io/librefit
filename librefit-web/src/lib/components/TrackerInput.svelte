@@ -116,9 +116,9 @@
 <div class="flex flex-row gap-2">
 	<div class="input-group max-2xl:md:input-group-divider grid-cols-[auto_1fr_auto]">
 		<div class="input-group-shim max-sm:!hidden">{unit}</div>
-		<input class="input" type="number" placeholder="Amount..." bind:value {disabled} />
+		<input class="input" type="number" placeholder="Amount..." aria-label="amount" bind:value {disabled} />
 		{#if categories}
-			<select {disabled} bind:value={category}>
+			<select aria-label="category" {disabled} bind:value={category}>
 				{#each categories as category}
 					<option value={category.shortvalue}>{category.longvalue}</option>
 				{/each}
@@ -128,18 +128,18 @@
 	<div class="flex flex-row gap-1">
 	{#if existing}
 		{#if !editing}
-			<button class="btn-icon variant-filled-secondary" on:click|preventDefault={change('update')}>
+			<button aria-label="edit" class="btn-icon variant-filled-secondary" on:click|preventDefault={change('update')}>
 				<span>
 					<Edit/>
 				</span>
 			</button>
-			<button class="btn-icon variant-filled" on:click|preventDefault={change('delete')}>
+			<button aria-label="delete" class="btn-icon variant-filled" on:click|preventDefault={change('delete')}>
 				<span>
 					<Trash/>
 				</span>
 			</button>
 		{:else}
-			<button bind:this={btnConfirm}
+			<button aria-label="confirm" bind:this={btnConfirm}
 				class="btn-icon variant-ghost-primary"
 				on:click={changeAction === 'update' ? update : remove}
 			>
@@ -147,7 +147,7 @@
 					<Check/>
 				</span>
 			</button>
-			<button bind:this={btnCancel} class="btn-icon variant-ghost-error" on:click|preventDefault={discard}>
+			<button aria-label="discard" bind:this={btnCancel} class="btn-icon variant-ghost-error" on:click|preventDefault={discard}>
 				<span>
 					{#if changeAction === 'update'}
 						<CancelEdit/>
@@ -160,7 +160,7 @@
 			</button>
 		{/if}
 	{:else}
-		<button bind:this={btnAdd} class="btn-icon variant-filled-primary" on:click|preventDefault={add}>
+		<button aria-label="add" bind:this={btnAdd} class="btn-icon variant-filled-primary" on:click|preventDefault={add}>
 			<span>
 				{#if unit === 'kcal'}
 					<AddKcal/>
