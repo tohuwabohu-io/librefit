@@ -1,5 +1,6 @@
 <script>
     import {goto} from '$app/navigation';
+    import NoFood from '$lib/assets/icons/food-off.svg?component';
     import Overflow1 from '$lib/assets/icons/overflow-1.svg?component';
     import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
     import Check from '$lib/assets/icons/check.svg?component';
@@ -159,7 +160,7 @@
 </script>
 
 <div class="{displayClass} p-4 gap-4 text-center justify-evenly">
-    {#if ctList}
+    {#if ctList && ctList.length > 0}
         {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
 
         <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
@@ -199,5 +200,9 @@
             <button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history
             </button>
         {/if}
+    {:else}
+        <div>
+            <NoFood height={100} width={100}/>
+        </div>
     {/if}
 </div>
