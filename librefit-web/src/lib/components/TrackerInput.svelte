@@ -113,20 +113,43 @@
 	}
 </script>
 
-<div class="flex flex-row gap-2">
-	<div class="input-group max-2xl:md:input-group-divider grid-cols-[auto_1fr_auto]">
-		<div class="input-group-shim max-sm:!hidden">{unit}</div>
-		<input class="input" type="number" placeholder="Amount..." aria-label="amount" bind:value {disabled} />
-		{#if categories}
-			<select aria-label="category" {disabled} bind:value={category}>
-				{#each categories as category}
-					<option value={category.shortvalue}>{category.longvalue}</option>
-				{/each}
-			</select>
-		{/if}
+<style>
+	.unset-fit {
+		min-width: unset !important;
+	}
+</style>
+
+<div class="flex flex-col gap-2">
+	<div class="flex flex-row gap-2">
+		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
+			<div class="input-group-shim">{unit}</div>
+			<input class="max-sm:max-w-36 unset-fit" type="number" placeholder="Amount..." aria-label="amount" bind:value {disabled} />
+			{#if categories}
+				<select aria-label="category" {disabled} bind:value={category}>
+					{#each categories as category}
+						<option value={category.shortvalue}>{category.longvalue}</option>
+					{/each}
+				</select>
+			{/if}
+		</div>
 	</div>
-	<div class="flex flex-row gap-1">
-	{#if existing}
+	<div class="flex flex-row gap-1 justify-end">
+		<div>
+		{#if !existing}
+			<div>
+				<button aria-label="add" bind:this={btnAdd} class="btn-icon variant-filled-primary" on:click|preventDefault={add}>
+			<span>
+				{#if unit === 'kcal'}
+					<AddKcal/>
+				{:else if unit === 'kg'}
+					<AddWeight/>
+				{:else}
+					<Add/>
+				{/if}
+			</span>
+				</button>
+			</div>
+		{:else}
 		{#if !editing}
 			<button aria-label="edit" class="btn-icon variant-filled-secondary" on:click|preventDefault={change('update')}>
 				<span>
@@ -159,18 +182,7 @@
 				</span>
 			</button>
 		{/if}
-	{:else}
-		<button aria-label="add" bind:this={btnAdd} class="btn-icon variant-filled-primary" on:click|preventDefault={add}>
-			<span>
-				{#if unit === 'kcal'}
-					<AddKcal/>
-				{:else if unit === 'kg'}
-					<AddWeight/>
-				{:else}
-					<Add/>
-				{/if}
-			</span>
-		</button>
 	{/if}
+		</div>
 	</div>
 </div>
