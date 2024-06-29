@@ -13,6 +13,7 @@
 	export let value, dateStr, sequence;
 	export let existing = false;
 	export let disabled = false;
+	export let quickadd = false;
 
 	/** @type Array<FoodCategory> */
 	export let categories;
@@ -125,32 +126,48 @@
 			<div class="input-group-shim">{unit}</div>
 			<input class="max-sm:max-w-36 unset-fit" type="number" placeholder="Amount..." aria-label="amount" bind:value {disabled} />
 			{#if categories}
-				<select aria-label="category" {disabled} bind:value={category}>
-					{#each categories as category}
-						<option value={category.shortvalue}>{category.longvalue}</option>
-					{/each}
-				</select>
+			<select aria-label="category" {disabled} bind:value={category}>
+				{#each categories as category}
+					<option value={category.shortvalue}>{category.longvalue}</option>
+				{/each}
+			</select>
 			{/if}
 		</div>
+		{#if quickadd}
+		<div>
+			<button aria-label="add" bind:this={btnAdd} class="btn-icon variant-filled-primary" on:click|preventDefault={add}>
+				<span>
+					{#if unit === 'kcal'}
+						<AddKcal/>
+					{:else if unit === 'kg'}
+						<AddWeight/>
+					{:else}
+						<Add/>
+					{/if}
+				</span>
+			</button>
+		</div>
+		{/if}
 	</div>
+	{#if !quickadd}
 	<div class="flex flex-row gap-1 justify-end">
 		<div>
-		{#if !existing}
+			{#if !existing}
 			<div>
 				<button aria-label="add" bind:this={btnAdd} class="btn-icon variant-filled-primary" on:click|preventDefault={add}>
-			<span>
-				{#if unit === 'kcal'}
-					<AddKcal/>
-				{:else if unit === 'kg'}
-					<AddWeight/>
-				{:else}
-					<Add/>
-				{/if}
-			</span>
+					<span>
+					{#if unit === 'kcal'}
+						<AddKcal/>
+					{:else if unit === 'kg'}
+						<AddWeight/>
+					{:else}
+						<Add/>
+					{/if}
+					</span>
 				</button>
 			</div>
-		{:else}
-		{#if !editing}
+			{:else}
+			{#if !editing}
 			<button aria-label="edit" class="btn-icon variant-filled-secondary" on:click|preventDefault={change('update')}>
 				<span>
 					<Edit/>
@@ -161,7 +178,7 @@
 					<Trash/>
 				</span>
 			</button>
-		{:else}
+			{:else}
 			<button aria-label="confirm" bind:this={btnConfirm}
 				class="btn-icon variant-ghost-primary"
 				on:click={changeAction === 'update' ? update : remove}
@@ -181,8 +198,9 @@
 					{/if}
 				</span>
 			</button>
+			{/if}
 		{/if}
-	{/if}
 		</div>
 	</div>
+	{/if}
 </div>
