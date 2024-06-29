@@ -1,0 +1,79 @@
+<script>
+    import {getModalStore} from '@skeletonlabs/skeleton';
+    import TrackerInput from '$lib/components/TrackerInput.svelte';
+    import ValidatedInput from '$lib/components/ValidatedInput.svelte';
+    import {display_date_format, getDateAsStr} from '$lib/date.js';
+
+    const modalStore = getModalStore();
+
+    let caloriesQuickAdd;
+
+    let entries;
+    let categories;
+
+    if ($modalStore[0] && $modalStore[0].meta) {
+        entries = $modalStore[0].meta.entries;
+        categories = $modalStore[0].meta.categories;
+    }
+
+    const onSubmit = (eventType, event) => {
+        if ($modalStore[0].response) {
+            $modalStore[0].response({
+                detail: {
+                    type: eventType,
+                    detail: event.detail
+                }
+            });
+        }
+    }
+
+    const onCancel = () => {
+        if ($modalStore[0].response) {
+            $modalStore[0].response(undefined);
+        }
+    }
+</script>
+
+<div class="modal block bg-surface-100-800-token w-modal h-auto p-4 space-y-4 rounded-container-token shadow-xl">
+    {#if !entries}
+        <header class="text-2xl font-bold">
+            Add entry for {getDateAsStr(new Date(), display_date_format)}
+        </header>
+        <div>
+            <ValidatedInput bind:value={caloriesQuickAdd} unit="kcal"/>
+            <!--
+            <TrackerInput {categories}
+                          dateStr={getDateAsStr(new Date())}
+                          category={getDaytimeFoodCategory(new Date())}
+                          unit={'kcal'}
+                          on:add={(e) => onSubmit('add', e)}/>
+              -->
+        </div>
+    {:else}
+        <header class="text-2xl font-bold">
+            Edit entries
+        </header>
+        <div class="flex flex-col grow gap-4 justify-between">
+            {#each entries as entry}
+            <TrackerInput {categories}
+                          value={entry.amount}
+                          dateStr={entry.added}
+                          sequence={entry.sequence}
+                          category={entry.category}
+                          on:add={(e) => onSubmit('add', e)}
+                          on:update={(e) => onSubmit('update', e)}
+                          on:remove={(e) => onSubmit('remove', e)}
+                          existing={entry.sequence !== undefined}
+                          disabled={entry.sequence !== undefined}
+                          unit={'kcal'}
+            />
+            {/each}
+        </div>
+    {/if}
+
+    <footer class="modal-footer flex justify-end space-x-2">
+        <button on:click|preventDefault={onCancel} class="btn variant-filled">
+            Close
+        </button>
+    </footer>
+</div>
