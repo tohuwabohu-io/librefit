@@ -11,5 +11,6 @@
       "sizes": "144x144",
       "type": "image/png"
     }
-  ]
+  ],
+  "background_color": "#e4e6ee"
 }
