@@ -16,6 +16,7 @@
     export let displayClass = '';
     export let displayHeader = true;
     export let displayHistory = true;
+    export let headerText = 'Average distribution';
 
     let polarAreaChart, dailyAverage;
 
@@ -162,7 +163,7 @@
 
 <div class="{displayClass} gap-4 text-center justify-evenly relative">
     {#if ctList && ctList.length > 0}
-        {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
+        {#if displayHeader}<h3 class="h3">{headerText}</h3>{/if}
 
         <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
