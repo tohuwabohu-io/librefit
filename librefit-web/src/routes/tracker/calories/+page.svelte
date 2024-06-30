@@ -10,6 +10,7 @@
 	import { addCalories, updateCalories, deleteCalories, listCaloriesForDate, listCalorieTrackerDatesRange} from '$lib/api/tracker.js';
 	import FoodOff from '$lib/assets/icons/food-off.svg';
 	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
+	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
@@ -164,12 +165,17 @@
 							{convertDateStrToDisplayDateStr(dateStr)}
 						</svelte:fragment>
 						<svelte:fragment slot="content">
-							<div class="flex lg:flex-row flex-col gap-4 grow">
+							<div class="flex lg:flex-row flex-col gap-4">
 								{#if datesToEntries[dateStr]}
 									<CalorieTracker entries={datesToEntries[dateStr]} categories={$foodCategories}
 										on:addCalories={addEntry}
 										on:updateCalories={updateEntry}
 										on:deleteCalories={deleteEntry}
+									/>
+
+									<CalorieDistribution ctList={datesToEntries[dateStr]}
+														 displayHistory={false}
+														 displayHeader={false}
 									/>
 								{:else}
 									{#await datesToEntries[dateStr]}
