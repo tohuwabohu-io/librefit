@@ -17,7 +17,6 @@
 	import {goto} from '$app/navigation';
 	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
 	import {subMonths} from 'date-fns';
-	import NoFood from '$lib/assets/icons/food-off.svg?component';
 	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
 	import {observeToggle} from '$lib/theme-toggle.js';
 
@@ -166,8 +165,8 @@
 			<h1>Good {getDaytimeGreeting(new Date())}{#if name}, {$user.name}!{:else}!{/if}</h1>
 			<p>This is your daily summary.</p>
 
-			<div class="flex xl:flex-row flex-col gap-8">
-				<div class="card flex xl:flex-row flex-col gap-4 p-4">
+			<div class="flex lg:flex-row flex-col gap-8">
+				<div class="card flex xl:flex-row flex-col gap-4 p-4 lg:w-1/3">
 					<CalorieTracker entries={ctListRecent} categories={$foodCategories}
 									on:addCalories={onAddCalories}
 									on:updateCalories={onUpdateCalories}
@@ -175,25 +174,17 @@
 					/>
 				</div>
 
-				<div class="card flex xl:flex-row flex-col gap-4 p-4">
-					<CalorieDistribution displayClass="flex flex-col" bind:ctList={$ctList} />
+				<div class="card flex xl:flex-row flex-col gap-4 p-4 lg:w-1/3">
+					<CalorieDistribution displayClass="flex flex-col"
+						            bind:ctList={$ctList}
+					/>
 				</div>
 
-				<div class="card p-4 md:flex md:flex-row">
+				<div class="card p-4 md:flex md:flex-row lg:w-1/3">
 					<WeightTracker displayClass="md:w-1/2"
 							on:addWeight={onAddWeight}
 							on:updateGoal={setGoal}
 					/>
-
-					<div class="xl:hidden hidden md:flex md:flex-col md:w-1/2 justify-center items-center">
-						{#if $ctList.length > 0}
-							<CalorieDistribution bind:ctList={$ctList} />
-						{:else}
-							<div>
-								<NoFood height={100} width={100}/>
-							</div>
-						{/if}
-					</div>
 				</div>
 			</div>
 
