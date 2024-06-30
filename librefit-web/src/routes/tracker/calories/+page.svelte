@@ -151,7 +151,7 @@
 
 {#if $user}
 <section>
-	<div class="container mx-auto p-8 space-y-10">
+	<div class="container 2xl:w-2/5 xl:w-3/5 lg:w-4/5 mx-auto p-8 space-y-10 justify-between">
 		<h1>History</h1>
 
 		{#if data.availableDates}
@@ -165,7 +165,7 @@
 							{convertDateStrToDisplayDateStr(dateStr)}
 						</svelte:fragment>
 						<svelte:fragment slot="content">
-							<div class="flex lg:flex-row flex-col gap-4">
+							<div class="flex md:flex-row flex-col gap-4 p-4">
 								{#if datesToEntries[dateStr]}
 									<CalorieTracker entries={datesToEntries[dateStr]} categories={$foodCategories}
 										on:addCalories={addEntry}
