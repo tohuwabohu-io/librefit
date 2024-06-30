@@ -137,8 +137,22 @@
     </div>
     <div class="flex">
             <div class="btn-group variant-filled w-fit grow">
-                <button class="w-1/2" aria-label="add calories" on:click={onAddCalories}><Plus/></button>
-                <button class="w-1/2" aria-label="edit calories" on:click={onEdit}><Edit/></button>
+                <button class="w-1/2" aria-label="add calories" on:click={onAddCalories}>
+                    <span>
+                        <Plus/>
+                    </span>
+                    <span>
+                        Add
+                    </span>
+                </button>
+                <button class="w-1/2" aria-label="edit calories" on:click={onEdit}>
+                    <span>
+                        <Edit/>
+                    </span>
+                    <span>
+                        Edit
+                    </span>
+                </button>
             </div>
     </div>
 </div>
