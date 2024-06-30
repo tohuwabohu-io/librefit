@@ -180,7 +180,7 @@
 					/>
 				</div>
 
-				<div class="card p-4 md:flex md:flex-row lg:w-1/3">
+				<div class="card md:flex md:flex-row lg:w-1/3 p-4">
 					<WeightTracker displayClass="md:w-1/2"
 							on:addWeight={onAddWeight}
 							on:updateGoal={setGoal}

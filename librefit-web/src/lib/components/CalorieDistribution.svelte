@@ -163,7 +163,7 @@
 
 <div class="{displayClass} gap-4 text-center justify-evenly relative">
     {#if ctList && ctList.length > 0}
-        {#if displayHeader}<h3 class="h3">{headerText}</h3>{/if}
+        {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
         <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 

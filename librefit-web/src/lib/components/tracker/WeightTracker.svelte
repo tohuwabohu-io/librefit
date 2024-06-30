@@ -1,20 +1,16 @@
 <script>
     import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
+    import Target from '$lib/assets/icons/target-arrow.svg?component';
     import {createEventDispatcher, getContext} from 'svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
 
     const currentGoal = getContext('currentGoal');
     const lastEntry = getContext('lastWeight')
-
     const modalStore = getModalStore();
-
     const todayDateStr = getDateAsStr(new Date());
-
     const dispatch = createEventDispatcher();
-
-    export let displayClass = '';
 
     const addWeight = (e) => {
         dispatch('addWeight', {
@@ -59,7 +55,8 @@
     }
 </script>
 
-<div class="flex flex-col grow gap-4 text-center items-center self-center {displayClass}">
+<div class="flex flex-col grow gap-4 text-center items-center self-center">
+    <h2 class="h3">Your weight</h2>
     {#if $lastEntry}
         <Scale width={100} height={100} />
 
@@ -84,12 +81,24 @@
         </p>
     {/if}
 
-    <div class="btn-group variant-filled-primary">
-        <button on:click|preventDefault={showWeightModal}>
-            Update weight
-        </button>
-        <button on:click|preventDefault={showGoalModal}>
-            Update goal
-        </button>
+    <div class="flex">
+        <div class="btn-group variant-filled w-fit grow">
+            <button class="w-1/2" on:click={showWeightModal}>
+                <span>
+                    <Scale/>
+                </span>
+                <span>
+                    Set weight
+                </span>
+            </button>
+            <button class="w-1/2" on:click={showGoalModal}>
+                <span>
+                    <Target/>
+                </span>
+                <span>
+                    Set target
+                </span>
+            </button>
+        </div>
     </div>
 </div>
