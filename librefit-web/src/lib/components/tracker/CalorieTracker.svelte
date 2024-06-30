@@ -74,10 +74,8 @@
             },
             response: (e) =>  {
                 console.log(e);
-                if (!e) modalStore.close();
-                else {
-                    if (e.detail.type === 'add') addCalories(e.detail);
-                }
+                if (e.detail.type === 'add') addCalories(e.detail);
+                if (e.detail.close) modalStore.close();
             }
         });
     }
@@ -91,11 +89,9 @@
                 categories: categories
             },
             response: (e) => {
-                if (!e) modalStore.close();
-                else {
-                    if (e.detail.type === 'update')  updateCalories(e.detail);
-                    else if (e.detail.type === 'remove') deleteCalories(e.detail);
-                }
+                if (e.detail.type === 'update')  updateCalories(e.detail);
+                else if (e.detail.type === 'remove') deleteCalories(e.detail);
+                if (!e || e.detail.close) modalStore.close();
             }
         });
     }

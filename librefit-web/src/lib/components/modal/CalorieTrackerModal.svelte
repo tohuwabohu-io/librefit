@@ -21,6 +21,7 @@
             $modalStore[0].response({
                 detail: {
                     type: eventType,
+                    close: true,
                     detail: event.detail
                 }
             });
@@ -29,7 +30,11 @@
 
     const onCancel = () => {
         if ($modalStore[0].response) {
-            $modalStore[0].response(undefined);
+            $modalStore[0].response({
+                detail: {
+                    close: true
+                }
+            });
         }
     }
 </script>
@@ -71,8 +76,8 @@
         </div>
     {/if}
 
-    <footer class="modal-footer flex justify-end space-x-2">
-        <button on:click|preventDefault={onCancel} class="btn variant-filled">
+    <footer class="modal-footer flex justify-start space-x-2">
+        <button on:click|preventDefault={onCancel} class="btn variant-ringed">
             Close
         </button>
     </footer>

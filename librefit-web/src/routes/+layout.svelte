@@ -12,6 +12,7 @@
 	import {Indicator} from '$lib/indicator.js';
 	import {afterNavigate, beforeNavigate} from '$app/navigation';
 	import RegistrationModal from '$lib/components/modal/RegistrationModal.svelte';
+	import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
 
 	initializeStores();
 
@@ -34,6 +35,10 @@
 
 		registrationModal: {
 			ref: RegistrationModal
+		},
+
+		trackerModal: {
+			ref: CalorieTrackerModal
 		}
 	};
 
