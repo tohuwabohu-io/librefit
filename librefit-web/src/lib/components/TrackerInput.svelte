@@ -16,7 +16,7 @@
 
 	export let unit;
 
-	export let maxWidthCss = 'sm:max-w-36';
+	export let maxWidthCss = 'w-28 max-w-fit';
 	export let placeholder = 'Amount...';
 
 	const dispatch = createEventDispatcher();
