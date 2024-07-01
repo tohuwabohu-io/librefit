@@ -10,7 +10,6 @@
 	$: indicator;
 
 	export const showDrawer = (e) => {
-		console.log(e);
 		drawerStore.open({
 			width: 'xl:w-1/3 md:w-3/5 w-full'
 		});

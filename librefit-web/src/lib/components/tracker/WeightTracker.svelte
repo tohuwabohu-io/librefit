@@ -2,7 +2,7 @@
     import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
     import Target from '$lib/assets/icons/target-arrow.svg?component';
-    import {createEventDispatcher, getContext} from 'svelte';
+    import {createEventDispatcher} from 'svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
 
@@ -15,8 +15,6 @@
      * @type WeightTrackerEntry
      */
     export let lastEntry;
-
-    console.log(lastEntry)
 
     const modalStore = getModalStore();
     const todayDateStr = getDateAsStr(new Date());
