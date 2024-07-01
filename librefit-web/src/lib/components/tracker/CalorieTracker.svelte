@@ -7,13 +7,16 @@
     import {getModalStore} from '@skeletonlabs/skeleton';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
 
-    const currentGoal = getContext('currentGoal');
     const modalStore = getModalStore();
 
-    export let entries;
+    /** @type Array<CalorieTrackerEntry> */
+    export let entries = [];
 
     /** @type Array<FoodCategory> */
     export let categories;
+
+    /** @type Goal */
+    export let currentGoal = null
 
     const dispatch = createEventDispatcher();
 
@@ -101,7 +104,7 @@
     const calculateDeficit = (entries) => {
         const total = entries.reduce((totalCalories, entry) => totalCalories + entry.amount, 0);
 
-        return total - $currentGoal.targetCalories;
+        return total - currentGoal.targetCalories;
     }
 </script>
 
@@ -112,14 +115,14 @@
     <div class="self-center">
         <TrackerRadial entries={entries.map(e => e.amount)} />
     </div>
-    {#if $currentGoal}
+    {#if currentGoal}
         {@const deficit = calculateDeficit(entries)}
     <div>
         {#if deficit < 0}
             <p>You still have {Math.abs(deficit)}kcal left for the day. Good job!</p>
         {:else if deficit === 0}
-            <p>A spot landing. How did you even do that? There's {deficit} left.</p>
-        {:else if deficit > 0 && (deficit + $currentGoal.targetCalories) < $currentGoal.maximumCalories}
+            <p>A spot landing. How did you even do that? There's {deficit}kcal left.</p>
+        {:else if deficit > 0 && (deficit + currentGoal.targetCalories) < currentGoal.maximumCalories}
             <p>You exceeded your daily target by {deficit}kcal. Days like these happen.</p>
         {:else}
             <p>With a {deficit}kcal surplus, you reached the red zone. Eating over your TDEE causes long term weight gain.</p>
