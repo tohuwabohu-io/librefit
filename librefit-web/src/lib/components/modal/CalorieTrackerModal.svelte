@@ -2,14 +2,17 @@
     import {getModalStore} from '@skeletonlabs/skeleton';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {display_date_format, getDateAsStr} from '$lib/date.js';
+    import {display_date_format, getDateAsStr, getDaytimeFoodCategory} from '$lib/date.js';
 
     const modalStore = getModalStore();
 
     let caloriesQuickAdd;
 
-    let entries;
-    let categories;
+    /** @type Array<CalorieTrackerEntry> */
+    export let entries;
+
+    /** @type Array<FoodCategory> */
+    export let categories;
 
     if ($modalStore[0] && $modalStore[0].meta) {
         entries = $modalStore[0].meta.entries;
@@ -45,14 +48,12 @@
             Add entry for {getDateAsStr(new Date(), display_date_format)}
         </header>
         <div>
-            <ValidatedInput bind:value={caloriesQuickAdd} unit="kcal"/>
-            <!--
-            <TrackerInput {categories}
+            <TrackerInput categories={categories}
                           dateStr={getDateAsStr(new Date())}
                           category={getDaytimeFoodCategory(new Date())}
                           unit={'kcal'}
-                          on:add={(e) => onSubmit('add', e)}/>
-              -->
+                          on:add={(e) => onSubmit('add', e)}
+            />
         </div>
     {:else}
         <header class="text-2xl font-bold">
