@@ -6,8 +6,18 @@
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
 
-    const currentGoal = getContext('currentGoal');
-    const lastEntry = getContext('lastWeight')
+    /**
+     * @type Goal
+     */
+    export let currentGoal;
+
+    /**
+     * @type WeightTrackerEntry
+     */
+    export let lastEntry;
+
+    console.log(lastEntry)
+
     const modalStore = getModalStore();
     const todayDateStr = getDateAsStr(new Date());
     const dispatch = createEventDispatcher();
@@ -43,7 +53,7 @@
         modalStore.trigger({
             type: 'component',
             component: 'goalModal',
-            meta: { goal: $currentGoal },
+            meta: { goal: currentGoal },
             response: (e) => {
                 if (!e.cancelled) {
                     updateGoal(e)
@@ -57,11 +67,11 @@
 
 <div class="flex flex-col grow gap-4 text-center items-center self-center">
     <h2 class="h3">Your weight</h2>
-    {#if $lastEntry}
+    {#if lastEntry}
         <Scale width={100} height={100} />
 
         <p>
-            Current weight: {$lastEntry.amount}kg ({convertDateStrToDisplayDateStr($lastEntry.added)})
+            Current weight: {lastEntry.amount}kg ({convertDateStrToDisplayDateStr(lastEntry.added)})
         </p>
     {:else}
         <NoScale width={100} height={100} />
@@ -71,9 +81,9 @@
         </p>
     {/if}
 
-    {#if $currentGoal}
+    {#if currentGoal}
         <p>
-            Goal: {$currentGoal.targetWeight}kg @ ({convertDateStrToDisplayDateStr($currentGoal.endDate)})
+            Goal: {currentGoal.targetWeight}kg @ ({convertDateStrToDisplayDateStr(currentGoal.endDate)})
         </p>
     {:else}
         <p>

@@ -184,6 +184,8 @@
 					<WeightTracker displayClass="md:w-1/2"
 							on:addWeight={onAddWeight}
 							on:updateGoal={setGoal}
+						    lastEntry={$lastWeightTrackerEntry}
+						    currentGoal={$currentGoal}
 					/>
 				</div>
 			</div>
