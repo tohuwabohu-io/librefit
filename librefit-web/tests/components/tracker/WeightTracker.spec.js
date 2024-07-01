@@ -4,26 +4,11 @@ import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 import { convertDateStrToDisplayDateStr } from '$lib/date.js';
 import { tick } from 'svelte';
 import * as skeleton from '@skeletonlabs/skeleton';
-
-vi.mock('@skeletonlabs/skeleton', () => ({
-	...vi.importActual('@skeletonlabs/skeleton'),
-	getModalStore: vi.fn().mockReturnValue({
-		trigger: vi.fn(),
-		close: vi.fn()
-	})
-}));
+import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.js';
 
 const mockData = {
 	lastEntry: { amount: 70, added: '2022-01-01' },
 	currentGoal: { targetWeight: 60, endDate: '2023-01-01' }
-};
-
-const extractResponseFn = () => {
-	// Get the 'response' function from the last call to the 'trigger' mock.
-	const mockTrigger = skeleton.getModalStore().trigger;
-	const lastCallArgs = mockTrigger.mock.calls[mockTrigger.mock.calls.length - 1];
-
-	return lastCallArgs[0].response;
 };
 
 /**
@@ -72,14 +57,14 @@ describe('WeightTracker.svelte component', () => {
 			response: expect.any(Function)
 		});
 
-		const responseFn = extractResponseFn();
+		const callback = extractModalStoreMockTriggerCallback();
 
-		await responseFn(undefined);
+		await callback(undefined);
 		await tick();
 
 		expect(dispatchMock).toHaveBeenCalledTimes(0);
 
-		await responseFn({
+		await callback({
 			dateStr: mockData.lastEntry.added,
 			detail: {
 				value: mockData.lastEntry.amount
@@ -108,16 +93,16 @@ describe('WeightTracker.svelte component', () => {
 			response: expect.any(Function)
 		});
 
-		const responseFn = extractResponseFn();
+		const callback = extractModalStoreMockTriggerCallback();
 
-		await responseFn({
+		await callback({
 			cancelled: true
 		});
 		await tick();
 
 		expect(dispatchMock).toHaveBeenCalledTimes(0);
 
-		await responseFn(mockData.currentGoal);
+		await callback(mockData.currentGoal);
 		await tick();
 
 		expect(dispatchMock).toHaveBeenCalledTimes(1);
