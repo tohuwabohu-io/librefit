@@ -1,12 +1,9 @@
 <script>
     import {getModalStore} from '@skeletonlabs/skeleton';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
-    import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {display_date_format, getDateAsStr, getDaytimeFoodCategory} from '$lib/date.js';
 
     const modalStore = getModalStore();
-
-    let caloriesQuickAdd;
 
     /** @type Array<CalorieTrackerEntry> */
     export let entries;
@@ -57,7 +54,7 @@
         </div>
     {:else}
         <header class="text-2xl font-bold">
-            Edit entries
+            Edit tracker for {getDateAsStr(new Date(), display_date_format)}
         </header>
         <div class="flex flex-col grow gap-4 justify-between">
             {#each entries as entry}
