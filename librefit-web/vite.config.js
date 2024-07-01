@@ -20,5 +20,8 @@ export default defineConfig({
 				]
 			}
 		})
-	]
+	],
+	test: {
+		setupFiles: ['./tests/__mocks__/skeletonProxy.js']
+	}
 });
