@@ -165,7 +165,7 @@
 
 			<div class="flex lg:flex-row flex-col gap-8">
 				<div class="card flex xl:flex-row flex-col gap-4 p-4 lg:w-1/3">
-					<CalorieTracker entries={ctListRecent} categories={$foodCategories}
+					<CalorieTracker entries={ctListRecent} categories={$foodCategories} currentGoal={$currentGoal}
 									on:addCalories={onAddCalories}
 									on:updateCalories={onUpdateCalories}
 									on:deleteCalories={onDeleteCalories}
