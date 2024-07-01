@@ -54,8 +54,6 @@
 		const amountMessage = validateAmount(event.detail.value);
 
 		if (!amountMessage) {
-			console.log(event);
-
 			await addCalories(event).then(async response => {
 				event.detail.callback();
 

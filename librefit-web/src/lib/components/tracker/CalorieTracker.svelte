@@ -73,7 +73,6 @@
                 categories: categories
             },
             response: (e) =>  {
-                console.log(e);
                 if (e.detail.type === 'add') addCalories(e.detail);
                 if (e.detail.close) modalStore.close();
             }
