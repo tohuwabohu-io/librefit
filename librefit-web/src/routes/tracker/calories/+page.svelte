@@ -10,6 +10,7 @@
 	import { addCalories, updateCalories, deleteCalories, listCaloriesForDate, listCalorieTrackerDatesRange} from '$lib/api/tracker.js';
 	import FoodOff from '$lib/assets/icons/food-off.svg';
 	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
+	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
@@ -18,6 +19,7 @@
 	const indicator = getContext('indicator');
 	const user = getContext('user');
 	const foodCategories = getContext('foodCategories');
+	const currentGoal = getContext('currentGoal');
 
 	if (!$user) goto('/');
 
@@ -150,8 +152,8 @@
 
 {#if $user}
 <section>
-	<div class="container mx-auto p-8 space-y-10">
-		<h1>History</h1>
+	<div class="container 2xl:w-2/5 xl:w-3/5 lg:w-4/5 mx-auto p-8 space-y-10 justify-between">
+		<h1 class="h1">Tracker History</h1>
 
 		{#if data.availableDates}
 			{#if availableDates.length > 0}
@@ -164,19 +166,24 @@
 							{convertDateStrToDisplayDateStr(dateStr)}
 						</svelte:fragment>
 						<svelte:fragment slot="content">
-							<div class="flex lg:flex-row flex-col gap-4 grow">
+							<div class="flex md:flex-row flex-col gap-4 p-4">
 								{#if datesToEntries[dateStr]}
-									<CalorieTracker entries={datesToEntries[dateStr]} categories={$foodCategories}
+									<CalorieTracker entries={datesToEntries[dateStr]} categories={$foodCategories} currentGoal={$currentGoal}
 										on:addCalories={addEntry}
 										on:updateCalories={updateEntry}
 										on:deleteCalories={deleteEntry}
+									/>
+
+									<CalorieDistribution ctList={datesToEntries[dateStr]}
+														 displayHistory={false}
+														 displayHeader={false}
 									/>
 								{:else}
 									{#await datesToEntries[dateStr]}
 										<p>... loading</p>
 									{:then entries}
 										{#if entries}
-											<CalorieTracker {entries} categories={$foodCategories}
+											<CalorieTracker {entries} categories={$foodCategories} currentGoal={$currentGoal}
 												on:addCalories={addEntry}
 												on:updateCalories={updateEntry}
 												on:deleteCalories={deleteEntry}

@@ -11,7 +11,7 @@
 
 <section class="variant-ghost-surface h-full flex">
     <div class="container mx-auto p-12 space-y-8 self-center">
-        <h1>
+        <h1 class="h1">
             Terms and conditions
         </h1>
         <p>
@@ -19,7 +19,7 @@
             website (“website”, "service") operated by tohuwabohu.io ("us", 'we", "our").
         </p>
 
-        <h2>
+        <h2 class="h2">
             Conditions of use
         </h2>
         <p>
@@ -29,7 +29,7 @@
             website, its products, and its services to those who have accepted its terms.
         </p>
 
-        <h2>
+        <h2 class="h2">
             Privacy policy
         </h2>
         <p>
@@ -37,7 +37,7 @@
             regarding our user data collection. It will help you better understand our practices.
         </p>
 
-        <h2>
+        <h2 class="h2">
             Age restriction
         </h2>
         <p>
@@ -46,7 +46,7 @@
             Agreement. We assume no responsibility for liabilities related to age misrepresentation.
         </p>
 
-        <h2>
+        <h2 class="h2">
             Intellectual property
         </h2>
         <p>
@@ -62,7 +62,7 @@
             you should contact us in order to come to an agreement.
         </p>
 
-        <h2>
+        <h2 class="h2">
             User accounts
         </h2>
         <p>
@@ -80,7 +80,7 @@
             sole discretion.
         </p>
 
-        <h2>
+        <h2 class="h2">
             Applicable law
         </h2>
         <p>
@@ -89,7 +89,7 @@
             between us and you, or its business partners and associates.
         </p>
 
-        <h2>
+        <h2 class="h2">
             Indemnification
         </h2>
         <p>
@@ -98,7 +98,7 @@
             select our own legal counsel.
         </p>
 
-        <h2>
+        <h2 class="h2">
             Limitation on liability
         </h2>
         <p>

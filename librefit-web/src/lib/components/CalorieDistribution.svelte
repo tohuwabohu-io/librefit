@@ -1,8 +1,10 @@
 <script>
     import {goto} from '$app/navigation';
+    import Check from '$lib/assets/icons/check.svg?component';
+    import History from '$lib/assets/icons/history.svg?component';
+    import NoFood from '$lib/assets/icons/food-off.svg?component';
     import Overflow1 from '$lib/assets/icons/overflow-1.svg?component';
     import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
-    import Check from '$lib/assets/icons/check.svg?component';
     import {PolarArea} from 'svelte-chartjs';
     import {Chart, registerables} from 'chart.js';
     import {getContext} from 'svelte';
@@ -14,6 +16,7 @@
     export let displayClass = '';
     export let displayHeader = true;
     export let displayHistory = true;
+    export let headerText = 'Average distribution';
 
     let polarAreaChart, dailyAverage;
 
@@ -106,7 +109,7 @@
                         ticks: {
                             backdropColor: `rgb(${labelColor})`,
                             color: `rgb(${labelTextColor})`
-                        },
+                        }
                     }
                 }
             }
@@ -158,9 +161,9 @@
     }
 </script>
 
-<div class="{displayClass} p-4 gap-4 text-center justify-evenly">
-    {#if ctList}
-        {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
+<div class="{displayClass} gap-4 text-center justify-evenly relative">
+    {#if ctList && ctList.length > 0}
+        {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
         <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
@@ -196,8 +199,18 @@
         </div>
 
         {#if displayHistory}
-            <button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history
+            <button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>
+                <span>
+                    <History/>
+                </span>
+                <span>
+                    History
+                </span>
             </button>
         {/if}
+    {:else}
+        <div>
+            <NoFood height={100} width={100}/>
+        </div>
     {/if}
 </div>

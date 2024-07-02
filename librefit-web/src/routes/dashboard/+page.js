@@ -13,6 +13,7 @@ export const load = async ({ fetch }) => {
 	const userApi = api.readUserInfo;
 
 	const today = new Date();
+	const lastWeek = subMonths(today, 7);
 	const lastMonth = subMonths(today, 1);
 
 	// return dashboard relevant data
@@ -24,7 +25,7 @@ export const load = async ({ fetch }) => {
 	const lastCtResponse = await listCaloriesForDate(today);
 	const listWeightResponse = await listWeightRange(lastMonth, today);
 
-	const listCtResponse = await listCalorieTrackerEntriesRange(lastMonth, today);
+	const listCtResponse = await listCalorieTrackerEntriesRange(lastWeek, today);
 
 	const lastWeightResponse = await proxyFetch(fetch, lastWeightApi);
 	const lastGoalResponse = await proxyFetch(fetch, goalApi);

@@ -17,7 +17,6 @@
 	import {goto} from '$app/navigation';
 	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
 	import {subMonths} from 'date-fns';
-	import NoFood from '$lib/assets/icons/food-off.svg?component';
 	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
 	import {observeToggle} from '$lib/theme-toggle.js';
 
@@ -55,8 +54,6 @@
 		const amountMessage = validateAmount(event.detail.value);
 
 		if (!amountMessage) {
-			console.log(event);
-
 			await addCalories(event).then(async response => {
 				event.detail.callback();
 
@@ -159,53 +156,42 @@
 
 {#if $user}
 <section>
-	<div class="container mx-auto p-8 space-y-8">
+	<div class="container md:w-fit mx-auto p-8 space-y-8">
 		{#if $user}
 			{@const name = $user.name}
 
-			<h1>Good {getDaytimeGreeting(new Date())}{#if name}, {$user.name}!{:else}!{/if}</h1>
+			<h1 class="h1">Good {getDaytimeGreeting(new Date())}{#if name}, {$user.name}!{:else}!{/if}</h1>
 			<p>This is your daily summary.</p>
 
-			<div class="flex xl:flex-row flex-col gap-8">
-				<div class="card flex xl:flex-row flex-col gap-4 grow p-4">
-					<CalorieTracker entries={ctListRecent} categories={$foodCategories}
+			<div class="flex lg:flex-row flex-col gap-8">
+				<div class="card flex xl:flex-row flex-col gap-4 p-4 lg:w-1/3">
+					<CalorieTracker entries={ctListRecent} categories={$foodCategories} currentGoal={$currentGoal}
 									on:addCalories={onAddCalories}
 									on:updateCalories={onUpdateCalories}
 									on:deleteCalories={onDeleteCalories}
 					/>
 				</div>
-				<div class="card p-4 md:flex md:flex-row">
+
+				<div class="card flex xl:flex-row flex-col gap-4 p-4 lg:w-1/3">
+					<CalorieDistribution displayClass="flex flex-col"
+						            bind:ctList={$ctList}
+					/>
+				</div>
+
+				<div class="card md:flex md:flex-row lg:w-1/3 p-4">
 					<WeightTracker displayClass="md:w-1/2"
 							on:addWeight={onAddWeight}
 							on:updateGoal={setGoal}
+						    lastEntry={$lastWeightTrackerEntry}
+						    currentGoal={$currentGoal}
 					/>
-
-					<div class="xl:hidden hidden md:flex md:flex-col md:w-1/2 justify-center items-center">
-						{#if $ctList.length > 0}
-							<CalorieDistribution bind:ctList={$ctList} />
-						{:else}
-							<div>
-								<NoFood height={100} width={100}/>
-							</div>
-						{/if}
-					</div>
 				</div>
 			</div>
 
 			<div class="flex md:flex-row flex-col gap-8">
-				<div class="flex flex-col md:max-xl:hidden card xl:w-1/4 justify-center items-center">
-					{#if $ctList.length > 0 }
-						<CalorieDistribution displayClass="flex flex-col" bind:ctList={$ctList} />
-					{:else}
-						<div>
-							<NoFood height={100} width={100}/>
-						</div>
-					{/if}
-				</div>
-
-				<div class="flex flex-row gap-4 grow card p-4 object-fill xl:w-3/4 justify-center items-center">
+				<div class="flex flex-row gap-4 card p-4 object-fill justify-center items-center relative md:w-full">
 					{#if wtChart && data.listWeight.length > 0}
-						<Line options={wtChart.chartOptions} data={wtChart.chartData}/>
+						<Line class="md:w-full" options={wtChart.chartOptions} data={wtChart.chartData}/>
 					{:else}
 						<div>
 							<ScaleOff width={100} height={100} class="self-center"/>

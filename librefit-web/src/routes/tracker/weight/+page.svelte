@@ -116,7 +116,7 @@
 {#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-10">
-        <h1>History</h1>
+        <h1 class="h1">Weight History</h1>
 
         {#if data.wtList}
             {#if wtList.length > 0}
@@ -140,7 +140,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <TrackerInput
+                                    <TrackerInput compact={true}
                                                   value={entry.amount}
                                                   dateStr={entry.added}
                                                   sequence={entry.sequence}
@@ -149,7 +149,10 @@
                                                   on:remove={deleteWeightEntry}
                                                   existing={entry.sequence !== undefined}
                                                   disabled={entry.sequence !== undefined}
-                                                  unit={'kg'}/>
+                                                  placeholder={''}
+                                                  unit={'kg'}
+                                                  maxWidthCss="max-sm:max-w-12"
+                                    />
                                 </td>
                             </tr>
                         {/each}

@@ -1,7 +1,37 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, getByRole, getByText, render, screen } from '@testing-library/svelte';
 import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
+import * as skeleton from '@skeletonlabs/skeleton';
 import { tick } from 'svelte';
+import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.js';
+import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.js';
+
+const mockCategories = [
+	{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
+	{ shortvalue: 'l', longvalue: 'Lunch', visible: true },
+	{ shortvalue: 'd', longvalue: 'Dinner', visible: true },
+	{ shortvalue: 't', longvalue: 'Treat', visible: true },
+	{ shortvalue: 's', longvalue: 'Snack', visible: true }
+];
+
+const mockEntries = [
+	{ added: '2023-11-10', sequence: 1, amount: 500, category: 'b' },
+	{ added: '2023-11-10', sequence: 2, amount: 300, category: 'l' },
+	{ added: '2023-11-10', sequence: 3, amount: 600, category: 'd' },
+	{ added: '2023-11-10', sequence: 4, amount: 200, category: 't' },
+	{ added: '2023-11-10', sequence: 5, amount: 150, category: 's' }
+];
+
+const mockGoal = {
+	added: '2023-01-01',
+	sequence: 1,
+	initialWeight: 70,
+	targetWeight: 60,
+	startDate: '2023-01-01',
+	endDate: '2023-12-31',
+	targetCalories: 2000,
+	maximumCalories: 2400
+};
 
 /**
  * @vitest-environment jsdom
@@ -9,217 +39,179 @@ import { tick } from 'svelte';
 describe('CalorieTracker.svelte component', () => {
 	afterEach(() => cleanup());
 
-	/*
-	 * Expectations:
-	 *  - render an empty component with one empty entry (number of TrackerInput components: 1)
-	 *  - change default data, click 'add'
-	 *  - addCalories must have been triggered once
-	 *  - addCalories must fire event with changed data
-	 *  - add a new empty entry on top (number of TrackerInput components: 2)
-	 *  - repeat process
-	 *  - number of TrackerInput components must equal to 3
-	 */
-	it('should render a pristine component, add two entries and grow', async () => {
-		const mockData = {
-			categories: [
-				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
-				{ shortvalue: 'l', longvalue: 'Lunch', visible: true },
-				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
-			],
-			entries: [
-				{
-					// there must always be one entry prepended or otherwise the component won't have any controls
-					added: '2022-02-02',
-					sequence: undefined,
-					category: 'l'
-				}
-			]
+	// Test that the CalorieTracker component renders correctly
+	it('renders correctly', () => {
+		const mockGoal = {
+			added: '2023-01-01',
+			sequence: 1,
+			initialWeight: 70,
+			targetWeight: 60,
+			startDate: '2023-01-01',
+			endDate: '2023-12-31',
+			targetCalories: 2000,
+			maximumCalories: 2400
 		};
 
-		const { component } = render(CalorieTracker, { ...mockData });
-
-		let addEvent;
-		const addMock = vi.fn((event) => {
-			addEvent = event.detail;
-			mockData.entries.unshift({
-				added: '2022-02-02',
-				sequence: undefined,
-				category: 'd'
-			});
-
-			// component won't add element by itself as the page would reload the whole dataset
-			// add new entry -> list expands
-			component.$set({ entries: mockData.entries });
+		const { getByText, getByRole, getByTestId } = render(CalorieTracker, {
+			categories: mockCategories,
+			entries: mockEntries,
+			currentGoal: mockGoal
 		});
 
-		await component.$on('addCalories', addMock);
+		// heading
+		expect(getByText('Calorie Tracker')).toBeTruthy();
 
-		// for now there should be only one of those components each
-		const amountInput = screen.getByRole('spinbutton', { name: 'amount' });
-		const categoryCombobox = screen.getByRole('combobox', { name: 'category' });
+		// radial
+		expect(getByTestId('progress-radial')).toBeDefined();
 
+		// deficit/surplus message
+		expect(getByText(`You still have 250kcal left for the day. Good job!`));
+
+		const amountInput = getByRole('spinbutton', { name: 'amount' });
+
+		// tracker
+		expect(getByText('kcal')).toBeDefined();
 		expect(amountInput.placeholder).toEqual('Amount...');
 		expect(amountInput.value).toBeFalsy();
-		expect(categoryCombobox.value).toStrictEqual('l');
 
-		// change amount + category and click 'add'
+		// quickadd
+		expect(getByRole('button', { name: 'add calories' })).toBeTruthy();
+
+		// button group
+		expect(getByText('Add')).toBeTruthy();
+		expect(getByText('Edit')).toBeTruthy();
+	});
+
+	it('should trigger the quick add button', async () => {
+		const { component, getByText, getByRole } = render(CalorieTracker);
+
+		let dispatchEvent;
+		const dispatchMock = vi.fn((e) => {
+			dispatchEvent = e.detail;
+		});
+		component.$on('addCalories', dispatchMock);
+
+		const amountInput = getByRole('spinbutton', { name: 'amount' });
 		await fireEvent.input(amountInput, { target: { value: 100 } });
-		await fireEvent.change(categoryCombobox, { target: { value: 'd' } });
 
-		expect(amountInput.value).toStrictEqual('100');
-		expect(categoryCombobox.value).toStrictEqual('d');
-
-		await fireEvent.click(screen.getByRole('button', { name: 'add' }));
+		const quickAddButton = getByRole('button', { name: 'add' });
+		await fireEvent.click(quickAddButton);
 		await tick();
 
-		expect(addMock).toHaveBeenCalledTimes(1);
-		expect(addEvent).toEqual({
+		expect(dispatchMock).toHaveBeenCalledTimes(1);
+		expect(dispatchEvent).toEqual({
 			callback: expect.any(Function),
-			target: undefined,
-			dateStr: '2022-02-02',
-			category: 'd',
-			value: 100
+			value: 100,
+			category: getDaytimeFoodCategory(new Date()),
+			dateStr: getDateAsStr(new Date()),
+			target: undefined
 		});
-
-		expect(mockData.entries.length).toStrictEqual(2);
-
-		await fireEvent.input(screen.getAllByRole('spinbutton', { name: 'amount' })[1], {
-			target: { value: 700 }
-		});
-		await fireEvent.change(screen.getAllByRole('combobox', { name: 'category' })[1], {
-			target: { value: 'b' }
-		});
-		await fireEvent.click(screen.getAllByRole('button', { name: 'add' })[1]);
-		await tick();
-
-		expect(addMock).toHaveBeenCalledTimes(2);
-		expect(addEvent).toEqual({
-			callback: expect.any(Function),
-			target: undefined,
-			dateStr: '2022-02-02',
-			category: 'b',
-			value: 700
-		});
-
-		expect(screen.getAllByRole('spinbutton', { name: 'amount' }).length).toStrictEqual(3);
 	});
 
-	/*
-	 * Expectations
-	 * 	- render component with two entries filled and one empty (number of TrackerInput components: 3)
-	 *  - for the 2nd entry (lunch), click 'delete' and confirm
-	 *  - deleteCalories must have been triggered once
-	 *  - deleteCalories must fire event with entry data that shall be deleted
-	 *  - number of TrackerInput components must equal to 2
-	 *  - repeat process for dinner (the new 2nd entry)
-	 *  - number of TrackerInput components must equal to 1
-	 */
-	it('should render a filled component, remove two entries and shrink', async () => {
-		const lunch = { added: '2022-02-02', amount: 500, sequence: 1, category: 'l' };
-		const dinner = { added: '2022-02-02', amount: 500, sequence: 2, category: 'd' };
-		const empty = { added: '2022-02-02', sequence: undefined, category: 'l' };
+	it('should trigger the add button and dispatch addCalories', async () => {
+		let dispatchEvent;
+		const dispatchMock = vi.fn((e) => {
+			dispatchEvent = e.detail;
+		});
 
-		const mockData = {
-			categories: [
-				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
-				{ shortvalue: 'l', longvalue: 'Lunch', visible: true },
-				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
-			],
-			entries: [empty, lunch, dinner]
+		const { component, getByText } = render(CalorieTracker);
+		component.$on('addCalories', dispatchMock);
+
+		// Expect that the add button is rendered
+		const addButton = getByText('Add');
+		await fireEvent.click(addButton);
+		await tick();
+
+		expect(skeleton.getModalStore().trigger).toHaveBeenCalledWith({
+			type: 'component',
+			component: 'trackerModal',
+			response: expect.any(Function),
+			meta: {
+				categories: undefined
+			}
+		});
+
+		const callback = extractModalStoreMockTriggerCallback();
+		await callback({
+			detail: {
+				close: true
+			}
+		});
+
+		expect(dispatchMock).toHaveBeenCalledTimes(0);
+
+		const callbackDetails = {
+			dateStr: getDateAsStr(new Date()),
+			value: 100,
+			category: getDaytimeFoodCategory(new Date())
 		};
 
-		const { component } = render(CalorieTracker, { ...mockData });
+		const callbackParams = {
+			detail: {
+				type: 'add',
+				detail: callbackDetails
+			}
+		};
 
-		let deleteEvent;
-		const deleteMock = vi.fn((event) => {
-			deleteEvent = event.detail;
+		await callback(callbackParams);
 
-			// component won't remove element by itself as the page would reload the whole dataset
-			const index = mockData.entries.findIndex((entry) => entry.sequence === event.detail.sequence);
-			mockData.entries.splice(index, 1);
-			component.$set({ entries: mockData.entries });
+		expect(dispatchMock).toHaveBeenCalledTimes(1);
+		expect(dispatchEvent).toEqual(callbackDetails);
+	});
+
+	it('should trigger the edit button and dispatch updateCalories', async () => {
+		let dispatchEvent;
+		const dispatchMock = vi.fn((e) => {
+			dispatchEvent = e.detail;
 		});
 
-		await component.$on('deleteCalories', deleteMock);
+		const { component, getByText } = render(CalorieTracker, {
+			categories: mockCategories,
+			entries: mockEntries,
+			currentGoal: mockGoal
+		});
+		component.$on('updateCalories', dispatchMock);
 
-		// the empty entry does not have a delete button, so the index shifts by -1
-		const deleteButton = screen.getAllByRole('button', { name: 'delete' })[0];
-		await fireEvent.click(deleteButton);
-
-		const confirmButton = screen.getByRole('button', { name: 'confirm' });
-		await fireEvent.click(confirmButton);
+		const editButton = getByText('Edit');
+		await fireEvent.click(editButton);
 		await tick();
 
-		expect(deleteMock).toHaveBeenCalledTimes(1);
-		expect(deleteEvent).toEqual({
-			callback: expect.any(Function),
-			target: confirmButton,
-			sequence: 1,
-			dateStr: '2022-02-02'
+		expect(skeleton.getModalStore().trigger).toHaveBeenCalledWith({
+			type: 'component',
+			component: 'trackerModal',
+			response: expect.any(Function),
+			meta: {
+				categories: mockCategories,
+				entries: mockEntries
+			}
 		});
 
-		expect(mockData.entries.length).toStrictEqual(2);
+		const callback = extractModalStoreMockTriggerCallback();
+		await callback({
+			detail: {
+				close: true
+			}
+		});
 
-		await fireEvent.click(deleteButton);
-		await fireEvent.click(confirmButton);
-		await tick();
+		expect(dispatchMock).toHaveBeenCalledTimes(0);
 
-		expect(deleteMock).toHaveBeenCalledTimes(2);
-		expect(deleteEvent).toEqual({
-			callback: expect.any(Function),
-			target: confirmButton,
+		const callbackDetails = {
+			dateStr: getDateAsStr(new Date()),
+			value: 100,
 			sequence: 2,
-			dateStr: '2022-02-02'
-		});
-
-		expect(screen.getAllByRole('spinbutton', { name: 'amount' }).length).toStrictEqual(1);
-	});
-
-	/*
-	 * Expectations
-	 *  - render component with one entry filled and one empty (number of TrackerInput components: 2)
-	 *  - for the filled entry click 'update' and confirm
-	 *  - updateCalories must have been triggered once
-	 *  - updateCalories must fire event with changed entry
-	 */
-	it('should render a filled component and update one entry', async () => {
-		const breakfast = { added: '2022-02-02', amount: 500, sequence: 1, category: 'b' };
-		const empty = { added: '2022-02-02', sequence: undefined, category: 'l' };
-
-		const mockData = {
-			categories: [
-				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
-				{ shortvalue: 'l', longvalue: 'Lunch', visible: true },
-				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
-			],
-			entries: [empty, breakfast]
+			category: getDaytimeFoodCategory(new Date())
 		};
 
-		const { component } = render(CalorieTracker, { ...mockData });
+		const callbackParams = {
+			detail: {
+				type: 'update',
+				detail: callbackDetails
+			}
+		};
 
-		let updateEvent;
-		const updateMock = vi.fn((event) => {
-			updateEvent = event.detail;
-			mockData.entries[event.detail.sequence] = event.detail;
-			component.$set({ entries: mockData.entries });
-		});
+		await callback(callbackParams);
 
-		await component.$on('updateCalories', updateMock);
-
-		await fireEvent.click(screen.getByRole('button', { name: 'edit' }));
-		await fireEvent.input(screen.getAllByRole('spinbutton', { name: 'amount' })[1], {
-			target: { value: 600 }
-		});
-		await fireEvent.click(screen.getByRole('button', { name: 'confirm' }));
-		await tick();
-
-		expect(updateMock).toHaveBeenCalledTimes(1);
-		expect(updateEvent).toEqual({
-			callback: expect.any(Function),
-			sequence: 1,
-			dateStr: '2022-02-02',
-			category: 'b',
-			value: 600
-		});
+		expect(dispatchMock).toHaveBeenCalledTimes(1);
+		expect(dispatchEvent).toEqual(callbackDetails);
 	});
 });

@@ -26,10 +26,11 @@
 		</a>
 	</svelte:fragment>
 	<svelte:fragment slot="trail">
-		<Avatar src={$user.avatar} initials="LU" width="w-12"
-				border="border-4 border-surface-300-600-token hover:!border-primary-500"
-				cursor="cursor-pointer"
-				on:click={showDrawer}
-		/>
+		<button on:click={showDrawer}>
+			<Avatar src={$user.avatar} initials="LU" width="w-12"
+					border="border-4 border-surface-300-600-token hover:!border-primary-500"
+					cursor="cursor-pointer"
+			/>
+		</button>
 	</svelte:fragment>
 </AppBar>

@@ -71,7 +71,7 @@
 {#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-8">
-        <h1>Profile</h1>
+        <h1 class="h1">Profile</h1>
         <p>Change your user settings.</p>
 
         <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" on:submit|preventDefault={handleSubmit}>

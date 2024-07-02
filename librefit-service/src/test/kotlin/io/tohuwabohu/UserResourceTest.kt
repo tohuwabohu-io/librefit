@@ -128,6 +128,7 @@ class UserResourceTest {
         val user = LibreUser(
             email = "unit-test1@test.dev",
             password = "password",
+            name = "Fridolin",
             avatar = "/path"
         )
 
