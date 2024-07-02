@@ -16,7 +16,7 @@
 
 	export let unit;
 
-	export let maxWidthCss = 'w-28 max-w-fit';
+	export let maxWidthCss = '';
 	export let placeholder = 'Amount...';
 
 	const dispatch = createEventDispatcher();
@@ -72,7 +72,7 @@
 	<div class="flex flex-row gap-2">
 		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
 			<div class="input-group-shim">{unit}</div>
-			<input class="{maxWidthCss} unset-fit" type="number" placeholder={placeholder} aria-label="amount" bind:value {disabled} />
+			<input class="{maxWidthCss} w-full unset-fit" type="number" placeholder={placeholder} aria-label="amount" bind:value {disabled} />
 			{#if categories}
 			<select aria-label="category" {disabled} bind:value={category}>
 				{#each categories as category}
