@@ -67,7 +67,7 @@
 {#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-10">
-        <h1>
+        <h1 class="h1">
             Calorie Distribution
         </h1>
         <div class="flex flex-col gap-4">

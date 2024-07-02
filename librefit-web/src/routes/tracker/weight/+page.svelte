@@ -116,7 +116,7 @@
 {#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-10">
-        <h1>History</h1>
+        <h1 class="h1">Weight History</h1>
 
         {#if data.wtList}
             {#if wtList.length > 0}

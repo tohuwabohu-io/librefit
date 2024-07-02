@@ -153,7 +153,7 @@
 {#if $user}
 <section>
 	<div class="container 2xl:w-2/5 xl:w-3/5 lg:w-4/5 mx-auto p-8 space-y-10 justify-between">
-		<h1>History</h1>
+		<h1 class="h1">Tracker History</h1>
 
 		{#if data.availableDates}
 			{#if availableDates.length > 0}
