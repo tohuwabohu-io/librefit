@@ -160,7 +160,7 @@
 		{#if $user}
 			{@const name = $user.name}
 
-			<h1>Good {getDaytimeGreeting(new Date())}{#if name}, {$user.name}!{:else}!{/if}</h1>
+			<h1 class="h1">Good {getDaytimeGreeting(new Date())}{#if name}, {$user.name}!{:else}!{/if}</h1>
 			<p>This is your daily summary.</p>
 
 			<div class="flex lg:flex-row flex-col gap-8">
