@@ -4,10 +4,10 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build ",
+		"build": "vite build",
 		"start": "node build",
 		"preview": "vite preview",
-		"test": "vitest",
+		"test": "vitest run",
 		"coverage": "vitest run --coverage",
 		"check": "svelte-kit sync && svelte-check",
 		"check:watch": "svelte-kit sync && svelte-check",
