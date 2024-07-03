@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("org.openapi.generator") version "6.3.0"
+    id("org.openapi.generator") version "7.7.0"
     kotlin("plugin.serialization")
 }
 
