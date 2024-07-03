@@ -1,8 +1,7 @@
 plugins {
-    kotlin("jvm") version "2.0.0"
-    id("org.openapi.generator") version "6.3.0"
-    id("com.github.node-gradle.node") version "3.5.1"
-    kotlin("plugin.serialization") version "2.0.0"
+    kotlin("jvm")
+    id("org.openapi.generator") version "7.7.0"
+    kotlin("plugin.serialization")
 }
 
 repositories {

@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "2.0.0"
-    kotlin("plugin.allopen") version "2.0.0"
-    kotlin("plugin.noarg") version "2.0.0"
-    kotlin("plugin.jpa") version "2.0.0"
+    kotlin("jvm")
+    kotlin("plugin.allopen")
+    kotlin("plugin.noarg")
+    kotlin("plugin.jpa")
     id("io.quarkus")
 }
 
