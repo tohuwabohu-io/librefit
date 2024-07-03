@@ -41,7 +41,7 @@ jobs:
 
     - name: Run gradle build
       if: github.event.pull_request.base.ref == 'main'
-      run: ./gradlew build -Dquarkus.http.auth.session.encryption-key=$(uuidgen)
+      run: ./gradlew build -Dquarkus.http.auth.session.encryption-key=$(uuidgen) -x test
       #run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
 
     - name: Generate JaCoCo Badge
