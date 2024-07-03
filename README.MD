@@ -26,14 +26,13 @@ was born.
 
 ### Dependencies
 
-- Gradle 7.6
-- Quarkus 3.5.0
-- Quinoa 2.3.5
-- Kotlin 1.9.0
+- Gradle 8.7
+- Quarkus 3.11.2
+- Quinoa 2.3.6
+- Kotlin 2.0.0
 - SvelteKit 2.5.2
 - Skeleton 2.9.0 
 - Postgres 15.2
-- OpenAPI 3.0.3
 
 ## Structure
 
