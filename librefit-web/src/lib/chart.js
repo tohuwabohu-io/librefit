@@ -6,9 +6,9 @@ import { getDateAsStr, parseStringAsDate } from '$lib/date.js';
 /**
  * @param {DataViews} view
  * @param {Date} start
- * @param {any[]} entries
+ * @param {Array<WeightTrackerEntry>} entries
  */
-export function createWeightChart(view, start, entries) {
+export const createWeightChart = (view, start, entries) => {
 	const legend = [];
 	const data = [];
 	const begin = 1;
@@ -75,12 +75,12 @@ export function createWeightChart(view, start, entries) {
 		tmpDate = sub(tmpDate, duration);
 	}
 	return { legend, data };
-}
+};
 
 /**
  * @param {any} weight
  */
-export function createWeightChartDataset(weight) {
+export const createWeightChartDataset = (weight) => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 
@@ -104,19 +104,7 @@ export function createWeightChartDataset(weight) {
 		spanGaps: true,
 		data: weight
 	};
-}
-const skipped = (
-	/** @type {{ p0: { skip: any; }; p1: { skip: any; }; }} */ ctx,
-	/** @type {any} */ value
-) => (ctx.p0.skip || ctx.p1.skip ? value : undefined);
-const down = (
-	/** @type {{ p0: { parsed: { y: number; }; }; p1: { parsed: { y: number; }; }; }} */ ctx,
-	/** @type {any} */ value
-) => (ctx.p0.parsed.y >= ctx.p1.parsed.y ? value : undefined);
-const up = (
-	/** @type {{ p0: { parsed: { y: number; }; }; p1: { parsed: { y: number; }; }; }} */ ctx,
-	/** @type {any} */ value
-) => (ctx.p0.parsed.y < ctx.p1.parsed.y ? value : undefined);
+};
 
 /**
  *
