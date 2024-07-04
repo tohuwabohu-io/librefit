@@ -161,52 +161,54 @@
     }
 </script>
 
-<div class="{displayClass} gap-4 text-center justify-between relative h-full">
+<div class="{displayClass} gap-4 text-center justify-between items-center relative h-full">
     {#if ctList && ctList.length > 0}
         {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
-        <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
+        <div class="flex flex-col w-fit h-full justify-between gap-4">
+            <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
-        <div>
-            <div class="w-full grid grid-cols-2 gap-2">
-                <div class="text-right">&empty; daily intake:</div>
-                <div class="flex flex-row text">
-                    ~{dailyAverage}kcal
+            <div>
+                <div class="w-full grid grid-cols-2 gap-2">
+                    <div class="text-right">&empty; daily intake:</div>
+                    <div class="flex flex-row text">
+                        ~{dailyAverage}kcal
+
+                        {#if $currentGoal}
+                            {@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
+                            <span>
+                                {#if targetAverageRatio <= 1}
+                                    <Check color="rgb(var(--color-primary-700))"/>
+                                {:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
+                                    <Overflow1 color="rgb(var(--color-warning-500))"/>
+                                {:else}
+                                    <Overflow2 color="rgb(var(--color-error-500))"/>
+                                {/if}
+                            </span>
+                        {/if}
+                    </div>
 
                     {#if $currentGoal}
-                        {@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
-                        <span>
-                            {#if targetAverageRatio <= 1}
-                                <Check color="rgb(var(--color-primary-700))"/>
-                            {:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
-                                <Overflow1 color="rgb(var(--color-warning-500))"/>
-                            {:else}
-                                <Overflow2 color="rgb(var(--color-error-500))"/>
-                            {/if}
-                        </span>
+                        <div class="text-right">
+                            &empty; target intake:
+                        </div>
+                        <div class="text-left">
+                            ~{$currentGoal.targetCalories}kcal
+                        </div>
                     {/if}
                 </div>
-
-                {#if $currentGoal}
-                    <div class="text-right">
-                        &empty; target intake:
-                    </div>
-                    <div class="text-left">
-                        ~{$currentGoal.targetCalories}kcal
-                    </div>
-                {/if}
             </div>
         </div>
 
         {#if displayHistory}
-            <button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>
-                <span>
-                    <History/>
-                </span>
-                <span>
-                    History
-                </span>
-            </button>
+        <button class="btn variant-filled w-full" on:click|preventDefault={() => goto('/tracker/calories')}>
+            <span>
+                <History/>
+            </span>
+            <span>
+                History
+            </span>
+        </button>
         {/if}
     {:else}
         <div>

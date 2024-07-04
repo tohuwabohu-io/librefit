@@ -4,6 +4,7 @@
     import Wand from '$lib/assets/icons/wand.svg?component';
 
     import {paintCalorieTrackerQuickview} from '$lib/quickview-chart.js';
+    import {goto} from '$app/navigation';
 
     /** @type Array<CalorieTrackerEntry> */
     export let entries;
@@ -18,20 +19,18 @@
     const onSetTarget = () => {
 
     }
-
-    const onOpenWizard = () => {
-
-    }
 </script>
 
 
 <div class="{displayClass} gap-4 text-center justify-between relative h-full">
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
-    {#if entries && currentGoal}
-        {@const quickview = paintCalorieTrackerQuickview(entries, currentGoal)}
-        <Bar data={quickview.chartData} options={quickview.chartOptions}/>
-    {/if}
+    <div class="flex flex-col w-fit h-full justify-between gap-4">
+        {#if entries && currentGoal}
+            {@const quickview = paintCalorieTrackerQuickview(entries, currentGoal)}
+            <Bar data={quickview.chartData} options={quickview.chartOptions}/>
+        {/if}
+    </div>
 
     <div class="flex">
         <div class="btn-group variant-filled w-fit grow">
@@ -43,7 +42,7 @@
                     Set target
                 </span>
             </button>
-            <button class="w-1/2" aria-label="edit calories" on:click={onOpenWizard}>
+            <button class="w-1/2" aria-label="edit calories"  on:click|preventDefault={() => goto('/wizard')}>
                 <span>
                     <Wand/>
                 </span>
