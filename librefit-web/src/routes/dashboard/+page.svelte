@@ -19,6 +19,7 @@
 	import {subMonths} from 'date-fns';
 	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
 	import {observeToggle} from '$lib/theme-toggle.js';
+	import CalorieQuickview from '$lib/components/CalorieQuickview.svelte';
 
 	Chart.register(...registerables);
 
@@ -179,12 +180,7 @@
 				</div>
 
 				<div class="card md:flex md:flex-row lg:w-1/3 p-4">
-					<WeightTracker displayClass="md:w-1/2"
-							on:addWeight={onAddWeight}
-							on:updateGoal={setGoal}
-						    lastEntry={$lastWeightTrackerEntry}
-						    currentGoal={$currentGoal}
-					/>
+					<CalorieQuickview bind:entries={$ctList} bind:currentGoal={$currentGoal} />
 				</div>
 			</div>
 

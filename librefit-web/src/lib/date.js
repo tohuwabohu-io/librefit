@@ -2,6 +2,7 @@ import { getHours, format, parse } from 'date-fns';
 
 export const default_date_format = 'yyyy-MM-dd'; // used for internal storage and fetch requests
 export const display_date_format = 'dd.MM.yyyy'; // used for display only
+export const display_date_format_day = 'dd.MM';
 /**
  * @param {number | Date} d
  * @param {string | undefined} [displayFormat]
