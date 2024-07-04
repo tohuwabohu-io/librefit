@@ -16,7 +16,7 @@
     import {getDaytimeGreeting} from '$lib/date.js';
 	import {goto} from '$app/navigation';
 	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
-	import {subMonths} from 'date-fns';
+	import {subMonths, subWeeks} from 'date-fns';
 	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
 	import {observeToggle} from '$lib/theme-toggle.js';
 	import CalorieQuickview from '$lib/components/CalorieQuickview.svelte';
@@ -47,6 +47,7 @@
 	if (!$user) goto('/');
 
 	const today = new Date();
+	const lastWeek = subWeeks(today, 1);
 	const lastMonth = subMonths(today, 1);
 
 	observeToggle(document.documentElement, () => repaintWeightChart());
@@ -125,7 +126,7 @@
 	}
 
 	const refreshCalorieDistribution = async () => {
-		const calorieTrackerRangeResponse = await listCalorieTrackerEntriesRange(lastMonth, today);
+		const calorieTrackerRangeResponse = await listCalorieTrackerEntriesRange(lastWeek, today);
 
 		if (calorieTrackerRangeResponse.ok) {
 			ctList.set(await calorieTrackerRangeResponse.json());

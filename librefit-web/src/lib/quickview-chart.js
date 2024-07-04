@@ -95,12 +95,11 @@ export const paintCalorieTrackerQuickview = (entries, goal) => {
 	const elemHtmlClasses = document.documentElement.classList;
 
 	// let borderColor = style.getPropertyValue('--color-surface-200');
-	// let labelColor = style.getPropertyValue('--color-surface-100');
+	let labelColor = style.getPropertyValue('--color-surface-100');
 	let labelTextColor = style.getPropertyValue('--color-surface-900');
 
 	if (elemHtmlClasses.contains('dark')) {
-		// borderColor = style.getPropertyValue('--color-surface-500');
-		// labelColor = style.getPropertyValue('--color-surface-800');
+		labelColor = style.getPropertyValue('--color-surface-800');
 		labelTextColor = style.getPropertyValue('--color-surface-100');
 	}
 
@@ -123,7 +122,14 @@ export const paintCalorieTrackerQuickview = (entries, goal) => {
 					}
 				},
 				responsive: true,
-				aspectRatio: 0.73
+				aspectRatio: 0.73,
+				plugins: {
+					legend: {
+						label: {
+							color: `rgb(${labelTextColor})`
+						}
+					}
+				}
 			}
 		};
 	}
