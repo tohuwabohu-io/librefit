@@ -1,7 +1,6 @@
 import { api } from '$lib/api/index.js';
 import { proxyFetch } from '$lib/api/util.js';
-import { subMonths } from 'date-fns';
-import { getDateAsStr } from '$lib/date.js';
+import { subMonths, subWeeks } from 'date-fns';
 import {
 	listCaloriesForDate,
 	listCalorieTrackerEntriesRange,
@@ -13,7 +12,7 @@ export const load = async ({ fetch }) => {
 	const userApi = api.readUserInfo;
 
 	const today = new Date();
-	const lastWeek = subMonths(today, 7);
+	const lastWeek = subWeeks(today, 1);
 	const lastMonth = subMonths(today, 1);
 
 	// return dashboard relevant data
@@ -24,7 +23,6 @@ export const load = async ({ fetch }) => {
 	const user = await proxyFetch(fetch, userApi);
 	const lastCtResponse = await listCaloriesForDate(today);
 	const listWeightResponse = await listWeightRange(lastMonth, today);
-
 	const listCtResponse = await listCalorieTrackerEntriesRange(lastWeek, today);
 
 	const lastWeightResponse = await proxyFetch(fetch, lastWeightApi);
