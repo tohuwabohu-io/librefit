@@ -161,7 +161,7 @@
     }
 </script>
 
-<div class="{displayClass} gap-4 text-center justify-evenly relative">
+<div class="{displayClass} gap-4 text-center justify-between relative h-full">
     {#if ctList && ctList.length > 0}
         {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 

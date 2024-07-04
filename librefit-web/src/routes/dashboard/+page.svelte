@@ -165,8 +165,8 @@
 			<h1 class="h1">Good {getDaytimeGreeting(new Date())}{#if name}, {$user.name}!{:else}!{/if}</h1>
 			<p>This is your daily summary.</p>
 
-			<div class="flex lg:flex-row flex-col gap-8">
-				<div class="card flex xl:flex-row flex-col gap-4 p-4 lg:w-1/3">
+			<div class="flex flex-col gap-8 lg:grid grid-cols-3">
+				<div class="card flex flex-col gap-4 p-4">
 					<CalorieTracker entries={ctListRecent} categories={$foodCategories} currentGoal={$currentGoal}
 									on:addCalories={onAddCalories}
 									on:updateCalories={onUpdateCalories}
@@ -174,14 +174,15 @@
 					/>
 				</div>
 
-				<div class="card flex xl:flex-row flex-col gap-4 p-4 lg:w-1/3">
+				<div class="card flex flex-col gap-4 p-4">
 					<CalorieDistribution displayClass="flex flex-col"
 						            bind:ctList={$ctList}
 					/>
 				</div>
 
-				<div class="card md:flex md:flex-row lg:w-1/3 p-4">
-					<CalorieQuickview bind:entries={$ctList} bind:currentGoal={$currentGoal} />
+				<div class="card p-4">
+					<CalorieQuickview displayClass="flex flex-col"
+									  bind:entries={$ctList} bind:currentGoal={$currentGoal} />
 				</div>
 			</div>
 

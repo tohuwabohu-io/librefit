@@ -113,7 +113,7 @@
     }
 </script>
 
-<div class="flex flex-col gap-4 justify-evenly text-center">
+<div class="flex flex-col gap-4 justify-between text-center h-full lg:w-80">
     <h2 class="h3">
         Calorie Tracker
     </h2>

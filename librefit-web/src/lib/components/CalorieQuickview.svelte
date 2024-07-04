@@ -25,7 +25,7 @@
 </script>
 
 
-<div class="{displayClass} gap-4 text-center justify-evenly relative">
+<div class="{displayClass} gap-4 text-center justify-between relative h-full">
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
     {#if entries && currentGoal}
