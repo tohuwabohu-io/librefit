@@ -25,7 +25,7 @@
 <div class="{displayClass} gap-4 text-center justify-between relative h-full">
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
-    <div class="flex flex-col w-fit h-full justify-between gap-4">
+    <div class="flex flex-col xl:w-fit h-full justify-between gap-4">
         {#if entries && currentGoal}
             {@const quickview = paintCalorieTrackerQuickview(entries, currentGoal)}
             <Bar data={quickview.chartData} options={quickview.chartOptions}/>
