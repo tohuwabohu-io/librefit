@@ -2,7 +2,7 @@
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
 	import {
 		paintWeightTrackerEntries
-	} from '$lib/chart.js';
+	} from '$lib/weight-chart.js';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import {getToastStore} from '@skeletonlabs/skeleton';
 	import {addCalories, addWeight, deleteCalories, updateCalories, listCalorieTrackerEntriesRange, listWeightRange} from '$lib/api/tracker.js';

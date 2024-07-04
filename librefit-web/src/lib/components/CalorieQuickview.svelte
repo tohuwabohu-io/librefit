@@ -2,7 +2,8 @@
     import {Bar} from 'svelte-chartjs';
     import Target from '$lib/assets/icons/target-arrow.svg?component';
     import Wand from '$lib/assets/icons/wand.svg?component';
-    import {paintCalorieTrackerQuickview} from '$lib/chart.js';
+
+    import {paintCalorieTrackerQuickview} from '$lib/quickview-chart.js';
 
     /** @type Array<CalorieTrackerEntry> */
     export let entries;
