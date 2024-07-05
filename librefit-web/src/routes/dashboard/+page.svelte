@@ -1,27 +1,32 @@
 <script>
-	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-	import {
-		paintWeightTrackerEntries
-	} from '$lib/weight-chart.js';
-	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
-	import {getToastStore} from '@skeletonlabs/skeleton';
-	import {addCalories, addWeight, deleteCalories, updateCalories, listCalorieTrackerEntriesRange, listWeightRange} from '$lib/api/tracker.js';
+    import {paintWeightTrackerEntries} from '$lib/weight-chart.js';
+    import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
+    import {getToastStore} from '@skeletonlabs/skeleton';
+    import {
+        addCalories,
+        addWeight,
+        deleteCalories,
+        listCalorieTrackerEntriesRange,
+        listWeightRange,
+        updateCalories
+    } from '$lib/api/tracker.js';
+	import {createGoal} from '$lib/api/target.js';
 	import {getContext} from 'svelte';
-	import {Chart, registerables} from 'chart.js';
-	import {Line} from 'svelte-chartjs';
-	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
-	import {validateAmount} from '$lib/validation.js';
-	import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
-    import { DataViews } from '$lib/enum.js';
+    import {Chart, registerables} from 'chart.js';
+    import {Line} from 'svelte-chartjs';
+    import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
+    import {validateAmount} from '$lib/validation.js';
+    import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
+    import {DataViews} from '$lib/enum.js';
     import {getDaytimeGreeting} from '$lib/date.js';
-	import {goto} from '$app/navigation';
-	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
-	import {subMonths, subWeeks} from 'date-fns';
-	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
-	import {observeToggle} from '$lib/theme-toggle.js';
-	import CalorieQuickview from '$lib/components/CalorieQuickview.svelte';
+    import {goto} from '$app/navigation';
+    import {getFoodCategoryLongvalue} from '$lib/api/category.js';
+    import {subMonths, subWeeks} from 'date-fns';
+    import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
+    import {observeToggle} from '$lib/theme-toggle.js';
+    import CalorieQuickview from '$lib/components/CalorieQuickview.svelte';
 
-	Chart.register(...registerables);
+    Chart.register(...registerables);
 
 	const lastWeightTrackerEntry = getContext('lastWeight');
 	const currentGoal = getContext('currentGoal');
@@ -147,8 +152,16 @@
 		wtChart = paintWeightTrackerEntries(wtListRecent, today, DataViews.Month);
 	}
 
-	const setGoal = (e) => {
+	const setGoal = async (e) => {
+        $indicator = $indicator.start(e.detail.target);
 
+        await createGoal(e.detail.goal).then(async response => {
+            currentGoal.set(response);
+        }).then(() => {
+            showToastSuccess(toastStore, 'Successfully set target.');
+        }).catch((e) => {
+            showToastError(toastStore, e);
+        }).finally(() => $indicator = $indicator.finish());
 	};
 </script>
 
@@ -182,7 +195,10 @@
 
 				<div class="card p-4">
 					<CalorieQuickview displayClass="flex flex-col"
-									  bind:entries={$ctList} bind:currentGoal={$currentGoal} />
+									  bind:entries={$ctList}
+                                      bind:currentGoal={$currentGoal}
+                                      on:setTarget={setGoal}
+                    />
 				</div>
 			</div>
 
