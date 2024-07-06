@@ -43,7 +43,6 @@
         value={entry.amount}
         dateStr={entry.added}
         sequence={entry.sequence}
-        category={entry.category}
         on:update={(e) => onSubmit('update', e)}
         on:remove={(e) => onSubmit('remove', e)}
         existing={entry.sequence !== undefined}
