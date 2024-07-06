@@ -7,7 +7,7 @@
   "scope": "/",
   "icons": [
     {
-      "src": "favicon-144.png",
+      "src": "favicon-144x144.png",
       "sizes": "144x144",
       "type": "image/png"
     }
