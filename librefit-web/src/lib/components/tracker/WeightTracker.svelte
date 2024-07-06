@@ -13,9 +13,9 @@
     export let currentGoal;
 
     /**
-     * @type WeightTrackerEntry
+     * @type Array<WeightTrackerEntry>
      */
-    export let lastEntry;
+    export let weightList;
 
     let weightQuickAdd;
 
@@ -63,9 +63,9 @@
 </script>
 
 <div class="flex flex-col grow gap-4 text-center items-center self-center w-full">
-    {#if lastEntry}
+    {#if weightList}
         <p>
-            Current weight: {lastEntry.amount}kg ({convertDateStrToDisplayDateStr(lastEntry.added)})
+            Current weight: {weightList[0].amount}kg ({convertDateStrToDisplayDateStr(weightList[0].added)})
         </p>
     {:else}
         <p>

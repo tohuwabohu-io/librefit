@@ -36,14 +36,15 @@
 
 	export let data;
 
-	$: lastWeightTrackerEntry.set(data.lastWeight);
-	$: currentGoal.set(data.currentGoal);
-	$: ctList.set(data.listCt);
-	$: foodCategories.set(data.foodCategories);
+	$: ctListRecent = data.lastCalories;
+	$: wtListRecent = data.lastWeight;
+	$: wtListMonth = data.listWeight;
 
-	$: ctListRecent = data.lastCt;
-	$: wtListRecent = data.listWeight;
-	$: wtChart = paintWeightTrackerEntries(wtListRecent, today, DataViews.Month);
+	$: wtChart = paintWeightTrackerEntries(wtListMonth, today, DataViews.Month);
+	$: lastWeightTrackerEntry.set(wtListRecent ? wtListRecent[0] : null);
+	$: currentGoal.set(data.currentGoal);
+	$: ctList.set(data.listCalories);
+	$: foodCategories.set(data.foodCategories);
 
 	const user = getContext('user');
 	const indicator = getContext('indicator');
@@ -138,7 +139,6 @@
 			showToastWarning(toastStore, amountMessage);
 			event.detail.callback(true);
 		}
-
 	}
 
 	const refreshCalorieDistribution = async () => {
@@ -153,14 +153,14 @@
 		const weightRangeResponse = await listWeightRange(lastMonth, today);
 
 		if (weightRangeResponse.ok) {
-			wtListRecent = await weightRangeResponse.json();
+			wtListMonth = await weightRangeResponse.json();
 
 			repaintWeightChart();
 		}
 	}
 
 	const repaintWeightChart = () => {
-		wtChart = paintWeightTrackerEntries(wtListRecent, today, DataViews.Month);
+		wtChart = paintWeightTrackerEntries(wtListMonth, today, DataViews.Month);
 	}
 
 	const setGoal = async (e) => {
@@ -223,7 +223,7 @@
 						<ScaleOff width={100} height={100} class="self-center"/>
 					</div>
 					{/if}
-					<WeightTracker lastEntry={$lastWeightTrackerEntry} currentGoal={$currentGoal}
+					<WeightTracker weightList={wtListRecent} currentGoal={$currentGoal}
 								   on:addWeight={onAddWeight}
 					/>
 				</div>

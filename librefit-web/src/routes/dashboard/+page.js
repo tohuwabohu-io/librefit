@@ -4,6 +4,7 @@ import { subMonths, subWeeks } from 'date-fns';
 import {
 	listCaloriesForDate,
 	listCalorieTrackerEntriesRange,
+	listWeightForDate,
 	listWeightRange
 } from '$lib/api/tracker.js';
 
@@ -16,7 +17,6 @@ export const load = async ({ fetch }) => {
 	const lastMonth = subMonths(today, 1);
 
 	// return dashboard relevant data
-	const lastWeightApi = api.findLastWeightTrackerEntry;
 	const goalApi = api.findLastGoal;
 	const listFoodCategoriesApi = api.listFoodCategories;
 
@@ -25,19 +25,19 @@ export const load = async ({ fetch }) => {
 	const listWeightResponse = await listWeightRange(lastMonth, today);
 	const listCtResponse = await listCalorieTrackerEntriesRange(lastWeek, today);
 
-	const lastWeightResponse = await proxyFetch(fetch, lastWeightApi);
+	const lastWeightResponse = await listWeightForDate(today);
 	const lastGoalResponse = await proxyFetch(fetch, goalApi);
 	const foodCategoryResponse = await proxyFetch(fetch, listFoodCategoriesApi);
 
 	if (user.ok) {
 		return {
 			userData: await user.json(),
-			lastWeight: lastWeightResponse.ok ? await lastWeightResponse.json() : undefined,
 			currentGoal: lastGoalResponse.ok ? await lastGoalResponse.json() : undefined,
-			lastCt: lastCtResponse,
+			foodCategories: await foodCategoryResponse.json(),
+			lastWeight: lastWeightResponse.ok ? await lastWeightResponse.json() : undefined,
+			lastCalories: lastCtResponse,
 			listWeight: listWeightResponse.ok ? await listWeightResponse.json() : undefined,
-			listCt: listCtResponse ? await listCtResponse.json() : undefined,
-			foodCategories: await foodCategoryResponse.json()
+			listCalories: listCtResponse ? await listCtResponse.json() : undefined
 		};
 	}
 };

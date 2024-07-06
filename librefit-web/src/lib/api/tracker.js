@@ -236,7 +236,7 @@ export const listWeightRange = (dateFrom, dateTo) => {
  */
 export const listWeightForDate = (date) => {
 	return proxyFetch(fetch, api.listWeightTrackerEntries, {
-		date: date
+		date: getDateAsStr(date)
 	});
 };
 
