@@ -5,6 +5,7 @@
     import {createEventDispatcher} from 'svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
+    import TrackerInput from '$lib/components/TrackerInput.svelte';
 
     /**
      * @type Goal
@@ -16,9 +17,22 @@
      */
     export let lastEntry;
 
+    let weightQuickAdd;
+
     const modalStore = getModalStore();
     const todayDateStr = getDateAsStr(new Date());
     const dispatch = createEventDispatcher();
+
+    const addWeightQuickly = (e) => {
+        dispatch('addWeight', {
+            dateStr: todayDateStr,
+            value: e.detail.value,
+            callback: () => {
+                e.detail.callback();
+                weightQuickAdd = undefined;
+            }
+        });
+    }
 
     const addWeight = (e) => {
         dispatch('addWeight', {
@@ -27,13 +41,13 @@
         });
     }
 
-    const updateGoal = (e) => {
-        dispatch('updateGoal', {
-            goal: e
-        })
+    const onEdit = (e) => {
+        dispatch('updateWeight', {
+
+        });
     }
-    
-    const showWeightModal = () => {
+
+    const onAdd = () => {
         modalStore.trigger({
             type: 'component',
             component: 'weightModal',
@@ -46,34 +60,14 @@
             }
         });
     }
-
-    const showGoalModal = () => {
-        modalStore.trigger({
-            type: 'component',
-            component: 'goalModal',
-            meta: { goal: currentGoal },
-            response: (e) => {
-                if (!e.cancelled) {
-                    updateGoal(e)
-                }
-
-                modalStore.close();
-            }
-        });
-    }
 </script>
 
-<div class="flex flex-col grow gap-4 text-center items-center self-center">
-    <h2 class="h3">Your weight</h2>
+<div class="flex flex-col grow gap-4 text-center items-center self-center w-full">
     {#if lastEntry}
-        <Scale width={100} height={100} />
-
         <p>
             Current weight: {lastEntry.amount}kg ({convertDateStrToDisplayDateStr(lastEntry.added)})
         </p>
     {:else}
-        <NoScale width={100} height={100} />
-
         <p>
             Nothing tracked yet. Today is a good day to start!
         </p>
@@ -89,22 +83,29 @@
         </p>
     {/if}
 
-    <div class="flex">
-        <div class="btn-group variant-filled w-fit grow">
-            <button class="w-1/2" on:click={showWeightModal}>
+    <div class="flex flex-col md:w-1/3 w-full gap-4">
+        <TrackerInput
+                bind:value={weightQuickAdd}
+                on:add={addWeightQuickly}
+                compact={true}
+                unit={'kg'}
+        />
+
+        <div class="btn-group variant-filled grow">
+            <button class="w-1/2" aria-label="add calories" on:click={onAdd}>
                 <span>
                     <Scale/>
                 </span>
                 <span>
-                    Set weight
+                    Add
                 </span>
             </button>
-            <button class="w-1/2" on:click={showGoalModal}>
+            <button class="w-1/2" aria-label="edit calories" on:click={onEdit}>
                 <span>
-                    <Target/>
+                    <Scale/>
                 </span>
                 <span>
-                    Set target
+                    Edit
                 </span>
             </button>
         </div>
