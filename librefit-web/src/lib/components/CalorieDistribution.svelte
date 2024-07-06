@@ -7,8 +7,9 @@
     import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
     import {PolarArea} from 'svelte-chartjs';
     import {Chart, registerables} from 'chart.js';
-    import {getContext} from 'svelte';
     import {observeToggle} from '$lib/theme-toggle.js';
+    import {createDistributionChart} from '$lib/distribution-chart.js';
+    import {getAverageDailyIntake} from '$lib/calorie-util.js';
 
     Chart.register(...registerables);
 
@@ -18,19 +19,19 @@
     export let displayHistory = true;
     export let headerText = 'Average distribution';
 
-    let polarAreaChart, dailyAverage;
-
-    const currentGoal = getContext('currentGoal');
-
     /** @type Array<FoodCategory> */
-    const foodCategories = getContext('foodCategories');
+    export let foodCategories;
+
+    /** @type Goal */
+    export let currentGoal;
+
+    let polarAreaChart, dailyAverage;
 
     /**
      * @param {Array<CalorieTrackerEntry>} entries
      */
     const refreshChart = (entries) => {
-        polarAreaChart = getData(entries);
-
+        polarAreaChart = createDistributionChart(entries, foodCategories, displayHistory);
         dailyAverage = getAverageDailyIntake(entries);
     }
 
@@ -39,126 +40,6 @@
     observeToggle(document.documentElement, () => {
         refreshChart(ctList);
     });
-
-    /**
-     * @param {Array<CalorieTrackerEntry>} entries
-     */
-    const getData = (entries) => {
-        const style = getComputedStyle(document.body);
-        const elemHtmlClasses = document.documentElement.classList;
-
-        let borderColor = style.getPropertyValue('--color-surface-200');
-        let labelColor = displayHistory ? style.getPropertyValue('--color-surface-100') : style.getPropertyValue('--color-surface-50')
-        let labelTextColor = style.getPropertyValue('--color-surface-900')
-
-        if (elemHtmlClasses.contains('dark')) {
-            borderColor = style.getPropertyValue('--color-surface-500');
-            labelColor = displayHistory ? style.getPropertyValue('--color-surface-800') : style.getPropertyValue('--color-surface-900');
-            labelTextColor = style.getPropertyValue('--color-surface-100');
-        }
-
-        const labels = [];
-        const values = [];
-
-        const averageCategoryIntake = getAverageCategoryIntake(entries);
-
-        if (averageCategoryIntake != null) {
-            $foodCategories.forEach(cat => {
-                const averageIntake = averageCategoryIntake.get(cat.shortvalue);
-
-                if (averageIntake > 0) {
-                    values.push(averageCategoryIntake.get(cat.shortvalue));
-                    labels.push(cat.longvalue);
-                }
-            });
-        }
-
-        return {
-            chartData: {
-                labels: labels,
-                datasets: [{
-                    label: '∅ kcal',
-                    data: values,
-                    hoverOffset: 4,
-                    backgroundColor: [
-                        `rgb(${style.getPropertyValue('--color-primary-500')} / .7)`,
-                        `rgb(${style.getPropertyValue('--color-secondary-500')} / .7)`,
-                        `rgb(${style.getPropertyValue('--color-tertiary-500')} / .7)`,
-                        `rgb(${style.getPropertyValue('--color-warning-500')} / .7)`,
-                        `rgb(${style.getPropertyValue('--color-error-500')} / .7)`
-                    ],
-                    borderColor: `rgb(${borderColor})`
-                }]
-            },
-            chartOptions: {
-                plugins: {
-                    title: {
-                        display: false,
-                        align: 'center',
-                        text: 'Last 7 days'
-                    },
-                    legend: {
-                        align: 'center',
-                        labels: {
-                            color: `rgb(${labelTextColor})`
-                        }
-                    }
-                },
-                scales: {
-                    r: {
-                        ticks: {
-                            backdropColor: `rgb(${labelColor})`,
-                            color: `rgb(${labelTextColor})`
-                        }
-                    }
-                }
-            }
-        };
-    }
-
-    const getAverageCategoryIntake = (entries) => {
-        const nonEmpty = entries.filter(e => e.amount > 0);
-
-        if (nonEmpty.length > 0) {
-            const catMap = new Map();
-
-            const sum = nonEmpty.map(e => e.amount).reduce((a, b) => a + b);
-            const dailyAverage = getAverageDailyIntake(entries);
-
-            $foodCategories.forEach(cat => {
-                const catEntries = nonEmpty.filter(e => e.category === cat.shortvalue);
-
-                if (catEntries.length > 0) {
-                    const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
-
-                    catMap.set(cat.shortvalue, Math.round(dailyAverage * (catSum / sum)));
-                }
-            });
-
-            return catMap;
-        }
-
-        return null;
-    }
-
-    /** @param {Array<CalorieTrackerEntry>} entries */
-    const getAverageDailyIntake = (entries) => {
-        const nonEmpty = entries.filter(e => e.amount > 0);
-
-        if (nonEmpty.length > 0) {
-            const days = new Set(nonEmpty.map(e => e.added));
-
-            let sum = 0;
-
-            for (let day of days) {
-                sum += entries.filter(e => e.added === day).map(e => e.amount).reduce((a, b) => a + b)
-            }
-
-            return Math.round(sum / days.size);
-        }
-
-        return 0;
-    }
 </script>
 
 <div class="{displayClass} gap-4 text-center justify-between items-center relative h-full">
@@ -174,8 +55,8 @@
                     <div class="flex flex-row text">
                         ~{dailyAverage}kcal
 
-                        {#if $currentGoal}
-                            {@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
+                        {#if currentGoal}
+                            {@const targetAverageRatio = dailyAverage / currentGoal.targetCalories}
                             <span>
                                 {#if targetAverageRatio <= 1}
                                     <Check color="rgb(var(--color-primary-700))"/>
@@ -188,12 +69,12 @@
                         {/if}
                     </div>
 
-                    {#if $currentGoal}
+                    {#if currentGoal}
                         <div class="text-right">
                             &empty; target intake:
                         </div>
                         <div class="text-left">
-                            ~{$currentGoal.targetCalories}kcal
+                            ~{currentGoal.targetCalories}kcal
                         </div>
                     {/if}
                 </div>

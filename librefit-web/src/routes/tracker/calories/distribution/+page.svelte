@@ -15,6 +15,7 @@
     const indicator = getContext('indicator');
     const ctList = getContext('ctList');
     const foodCategories = getContext('foodCategories');
+    const currentGoal = getContext('currentGoal');
 
     if (!$user) goto('/');
 
@@ -84,7 +85,13 @@
 
             {#if $ctList.length > 0 }
                 <div class="flex flex-col lg:flex-row gap-2">
-                    <CalorieDistribution displayClass="lg:w-1/4" ctList={filteredData} displayHeader={false} displayHistory={false}/>
+                    <CalorieDistribution displayClass="lg:w-1/4"
+                                         ctList={filteredData}
+                                         displayHeader={false}
+                                         displayHistory={false}
+                                         foodCategories={$foodCategories}
+                                         currentGoal={$currentGoal}
+                    />
 
                     <div class="lg:w-3/5 w-full flex flex-col grow align-middle self-center">
                         <h2 class="h2">Last {filter.toLowerCase()}:</h2>

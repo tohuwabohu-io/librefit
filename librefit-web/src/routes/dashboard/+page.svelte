@@ -189,7 +189,7 @@
 
 				<div class="card flex flex-col gap-4 p-4">
 					<CalorieDistribution displayClass="flex flex-col"
-						            bind:ctList={$ctList}
+						            bind:ctList={$ctList} foodCategories={$foodCategories} currentGoal={$currentGoal}
 					/>
 				</div>
 
