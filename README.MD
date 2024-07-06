@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="librefit-web/static/assets/images/logo/librefit-logo-128.png">
+    <img src="librefit-web/static/favicon-128x128.png">
     <p>
         <b>LibreFit:</b>
         Your OpenSource Calorie Tracker
