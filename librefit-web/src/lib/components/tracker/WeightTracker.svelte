@@ -93,7 +93,7 @@
         </p>
     {/if}
 
-    <div class="flex flex-col md:w-1/3 w-full gap-4">
+    <div class="flex flex-col lg:w-1/3 w-full gap-4">
         <TrackerInput
                 bind:value={weightQuickAdd}
                 on:add={addWeightQuickly}
