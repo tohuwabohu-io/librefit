@@ -1,7 +1,5 @@
 <script>
-    import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
-    import Target from '$lib/assets/icons/target-arrow.svg?component';
     import {createEventDispatcher} from 'svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
@@ -34,42 +32,54 @@
         });
     }
 
-    const addWeight = (e) => {
-        dispatch('addWeight', {
-            dateStr: todayDateStr,
-            value: e.detail.value
-        });
-    }
-
-    const onEdit = (e) => {
+    const updateWeight = (e) => {
         dispatch('updateWeight', {
-
+            sequence: e.detail.sequence,
+            dateStr: e.detail.dateStr,
+            value: e.detail.value,
+            target: e.detail.target,
+            callback: e.detail.callback
         });
     }
 
-    const onAdd = () => {
+    const deleteWeight = (e) => {
+        console.log(e);
+        dispatch('deleteWeight', {
+            sequence: e.detail.sequence,
+            dateStr: e.detail.dateStr,
+            target: e.detail.target,
+            callback: e.detail.callback
+        });
+    }
+
+    const onEdit = () => {
         modalStore.trigger({
             type: 'component',
             component: 'weightModal',
+            meta: {
+                weightList: weightList
+            },
             response: (e) => {
-                if (e) {
-                    addWeight(e);
-                }
+                console.log(e);
 
-                modalStore.close();
+                if (e) {
+                    if (e.detail.type === 'update') updateWeight(e.detail);
+                    else if (e.detail.type === 'remove') deleteWeight(e.detail);
+                    if (e.detail.close) modalStore.close();
+                } else modalStore.close();
             }
         });
     }
 </script>
 
 <div class="flex flex-col grow gap-4 text-center items-center self-center w-full">
-    {#if weightList}
+    {#if weightList && weightList.length > 0}
         <p>
             Current weight: {weightList[0].amount}kg ({convertDateStrToDisplayDateStr(weightList[0].added)})
         </p>
     {:else}
         <p>
-            Nothing tracked yet. Today is a good day to start!
+            Nothing tracked for today. Now would be a good moment!
         </p>
     {/if}
 
@@ -91,23 +101,15 @@
                 unit={'kg'}
         />
 
-        <div class="btn-group variant-filled grow">
-            <button class="w-1/2" aria-label="add calories" on:click={onAdd}>
-                <span>
-                    <Scale/>
-                </span>
-                <span>
-                    Add
-                </span>
-            </button>
-            <button class="w-1/2" aria-label="edit calories" on:click={onEdit}>
-                <span>
-                    <Scale/>
-                </span>
-                <span>
-                    Edit
-                </span>
-            </button>
-        </div>
+        {#if weightList && weightList.length > 0}
+        <button class="btn variant-filled grow" aria-label="edit weight" on:click={onEdit}>
+            <span>
+                <Scale/>
+            </span>
+            <span>
+                Edit
+            </span>
+        </button>
+        {/if}
     </div>
 </div>

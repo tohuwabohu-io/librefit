@@ -1,16 +1,26 @@
 <script>
-    import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
+    import {convertDateStrToDisplayDateStr} from '$lib/date.js';
+    import TrackerInput from '$lib/components/TrackerInput.svelte';
 
     let value;
 
     const modalStore = getModalStore();
 
-    const onSubmit = () => {
+    /** @type Array<WeightTrackerEntry> */
+    let weightList;
+
+    if ($modalStore[0] && $modalStore[0].meta) {
+        weightList = $modalStore[0].meta.weightList;
+    }
+
+    const onSubmit = (eventType, e) => {
         if ($modalStore[0].response) {
             $modalStore[0].response({
                 detail: {
-                    value: value
+                    type: eventType,
+                    close: true,
+                    detail: e.detail
                 }
             });
         }
@@ -25,12 +35,22 @@
 
 <div class="modal block bg-surface-100-800-token w-modal h-auto p-4 space-y-4 rounded-container-token shadow-xl">
     <header class="text-2xl font-bold">
-        Update weight
+        Update weight for {convertDateStrToDisplayDateStr(weightList[0].added)}
     </header>
 
-    <div>
-        <ValidatedInput bind:value type="number" unit="kg" required/>
-    </div>
+    {#each weightList as entry}
+    <TrackerInput compact={true}
+        value={entry.amount}
+        dateStr={entry.added}
+        sequence={entry.sequence}
+        category={entry.category}
+        on:update={(e) => onSubmit('update', e)}
+        on:remove={(e) => onSubmit('remove', e)}
+        existing={entry.sequence !== undefined}
+        disabled={entry.sequence !== undefined}
+        unit={'kg'}
+    />
+    {/each}
 
     <footer class="modal-footer flex justify-end space-x-2">
 

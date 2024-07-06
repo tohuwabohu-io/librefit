@@ -147,7 +147,7 @@ export const addWeight = (event) => {
 
 	return proxyFetch(fetch, api.createWeightTrackerEntry, newEntry).then(async (response) => {
 		if (response.ok) {
-			return proxyFetch(fetch, api.findLastWeightTrackerEntry);
+			return listWeightForDate(parseStringAsDate(newEntry.added));
 		} else throw response;
 	});
 };
@@ -163,7 +163,11 @@ export const updateWeight = (event) => {
 		amount: event.detail.value
 	};
 
-	return proxyFetch(fetch, api.updateWeightTrackerEntry, entry);
+	return proxyFetch(fetch, api.updateWeightTrackerEntry, entry).then(async (response) => {
+		if (response.ok) {
+			return listWeightForDate(parseStringAsDate(entry.added));
+		} else throw response;
+	});
 };
 
 /**
@@ -175,7 +179,11 @@ export const deleteWeight = (event) => {
 		date: event.detail.dateStr
 	};
 
-	return proxyFetch(fetch, api.deleteWeightTrackerEntry, params);
+	return proxyFetch(fetch, api.deleteWeightTrackerEntry, params).then(async (response) => {
+		if (response.ok) {
+			return listWeightForDate(parseStringAsDate(params.date));
+		} else throw response;
+	});
 };
 
 /**
