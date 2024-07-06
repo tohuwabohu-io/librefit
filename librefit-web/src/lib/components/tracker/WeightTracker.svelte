@@ -1,10 +1,9 @@
 <script>
-    import NoScale from '$lib/assets/icons/scale-outline-off.svg?component';
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
-    import Target from '$lib/assets/icons/target-arrow.svg?component';
     import {createEventDispatcher} from 'svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
+    import TrackerInput from '$lib/components/TrackerInput.svelte';
 
     /**
      * @type Goal
@@ -12,70 +11,75 @@
     export let currentGoal;
 
     /**
-     * @type WeightTrackerEntry
+     * @type Array<WeightTrackerEntry>
      */
-    export let lastEntry;
+    export let weightList;
+
+    let weightQuickAdd;
 
     const modalStore = getModalStore();
     const todayDateStr = getDateAsStr(new Date());
     const dispatch = createEventDispatcher();
 
-    const addWeight = (e) => {
+    const addWeightQuickly = (e) => {
         dispatch('addWeight', {
             dateStr: todayDateStr,
-            value: e.detail.value
-        });
-    }
-
-    const updateGoal = (e) => {
-        dispatch('updateGoal', {
-            goal: e
-        })
-    }
-    
-    const showWeightModal = () => {
-        modalStore.trigger({
-            type: 'component',
-            component: 'weightModal',
-            response: (e) => {
-                if (e) {
-                    addWeight(e);
-                }
-
-                modalStore.close();
+            value: e.detail.value,
+            callback: () => {
+                e.detail.callback();
+                weightQuickAdd = undefined;
             }
         });
     }
 
-    const showGoalModal = () => {
+    const updateWeight = (e) => {
+        dispatch('updateWeight', {
+            sequence: e.detail.sequence,
+            dateStr: e.detail.dateStr,
+            value: e.detail.value,
+            target: e.detail.target,
+            callback: e.detail.callback
+        });
+    }
+
+    const deleteWeight = (e) => {
+        console.log(e);
+        dispatch('deleteWeight', {
+            sequence: e.detail.sequence,
+            dateStr: e.detail.dateStr,
+            target: e.detail.target,
+            callback: e.detail.callback
+        });
+    }
+
+    const onEdit = () => {
         modalStore.trigger({
             type: 'component',
-            component: 'goalModal',
-            meta: { goal: currentGoal },
+            component: 'weightModal',
+            meta: {
+                weightList: weightList
+            },
             response: (e) => {
-                if (!e.cancelled) {
-                    updateGoal(e)
-                }
+                console.log(e);
 
-                modalStore.close();
+                if (e) {
+                    if (e.detail.type === 'update') updateWeight(e.detail);
+                    else if (e.detail.type === 'remove') deleteWeight(e.detail);
+                    if (e.detail.close) modalStore.close();
+                } else modalStore.close();
             }
         });
     }
 </script>
 
-<div class="flex flex-col grow gap-4 text-center items-center self-center">
-    <h2 class="h3">Your weight</h2>
-    {#if lastEntry}
-        <Scale width={100} height={100} />
-
+<div class="flex flex-col grow gap-4 text-center items-center self-center w-full">
+    {#if weightList && weightList.length > 0}
         <p>
-            Current weight: {lastEntry.amount}kg ({convertDateStrToDisplayDateStr(lastEntry.added)})
+            Current weight: {weightList[0].amount}kg ({convertDateStrToDisplayDateStr(weightList[0].added)})
         </p>
     {:else}
-        <NoScale width={100} height={100} />
-
         <p>
-            Nothing tracked yet. Today is a good day to start!
+            Nothing tracked for today. Now would be a good moment!
         </p>
     {/if}
 
@@ -89,24 +93,23 @@
         </p>
     {/if}
 
-    <div class="flex">
-        <div class="btn-group variant-filled w-fit grow">
-            <button class="w-1/2" on:click={showWeightModal}>
-                <span>
-                    <Scale/>
-                </span>
-                <span>
-                    Set weight
-                </span>
-            </button>
-            <button class="w-1/2" on:click={showGoalModal}>
-                <span>
-                    <Target/>
-                </span>
-                <span>
-                    Set target
-                </span>
-            </button>
-        </div>
+    <div class="flex flex-col lg:w-1/3 w-full gap-4">
+        <TrackerInput
+                bind:value={weightQuickAdd}
+                on:add={addWeightQuickly}
+                compact={true}
+                unit={'kg'}
+        />
+
+        {#if weightList && weightList.length > 0}
+        <button class="btn variant-filled grow" aria-label="edit weight" on:click={onEdit}>
+            <span>
+                <Scale/>
+            </span>
+            <span>
+                Edit
+            </span>
+        </button>
+        {/if}
     </div>
 </div>

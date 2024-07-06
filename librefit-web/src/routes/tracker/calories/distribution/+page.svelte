@@ -15,6 +15,7 @@
     const indicator = getContext('indicator');
     const ctList = getContext('ctList');
     const foodCategories = getContext('foodCategories');
+    const currentGoal = getContext('currentGoal');
 
     if (!$user) goto('/');
 
@@ -83,10 +84,8 @@
             </RadioGroup>
 
             {#if $ctList.length > 0 }
-                <div class="flex flex-col lg:flex-row gap-2">
-                    <CalorieDistribution displayClass="lg:w-1/4" ctList={filteredData} displayHeader={false} displayHistory={false}/>
-
-                    <div class="lg:w-3/5 w-full flex flex-col grow align-middle self-center">
+                <div class="flex flex-col lg:flex-row gap-4">
+                    <div class="lg:w-3/5 flex flex-col">
                         <h2 class="h2">Last {filter.toLowerCase()}:</h2>
                         <div class="table-container">
                             <table class="table table-hover table-compact table-auto w-full align-middle">
@@ -118,6 +117,15 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="lg:w-2/5 flex justify-center">
+                        <CalorieDistribution displayClass="flex"
+                                ctList={filteredData}
+                                             displayHeader={false}
+                                             displayHistory={false}
+                                             foodCategories={$foodCategories}
+                                             currentGoal={$currentGoal}
+                        />
                     </div>
                 </div>
             {:else}

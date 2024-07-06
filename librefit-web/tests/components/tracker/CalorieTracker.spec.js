@@ -214,4 +214,42 @@ describe('CalorieTracker.svelte component', () => {
 		expect(dispatchMock).toHaveBeenCalledTimes(1);
 		expect(dispatchEvent).toEqual(callbackDetails);
 	});
+
+	it('should trigger the edit button and dispatch deleteCalories', async () => {
+		let dispatchEvent;
+		const dispatchMock = vi.fn((e) => {
+			dispatchEvent = e.detail;
+		});
+
+		const { component, getByText } = render(CalorieTracker, {
+			categories: mockCategories,
+			entries: mockEntries,
+			currentGoal: mockGoal
+		});
+
+		component.$on('deleteCalories', dispatchMock);
+
+		const editButton = getByText('Edit');
+		await fireEvent.click(editButton);
+		await tick();
+
+		const callback = extractModalStoreMockTriggerCallback();
+
+		const callbackDetails = {
+			dateStr: getDateAsStr(new Date()),
+			sequence: 2
+		};
+
+		const callbackParams = {
+			detail: {
+				type: 'remove',
+				detail: callbackDetails
+			}
+		};
+
+		await callback(callbackParams);
+
+		expect(dispatchMock).toHaveBeenCalledTimes(1);
+		expect(dispatchEvent).toEqual(callbackDetails);
+	});
 });

@@ -1,13 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, getByText, render } from '@testing-library/svelte';
 import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-import { convertDateStrToDisplayDateStr } from '$lib/date.js';
+import { convertDateStrToDisplayDateStr, getDateAsStr } from '$lib/date.js';
 import { tick } from 'svelte';
 import * as skeleton from '@skeletonlabs/skeleton';
 import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.js';
 
 const mockData = {
-	lastEntry: { amount: 70, added: '2022-01-01' },
+	weightList: [
+		{ amount: 70, added: '2022-01-01', sequence: 1 },
+		{ amount: 69, added: '2022-02-01', sequence: 2 }
+	],
 	currentGoal: { targetWeight: 60, endDate: '2023-01-01' }
 };
 
@@ -22,7 +25,7 @@ describe('WeightTracker.svelte component', () => {
 
 		expect(
 			getByText(
-				`Current weight: ${mockData.lastEntry.amount}kg (${convertDateStrToDisplayDateStr(mockData.lastEntry.added)})`
+				`Current weight: ${mockData.weightList[0].amount}kg (${convertDateStrToDisplayDateStr(mockData.weightList[0].added)})`
 			)
 		).toBeDefined();
 
@@ -36,17 +39,46 @@ describe('WeightTracker.svelte component', () => {
 	it('renders an empty component correctly', () => {
 		const { getByText } = render(WeightTracker);
 
-		expect(getByText('Nothing tracked yet. Today is a good day to start!')).toBeDefined();
+		expect(getByText('Nothing tracked for today. Now would be a good moment!')).toBeDefined();
 		expect(getByText(`No goal set up.`)).toBeDefined();
 	});
 
-	it('should trigger the update weight button and dispatch addWeight', async () => {
-		const { component, getByText } = render(WeightTracker, mockData);
+	it('should trigger the quick add button and dispatch addWeight', async () => {
+		const { component, getByText, getByRole } = render(WeightTracker);
 
-		const dispatchMock = vi.fn();
+		let dispatchEvent;
+		const dispatchMock = vi.fn((e) => {
+			dispatchEvent = e.detail;
+		});
 		component.$on('addWeight', dispatchMock);
 
-		const updateWeightButton = getByText('Set weight');
+		const amountInput = getByRole('spinbutton', { name: 'amount' });
+		await fireEvent.input(amountInput, { target: { value: 72 } });
+
+		const quickAddButton = getByRole('button', { name: 'add' });
+		await fireEvent.click(quickAddButton);
+		await tick();
+
+		expect(dispatchMock).toHaveBeenCalledTimes(1);
+		expect(dispatchEvent).toEqual({
+			callback: expect.any(Function),
+			value: 72,
+			dateStr: getDateAsStr(new Date()),
+			target: undefined
+		});
+	});
+
+	it('should trigger the edit button and dispatch updateWeight', async () => {
+		let dispatchEvent;
+		const dispatchMock = vi.fn((e) => {
+			dispatchEvent = e.detail;
+		});
+
+		const { component, getByText } = render(WeightTracker, mockData);
+
+		component.$on('updateWeight', dispatchMock);
+
+		const updateWeightButton = getByText('Edit');
 		expect(updateWeightButton).toBeTruthy();
 		await fireEvent.click(updateWeightButton);
 		await tick();
@@ -54,7 +86,10 @@ describe('WeightTracker.svelte component', () => {
 		expect(skeleton.getModalStore().trigger).toHaveBeenCalledWith({
 			type: 'component',
 			component: 'weightModal',
-			response: expect.any(Function)
+			response: expect.any(Function),
+			meta: {
+				weightList: mockData.weightList
+			}
 		});
 
 		const callback = extractModalStoreMockTriggerCallback();
@@ -64,47 +99,61 @@ describe('WeightTracker.svelte component', () => {
 
 		expect(dispatchMock).toHaveBeenCalledTimes(0);
 
-		await callback({
-			dateStr: mockData.lastEntry.added,
+		const callbackDetails = {
+			dateStr: getDateAsStr(new Date()),
+			value: 71,
+			sequence: 2
+		};
+
+		const callbackParams = {
 			detail: {
-				value: mockData.lastEntry.amount
+				type: 'update',
+				detail: callbackDetails
 			}
-		});
-		await tick();
+		};
+
+		await callback(callbackParams);
 
 		expect(dispatchMock).toHaveBeenCalledTimes(1);
+		expect(dispatchEvent).toEqual(callbackDetails);
 	});
 
-	it('should trigger the update target button and dispatch updateGoal', async () => {
-		const dispatchMock = vi.fn();
+	it('should trigger the edit button and dispatch deleteWeight', async () => {
+		let dispatchEvent;
+		const dispatchMock = vi.fn((e) => {
+			dispatchEvent = e.detail;
+		});
 
 		const { component, getByText } = render(WeightTracker, mockData);
-		component.$on('updateGoal', dispatchMock);
 
-		const updateWeightButton = getByText('Set target');
+		component.$on('deleteWeight', dispatchMock);
+
+		const updateWeightButton = getByText('Edit');
 		expect(updateWeightButton).toBeTruthy();
 		await fireEvent.click(updateWeightButton);
 		await tick();
 
-		expect(skeleton.getModalStore().trigger).toHaveBeenCalledWith({
-			type: 'component',
-			component: 'goalModal',
-			meta: { goal: mockData.currentGoal },
-			response: expect.any(Function)
-		});
-
 		const callback = extractModalStoreMockTriggerCallback();
-
-		await callback({
-			cancelled: true
-		});
+		await callback(undefined);
 		await tick();
 
 		expect(dispatchMock).toHaveBeenCalledTimes(0);
 
-		await callback(mockData.currentGoal);
-		await tick();
+		const callbackDetails = {
+			dateStr: getDateAsStr(new Date()),
+			sequence: 2
+		};
+
+		const callbackParams = {
+			detail: {
+				type: 'remove',
+				detail: callbackDetails
+			}
+		};
+
+		await callback(callbackParams);
 
 		expect(dispatchMock).toHaveBeenCalledTimes(1);
+		expect(dispatchEvent).toEqual(callbackDetails);
 	});
 });

@@ -113,35 +113,38 @@
     }
 </script>
 
-<div class="flex flex-col gap-4 justify-evenly text-center">
+<div class="flex flex-col gap-4 justify-between text-center h-full xl:w-80">
     <h2 class="h3">
         Calorie Tracker
     </h2>
-    <div class="self-center">
-        <TrackerRadial entries={entries.map(e => e.amount)} />
-    </div>
-    {#if currentGoal}
-        {@const deficit = calculateDeficit(entries)}
-    <div>
-        {#if deficit < 0}
-            <p>You still have {Math.abs(deficit)}kcal left for the day. Good job!</p>
-        {:else if deficit === 0}
-            <p>A spot landing. How did you even do that? There's {deficit}kcal left.</p>
-        {:else if deficit > 0 && (deficit + currentGoal.targetCalories) < currentGoal.maximumCalories}
-            <p>You exceeded your daily target by {deficit}kcal. Days like these happen.</p>
-        {:else}
-            <p>With a {deficit}kcal surplus, you reached the red zone. Eating over your TDEE causes long term weight gain.</p>
+    <div class="flex flex-col w-fit h-full justify-between gap-4 pt-4">
+        <div class="self-center">
+            <TrackerRadial entries={entries.map(e => e.amount)} />
+        </div>
+        {#if currentGoal}
+            {@const deficit = calculateDeficit(entries)}
+            <div>
+                {#if deficit < 0}
+                    <p>You still have {Math.abs(deficit)}kcal left for the day. Good job!</p>
+                {:else if deficit === 0}
+                    <p>A spot landing. How did you even do that? There's {deficit}kcal left.</p>
+                {:else if deficit > 0 && (deficit + currentGoal.targetCalories) < currentGoal.maximumCalories}
+                    <p>You exceeded your daily target by {deficit}kcal. Days like these happen.</p>
+                {:else}
+                    <p>With a {deficit}kcal surplus, you reached the red zone. Eating over your TDEE causes long term weight gain.</p>
+                {/if}
+            </div>
         {/if}
+        <div>
+            <TrackerInput
+                    bind:value={caloriesQuickAdd}
+                    on:add={addCaloriesQuickly}
+                    compact={true}
+                    unit={'kcal'}
+            />
+        </div>
     </div>
-    {/if}
-    <div>
-        <TrackerInput
-            bind:value={caloriesQuickAdd}
-            on:add={addCaloriesQuickly}
-            compact={true}
-            unit={'kcal'}
-        />
-    </div>
+
     <div class="flex">
         <div class="btn-group variant-filled w-fit grow">
             <button class="w-1/2" aria-label="add calories" on:click={onAddCalories}>

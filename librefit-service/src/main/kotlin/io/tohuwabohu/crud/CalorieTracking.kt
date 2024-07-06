@@ -15,9 +15,6 @@ import java.util.*
 @NamedQueries(
     NamedQuery(name = "CalorieTrackerEntry.listDates",
         query = "from CalorieTrackerEntry where userId = ?1 and added between ?2 and ?3 group by added, userId, sequence order by added desc, userId, sequence"
-    ),
-    NamedQuery(name = "CalorieTrackerEntry.listCalorieTrackerRangeBetween",
-        query = "from CalorieTrackerEntry where userId = ?1 and added between ?2 and ?3 order by sequence desc"
     )
 )
 data class CalorieTrackerEntry (
@@ -46,8 +43,4 @@ class CalorieTrackerRepository : LibreUserRelatedRepository<CalorieTrackerEntry>
             .list()
             .onItem().ifNotNull().transform { list -> list.map { entry -> entry.added }.toSet() }
             .onItem().ifNull().failWith(EntityNotFoundException())
-
-    override fun listEntriesForUserAndDateRange(userId: UUID, dateFrom: LocalDate, dateTo: LocalDate): Uni<List<CalorieTrackerEntry>> {
-        return list("#CalorieTrackerEntry.listCalorieTrackerRangeBetween", userId, dateFrom, dateTo)
-    }
 }
