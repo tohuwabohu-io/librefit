@@ -16,7 +16,7 @@
 
     export let displayClass = '';
     export let displayHeader = true;
-    export let headerText = 'Weekly Quickview';
+    export let headerText = 'Target Quickview';
 
     const modalStore = getModalStore();
     const dispatch = createEventDispatcher();
