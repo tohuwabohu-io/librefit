@@ -2,6 +2,7 @@
     import {Bar} from 'svelte-chartjs';
     import {createEventDispatcher} from 'svelte';
     import Target from '$lib/assets/icons/target-arrow.svg?component';
+    import TargetOff from '$lib/assets/icons/target-off.svg?component';
     import Wand from '$lib/assets/icons/wand.svg?component';
 
     import {paintCalorieTrackerQuickview} from '$lib/quickview-chart.js';
@@ -53,12 +54,20 @@
 <div class="{displayClass} gap-4 text-center justify-between relative h-full">
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
+    {#if entries && currentGoal}
+        {@const quickview = paintCalorieTrackerQuickview(entries, currentGoal)}
     <div class="flex flex-col xl:w-fit h-full justify-between gap-4">
-        {#if entries && currentGoal}
-            {@const quickview = paintCalorieTrackerQuickview(entries, currentGoal)}
-            <Bar data={quickview.chartData} options={quickview.chartOptions}/>
-        {/if}
+        <Bar data={quickview.chartData} options={quickview.chartOptions}/>
     </div>
+
+    {:else}
+    <div class="flex flex-col gap-4 m-auto">
+        <TargetOff width={100} height={100} class="self-center"/>
+        <p>
+            No target set up.
+        </p>
+    </div>
+    {/if}
 
     <div class="flex">
         <div class="btn-group variant-filled w-fit grow">

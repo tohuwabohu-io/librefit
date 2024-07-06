@@ -43,9 +43,9 @@
 </script>
 
 <div class="{displayClass} gap-4 text-center justify-between items-center relative h-full">
-    {#if ctList && ctList.length > 0}
-        {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
+    {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
+    {#if ctList && ctList.length > 0}
         <div class="flex flex-col w-fit h-full justify-between gap-4">
             <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
@@ -80,8 +80,16 @@
                 </div>
             </div>
         </div>
+    {:else}
+        <div class="flex flex-col gap-4 m-auto">
+            <NoFood height={100} width={100} class="self-center"/>
+            <p>
+                Nothing tracked yet.
+            </p>
+        </div>
+    {/if}
 
-        {#if displayHistory}
+    {#if displayHistory}
         <button class="btn variant-filled w-full" on:click|preventDefault={() => goto('/tracker/calories')}>
             <span>
                 <History/>
@@ -90,10 +98,5 @@
                 History
             </span>
         </button>
-        {/if}
-    {:else}
-        <div>
-            <NoFood height={100} width={100}/>
-        </div>
     {/if}
 </div>
