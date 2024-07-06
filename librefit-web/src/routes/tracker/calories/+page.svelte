@@ -177,6 +177,8 @@
 									<CalorieDistribution ctList={datesToEntries[dateStr]}
 														 displayHistory={false}
 														 displayHeader={false}
+														 foodCategories={$foodCategories}
+														 currentGoal={$currentGoal}
 									/>
 								{:else}
 									{#await datesToEntries[dateStr]}

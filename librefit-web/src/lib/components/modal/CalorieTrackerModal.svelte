@@ -12,7 +12,11 @@
     export let categories;
 
     if ($modalStore[0] && $modalStore[0].meta) {
-        entries = $modalStore[0].meta.entries;
+        entries = $modalStore[0].meta.entries
+
+        if (entries) {
+            entries = entries.sort((a, b) => a.sequence - b.sequence);
+        }
         categories = $modalStore[0].meta.categories;
     }
 

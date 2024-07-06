@@ -1,6 +1,6 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-	import {paintWeightTrackerEntries} from '$lib/chart.js';
+	import {paintWeightTrackerEntries} from '$lib/weight-chart.js';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
 	import {showToastError} from '$lib/toast.js';

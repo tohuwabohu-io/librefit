@@ -2,7 +2,7 @@ import {
 	createWeightChart,
 	createWeightChartDataset,
 	paintWeightTrackerEntries
-} from '$lib/chart.js';
+} from '$lib/weight-chart.js';
 import { describe, expect, it, vi } from 'vitest';
 import { DataViews } from '$lib/enum.js';
 
@@ -110,7 +110,6 @@ describe('createWeightChartDataset function', async () => {
 		const chartDataset = createWeightChartDataset(weight);
 
 		expect(chartDataset.borderColor).toBe('rgb(255, 255, 255)');
-		expect(chartDataset.label).toBe('Weight (kg)');
 		expect(chartDataset.data).toBe(weight);
 		expect(chartDataset.label).toBe('Weight (kg)');
 		expect(chartDataset.options).toEqual({

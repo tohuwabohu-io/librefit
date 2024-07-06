@@ -21,8 +21,11 @@
 <AppBar shadow="drop-shadow">
 	<svelte:fragment slot="lead">
 		<a href="/dashboard" class="h1 text-2xl">
-			<span class="text-primary-500"> Libre </span>
-			<span class="text-secondary-500"> Fit </span>
+			<span class="flex flex-row gap-1">
+				<img src="/favicon-128x128.png" role="presentation" alt="" class="h-8">
+				<span class="text-primary-500"> Libre </span>
+				<span class="text-secondary-500"> Fit </span>
+			</span>
 		</a>
 	</svelte:fragment>
 	<svelte:fragment slot="trail">

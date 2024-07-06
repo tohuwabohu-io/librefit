@@ -125,7 +125,7 @@ abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : Panach
         return list("userId = ?1 and added = ?2 order by sequence desc", userId, date)
     }
 
-    open fun listEntriesForUserAndDateRange(userId: UUID, dateFrom: LocalDate, dateTo: LocalDate): Uni<List<Entity>> {
+    fun listEntriesForUserAndDateRange(userId: UUID, dateFrom: LocalDate, dateTo: LocalDate): Uni<List<Entity>> {
         return list("userId = ?1 and added between ?2 and ?3 order by added desc", userId, dateFrom, dateTo)
     }
 
