@@ -4,7 +4,7 @@ import { librefitTheme } from './src/librefit-theme.js';
 
 /** @type {import('tailwindcss').Config} */
 const config = {
-	darkMode: 'class',
+	darkMode: 'media',
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',
 		join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')

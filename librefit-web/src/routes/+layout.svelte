@@ -1,98 +1,113 @@
 <script>
-	import '../app.pcss';
-	import {AppShell, Drawer, initializeStores, Modal, Toast} from '@skeletonlabs/skeleton';
-	import TopBar from '$lib/components/TopBar.svelte';
-	import WeightModal from '$lib/components/modal/WeightModal.svelte';
-	import GoalModal from '$lib/components/modal/GoalModal.svelte';
-	import UserPanel from '$lib/components/UserPanel.svelte';
-	import {setContext} from 'svelte';
-	import {writable} from 'svelte/store';
-	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
-	import TosModal from '$lib/components/modal/TosModal.svelte';
-	import {Indicator} from '$lib/indicator.js';
-	import {afterNavigate, beforeNavigate} from '$app/navigation';
-	import RegistrationModal from '$lib/components/modal/RegistrationModal.svelte';
-	import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
+    import '../app.pcss';
+    import {autoModeWatcher, AppShell, Drawer, initializeStores, Modal, Toast} from '@skeletonlabs/skeleton';
+    import TopBar from '$lib/components/TopBar.svelte';
+    import WeightModal from '$lib/components/modal/WeightModal.svelte';
+    import GoalModal from '$lib/components/modal/GoalModal.svelte';
+    import UserPanel from '$lib/components/UserPanel.svelte';
+    import {onMount, setContext} from 'svelte';
+    import {writable} from 'svelte/store';
+    import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
+    import TosModal from '$lib/components/modal/TosModal.svelte';
+    import {Indicator} from '$lib/indicator.js';
+    import {afterNavigate, beforeNavigate} from '$app/navigation';
+    import RegistrationModal from '$lib/components/modal/RegistrationModal.svelte';
+    import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
+    import {observeToggle} from '$lib/theme-toggle.js';
 
-	initializeStores();
+    initializeStores();
 
-	const modalComponentRegistry = {
-		weightModal: {
-			ref: WeightModal,
-		},
+	onMount(() => {
+		autoModeWatcher();
+	});
 
-		goalModal: {
-			ref: GoalModal,
-		},
+    const modalComponentRegistry = {
+        weightModal: {
+            ref: WeightModal,
+        },
 
-		avatarModal: {
-			ref: AvatarModal
-		},
+        goalModal: {
+            ref: GoalModal,
+        },
 
-		tosModal: {
-			ref: TosModal
-		},
+        avatarModal: {
+            ref: AvatarModal
+        },
 
-		registrationModal: {
-			ref: RegistrationModal
-		},
+        tosModal: {
+            ref: TosModal
+        },
 
-		trackerModal: {
-			ref: CalorieTrackerModal
-		}
-	};
+        registrationModal: {
+            ref: RegistrationModal
+        },
 
-	const user = writable();
-	const indicator = writable();
-	const currentGoal = writable();
-	const lastWeight = writable();
-	const foodCategories = writable();
-	const ctList = writable();
+        trackerModal: {
+            ref: CalorieTrackerModal
+        }
+    };
 
-	$: indicator.set(new Indicator());
+    const user = writable();
+    const indicator = writable();
+    const currentGoal = writable();
+    const lastWeight = writable();
+    const foodCategories = writable();
+    const ctList = writable();
 
-	setContext('user', user);
-	setContext('indicator', indicator);
-	setContext('currentGoal', currentGoal);
-	setContext('lastWeight', lastWeight);
-	setContext('foodCategories', foodCategories);
-	setContext('ctList', ctList);
+    $: indicator.set(new Indicator());
 
-	const logout = () => {
-		user.set(null);
-	}
+    setContext('user', user);
+    setContext('indicator', indicator);
+    setContext('currentGoal', currentGoal);
+    setContext('lastWeight', lastWeight);
+    setContext('foodCategories', foodCategories);
+    setContext('ctList', ctList);
 
-	beforeNavigate(() => {
-		$indicator = $indicator.start();
-	})
+    const logout = () => {
+        user.set(null);
+    }
 
-	afterNavigate(() => {
-		$indicator = $indicator.finish();
+    beforeNavigate(() => {
+        $indicator = $indicator.start();
+    })
 
-		setTimeout(() => {
-			$indicator = $indicator.hide();
-		}, 1000);
-	})
+    afterNavigate(() => {
+        $indicator = $indicator.finish();
+
+        setTimeout(() => {
+            $indicator = $indicator.hide();
+        }, 1000);
+    })
+
+    observeToggle(document.documentElement, (document) => {
+        if (document.classList.contains('dark')) {
+            $indicator = $indicator.toggle('dark');
+        } else {
+            $indicator = $indicator.toggle('light');
+        }
+    });
 </script>
 
 <Toast position={'tr'}/>
-<Modal components={modalComponentRegistry} />
+<Modal components={modalComponentRegistry}/>
 <Drawer position={'right'}>
-	<UserPanel on:logout={logout}/>
+    <UserPanel on:logout={logout}/>
 </Drawer>
 
 <AppShell>
-	<svelte:fragment slot="header">
-		{#if $user && window.location.pathname !== '/'} <TopBar />{/if}
-	</svelte:fragment>
-	<!-- Router Slot -->
-	<slot />
-	<!-- ---- / ---- -->
-	<svelte:fragment slot="pageFooter">
-		{#if $user && window.location.pathname !== '/'}
-			<div class="text-center">
-				<p class="unstyled text-xs">&copy; {new Date().getFullYear()} tohuwabohu.io</p>
-			</div>
-		{/if}
-	</svelte:fragment>
+    <svelte:fragment slot="header">
+        {#if $user && window.location.pathname !== '/'}
+            <TopBar/>
+        {/if}
+    </svelte:fragment>
+    <!-- Router Slot -->
+    <slot/>
+    <!-- ---- / ---- -->
+    <svelte:fragment slot="pageFooter">
+        {#if $user && window.location.pathname !== '/'}
+            <div class="text-center">
+                <p class="unstyled text-xs">&copy; {new Date().getFullYear()} tohuwabohu.io</p>
+            </div>
+        {/if}
+    </svelte:fragment>
 </AppShell>

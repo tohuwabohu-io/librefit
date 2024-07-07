@@ -94,7 +94,6 @@ export const paintCalorieTrackerQuickview = (entries, goal) => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 
-	// let borderColor = style.getPropertyValue('--color-surface-200');
 	let labelColor = style.getPropertyValue('--color-surface-100');
 	let labelTextColor = style.getPropertyValue('--color-surface-900');
 
@@ -105,12 +104,13 @@ export const paintCalorieTrackerQuickview = (entries, goal) => {
 
 	const noNaN = entries.map((entry) => entry.amount);
 
+	console.log(noNaN);
+
 	const chartData = createCalorieTrackerQuickviewDataset(entries, goal);
 
 	if (noNaN.length > 0) {
 		return {
 			chartData: {
-				//labels: [1, 2, 3, 4, 5, 6, 7, 8],s
 				labels: chartData.labels,
 				datasets: chartData.datasets
 			},
@@ -118,13 +118,25 @@ export const paintCalorieTrackerQuickview = (entries, goal) => {
 				indexAxis: 'y',
 				scales: {
 					y: {
-						beginAtZero: false
+						beginAtZero: false,
+						ticks: {
+							backdropColor: `rgb(${labelColor})`,
+							color: `rgb(${labelTextColor})`
+						}
+					},
+					x: {
+						ticks: {
+							backdropColor: `rgb(${labelColor})`,
+							color: `rgb(${labelTextColor})`
+						}
 					}
 				},
 				responsive: true,
 				aspectRatio: 0.73,
 				plugins: {
 					legend: {
+						display: false,
+						align: 'center',
 						label: {
 							color: `rgb(${labelTextColor})`
 						}
