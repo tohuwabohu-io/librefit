@@ -43,7 +43,6 @@
     }
 
     const deleteWeight = (e) => {
-        console.log(e);
         dispatch('deleteWeight', {
             sequence: e.detail.sequence,
             dateStr: e.detail.dateStr,
@@ -60,8 +59,6 @@
                 weightList: weightList
             },
             response: (e) => {
-                console.log(e);
-
                 if (e) {
                     if (e.detail.type === 'update') updateWeight(e.detail);
                     else if (e.detail.type === 'remove') deleteWeight(e.detail);

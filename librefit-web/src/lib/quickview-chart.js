@@ -104,8 +104,6 @@ export const paintCalorieTrackerQuickview = (entries, goal) => {
 
 	const noNaN = entries.map((entry) => entry.amount);
 
-	console.log(noNaN);
-
 	const chartData = createCalorieTrackerQuickviewDataset(entries, goal);
 
 	if (noNaN.length > 0) {
