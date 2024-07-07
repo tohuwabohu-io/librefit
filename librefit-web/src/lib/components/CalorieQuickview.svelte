@@ -8,6 +8,7 @@
     import {paintCalorieTrackerQuickview} from '$lib/quickview-chart.js';
     import {goto} from '$app/navigation';
     import {getModalStore} from '@skeletonlabs/skeleton';
+    import {observeToggle} from '$lib/theme-toggle.js';
 
     /** @type Array<CalorieTrackerEntry> */
     export let entries;
@@ -23,6 +24,11 @@
     const dispatch = createEventDispatcher();
 
     let targetButton;
+    let quickview;
+
+    if (entries && currentGoal) {
+        quickview = paintCalorieTrackerQuickview(entries, currentGoal);
+    }
 
     const setTarget = (event) => {
         dispatch('setTarget', {
@@ -48,6 +54,10 @@
             }
         })
     }
+
+    observeToggle(document.documentElement, () => {
+        quickview = paintCalorieTrackerQuickview(entries, currentGoal);
+    });
 </script>
 
 
@@ -55,7 +65,6 @@
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
     {#if entries && currentGoal}
-        {@const quickview = paintCalorieTrackerQuickview(entries, currentGoal)}
     <div class="flex flex-col xl:w-fit h-full justify-between gap-4">
         <Bar data={quickview.chartData} options={quickview.chartOptions}/>
     </div>

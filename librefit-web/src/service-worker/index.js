@@ -16,6 +16,16 @@ self.addEventListener('install', (event) => {
 	async function addFilesToCache() {
 		const cache = await caches.open(CACHE);
 		await cache.addAll(ASSETS);
+		// Request persistent storage
+		if (navigator.storage && navigator.storage.persist) {
+			navigator.storage.persist().then((granted) => {
+				if (granted) {
+					console.log('Persistent storage granted');
+				} else {
+					console.log('Persistent storage not granted');
+				}
+			});
+		}
 	}
 
 	event.waitUntil(addFilesToCache());
@@ -48,7 +58,9 @@ self.addEventListener('fetch', (event) => {
 		// for everything else, try the network first, but
 		// fall back to the cache if we're offline
 		try {
-			const response = await fetch(event.request);
+			const response = await fetch(event.request, {
+				credentials: 'include' // Include cookies in the request
+			});
 
 			if (response.status === 200) {
 				cache.put(event.request, response.clone());
