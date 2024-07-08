@@ -55,8 +55,9 @@ fun transformNumberFormatException(): ValidationError {
     )
 }
 
-class ErrorDescription(val field: String, val message: String)
-class ErrorResponse(val errors: List<ErrorDescription>)
+data class ErrorDescription(val field: String, val message: String)
+data class ErrorResponse(val title: String = "", val status: Int = 0, val errors: List<ErrorDescription> = emptyList())
+
 class ValidationError(val errors: List<ErrorDescription>) : Throwable()
 
 @Provider
@@ -67,7 +68,7 @@ class ValidationErrorMapper : ExceptionMapper<ValidationError> {
     override fun toResponse(exception: ValidationError): Response {
         log.error("Validation failed", exception)
 
-        return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse(exception.errors)).build()
+        return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse("Validation Error", 400, exception.errors)).build()
     }
 }
 

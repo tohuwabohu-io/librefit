@@ -13,21 +13,13 @@ import java.util.*
 
 @Entity
 @NamedQueries(
-    NamedQuery(name = "Goal.findLast", query = "from Goal where userId = ?1 order by sequence desc, added desc, userId limit 1")
+    NamedQuery(name = "CalorieTarget.findLast", query = "from CalorieTarget where userId = ?1 order by sequence desc, added desc, userId limit 1")
 )
-data class Goal(
-    @field:NotNull(message = "The initial weight of your goal must not be empty.")
-    @field:Min(value = 0, message = "The initial weight of your goal must not be less than zero.")
-    var initialWeight: Float,
-
-    @field:NotNull(message = "The target weight of your goal must not be empty.")
-    @field:Min(value = 0, message = "The target weight of your goal must not be less than zero.")
-    var targetWeight: Float,
-
-    @field:NotNull(message = "The starting date of your goal must not be empty.")
+data class CalorieTarget (
+    @field:NotNull(message = "The starting date of your target must not be empty.")
     var startDate: LocalDate,
 
-    @field:NotNull(message = "The end date of your goal must not be empty.")
+    @field:NotNull(message = "The end date of your target must not be empty.")
     var endDate: LocalDate,
 
     @Column(nullable = true)
@@ -47,9 +39,9 @@ data class Goal(
 }
 
 @ApplicationScoped
-class GoalsRepository : LibreUserRelatedRepository<Goal>() {
-    fun findLastGoal(userId: UUID): Uni<Goal?> {
-        return find("#Goal.findLast", userId).firstResult()
+class CalorieTargetRepository : LibreUserRelatedRepository<CalorieTarget>() {
+    fun findLatestCalorieTarget(userId: UUID): Uni<CalorieTarget?> {
+        return find("#CalorieTarget.findLast", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 }
