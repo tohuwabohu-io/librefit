@@ -9,7 +9,6 @@ import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.WeightTarget
-import io.tohuwabohu.crud.error.ErrorDescription
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
