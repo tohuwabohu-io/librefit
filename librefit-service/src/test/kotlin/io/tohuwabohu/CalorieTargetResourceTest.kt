@@ -16,7 +16,7 @@ import java.util.*
 
 @QuarkusTest
 @TestHTTPEndpoint(CalorieTargetResource::class)
-class CalorieTargetTest {
+class CalorieTargetResourceTest {
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])

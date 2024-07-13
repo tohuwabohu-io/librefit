@@ -16,7 +16,7 @@ import java.util.*
 
 @QuarkusTest
 @TestHTTPEndpoint(WeightTargetResource::class)
-class WeightTargetTest {
+class WeightTargetResourceTest {
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     fun `should create an entry`() {
@@ -124,8 +124,6 @@ class WeightTargetTest {
             statusCode(404)
         }
     }
-
-    // ... continuing from the previous test
 
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])

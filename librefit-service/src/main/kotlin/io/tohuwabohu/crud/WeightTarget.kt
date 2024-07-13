@@ -4,7 +4,10 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.NamedQueries
+import jakarta.persistence.NamedQuery
+import jakarta.persistence.PreUpdate
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
@@ -42,6 +45,5 @@ data class WeightTarget(
 class WeightTargetRepository : LibreUserRelatedRepository<WeightTarget>() {
     fun findLatestWeightTarget(userId: UUID): Uni<WeightTarget?> {
         return find("#WeightTarget.findLast", userId).firstResult()
-            .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 }

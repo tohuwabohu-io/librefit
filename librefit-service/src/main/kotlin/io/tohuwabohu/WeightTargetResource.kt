@@ -8,6 +8,7 @@ import io.tohuwabohu.crud.WeightTargetRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import jakarta.annotation.security.RolesAllowed
+import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
@@ -163,7 +164,8 @@ class WeightTargetResource(private val weightTargetRepository: WeightTargetRepos
     )
     fun latest(@Context securityIdentity: SecurityIdentity): Uni<Response> = weightTargetRepository
         .findLatestWeightTarget(UUID.fromString(securityIdentity.principal.name))
-        .onItem().transform { entry -> Response.ok(entry).build() }
+        .onItem().ifNotNull().transform { entry -> Response.ok(entry).build() }
+        .onItem().ifNull().failWith(EntityNotFoundException())
         .onFailure().invoke { e -> Log.error(e) }
         .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
 }

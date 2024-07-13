@@ -42,6 +42,5 @@ data class CalorieTarget (
 class CalorieTargetRepository : LibreUserRelatedRepository<CalorieTarget>() {
     fun findLatestCalorieTarget(userId: UUID): Uni<CalorieTarget?> {
         return find("#CalorieTarget.findLast", userId).firstResult()
-            .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 }
