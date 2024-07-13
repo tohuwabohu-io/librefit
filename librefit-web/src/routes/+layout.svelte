@@ -2,7 +2,7 @@
     import '../app.pcss';
     import {autoModeWatcher, AppShell, Drawer, initializeStores, Modal, Toast} from '@skeletonlabs/skeleton';
     import TopBar from '$lib/components/TopBar.svelte';
-    import WeightModal from '$lib/components/modal/WeightModal.svelte';
+    import WeightModal from '$lib/components/modal/WeightTrackerModal.svelte';
     import GoalModal from '$lib/components/modal/GoalModal.svelte';
     import UserPanel from '$lib/components/UserPanel.svelte';
     import {onMount, setContext} from 'svelte';
@@ -14,6 +14,8 @@
     import RegistrationModal from '$lib/components/modal/RegistrationModal.svelte';
     import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
     import {observeToggle} from '$lib/theme-toggle.js';
+    import CalorieTargetModal from '$lib/components/modal/CalorieTargetModal.svelte';
+    import WeightTargetModal from '$lib/components/modal/WeightTargetModal.svelte';
 
     initializeStores();
 
@@ -44,6 +46,14 @@
 
         trackerModal: {
             ref: CalorieTrackerModal
+        },
+
+        calorieTargetModal: {
+            ref: CalorieTargetModal
+        },
+
+        weightTargetModal: {
+            ref: WeightTargetModal
         }
     };
 
