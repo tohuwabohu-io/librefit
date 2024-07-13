@@ -6,9 +6,9 @@
     import TrackerInput from '$lib/components/TrackerInput.svelte';
 
     /**
-     * @type Goal
+     * @type WeightTarget
      */
-    export let currentGoal;
+    export let weightTarget;
 
     /**
      * @type Array<WeightTrackerEntry>
@@ -80,13 +80,13 @@
         </p>
     {/if}
 
-    {#if currentGoal}
+    {#if weightTarget}
         <p>
-            Goal: {currentGoal.targetWeight}kg @ ({convertDateStrToDisplayDateStr(currentGoal.endDate)})
+            Target: {weightTarget.targetWeight}kg @ ({convertDateStrToDisplayDateStr(weightTarget.endDate)})
         </p>
     {:else}
         <p>
-            No goal set up.
+            No target weight set.
         </p>
     {/if}
 

@@ -11,7 +11,7 @@ const mockData = {
 		{ amount: 70, added: '2022-01-01', sequence: 1 },
 		{ amount: 69, added: '2022-02-01', sequence: 2 }
 	],
-	currentGoal: { targetWeight: 60, endDate: '2023-01-01' }
+	weightTarget: { targetWeight: 60, endDate: '2023-01-01' }
 };
 
 /**
@@ -31,7 +31,7 @@ describe('WeightTracker.svelte component', () => {
 
 		expect(
 			getByText(
-				`Goal: ${mockData.currentGoal.targetWeight}kg @ (${convertDateStrToDisplayDateStr(mockData.currentGoal.endDate)})`
+				`Target: ${mockData.weightTarget.targetWeight}kg @ (${convertDateStrToDisplayDateStr(mockData.weightTarget.endDate)})`
 			)
 		).toBeDefined();
 	});
@@ -40,7 +40,7 @@ describe('WeightTracker.svelte component', () => {
 		const { getByText } = render(WeightTracker);
 
 		expect(getByText('Nothing tracked for today. Now would be a good moment!')).toBeDefined();
-		expect(getByText(`No goal set up.`)).toBeDefined();
+		expect(getByText(`No target weight set.`)).toBeDefined();
 	});
 
 	it('should trigger the quick add button and dispatch addWeight', async () => {

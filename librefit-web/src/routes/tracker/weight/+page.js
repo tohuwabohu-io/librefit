@@ -8,7 +8,7 @@ export const load = async ({ fetch }) => {
 
 	if (wtListResponse.ok) {
 		return {
-			wtList: await wtListResponse.json()
+			weightWeekList: await wtListResponse.json()
 		};
 	} else {
 		return { error: 'An error has occured. Please try again later.' };
