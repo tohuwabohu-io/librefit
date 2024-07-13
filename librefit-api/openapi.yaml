@@ -9,23 +9,24 @@ servers:
 - url: http://0.0.0.0:8080
   description: Auto generated value
 paths:
-  /api/goals/create:
-    post:
+  /api/composite/dashboard/{date}:
+    get:
       tags:
-      - Goals Resource
-      operationId: createGoal
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Goal"
+      - Composite Resource
+      operationId: getDashboard
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/LocalDate"
       responses:
-        "201":
+        "200":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Goal"
+                $ref: "#/components/schemas/Dashboard"
         "400":
           description: Bad Request
           content:
@@ -36,145 +37,6 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
-        "403":
-          description: Not Allowed
-      security:
-      - SecurityScheme: []
-  /api/goals/delete/{date}/{sequence}:
-    delete:
-      tags:
-      - Goals Resource
-      operationId: deleteGoal
-      parameters:
-      - name: date
-        in: path
-        required: true
-        schema:
-          $ref: "#/components/schemas/LocalDate"
-      - name: sequence
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json: {}
-        "404":
-          description: Not Found
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Not Allowed
-      security:
-      - SecurityScheme: []
-  /api/goals/last:
-    get:
-      tags:
-      - Goals Resource
-      operationId: findLastGoal
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Goal"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Not Allowed
-      security:
-      - SecurityScheme: []
-  /api/goals/read/{date}/{sequence}:
-    get:
-      tags:
-      - Goals Resource
-      operationId: readGoal
-      parameters:
-      - name: date
-        in: path
-        required: true
-        schema:
-          $ref: "#/components/schemas/LocalDate"
-      - name: sequence
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Goal"
-        "404":
-          description: Not Found
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Not Allowed
-      security:
-      - SecurityScheme: []
-  /api/goals/update:
-    put:
-      tags:
-      - Goals Resource
-      operationId: updateGoal
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Goal"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json: {}
-        "404":
-          description: Not Found
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Not Allowed
-      security:
-      - SecurityScheme: []
   /api/import/bulk:
     post:
       tags:
@@ -206,6 +68,338 @@ paths:
           description: OK
           content:
             application/json: {}
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/calories/create:
+    post:
+      tags:
+      - Calorie Target Resource
+      operationId: createCalorieTarget
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalorieTarget"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalorieTarget"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/calories/delete/{date}/{sequence}:
+    delete:
+      tags:
+      - Calorie Target Resource
+      operationId: deleteCalorieTarget
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/LocalDate"
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/calories/last:
+    get:
+      tags:
+      - Calorie Target Resource
+      operationId: findLastCalorieTarget
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalorieTarget"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/calories/read/{date}/{sequence}:
+    get:
+      tags:
+      - Calorie Target Resource
+      operationId: readCalorieTarget
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/LocalDate"
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalorieTarget"
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/calories/update:
+    put:
+      tags:
+      - Calorie Target Resource
+      operationId: updateCalorieTarget
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalorieTarget"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/weight/create:
+    post:
+      tags:
+      - Weight Target Resource
+      operationId: createWeightTarget
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WeightTarget"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeightTarget"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/weight/delete/{date}/{sequence}:
+    delete:
+      tags:
+      - Weight Target Resource
+      operationId: deleteWeightTarget
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/LocalDate"
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/weight/last:
+    get:
+      tags:
+      - Weight Target Resource
+      operationId: findLastWeightTarget
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeightTarget"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/weight/read/{date}/{sequence}:
+    get:
+      tags:
+      - Weight Target Resource
+      operationId: readWeightTarget
+      parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/LocalDate"
+      - name: sequence
+        in: path
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeightTarget"
+        "404":
+          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+  /api/target/weight/update:
+    put:
+      tags:
+      - Weight Target Resource
+      operationId: updateWeightTarget
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WeightTarget"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "404":
+          description: Not Found
         "400":
           description: Bad Request
           content:
@@ -1001,6 +1195,43 @@ components:
       - MALE
       - FEMALE
       type: string
+    CalorieTarget:
+      required:
+      - added
+      - startDate
+      - endDate
+      type: object
+      properties:
+        userId:
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/UUID"
+          nullable: true
+        added:
+          $ref: "#/components/schemas/LocalDate"
+        sequence:
+          format: int64
+          type: integer
+          nullable: true
+        startDate:
+          $ref: "#/components/schemas/LocalDate"
+        endDate:
+          $ref: "#/components/schemas/LocalDate"
+        targetCalories:
+          format: float
+          minimum: 0
+          type: number
+          nullable: true
+        maximumCalories:
+          format: float
+          minimum: 0
+          type: number
+          nullable: true
+        updated:
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/LocalDateTime"
+          nullable: true
     CalorieTrackerEntry:
       required:
       - added
@@ -1033,6 +1264,43 @@ components:
         description:
           type: string
           nullable: true
+    Dashboard:
+      required:
+      - userData
+      - foodCategories
+      type: object
+      properties:
+        userData:
+          $ref: "#/components/schemas/LibreUser"
+        foodCategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodCategory"
+        calorieTarget:
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/CalorieTarget"
+          nullable: true
+        caloriesTodayList:
+          type: array
+          items:
+            $ref: "#/components/schemas/CalorieTrackerEntry"
+          nullable: true
+        caloriesWeekList:
+          type: array
+          items:
+            $ref: "#/components/schemas/CalorieTrackerEntry"
+          nullable: true
+        weightTarget:
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/WeightTarget"
+          nullable: true
+        weightMonthList:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeightTrackerEntry"
+          nullable: true
     ErrorDescription:
       required:
       - field
@@ -1045,9 +1313,15 @@ components:
           type: string
     ErrorResponse:
       required:
+      - title
       - errors
       type: object
       properties:
+        title:
+          type: string
+        status:
+          format: int32
+          type: integer
         errors:
           type: array
           items:
@@ -1066,53 +1340,6 @@ components:
           type: string
         visible:
           type: boolean
-    Goal:
-      required:
-      - added
-      - initialWeight
-      - targetWeight
-      - startDate
-      - endDate
-      type: object
-      properties:
-        userId:
-          type: string
-          allOf:
-          - $ref: "#/components/schemas/UUID"
-          nullable: true
-        added:
-          $ref: "#/components/schemas/LocalDate"
-        sequence:
-          format: int64
-          type: integer
-          nullable: true
-        initialWeight:
-          format: float
-          minimum: 0
-          type: number
-        targetWeight:
-          format: float
-          minimum: 0
-          type: number
-        startDate:
-          $ref: "#/components/schemas/LocalDate"
-        endDate:
-          $ref: "#/components/schemas/LocalDate"
-        targetCalories:
-          format: float
-          minimum: 0
-          type: number
-          nullable: true
-        maximumCalories:
-          format: float
-          minimum: 0
-          type: number
-          nullable: true
-        updated:
-          type: string
-          allOf:
-          - $ref: "#/components/schemas/LocalDateTime"
-          nullable: true
     ImportConfig:
       required:
       - datePattern
@@ -1242,6 +1469,49 @@ components:
       format: uuid
       pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
       type: string
+    WeightTarget:
+      required:
+      - added
+      - startDate
+      - endDate
+      - initialWeight
+      - targetWeight
+      type: object
+      properties:
+        userId:
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/UUID"
+          nullable: true
+        added:
+          $ref: "#/components/schemas/LocalDate"
+        sequence:
+          format: int64
+          type: integer
+          nullable: true
+        startDate:
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/LocalDate"
+          nullable: true
+        endDate:
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/LocalDate"
+          nullable: true
+        initialWeight:
+          format: float
+          minimum: 0
+          type: number
+        targetWeight:
+          format: float
+          minimum: 0
+          type: number
+        updated:
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/LocalDateTime"
+          nullable: true
     WeightTrackerEntry:
       required:
       - added
