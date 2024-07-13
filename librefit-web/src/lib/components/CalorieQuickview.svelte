@@ -11,10 +11,10 @@
     import {observeToggle} from '$lib/theme-toggle.js';
 
     /** @type Array<CalorieTrackerEntry> */
-    export let entries;
+    export let calorieTrackerEntries;
 
-    /** @type Goal */
-    export let currentGoal;
+    /** @type CalorieTarget */
+    export let calorieTarget;
 
     export let displayClass = '';
     export let displayHeader = true;
@@ -26,13 +26,13 @@
     let targetButton;
     let quickview;
 
-    if (entries && currentGoal) {
-        quickview = paintCalorieTrackerQuickview(entries, currentGoal);
+    if (calorieTrackerEntries && calorieTarget) {
+        quickview = paintCalorieTrackerQuickview(calorieTrackerEntries, calorieTarget);
     }
 
     const setTarget = (event) => {
         dispatch('setTarget', {
-            goal: event.goal,
+            calorieTarget: event.calorieTarget,
             target: targetButton
         });
     }
@@ -40,10 +40,10 @@
     const onSetTarget = () => {
         modalStore.trigger({
             type: 'component',
-            component: 'goalModal',
+            component: 'calorieTargetModal',
             meta: {
-                /** @type Goal */
-                goal: currentGoal
+                /** @type CalorieTarget */
+                currentTarget: calorieTarget
             },
             response: async (e) => {
                 if (!e.cancelled) {
@@ -56,7 +56,7 @@
     }
 
     observeToggle(document.documentElement, () => {
-        quickview = paintCalorieTrackerQuickview(entries, currentGoal);
+        quickview = paintCalorieTrackerQuickview(calorieTrackerEntries, calorieTarget);
     });
 </script>
 
@@ -64,7 +64,7 @@
 <div class="{displayClass} gap-4 text-center justify-between relative h-full">
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
-    {#if entries && currentGoal}
+    {#if calorieTrackerEntries && calorieTarget}
     <div class="flex flex-col xl:w-fit h-full justify-between gap-4">
         <Bar data={quickview.chartData} options={quickview.chartOptions}/>
     </div>

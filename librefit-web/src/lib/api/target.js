@@ -2,15 +2,29 @@ import { proxyFetch } from '$lib/api/util.js';
 import { api } from '$lib/api/index.js';
 
 /**
- * @param {Goal} goal
- * @return {Promise}
+ * @param {CalorieTarget} calorieTarget
+ * @return {Promise<* | undefined>}
  */
-export const createGoal = async (goal) => {
-	return proxyFetch(fetch, api.createGoal, goal).then(async (response) => {
+export const createCalorieTarget = async (calorieTarget) => {
+	return proxyFetch(fetch, api.createCalorieTarget, calorieTarget).then(async (response) => {
 		if (response.ok) {
-			const goal = await response.json();
+			const calorieTarget = await response.json();
 
-			return Promise.resolve(goal);
+			return Promise.resolve(calorieTarget);
+		} else throw response;
+	});
+};
+
+/**
+ * @param {WeightTarget} weightTarget
+ * @return {Promise<* | undefined>}
+ */
+export const createWeightTarget = async (weightTarget) => {
+	return proxyFetch(fetch, api.createWeightTarget, weightTarget).then(async (response) => {
+		if (response.ok) {
+			const weightTarget = await response.json();
+
+			return Promise.resolve(weightTarget);
 		} else throw response;
 	});
 };

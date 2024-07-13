@@ -9,20 +9,30 @@
     import NoFood from '$lib/assets/icons/food-off.svg?component'
     import {getFoodCategoryLongvalue, skimCategories} from '$lib/api/category.js';
 
+    export let data;
+
     const toastStore = getToastStore();
 
+    /** @type List<CalorieTrackerEntry> */
+    const calorieTrackerEntries = data.caloriesMonthList;
+
+    /** @type Writable<LibreUser> */
     const user = getContext('user');
+
     const indicator = getContext('indicator');
-    const ctList = getContext('ctList');
+
+    /** @type Writable<List<FoodCategory>> */
     const foodCategories = getContext('foodCategories');
-    const currentGoal = getContext('currentGoal');
+
+    /** @type Writable<CalorieTarget> */
+    const calorieTarget = getContext('calorieTarget');
 
     if (!$user) goto('/');
 
     let filter = DataViews.Month;
-    let filteredData = $ctList;
+    let filteredData = calorieTrackerEntries;
 
-    let categories = skimCategories($ctList);
+    let categories = skimCategories(calorieTrackerEntries);
 
     $: filteredData;
     $: categories;
@@ -83,7 +93,7 @@
                 {/each}
             </RadioGroup>
 
-            {#if $ctList.length > 0 }
+            {#if calorieTrackerEntries.length > 0 }
                 <div class="flex flex-col lg:flex-row gap-4">
                     <div class="lg:w-3/5 flex flex-col">
                         <h2 class="h2">Last {filter.toLowerCase()}:</h2>
@@ -120,11 +130,11 @@
                     </div>
                     <div class="lg:w-2/5 flex justify-center">
                         <CalorieDistribution displayClass="flex"
-                                ctList={filteredData}
-                                             displayHeader={false}
-                                             displayHistory={false}
-                                             foodCategories={$foodCategories}
-                                             currentGoal={$currentGoal}
+                                calorieTrackerEntries={filteredData}
+                                displayHeader={false}
+                                displayHistory={false}
+                                foodCategories={$foodCategories}
+                                bind:calorieTarget={$calorieTarget}
                         />
                     </div>
                 </div>
