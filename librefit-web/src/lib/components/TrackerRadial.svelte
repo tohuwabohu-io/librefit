@@ -1,5 +1,4 @@
 <script>
-	import {getContext} from 'svelte';
 
 	/** @type CalorieTarget */
 	export let calorieTarget;

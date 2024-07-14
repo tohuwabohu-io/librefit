@@ -5,6 +5,7 @@ import { error } from '@sveltejs/kit';
  * @param {function} fetchApi
  * @param {{path: String; method: String; contentType: String; guarded: boolean}} api
  * @param {any} [data]
+ * @returns Response
  */
 export const proxyFetch = async (fetchApi, api, data) => {
 	let response;

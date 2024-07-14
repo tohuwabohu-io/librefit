@@ -3,12 +3,16 @@
     import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
     import {getToastStore} from '@skeletonlabs/skeleton';
     import {
-        addCalories, updateCalories, deleteCalories,
-        addWeight, updateWeight, deleteWeight,
+        addCalories,
+        addWeight,
+        deleteCalories,
+        deleteWeight,
         listCalorieTrackerEntriesRange,
-        listWeightRange, listWeightForDate
+        listWeightRange,
+        updateCalories,
+        updateWeight
     } from '$lib/api/tracker.js';
-    import {createGoal} from '$lib/api/target.js';
+    import {createCalorieTarget, createWeightTarget} from '$lib/api/target.js';
     import {getContext} from 'svelte';
     import {Chart, registerables} from 'chart.js';
     import {Line} from 'svelte-chartjs';
@@ -27,22 +31,34 @@
 
     Chart.register(...registerables);
 
+    /** @type Writable<WeightTrackerEntry> */
     const lastWeightTrackerEntry = getContext('lastWeight');
-    const currentGoal = getContext('currentGoal');
+
+    /** @type Writable<WeightTarget> */
+    const weightTarget = getContext('weightTarget');
+
+    /** @type Writable<CalorieTarget> */
+    const calorieTarget = getContext('calorieTarget');
+
+    /** @type Writable<List<FoodCategory>> */
     const foodCategories = getContext('foodCategories');
-    const ctList = getContext('ctList');
 
     export let data;
 
-    $: ctListRecent = data.lastCalories;
-    $: wtListRecent = data.lastWeight;
-    $: wtListMonth = data.listWeight;
+    /** @type Dashboard */
+    const dashboardData = data.dashboardData;
 
-    $: wtChart = paintWeightTrackerEntries(wtListMonth, today, DataViews.Month);
-    $: lastWeightTrackerEntry.set(wtListRecent ? wtListRecent[0] : null);
-    $: currentGoal.set(data.currentGoal);
-    $: ctList.set(data.listCalories);
-    $: foodCategories.set(data.foodCategories);
+    let caloriesToday = dashboardData.caloriesTodayList;
+    let weightListToday = dashboardData.weightTodayList;
+    let weightListMonth = dashboardData.weightMonthList;
+
+    $: weightChart = paintWeightTrackerEntries(weightListMonth, today, DataViews.Month);
+    $: lastWeightTrackerEntry.set(dashboardData.weightTodayList[0]);
+    $: weightTarget.set(dashboardData.weightTarget);
+    $: calorieTarget.set(dashboardData.calorieTarget);
+    $: foodCategories.set(dashboardData.foodCategories);
+
+    $: dashboardData.caloriesWeekList;
 
     const user = getContext('user');
     const indicator = getContext('indicator');
@@ -64,7 +80,7 @@
             await addCalories(event).then(async response => {
                 event.detail.callback();
 
-                ctListRecent = await response;
+                caloriesToday = await response;
 
                 showToastSuccess(
                     toastStore,
@@ -91,7 +107,7 @@
             await updateCalories(event).then(async response => {
                 event.detail.callback();
 
-                ctListRecent = await response;
+                caloriesToday = await response;
 
                 showToastSuccess(
                     toastStore,
@@ -113,7 +129,7 @@
         await deleteCalories(event).then(async response => {
             event.detail.callback();
 
-            ctListRecent = await response;
+            caloriesToday = await response;
 
             showToastSuccess(toastStore, `Deletion successful.`);
         }).then(refreshCalorieDistribution).catch((e) => {
@@ -131,8 +147,8 @@
             await addWeight(event).then(async response => {
                 event.detail.callback();
 
-                wtListRecent = await response.json();
-                lastWeightTrackerEntry.set(wtListRecent[0]);
+                weightListToday = await response.json();
+                lastWeightTrackerEntry.set(weightListToday[0]);
 
                 showToastSuccess(toastStore, `Set weight to ${$lastWeightTrackerEntry.amount}kg.`);
             }).then(refreshWeightChart).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
@@ -151,7 +167,7 @@
             await updateWeight(event).then(async response => {
 				event.detail.callback();
 
-                wtListRecent = await response.json();
+                weightListToday = await response.json();
 
 				showToastSuccess(toastStore, 'Successfully updated weight.');
             }).then(refreshWeightChart).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
@@ -167,7 +183,7 @@
 		await deleteWeight(event).then(async (response) => {
 			event.detail.callback();
 
-            wtListRecent = await response.json();
+            weightListToday = await response.json();
 
 			showToastSuccess(toastStore, `Deletion successful.`);
 		}).then(refreshWeightChart).catch((e) => {
@@ -180,7 +196,7 @@
         const calorieTrackerRangeResponse = await listCalorieTrackerEntriesRange(lastWeek, today);
 
         if (calorieTrackerRangeResponse.ok) {
-            ctList.set(await calorieTrackerRangeResponse.json());
+            dashboardData.caloriesWeekList = await calorieTrackerRangeResponse.json();
         }
     }
 
@@ -188,27 +204,39 @@
         const weightRangeResponse = await listWeightRange(lastMonth, today);
 
         if (weightRangeResponse.ok) {
-            wtListMonth = await weightRangeResponse.json();
+            weightListMonth = await weightRangeResponse.json();
 
             repaintWeightChart();
         }
     }
 
     const repaintWeightChart = () => {
-        wtChart = paintWeightTrackerEntries(wtListMonth, today, DataViews.Month);
+        weightChart = paintWeightTrackerEntries(weightListMonth, today, DataViews.Month);
     }
 
-    const setGoal = async (e) => {
+    const setCalorieTarget = async (e) => {
         $indicator = $indicator.start(e.detail.target);
 
-        await createGoal(e.detail.goal).then(async response => {
-            currentGoal.set(response);
+        await createCalorieTarget(e.detail.calorieTarget).then(async response => {
+            calorieTarget.set(response);
         }).then(() => {
             showToastSuccess(toastStore, 'Successfully set target.');
         }).catch((e) => {
             showToastError(toastStore, e);
         }).finally(() => $indicator = $indicator.finish());
-    };
+    }
+
+    const setWeightTarget = async (e) => {
+        $indicator = $indicator.start(e.detail.target);
+
+        await createWeightTarget(e.detail.weightTarget).then(async response => {
+            calorieTarget.set(response);
+        }).then(() => {
+            showToastSuccess(toastStore, 'Successfully set target.');
+        }).catch((e) => {
+            showToastError(toastStore, e);
+        }).finally(() => $indicator = $indicator.finish());
+    }
 </script>
 
 <svelte:head>
@@ -226,7 +254,9 @@
 
                 <div class="flex flex-col gap-8 lg:grid grid-cols-3">
                     <div class="card flex flex-col gap-4 p-4">
-                        <CalorieTracker entries={ctListRecent} categories={$foodCategories} currentGoal={$currentGoal}
+                        <CalorieTracker calorieTrackerEntries={caloriesToday}
+                                        categories={$foodCategories}
+                                        bind:calorieTarget={$calorieTarget}
                                         on:addCalories={onAddCalories}
                                         on:updateCalories={onUpdateCalories}
                                         on:deleteCalories={onDeleteCalories}
@@ -235,16 +265,17 @@
 
                     <div class="card flex flex-col gap-4 p-4">
                         <CalorieDistribution displayClass="flex flex-col"
-                                             bind:ctList={$ctList} foodCategories={$foodCategories}
-                                             currentGoal={$currentGoal}
+                                             bind:calorieTrackerEntries={dashboardData.caloriesWeekList}
+                                             foodCategories={$foodCategories}
+                                             bind:calorieTarget={dashboardData.calorieTarget}
                         />
                     </div>
 
                     <div class="card p-4">
                         <CalorieQuickview displayClass="flex flex-col"
-                                          bind:entries={$ctList}
-                                          bind:currentGoal={$currentGoal}
-                                          on:setTarget={setGoal}
+                                          bind:calorieTrackerEntries={dashboardData.caloriesWeekList}
+                                          calorieTarget={$calorieTarget}
+                                          on:setTarget={setCalorieTarget}
                         />
                     </div>
                 </div>
@@ -252,15 +283,18 @@
                 <div class="flex md:flex-row flex-col gap-8">
                     <div class="flex flex-col gap-4 card p-4 object-fill justify-center items-center relative md:w-full">
                         <h2 class="h3">Weight Tracker</h2>
-                        {#if wtChart && data.listWeight.length > 0}
-                            <Line class="md:w-full" options={wtChart.chartOptions} data={wtChart.chartData}/>
+                        {#if weightChart && weightListMonth.length > 0}
+                            <Line class="md:w-full" options={weightChart.chartOptions} data={weightChart.chartData}/>
                         {:else}
                             <div>
                                 <ScaleOff width={100} height={100} class="self-center"/>
                             </div>
                         {/if}
-                        <WeightTracker weightList={wtListRecent} currentGoal={$currentGoal}
-                                       on:addWeight={onAddWeight} on:updateWeight={onUpdateWeight} on:deleteWeight={onDeleteWeight}
+                        <WeightTracker weightList={weightListToday}
+                                       weightTarget={$weightTarget}
+                                       on:addWeight={onAddWeight}
+                                       on:updateWeight={onUpdateWeight}
+                                       on:deleteWeight={onDeleteWeight}
                         />
                     </div>
                 </div>

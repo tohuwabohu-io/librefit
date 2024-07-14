@@ -14,7 +14,7 @@
     const toastStore = getToastStore();
 
     /** @type List<CalorieTrackerEntry> */
-    const calorieTrackerEntries = data.caloriesMonthList;
+    $: calorieTrackerEntries = data.caloriesMonthList;
 
     /** @type Writable<LibreUser> */
     const user = getContext('user');

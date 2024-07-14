@@ -59,19 +59,19 @@
 
     const user = writable();
     const indicator = writable();
-    const currentGoal = writable();
+    const weightTarget = writable();
+    const calorieTarget = writable();
     const lastWeight = writable();
     const foodCategories = writable();
-    const ctList = writable();
 
     $: indicator.set(new Indicator());
 
     setContext('user', user);
     setContext('indicator', indicator);
-    setContext('currentGoal', currentGoal);
+    setContext('weightTarget', weightTarget);
+    setContext('calorieTarget', calorieTarget);
     setContext('lastWeight', lastWeight);
     setContext('foodCategories', foodCategories);
-    setContext('ctList', ctList);
 
     const logout = () => {
         user.set(null);

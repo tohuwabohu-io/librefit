@@ -6,8 +6,7 @@ export const load = async ({ fetch }) => {
 	const today = new Date();
 	const lastMonth = subMonths(today, 1);
 
-	/** @type Promise<List<CalorieTrackerEntry>> */
-	const monthList = listCalorieTrackerEntriesRange(lastMonth, today);
+	const monthList = await listCalorieTrackerEntriesRange(lastMonth, today);
 
 	if (monthList.ok) {
 		return {

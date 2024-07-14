@@ -26,7 +26,7 @@
     let targetButton;
     let quickview;
 
-    if (calorieTrackerEntries && calorieTarget) {
+    $: if (calorieTrackerEntries && calorieTarget) {
         quickview = paintCalorieTrackerQuickview(calorieTrackerEntries, calorieTarget);
     }
 
