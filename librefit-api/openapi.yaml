@@ -37,6 +37,10 @@ paths:
           description: Unauthorized
         "500":
           description: Internal Server Error
+        "403":
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
   /api/import/bulk:
     post:
       tags:
@@ -1295,6 +1299,11 @@ components:
           type: object
           allOf:
           - $ref: "#/components/schemas/WeightTarget"
+          nullable: true
+        weightTodayList:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeightTrackerEntry"
           nullable: true
         weightMonthList:
           type: array

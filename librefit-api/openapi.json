@@ -50,8 +50,14 @@
           },
           "500" : {
             "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/api/import/bulk" : {
@@ -1905,6 +1911,13 @@
             "allOf" : [ {
               "$ref" : "#/components/schemas/WeightTarget"
             } ],
+            "nullable" : true
+          },
+          "weightTodayList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/WeightTrackerEntry"
+            },
             "nullable" : true
           },
           "weightMonthList" : {
