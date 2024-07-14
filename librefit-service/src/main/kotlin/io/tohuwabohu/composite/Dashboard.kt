@@ -9,5 +9,6 @@ data class Dashboard(
     val caloriesTodayList: List<CalorieTrackerEntry>?,
     val caloriesWeekList: List<CalorieTrackerEntry>?,
     val weightTarget: WeightTarget?,
+    val weightTodayList: List<WeightTrackerEntry>?,
     val weightMonthList: List<WeightTrackerEntry>?
 )

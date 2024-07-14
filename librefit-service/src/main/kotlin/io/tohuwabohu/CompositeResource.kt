@@ -59,7 +59,7 @@ class CompositeResource(
 
         return userRepository.findById(userId).chain { user ->
             foodCategoryRepository.listVisibleCategories().map { categories ->
-                Dashboard(user.copy(password = ""), categories, null, emptyList(), emptyList(), null, emptyList())
+                Dashboard(user.copy(password = ""), categories, null, emptyList(), emptyList(), null, emptyList(), emptyList())
             }
         }.chain { dash ->
             calorieTargetRepository.findLatestCalorieTarget(userId).map { target ->
@@ -77,6 +77,11 @@ class CompositeResource(
             weightTargetRepository.findLatestWeightTarget(userId).map { target ->
                 dash.copy(weightTarget = target)
             }
+        }.chain{ dash ->
+            weightTrackerRepository.listEntriesForUserAndDate(userId, date).map { entries ->
+                dash.copy(weightTodayList = entries)
+            }
+
         }.chain { dash ->
             weightTrackerRepository.listEntriesForUserAndDateRange(userId, month, date).map { entries ->
                 dash.copy(weightMonthList = entries)
