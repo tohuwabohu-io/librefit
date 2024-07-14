@@ -17,6 +17,11 @@
 		total = entries.reduce((a, b) => a + b);
 	}
 
+	$: if (calorieTarget) {
+		limit = calorieTarget.targetCalories;
+		maximum = calorieTarget.maximumCalories;
+	}
+
 	let innerEnd, outerEnd;
 
 	const stroke = 40;
