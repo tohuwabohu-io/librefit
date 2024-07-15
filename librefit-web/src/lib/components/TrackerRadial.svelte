@@ -4,7 +4,7 @@
 	export let calorieTarget;
 
 	/** @type {Array<number>} */
-	export let entries = [];
+	export let entries;
 
 	let limit = calorieTarget && calorieTarget.targetCalories ? calorieTarget.targetCalories : 0,
 		maximum = calorieTarget && calorieTarget.maximumCalories ? calorieTarget.maximumCalories : 0,
@@ -13,7 +13,7 @@
 	let width = 512,
 		height = 512;
 
-	$: if (entries.length > 0) {
+	$: if (entries && entries.length > 0) {
 		total = entries.reduce((a, b) => a + b);
 	}
 
