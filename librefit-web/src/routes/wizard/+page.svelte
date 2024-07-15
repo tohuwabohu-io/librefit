@@ -2,19 +2,17 @@
 	import TdeeStepper from '$lib/components/TdeeStepper.svelte';
 	import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
 	import {showToastError, showToastSuccess} from '$lib/toast.js';
-	import * as dateUtil from 'date-fns';
+	import addDays from 'date-fns';
 	import {getContext} from 'svelte';
 	import {proxyFetch} from '$lib/api/util.js';
 	import {api} from '$lib/api/index.js';
-    import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
-    import {getDateAsStr} from '$lib/date.js';
+	import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
+	import {getDateAsStr} from '$lib/date.js';
 	import {goto} from '$app/navigation';
 
 	const modalStore = getModalStore();
 	const toastStore = getToastStore();
 
-	const lastWeightEntry = getContext('lastWeight');
-	const currentGoal = getContext('currentGoal');
 	const indicator = getContext('indicator');
 	const user = getContext('user');
 
@@ -47,7 +45,7 @@
 
 	/** @param {Tdee} calculationResult */
 	const showGoalModal = (calculationResult) => {
-		const endDate = dateUtil.addDays(today, calculationResult.durationDays);
+		const endDate = addDays(today, calculationResult.durationDays);
 
 		modalStore.trigger({
 			type: 'component',
@@ -81,18 +79,12 @@
 			if (response.ok) {
 				showToastSuccess(toastStore, 'Successfully created goal.');
 
-				currentGoal.set(await response.json());
-
 				return proxyFetch(fetch, api.createWeightTrackerEntry, {
 					added: getDateAsStr(today),
 					amount: goal.initialWeight
 				})
 			} else {
 				throw Error();
-			}
-		}).then(async response => {
-			if (response.ok) {
-				lastWeightEntry.set(await response.json());
 			}
 		}).catch((error) => showToastError(toastStore, error)).finally(() => $indicator = $indicator.finish())
 	}
