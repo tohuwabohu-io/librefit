@@ -34,12 +34,6 @@
     /** @type Writable<WeightTrackerEntry> */
     const lastWeightTrackerEntry = getContext('lastWeight');
 
-    /** @type Writable<WeightTarget> */
-    const weightTarget = getContext('weightTarget');
-
-    /** @type Writable<CalorieTarget> */
-    const calorieTarget = getContext('calorieTarget');
-
     /** @type Writable<List<FoodCategory>> */
     const foodCategories = getContext('foodCategories');
 
@@ -48,14 +42,23 @@
     /** @type Dashboard */
     const dashboardData = data.dashboardData;
 
+    /** @type List<CalorieTrackerEntry> */
     let caloriesToday = dashboardData.caloriesTodayList;
+
+    /** @type List<WeightTrackerEntry> */
     let weightListToday = dashboardData.weightTodayList;
+
+    /** @type List<WeightTrackerEntry> */
     let weightListMonth = dashboardData.weightMonthList;
+
+    /** @type CalorieTrackerEntry */
+    let calorieTarget = dashboardData.calorieTarget;
+
+    /** @type WeightTrackerEntry */
+    let weightTarget = dashboardData.weightTarget;
 
     $: weightChart = paintWeightTrackerEntries(weightListMonth, today, DataViews.Month);
     $: lastWeightTrackerEntry.set(dashboardData.weightTodayList[0]);
-    $: weightTarget.set(dashboardData.weightTarget);
-    $: calorieTarget.set(dashboardData.calorieTarget);
     $: foodCategories.set(dashboardData.foodCategories);
 
     $: dashboardData.caloriesWeekList;
@@ -217,8 +220,8 @@
     const setCalorieTarget = async (e) => {
         $indicator = $indicator.start(e.detail.target);
 
-        await createCalorieTarget(e.detail.calorieTarget).then(async response => {
-            calorieTarget.set(response);
+        await createCalorieTarget(e.detail.calorieTarget).then(response => {
+            calorieTarget = response;
         }).then(() => {
             showToastSuccess(toastStore, 'Successfully set target.');
         }).catch((e) => {
@@ -230,7 +233,7 @@
         $indicator = $indicator.start(e.detail.target);
 
         await createWeightTarget(e.detail.weightTarget).then(async response => {
-            calorieTarget.set(response);
+            weightTarget = response;
         }).then(() => {
             showToastSuccess(toastStore, 'Successfully set target.');
         }).catch((e) => {
@@ -256,7 +259,7 @@
                     <div class="card flex flex-col gap-4 p-4">
                         <CalorieTracker calorieTrackerEntries={caloriesToday}
                                         categories={$foodCategories}
-                                        bind:calorieTarget={$calorieTarget}
+                                        bind:calorieTarget={calorieTarget}
                                         on:addCalories={onAddCalories}
                                         on:updateCalories={onUpdateCalories}
                                         on:deleteCalories={onDeleteCalories}
@@ -265,8 +268,8 @@
 
                     <div class="card flex flex-col gap-4 p-4">
                         <CalorieDistribution displayClass="flex flex-col"
-                                             bind:calorieTrackerEntries={dashboardData.caloriesWeekList}
                                              foodCategories={$foodCategories}
+                                             bind:calorieTrackerEntries={dashboardData.caloriesWeekList}
                                              bind:calorieTarget={dashboardData.calorieTarget}
                         />
                     </div>
@@ -274,7 +277,7 @@
                     <div class="card p-4">
                         <CalorieQuickview displayClass="flex flex-col"
                                           bind:calorieTrackerEntries={dashboardData.caloriesWeekList}
-                                          calorieTarget={$calorieTarget}
+                                          bind:calorieTarget={calorieTarget}
                                           on:setTarget={setCalorieTarget}
                         />
                     </div>
@@ -291,7 +294,7 @@
                             </div>
                         {/if}
                         <WeightTracker weightList={weightListToday}
-                                       weightTarget={$weightTarget}
+                                       weightTarget={weightTarget}
                                        on:addWeight={onAddWeight}
                                        on:updateWeight={onUpdateWeight}
                                        on:deleteWeight={onDeleteWeight}
