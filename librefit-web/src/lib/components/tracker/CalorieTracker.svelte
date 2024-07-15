@@ -21,6 +21,11 @@
     const dispatch = createEventDispatcher();
 
     let caloriesQuickAdd;
+    let deficit;
+
+    $: if (calorieTarget) {
+        deficit = calculateDeficit(calorieTrackerEntries)
+    }
 
     const addCaloriesQuickly = (e) => {
         // take default category based on time
@@ -122,13 +127,12 @@
             <TrackerRadial entries={calorieTrackerEntries.map(e => e.amount)} {calorieTarget} />
         </div>
         {#if calorieTarget}
-            {@const deficit = calculateDeficit(calorieTrackerEntries)}
             <div>
                 {#if deficit < 0}
                     <p>You still have {Math.abs(deficit)}kcal left for the day. Good job!</p>
                 {:else if deficit === 0}
                     <p>A spot landing. How did you even do that? There's {deficit}kcal left.</p>
-                {:else if deficit > 0 && (deficit + calorieTarget.targetCalories) < calorieTarget.maximumCalories}
+                {:else if deficit > 0 && (deficit + calorieTarget.targetCalories) <= calorieTarget.maximumCalories}
                     <p>You exceeded your daily target by {deficit}kcal. Days like these happen.</p>
                 {:else}
                     <p>With a {deficit}kcal surplus, you reached the red zone. Eating over your TDEE causes long term weight gain.</p>
