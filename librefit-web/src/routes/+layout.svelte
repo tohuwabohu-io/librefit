@@ -3,7 +3,7 @@
     import {autoModeWatcher, AppShell, Drawer, initializeStores, Modal, Toast} from '@skeletonlabs/skeleton';
     import TopBar from '$lib/components/TopBar.svelte';
     import WeightModal from '$lib/components/modal/WeightTrackerModal.svelte';
-    import GoalModal from '$lib/components/modal/GoalModal.svelte';
+    import TargetModal from '$lib/components/modal/TargetModal.svelte';
     import UserPanel from '$lib/components/UserPanel.svelte';
     import {onMount, setContext} from 'svelte';
     import {writable} from 'svelte/store';
@@ -28,8 +28,8 @@
             ref: WeightModal,
         },
 
-        goalModal: {
-            ref: GoalModal,
+        targetModal: {
+            ref: TargetModal,
         },
 
         avatarModal: {
