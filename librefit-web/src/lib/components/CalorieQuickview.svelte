@@ -40,10 +40,10 @@
     const onSetTarget = () => {
         modalStore.trigger({
             type: 'component',
-            component: 'calorieTargetModal',
+            component: 'targetModal',
             meta: {
                 /** @type CalorieTarget */
-                currentTarget: calorieTarget
+                calorieTarget: calorieTarget
             },
             response: async (e) => {
                 if (!e.cancelled) {

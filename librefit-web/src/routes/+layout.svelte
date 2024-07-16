@@ -14,8 +14,6 @@
     import RegistrationModal from '$lib/components/modal/RegistrationModal.svelte';
     import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
     import {observeToggle} from '$lib/theme-toggle.js';
-    import CalorieTargetModal from '$lib/components/modal/CalorieTargetModal.svelte';
-    import WeightTargetModal from '$lib/components/modal/WeightTargetModal.svelte';
 
     initializeStores();
 
@@ -46,14 +44,6 @@
 
         trackerModal: {
             ref: CalorieTrackerModal
-        },
-
-        calorieTargetModal: {
-            ref: CalorieTargetModal
-        },
-
-        weightTargetModal: {
-            ref: WeightTargetModal
         }
     };
 
