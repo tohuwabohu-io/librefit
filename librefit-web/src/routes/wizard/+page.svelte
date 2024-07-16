@@ -1,16 +1,17 @@
 <script>
-	import TdeeStepper from '$lib/components/TdeeStepper.svelte';
-	import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
-	import {showToastError, showToastSuccess} from '$lib/toast.js';
-	import addDays from 'date-fns';
-	import {getContext} from 'svelte';
-	import {proxyFetch} from '$lib/api/util.js';
-	import {api} from '$lib/api/index.js';
-	import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
-	import {getDateAsStr} from '$lib/date.js';
-	import {goto} from '$app/navigation';
+    import TdeeStepper from '$lib/components/TdeeStepper.svelte';
+    import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
+    import {showToastError, showToastSuccess} from '$lib/toast.js';
+    import {addDays} from 'date-fns';
+    import {getContext} from 'svelte';
+    import {proxyFetch} from '$lib/api/util.js';
+    import {api} from '$lib/api/index.js';
+    import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
+    import {getDateAsStr} from '$lib/date.js';
+    import {goto} from '$app/navigation';
+    import {createCalorieTarget, createWeightTarget} from '$lib/api/target.js';
 
-	const modalStore = getModalStore();
+    const modalStore = getModalStore();
 	const toastStore = getToastStore();
 
 	const indicator = getContext('indicator');
@@ -49,22 +50,28 @@
 
 		modalStore.trigger({
 			type: 'component',
-			component: 'goalModal',
+			component: 'targetModal',
 			meta: {
-				/** @type Goal */
-				goal: {
+				/** @type CalorieTarget */
+				calorieTarget: {
 					added: getDateAsStr(today),
 					endDate: getDateAsStr(endDate),
 					startDate: getDateAsStr(today),
-					initialWeight: calculationResult.weight,
-					targetWeight: calculationResult.targetWeight,
 					targetCalories: calculationResult.target,
 					maximumCalories: calculationResult.tdee
-				}
+				},
+                /** @type WeightTarget */
+                weightTarget: {
+                    added: getDateAsStr(today),
+                    endDate: getDateAsStr(endDate),
+                    startDate: getDateAsStr(today),
+                    initialWeight: calculationResult.weight,
+                    targetWeight: calculationResult.targetWeight
+                }
 			},
 			response: async (e) => {
 				if (!e.cancelled) {
-					await createGoalAddWeight(e.goal);
+					await createTargetsAddWeight(e);
 				}
 
 				modalStore.close();
@@ -72,21 +79,13 @@
 		})
 	}
 
-	const createGoalAddWeight = async (goal) => {
+	const createTargetsAddWeight = async (detail) => {
 		$indicator = $indicator.start();
 
-		await proxyFetch(fetch, api.createGoal, goal).then(async response => {
-			if (response.ok) {
-				showToastSuccess(toastStore, 'Successfully created goal.');
-
-				return proxyFetch(fetch, api.createWeightTrackerEntry, {
-					added: getDateAsStr(today),
-					amount: goal.initialWeight
-				})
-			} else {
-				throw Error();
-			}
-		}).catch((error) => showToastError(toastStore, error)).finally(() => $indicator = $indicator.finish())
+        await createCalorieTarget(detail.calorieTarget).then(_ => createWeightTarget(detail.weightTarget))
+				.then(_ => showToastSuccess(toastStore, 'Successfully set targets.'))
+            .catch((error) => showToastError(toastStore, error))
+            .finally(() => $indicator = $indicator.finish());
 	}
 </script>
 
