@@ -2,7 +2,7 @@
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {getDateAsStr} from '$lib/date.js';
-    import {validateCalorieTarget, validateWeightTarget, validateTrackerAmount, validateEndDate} from '$lib/api/target.js';
+    import {validateCalorieTarget, validateTrackerAmount, validateWeightTarget} from '$lib/validation.js';
 
     const today = new Date();
 
@@ -35,33 +35,11 @@
     if ($modalStore[0] && $modalStore[0].meta) {
         calorieTarget = $modalStore[0].meta.calorieTarget;
         weightTarget = $modalStore[0].meta.weightTarget;
-
     }
 
     const onSubmit = () => {
-        if (calorieTarget) {
-            calorieTarget.added = added;
-            calorieTarget.startDate = startDate;
-            calorieTarget.endDate = endDate;
-
-            errors.calorieTarget = validateCalorieTarget(calorieTarget);
-            errorEndDate = errors.calorieTarget.endDate;
-
-            errors.valid &&= errors.calorieTarget.targetCalories.valid;
-            errors.valid &&= errors.calorieTarget.maximumCalories.valid;
-        }
-
-        if (weightTarget) {
-            weightTarget.added = added;
-            weightTarget.startDate = startDate;
-            weightTarget.endDate = endDate;
-
-            errors.weightTarget = validateWeightTarget(weightTarget);
-            errorEndDate = errors.weightTarget.endDate;
-
-            errors.valid &&= errors.weightTarget.initialWeight.valid;
-            errors.valid &&= errors.weightTarget.targetWeight.valid;
-        }
+        if (calorieTarget) populateAndValidateTarget(calorieTarget, validateCalorieTarget, 'targetCalories', 'maximumCalories');
+        if (weightTarget) populateAndValidateTarget(weightTarget, validateWeightTarget, 'initialWeight', 'targetWeight');
 
         errors.valid &&= errorEndDate.valid;
 
@@ -73,6 +51,18 @@
                 });
             }
         }
+    }
+
+    const populateAndValidateTarget = (target, validationFn, prop1, prop2) => {
+        target.added = added;
+        target.startDate = startDate;
+        target.endDate = endDate;
+
+        errors[target] = validationFn(target);
+        errorEndDate = errors[target].endDate;
+
+        errors.valid &&= errors[target][prop1].valid;
+        errors.valid &&= errors[target][prop2].valid;
     }
 
     const onCancel = () => {
