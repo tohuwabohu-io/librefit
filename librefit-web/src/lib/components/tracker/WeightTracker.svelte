@@ -4,6 +4,7 @@
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
+    import Target from '$lib/assets/icons/target-arrow.svg?component';
 
     /**
      * @type WeightTarget
@@ -16,6 +17,7 @@
     export let weightList;
 
     let weightQuickAdd;
+    let btnTarget;
 
     const modalStore = getModalStore();
     const todayDateStr = getDateAsStr(new Date());
@@ -51,6 +53,13 @@
         });
     }
 
+    const setTarget = (e) => {
+        dispatch('setTarget', {
+            weightTarget: e.weightTarget,
+            target: btnTarget
+        });
+    }
+
     const onEdit = () => {
         modalStore.trigger({
             type: 'component',
@@ -67,28 +76,51 @@
             }
         });
     }
+
+    const onSetTarget = () => {
+        modalStore.trigger({
+            type: 'component',
+            component: 'targetModal',
+            meta: {
+                weightTarget: weightTarget
+            },
+            response: (e) => {
+                if (!e.cancelled) {
+                   setTarget(e);
+                }
+
+                modalStore.close();
+            }
+        });
+    }
 </script>
 
 <div class="flex flex-col grow gap-4 text-center items-center self-center w-full">
     {#if weightList && weightList.length > 0}
-        <p>
-            Current weight: {weightList[0].amount}kg ({convertDateStrToDisplayDateStr(weightList[0].added)})
-        </p>
+    <p>
+        Current weight: {weightList[0].amount}kg ({convertDateStrToDisplayDateStr(weightList[0].added)})
+    </p>
     {:else}
-        <p>
-            Nothing tracked for today. Now would be a good moment!
-        </p>
+    <p>
+        Nothing tracked for today. Now would be a good moment!
+    </p>
     {/if}
 
-    {#if weightTarget}
-        <p>
-            Target: {weightTarget.targetWeight}kg @ ({convertDateStrToDisplayDateStr(weightTarget.endDate)})
-        </p>
-    {:else}
-        <p>
-            No target weight set.
-        </p>
-    {/if}
+
+    <div class="flex flex-row gap-1 items-center">
+        {#if weightTarget}
+            <p>
+                Target: {weightTarget.targetWeight}kg @ ({convertDateStrToDisplayDateStr(weightTarget.endDate)})
+            </p>
+        {:else}
+            <p>
+                No target weight set.
+            </p>
+        {/if}
+        <button class="btn-icon variant-filled w-8" bind:this={btnTarget} on:click={onSetTarget}>
+            <Target/>
+        </button>
+    </div>
 
     <div class="flex flex-col lg:w-1/3 w-full gap-4">
         <TrackerInput

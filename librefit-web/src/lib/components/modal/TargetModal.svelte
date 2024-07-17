@@ -7,17 +7,7 @@
     const today = new Date();
 
     /** @type {any} */
-    let errors = {
-        valid: true,
-        calorieTarget: {
-            targetCalories: {},
-            maximumCalories: {}
-        },
-        weightTarget: {
-            initialWeight: {},
-            targetWeight: {}
-        }
-    }
+    let errors;
 
     let errorEndDate = {
         valid: true
@@ -35,9 +25,23 @@
     if ($modalStore[0] && $modalStore[0].meta) {
         calorieTarget = $modalStore[0].meta.calorieTarget;
         weightTarget = $modalStore[0].meta.weightTarget;
+
+        errors = {
+            valid: true,
+            calorieTarget: !calorieTarget ? undefined : {
+                targetCalories: {},
+                maximumCalories: {}
+            },
+            weightTarget: !weightTarget ? undefined : {
+                initialWeight: {},
+                targetWeight: {}
+            }
+        }
     }
 
     const onSubmit = () => {
+        errors.valid = true;
+
         if (calorieTarget) populateAndValidateTarget(calorieTarget, validateCalorieTarget, 'targetCalories', 'maximumCalories');
         if (weightTarget) populateAndValidateTarget(weightTarget, validateWeightTarget, 'initialWeight', 'targetWeight');
 
@@ -54,15 +58,20 @@
     }
 
     const populateAndValidateTarget = (target, validationFn, prop1, prop2) => {
+        let type = '';
+
+        if (target === calorieTarget) type = 'calorieTarget';
+        else if (target === weightTarget) type = 'weightTarget';
+
         target.added = added;
         target.startDate = startDate;
         target.endDate = endDate;
 
-        errors[target] = validationFn(target);
-        errorEndDate = errors[target].endDate;
+        errors[type] = validationFn(target);
+        errorEndDate = errors[type].endDate;
 
-        errors.valid &&= errors[target][prop1].valid;
-        errors.valid &&= errors[target][prop2].valid;
+        errors.valid &&= errors[type][prop1].valid;
+        errors.valid &&= errors[type][prop2].valid;
     }
 
     const onCancel = () => {

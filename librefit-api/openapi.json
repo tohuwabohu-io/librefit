@@ -26,7 +26,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Created",
+            "description" : "OK",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -34,6 +34,48 @@
                 }
               }
             }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/composite/wizard/result" : {
+      "post" : {
+        "tags" : [ "Composite Resource" ],
+        "operationId" : "postWizardResult",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Wizard"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
           "400" : {
             "description" : "Bad Request",
@@ -2218,6 +2260,21 @@
               "$ref" : "#/components/schemas/LocalDateTime"
             } ],
             "nullable" : true
+          }
+        }
+      },
+      "Wizard" : {
+        "required" : [ "calorieTarget", "weightTarget", "weightTrackerEntry" ],
+        "type" : "object",
+        "properties" : {
+          "calorieTarget" : {
+            "$ref" : "#/components/schemas/CalorieTarget"
+          },
+          "weightTarget" : {
+            "$ref" : "#/components/schemas/WeightTarget"
+          },
+          "weightTrackerEntry" : {
+            "$ref" : "#/components/schemas/WeightTrackerEntry"
           }
         }
       }

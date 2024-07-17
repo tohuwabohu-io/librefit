@@ -1,17 +1,17 @@
 <script>
-    import TdeeStepper from '$lib/components/TdeeStepper.svelte';
-    import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
-    import {showToastError, showToastSuccess} from '$lib/toast.js';
-    import {addDays} from 'date-fns';
-    import {getContext} from 'svelte';
-    import {proxyFetch} from '$lib/api/util.js';
-    import {api} from '$lib/api/index.js';
-    import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
-    import {getDateAsStr} from '$lib/date.js';
-    import {goto} from '$app/navigation';
-    import {createCalorieTarget, createWeightTarget} from '$lib/api/target.js';
+	import TdeeStepper from '$lib/components/TdeeStepper.svelte';
+	import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
+	import {showToastError, showToastSuccess} from '$lib/toast.js';
+	import {addDays} from 'date-fns';
+	import {getContext} from 'svelte';
+	import {proxyFetch} from '$lib/api/util.js';
+	import {api} from '$lib/api/index.js';
+	import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
+	import {getDateAsStr} from '$lib/date.js';
+	import {goto} from '$app/navigation';
+	import {postWizardResult} from '$lib/api/wizard.js';
 
-    const modalStore = getModalStore();
+	const modalStore = getModalStore();
 	const toastStore = getToastStore();
 
 	const indicator = getContext('indicator');
@@ -82,8 +82,18 @@
 	const createTargetsAddWeight = async (detail) => {
 		$indicator = $indicator.start();
 
-        await createCalorieTarget(detail.calorieTarget).then(_ => createWeightTarget(detail.weightTarget))
-				.then(_ => showToastSuccess(toastStore, 'Successfully set targets.'))
+		/** @type {Wizard} */
+		const wizard = {
+			calorieTarget: detail.calorieTarget,
+			weightTarget: detail.weightTarget,
+			weightTrackerEntry: {
+				added: getDateAsStr(today),
+				sequence: 1,
+				amount: detail.weightTarget.initialWeight
+			}
+		}
+
+        await postWizardResult(wizard).then(async _ => showToastSuccess(toastStore, 'Successfully saved your targets.'))
             .catch((error) => showToastError(toastStore, error))
             .finally(() => $indicator = $indicator.finish());
 	}

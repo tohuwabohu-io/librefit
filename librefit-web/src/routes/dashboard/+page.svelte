@@ -223,7 +223,7 @@
         await createCalorieTarget(e.detail.calorieTarget).then(response => {
             calorieTarget = response;
         }).then(() => {
-            showToastSuccess(toastStore, 'Successfully set target.');
+            showToastSuccess(toastStore, 'Successfully set target caloric intake.');
         }).catch((e) => {
             showToastError(toastStore, e);
         }).finally(() => $indicator = $indicator.finish());
@@ -235,7 +235,7 @@
         await createWeightTarget(e.detail.weightTarget).then(async response => {
             weightTarget = response;
         }).then(() => {
-            showToastSuccess(toastStore, 'Successfully set target.');
+            showToastSuccess(toastStore, 'Successfully set target weight.');
         }).catch((e) => {
             showToastError(toastStore, e);
         }).finally(() => $indicator = $indicator.finish());
@@ -298,6 +298,7 @@
                                        on:addWeight={onAddWeight}
                                        on:updateWeight={onUpdateWeight}
                                        on:deleteWeight={onDeleteWeight}
+                                       on:setTarget={setWeightTarget}
                         />
                     </div>
                 </div>
