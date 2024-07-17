@@ -4,13 +4,12 @@ import io.quarkus.logging.Log
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.composite.Dashboard
+import io.tohuwabohu.composite.Wizard
 import io.tohuwabohu.crud.*
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.createErrorResponse
 import jakarta.annotation.security.RolesAllowed
-import jakarta.ws.rs.GET
-import jakarta.ws.rs.Path
-import jakarta.ws.rs.Produces
+import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
@@ -37,7 +36,7 @@ class CompositeResource(
     @Produces(MediaType.APPLICATION_JSON)
     @APIResponses(
         APIResponse(
-            responseCode = "200", description = "Created", content = [Content(
+            responseCode = "200", description = "OK", content = [Content(
                 mediaType = "application/json", schema = Schema(implementation = Dashboard::class)
             )]
         ),
@@ -89,6 +88,38 @@ class CompositeResource(
         }.onItem().transform { dash ->
             Response.ok(dash).build()
         }.onFailure().invoke { e -> Log.error(e) }.onFailure()
+            .recoverWithItem { throwable -> createErrorResponse(throwable) }
+    }
+
+    @POST
+    @Path("/wizard/result")
+    @RolesAllowed("User", "Admin")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @APIResponses(
+        APIResponse(responseCode = "201", description = "Created"),
+        APIResponse(responseCode = "400", description = "Bad Request", content = [
+            Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = ErrorResponse::class)
+            )
+        ]),
+        APIResponse(responseCode = "401", description = "Unauthorized"),
+        APIResponse(responseCode = "500", description = "Internal Server Error")
+    )
+    @Operation(
+        operationId = "postWizardResult"
+    )
+    fun postWizardResult(
+        @Context securityIdentity: SecurityIdentity,
+        wizard: Wizard
+    ): Uni<Response> {
+        return calorieTargetRepository.validateAndPersist(wizard.calorieTarget)
+            .chain { _ -> weightTargetRepository.validateAndPersist(wizard.weightTarget) }
+            .chain { _ -> weightTrackerRepository.validateAndPersist(wizard.weightTrackerEntry) }
+            .onItem().transform { _ ->
+                Response.status(Response.Status.CREATED).build()
+            }.onFailure().invoke { e -> Log.error(e) }.onFailure()
             .recoverWithItem { throwable -> createErrorResponse(throwable) }
     }
 }
