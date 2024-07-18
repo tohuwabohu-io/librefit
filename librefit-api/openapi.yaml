@@ -1250,14 +1250,12 @@ components:
           $ref: "#/components/schemas/LocalDate"
         targetCalories:
           format: float
-          minimum: 0
+          minimum: 1
           type: number
-          nullable: true
         maximumCalories:
           format: float
-          minimum: 0
+          minimum: 1
           type: number
-          nullable: true
         updated:
           type: string
           allOf:

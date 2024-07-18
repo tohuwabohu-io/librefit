@@ -1855,15 +1855,13 @@
           },
           "targetCalories" : {
             "format" : "float",
-            "minimum" : 0,
-            "type" : "number",
-            "nullable" : true
+            "minimum" : 1,
+            "type" : "number"
           },
           "maximumCalories" : {
             "format" : "float",
-            "minimum" : 0,
-            "type" : "number",
-            "nullable" : true
+            "minimum" : 1,
+            "type" : "number"
           },
           "updated" : {
             "type" : "string",
