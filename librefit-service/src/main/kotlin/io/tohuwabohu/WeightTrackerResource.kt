@@ -6,7 +6,7 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.WeightTrackerEntry
 import io.tohuwabohu.crud.WeightTrackerRepository
 import io.tohuwabohu.crud.error.ErrorResponse
-import io.tohuwabohu.crud.error.createErrorResponse
+import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.annotation.security.RolesAllowed
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
@@ -55,8 +55,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
 
         return weightTrackerRepository.validateAndPersist(weightTrackerEntry)
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @PUT
@@ -85,8 +84,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
 
         return weightTrackerRepository.updateEntry(weightTrackerEntry, WeightTrackerEntry::class.java)
             .onItem().transform { updated -> Response.ok(updated).build() }
-            .onFailure().invoke{ e -> Log.error(e)}
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @DELETE
@@ -112,8 +110,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
 
         return weightTrackerRepository.deleteEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -141,8 +138,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     fun read(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> =
         weightTrackerRepository.readEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
 
     @GET
     @Path("/list/dates/{dateFrom}/{dateTo}")
@@ -167,8 +163,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
 
         return weightTrackerRepository.listDatesForUser(UUID.fromString(securityIdentity.principal.name), dateFrom, dateTo)
             .onItem().transform { Response.ok(it).build() }
-            .onFailure().invoke { throwable -> Log.error(throwable) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -195,8 +190,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     fun listEntries(@Context securityIdentity: SecurityIdentity, date: LocalDate): Uni<Response> {
         return weightTrackerRepository.listEntriesForUserAndDate(UUID.fromString(securityIdentity.principal.name), date)
             .onItem().transform { list -> Response.ok(list).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -223,8 +217,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     fun listEntries(@Context securityIdentity: SecurityIdentity, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         return weightTrackerRepository.listEntriesForUserAndDateRange(UUID.fromString(securityIdentity.principal.name), dateFrom, dateTo)
             .onItem().transform { list -> Response.ok(list).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -251,6 +244,5 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     fun findLast(@Context securityIdentity: SecurityIdentity, @Context securityContext: SecurityContext): Uni<Response> = weightTrackerRepository
         .findLastEntry(UUID.fromString(securityIdentity.principal.name))
         .onItem().transform { entry -> Response.ok(entry).build() }
-        .onFailure().invoke { e -> Log.error(e) }
-        .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+        .onFailure().recoverWithResponse()
 }

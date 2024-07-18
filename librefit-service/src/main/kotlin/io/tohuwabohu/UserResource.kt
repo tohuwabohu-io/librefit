@@ -6,12 +6,17 @@ import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
+import io.tohuwabohu.crud.error.ErrorHandler.createErrorResponse
 import io.tohuwabohu.crud.error.ErrorResponse
-import io.tohuwabohu.crud.error.createErrorResponse
+import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.annotation.security.PermitAll
 import jakarta.annotation.security.RolesAllowed
 import jakarta.validation.Valid
-import jakarta.ws.rs.*
+import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.POST
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.NewCookie
@@ -58,8 +63,7 @@ class UserResource(
 
         return userRepository.createUser(libreUser)
             .onItem().transform { Response.ok(libreUser).status(Response.Status.CREATED).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @POST
@@ -110,7 +114,7 @@ class UserResource(
                     ).build()
                 )
             }
-        }.onFailure().invoke { e -> Log.error(e) }.onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+        }.onFailure().recoverWithResponse()
     }
 
     @GET
@@ -145,8 +149,7 @@ class UserResource(
                 Response.ok(user).build()
             }
             .onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @POST
@@ -182,10 +185,8 @@ class UserResource(
         return userRepository.updateUser(libreUser,
             UUID.fromString(securityIdentity.principal.name)
         ).onItem().ifNotNull().transform { updated ->
-                updated!!.password = ""
-                Response.ok(updated).build()
-            }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            updated!!.password = ""
+            Response.ok(updated).build()
+        }.onFailure().recoverWithResponse()
     }
 }

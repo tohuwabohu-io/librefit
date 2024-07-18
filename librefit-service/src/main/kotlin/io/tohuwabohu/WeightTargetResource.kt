@@ -6,11 +6,17 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.WeightTarget
 import io.tohuwabohu.crud.WeightTargetRepository
 import io.tohuwabohu.crud.error.ErrorResponse
-import io.tohuwabohu.crud.error.createErrorResponse
+import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.annotation.security.RolesAllowed
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Valid
-import jakarta.ws.rs.*
+import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.DELETE
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.POST
+import jakarta.ws.rs.PUT
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
@@ -55,8 +61,7 @@ class WeightTargetResource(private val weightTargetRepository: WeightTargetRepos
 
         return weightTargetRepository.validateAndPersist(weightTarget)
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @PUT
@@ -82,8 +87,7 @@ class WeightTargetResource(private val weightTargetRepository: WeightTargetRepos
 
         return weightTargetRepository.updateEntry(weightTarget, WeightTarget::class.java)
             .onItem().transform { updated -> Response.ok(updated).build() }
-            .onFailure().invoke{ e -> Log.error(e)}
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -111,8 +115,7 @@ class WeightTargetResource(private val weightTargetRepository: WeightTargetRepos
     fun read(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
         return weightTargetRepository.readEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @DELETE
@@ -137,8 +140,7 @@ class WeightTargetResource(private val weightTargetRepository: WeightTargetRepos
 
         return weightTargetRepository.deleteEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -166,6 +168,5 @@ class WeightTargetResource(private val weightTargetRepository: WeightTargetRepos
         .findLatestWeightTarget(UUID.fromString(securityIdentity.principal.name))
         .onItem().ifNotNull().transform { entry -> Response.ok(entry).build() }
         .onItem().ifNull().failWith(EntityNotFoundException())
-        .onFailure().invoke { e -> Log.error(e) }
-        .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+        .onFailure().recoverWithResponse()
 }

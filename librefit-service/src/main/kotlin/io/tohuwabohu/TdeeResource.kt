@@ -1,13 +1,12 @@
 package io.tohuwabohu
 
-import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.calc.CalculationGoal
 import io.tohuwabohu.calc.CalculationSex
 import io.tohuwabohu.calc.Tdee
 import io.tohuwabohu.calc.TdeeCalculator
 import io.tohuwabohu.crud.error.ErrorResponse
-import io.tohuwabohu.crud.error.createErrorResponse
+import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
@@ -52,7 +51,7 @@ class TdeeResource(private val calculator: TdeeCalculator) {
     ): Uni<Response> {
         return calculator.calculate(Tdee(age, sex, weight, height, activityLevel, weeklyDifference, calculationGoal))
             .onItem().transform { result -> Response.ok(result).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 }
+

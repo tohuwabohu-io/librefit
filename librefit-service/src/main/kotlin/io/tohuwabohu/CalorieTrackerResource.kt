@@ -5,7 +5,7 @@ import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.*
 import io.tohuwabohu.crud.error.ErrorResponse
-import io.tohuwabohu.crud.error.createErrorResponse
+import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.annotation.security.RolesAllowed
 import jakarta.enterprise.context.RequestScoped
 import jakarta.validation.Valid
@@ -54,8 +54,7 @@ class CalorieTrackerResource(
 
         return calorieTrackerRepository.validateAndPersist(calorieTracker)
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @PUT
@@ -81,8 +80,7 @@ class CalorieTrackerResource(
 
         return calorieTrackerRepository.updateEntry(calorieTracker, CalorieTrackerEntry::class.java)
             .onItem().transform { entry -> Response.ok(entry).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
 
@@ -109,8 +107,7 @@ class CalorieTrackerResource(
     fun read(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
         return calorieTrackerRepository.readEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
 
@@ -134,8 +131,7 @@ class CalorieTrackerResource(
 
         return calorieTrackerRepository.deleteEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
-            .onFailure().invoke { throwable -> Log.error(throwable) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -160,8 +156,7 @@ class CalorieTrackerResource(
     fun listDates(@Context securityIdentity: SecurityIdentity, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         return calorieTrackerRepository.listDatesForUser(UUID.fromString(securityIdentity.principal.name), dateFrom, dateTo)
             .onItem().transform { Response.ok(it).build() }
-            .onFailure().invoke { throwable -> Log.error(throwable) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -186,8 +181,7 @@ class CalorieTrackerResource(
     fun listEntries(@Context securityIdentity: SecurityIdentity, date: LocalDate): Uni<Response> {
         return calorieTrackerRepository.listEntriesForUserAndDate(UUID.fromString(securityIdentity.principal.name), date)
             .onItem().transform { Response.ok(it).build() }
-            .onFailure().invoke { throwable -> Log.error(throwable) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -214,8 +208,7 @@ class CalorieTrackerResource(
     fun listEntries(@Context securityIdentity: SecurityIdentity, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         return calorieTrackerRepository.listEntriesForUserAndDateRange(UUID.fromString(securityIdentity.principal.name), dateFrom, dateTo)
             .onItem().transform { list -> Response.ok(list).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -240,8 +233,8 @@ class CalorieTrackerResource(
         operationId = "listFoodCategories"
     )
     fun listCategories(): Uni<Response> {
-        return foodCategoryRepository.listVisibleCategories().onItem().transform { list -> Response.ok(list).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+        return foodCategoryRepository.listVisibleCategories()
+            .onItem().transform { list -> Response.ok(list).build() }
+            .onFailure().recoverWithResponse()
     }
 }
