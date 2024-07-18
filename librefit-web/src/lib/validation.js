@@ -124,8 +124,8 @@ export const getFieldError = (errorResponse, fieldName) => {
  */
 export const validateCalorieTarget = (target) => {
 	let endDateValidation = validateEndDate(target.startDate, target.endDate);
-	let targetCaloriesValidation = validateTrackerAmount(target.targetCalories);
-	let maximumCaloriesValidation = validateTrackerAmount(target.maximumCalories);
+	let targetCaloriesValidation = validateTrackerAmount({ value: target.targetCalories });
+	let maximumCaloriesValidation = validateTrackerAmount({ value: target.maximumCalories });
 
 	if (maximumCaloriesValidation.valid) {
 		maximumCaloriesValidation =
@@ -146,8 +146,8 @@ export const validateCalorieTarget = (target) => {
  */
 export const validateWeightTarget = (target) => {
 	let endDateValidation = validateEndDate(target.startDate, target.endDate);
-	let initialWeightMessage = validateTrackerAmount(target.initialWeight);
-	let targetWeightMessage = validateTrackerAmount(target.targetWeight);
+	let initialWeightMessage = validateTrackerAmount({ value: target.initialWeight });
+	let targetWeightMessage = validateTrackerAmount({ value: target.targetWeight });
 
 	return {
 		endDate: endDateValidation,
@@ -171,10 +171,10 @@ export const validateEndDate = (startDateStr, endDateStr) => {
 };
 
 export const validateTrackerAmount = (detail) => {
-	if (detail.value <= 0) {
+	if (!detail.value || detail.value <= 0) {
 		return {
 			valid: false,
-			errorMessage: `${detail.label} must be greater than zero.`
+			errorMessage: `${detail.label ? detail.label : 'Value'} must be greater than zero.`
 		};
 	}
 

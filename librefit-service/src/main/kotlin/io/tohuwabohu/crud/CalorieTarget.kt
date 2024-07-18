@@ -4,7 +4,10 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
 import io.tohuwabohu.crud.relation.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.NamedQueries
+import jakarta.persistence.NamedQuery
+import jakarta.persistence.PreUpdate
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
@@ -22,13 +25,13 @@ data class CalorieTarget (
     @field:NotNull(message = "The end date of your target must not be empty.")
     var endDate: LocalDate,
 
-    @Column(nullable = true)
-    @field:Min(value = 0, message = "The target calorie amount must not be less than zero.")
-    var targetCalories: Float? = null,
+    @field:NotNull(message = "Target intake must not be empty.")
+    @field:Min(value = 1, message = "Target intake must be greater than zero.")
+    var targetCalories: Float,
 
-    @Column(nullable = true)
-    @field:Min(value = 0, message = "The maximum calorie amount must not be less than zero.")
-    var maximumCalories: Float? = null,
+    @field:NotNull(message = "Maximum amount must not be empty.")
+    @field:Min(value = 1, message = "Maximum amount must be greater than zero.")
+    var maximumCalories: Float,
 
     var updated: LocalDateTime? = null
 ) : LibreUserWeakEntity() {
