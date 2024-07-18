@@ -804,12 +804,12 @@
     "/api/tracker/calories/create" : {
       "post" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "createCalorieTrackerEntry",
+        "operationId" : "createCalorieTracker",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                "$ref" : "#/components/schemas/CalorieTracker"
               }
             }
           }
@@ -820,7 +820,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                  "$ref" : "#/components/schemas/CalorieTracker"
                 }
               }
             }
@@ -853,7 +853,7 @@
     "/api/tracker/calories/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "deleteCalorieTrackerEntry",
+        "operationId" : "deleteCalorieTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -966,7 +966,7 @@
     "/api/tracker/calories/list/{dateFrom}/{dateTo}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "listCalorieTrackerEntriesRange",
+        "operationId" : "listCalorieTrackerRange",
         "parameters" : [ {
           "name" : "dateFrom",
           "in" : "path",
@@ -990,7 +990,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                    "$ref" : "#/components/schemas/CalorieTracker"
                   }
                 }
               }
@@ -1024,7 +1024,7 @@
     "/api/tracker/calories/list/{date}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "listCalorieTrackerEntriesForDate",
+        "operationId" : "listCalorieTrackerForDate",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -1041,7 +1041,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                    "$ref" : "#/components/schemas/CalorieTracker"
                   }
                 }
               }
@@ -1075,7 +1075,7 @@
     "/api/tracker/calories/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "readCalorieTrackerEntry",
+        "operationId" : "readCalorieTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -1098,7 +1098,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                  "$ref" : "#/components/schemas/CalorieTracker"
                 }
               }
             }
@@ -1134,12 +1134,12 @@
     "/api/tracker/calories/update" : {
       "put" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "updateCalorieTrackerEntry",
+        "operationId" : "updateCalorieTracker",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                "$ref" : "#/components/schemas/CalorieTracker"
               }
             }
           }
@@ -1182,12 +1182,12 @@
     "/api/tracker/weight/create" : {
       "post" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "createWeightTrackerEntry",
+        "operationId" : "createWeightTracker",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/WeightTrackerEntry"
+                "$ref" : "#/components/schemas/WeightTracker"
               }
             }
           }
@@ -1198,7 +1198,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/WeightTrackerEntry"
+                  "$ref" : "#/components/schemas/WeightTracker"
                 }
               }
             }
@@ -1231,7 +1231,7 @@
     "/api/tracker/weight/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "deleteWeightTrackerEntry",
+        "operationId" : "deleteWeightTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -1286,14 +1286,14 @@
     "/api/tracker/weight/last" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "findLastWeightTrackerEntry",
+        "operationId" : "findLastWeightTracker",
         "responses" : {
           "200" : {
             "description" : "OK",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/WeightTrackerEntry"
+                  "$ref" : "#/components/schemas/WeightTracker"
                 }
               }
             }
@@ -1384,7 +1384,7 @@
     "/api/tracker/weight/list/{dateFrom}/{dateTo}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "listWeightTrackerEntriesRange",
+        "operationId" : "listWeightTrackerRange",
         "parameters" : [ {
           "name" : "dateFrom",
           "in" : "path",
@@ -1408,7 +1408,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/WeightTrackerEntry"
+                    "$ref" : "#/components/schemas/WeightTracker"
                   }
                 }
               }
@@ -1442,7 +1442,7 @@
     "/api/tracker/weight/list/{date}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "listWeightTrackerEntries",
+        "operationId" : "listWeightTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -1459,7 +1459,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/WeightTrackerEntry"
+                    "$ref" : "#/components/schemas/WeightTracker"
                   }
                 }
               }
@@ -1493,7 +1493,7 @@
     "/api/tracker/weight/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "readWeightTrackerEntry",
+        "operationId" : "readWeightTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -1516,7 +1516,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/WeightTrackerEntry"
+                  "$ref" : "#/components/schemas/WeightTracker"
                 }
               }
             }
@@ -1552,12 +1552,12 @@
     "/api/tracker/weight/update" : {
       "put" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "updateWeightTrackerEntry",
+        "operationId" : "updateWeightTracker",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/WeightTrackerEntry"
+                "$ref" : "#/components/schemas/WeightTracker"
               }
             }
           }
@@ -1629,10 +1629,7 @@
         },
         "responses" : {
           "200" : {
-            "description" : "OK",
-            "content" : {
-              "text/plain" : { }
-            }
+            "description" : "OK"
           },
           "400" : {
             "description" : "Bad Request",
@@ -1829,7 +1826,7 @@
         "type" : "string"
       },
       "CalorieTarget" : {
-        "required" : [ "added", "startDate", "endDate" ],
+        "required" : [ "added", "startDate", "endDate", "targetCalories", "maximumCalories" ],
         "type" : "object",
         "properties" : {
           "userId" : {
@@ -1872,7 +1869,7 @@
           }
         }
       },
-      "CalorieTrackerEntry" : {
+      "CalorieTracker" : {
         "required" : [ "added", "amount", "category" ],
         "type" : "object",
         "properties" : {
@@ -1935,14 +1932,14 @@
           "caloriesTodayList" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/CalorieTrackerEntry"
+              "$ref" : "#/components/schemas/CalorieTracker"
             },
             "nullable" : true
           },
           "caloriesWeekList" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/CalorieTrackerEntry"
+              "$ref" : "#/components/schemas/CalorieTracker"
             },
             "nullable" : true
           },
@@ -1956,14 +1953,14 @@
           "weightTodayList" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/WeightTrackerEntry"
+              "$ref" : "#/components/schemas/WeightTracker"
             },
             "nullable" : true
           },
           "weightMonthList" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/WeightTrackerEntry"
+              "$ref" : "#/components/schemas/WeightTracker"
             },
             "nullable" : true
           }
@@ -2228,7 +2225,7 @@
           }
         }
       },
-      "WeightTrackerEntry" : {
+      "WeightTracker" : {
         "required" : [ "added" ],
         "type" : "object",
         "properties" : {
@@ -2262,7 +2259,7 @@
         }
       },
       "Wizard" : {
-        "required" : [ "calorieTarget", "weightTarget", "weightTrackerEntry" ],
+        "required" : [ "calorieTarget", "weightTarget", "weightTracker" ],
         "type" : "object",
         "properties" : {
           "calorieTarget" : {
@@ -2271,8 +2268,8 @@
           "weightTarget" : {
             "$ref" : "#/components/schemas/WeightTarget"
           },
-          "weightTrackerEntry" : {
-            "$ref" : "#/components/schemas/WeightTrackerEntry"
+          "weightTracker" : {
+            "$ref" : "#/components/schemas/WeightTracker"
           }
         }
       }

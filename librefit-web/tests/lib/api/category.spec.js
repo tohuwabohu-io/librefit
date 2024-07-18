@@ -21,14 +21,10 @@ describe('category', () => {
 
 	test('should return the unique categories from the entries', () => {
 		// set up some dummy data
-		const calorieTrackerEntries = [
-			{ category: 'cat1' },
-			{ category: 'cat2' },
-			{ category: 'cat1' }
-		];
+		const calorieTracker = [{ category: 'cat1' }, { category: 'cat2' }, { category: 'cat1' }];
 
 		// call the function
-		const result = skimCategories(calorieTrackerEntries);
+		const result = skimCategories(calorieTracker);
 
 		// assert that the function returns the expected result
 		expect(result).toEqual(new Set(['cat1', 'cat2']));

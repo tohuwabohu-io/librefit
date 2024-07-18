@@ -86,7 +86,7 @@
 		const wizard = {
 			calorieTarget: detail.calorieTarget,
 			weightTarget: detail.weightTarget,
-			weightTrackerEntry: {
+			weightTracker: {
 				added: getDateAsStr(today),
 				sequence: 1,
 				amount: detail.weightTarget.initialWeight

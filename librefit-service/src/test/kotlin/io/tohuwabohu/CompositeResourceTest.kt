@@ -12,7 +12,7 @@ import io.tohuwabohu.composite.Dashboard
 import io.tohuwabohu.composite.Wizard
 import io.tohuwabohu.crud.CalorieTarget
 import io.tohuwabohu.crud.WeightTarget
-import io.tohuwabohu.crud.WeightTrackerEntry
+import io.tohuwabohu.crud.WeightTracker
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.*
@@ -104,14 +104,14 @@ class CompositeResourceTest {
             userId = UUID.fromString("2291b08c-7fb5-11ee-b962-0242ac120002")
         }
 
-        val weightTrackerEntry = WeightTrackerEntry(
+        val weightTracker = WeightTracker(
             amount = 75f,
         ).apply {
             added = baseDate
             userId = UUID.fromString("2291b08c-7fb5-11ee-b962-0242ac120002")
         }
 
-        val wizard = Wizard(calorieTarget, weightTarget, weightTrackerEntry);
+        val wizard = Wizard(calorieTarget, weightTarget, weightTracker);
 
         Given {
             header("Content-Type", ContentType.JSON)

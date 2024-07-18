@@ -3,7 +3,7 @@ package io.tohuwabohu
 import io.quarkus.logging.Log
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.WeightTrackerEntry
+import io.tohuwabohu.crud.WeightTracker
 import io.tohuwabohu.crud.WeightTrackerRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
@@ -33,7 +33,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "201", description = "Created", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WeightTrackerEntry::class)
+                schema = Schema(implementation = WeightTracker::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [
@@ -46,14 +46,14 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "createWeightTrackerEntry"
+        operationId = "createWeightTracker"
     )
-    fun create(@Context securityIdentity: SecurityIdentity, @Valid weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
-        Log.info("Creating a new weight tracker entry=$weightTrackerEntry")
+    fun create(@Context securityIdentity: SecurityIdentity, @Valid weightTracker: WeightTracker): Uni<Response> {
+        Log.info("Creating a new weight tracker entry=$weightTracker")
 
-        weightTrackerEntry.userId = UUID.fromString(securityIdentity.principal.name)
+        weightTracker.userId = UUID.fromString(securityIdentity.principal.name)
 
-        return weightTrackerRepository.validateAndPersist(weightTrackerEntry)
+        return weightTrackerRepository.validateAndPersist(weightTracker)
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().recoverWithResponse()
     }
@@ -74,15 +74,15 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "updateWeightTrackerEntry"
+        operationId = "updateWeightTracker"
     )
-    fun update(@Context securityIdentity: SecurityIdentity, @Valid weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
-        weightTrackerEntry.userId = UUID.fromString(securityIdentity.principal.name)
+    fun update(@Context securityIdentity: SecurityIdentity, @Valid weightTracker: WeightTracker): Uni<Response> {
+        weightTracker.userId = UUID.fromString(securityIdentity.principal.name)
 
-        Log.info("Updating weight tracker entry $weightTrackerEntry")
+        Log.info("Updating weight tracker entry $weightTracker")
 
 
-        return weightTrackerRepository.updateEntry(weightTrackerEntry, WeightTrackerEntry::class.java)
+        return weightTrackerRepository.updateEntry(weightTracker, WeightTracker::class.java)
             .onItem().transform { updated -> Response.ok(updated).build() }
             .onFailure().recoverWithResponse()
     }
@@ -102,7 +102,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "deleteWeightTrackerEntry"
+        operationId = "deleteWeightTracker"
     )
     fun delete(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
         Log.info("Delete weight tracker entry with added=$date sequence=$sequence")
@@ -121,7 +121,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WeightTrackerEntry::class)
+                schema = Schema(implementation = WeightTracker::class)
             )
         ]),
         APIResponse(responseCode = "404", description = "Not Found"),
@@ -133,7 +133,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "readWeightTrackerEntry"
+        operationId = "readWeightTracker"
     )
     fun read(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> =
         weightTrackerRepository.readEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
@@ -173,7 +173,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Array<WeightTrackerEntry>::class)
+                schema = Schema(implementation = Array<WeightTracker>::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -185,7 +185,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-        operationId = "listWeightTrackerEntries"
+        operationId = "listWeightTracker"
     )
     fun listEntries(@Context securityIdentity: SecurityIdentity, date: LocalDate): Uni<Response> {
         return weightTrackerRepository.listEntriesForUserAndDate(UUID.fromString(securityIdentity.principal.name), date)
@@ -200,7 +200,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Array<WeightTrackerEntry>::class)
+                schema = Schema(implementation = Array<WeightTracker>::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -212,7 +212,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-        operationId = "listWeightTrackerEntriesRange"
+        operationId = "listWeightTrackerRange"
     )
     fun listEntries(@Context securityIdentity: SecurityIdentity, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         return weightTrackerRepository.listEntriesForUserAndDateRange(UUID.fromString(securityIdentity.principal.name), dateFrom, dateTo)
@@ -227,7 +227,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WeightTrackerEntry::class)
+                schema = Schema(implementation = WeightTracker::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -239,7 +239,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-        operationId = "findLastWeightTrackerEntry"
+        operationId = "findLastWeightTracker"
     )
     fun findLast(@Context securityIdentity: SecurityIdentity, @Context securityContext: SecurityContext): Uni<Response> = weightTrackerRepository
         .findLastEntry(UUID.fromString(securityIdentity.principal.name))

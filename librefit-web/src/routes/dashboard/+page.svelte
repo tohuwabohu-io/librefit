@@ -1,5 +1,5 @@
 <script>
-    import {paintWeightTrackerEntries} from '$lib/weight-chart.js';
+    import {paintWeightTracker} from '$lib/weight-chart.js';
     import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
     import {getToastStore} from '@skeletonlabs/skeleton';
     import {
@@ -7,7 +7,7 @@
         addWeight,
         deleteCalories,
         deleteWeight,
-        listCalorieTrackerEntriesRange,
+        listCalorieTrackerRange,
         listWeightRange,
         updateCalories,
         updateWeight
@@ -31,8 +31,8 @@
 
     Chart.register(...registerables);
 
-    /** @type Writable<WeightTrackerEntry> */
-    const lastWeightTrackerEntry = getContext('lastWeight');
+    /** @type Writable<WeightTracker> */
+    const lastWeightTracker = getContext('lastWeight');
 
     /** @type Writable<List<FoodCategory>> */
     const foodCategories = getContext('foodCategories');
@@ -42,23 +42,23 @@
     /** @type Dashboard */
     const dashboardData = data.dashboardData;
 
-    /** @type List<CalorieTrackerEntry> */
+    /** @type List<CalorieTracker> */
     let caloriesToday = dashboardData.caloriesTodayList;
 
-    /** @type List<WeightTrackerEntry> */
+    /** @type List<WeightTracker> */
     let weightListToday = dashboardData.weightTodayList;
 
-    /** @type List<WeightTrackerEntry> */
+    /** @type List<WeightTracker> */
     let weightListMonth = dashboardData.weightMonthList;
 
-    /** @type CalorieTrackerEntry */
+    /** @type CalorieTracker */
     let calorieTarget = dashboardData.calorieTarget;
 
-    /** @type WeightTrackerEntry */
+    /** @type WeightTracker */
     let weightTarget = dashboardData.weightTarget;
 
-    $: weightChart = paintWeightTrackerEntries(weightListMonth, today, DataViews.Month);
-    $: lastWeightTrackerEntry.set(dashboardData.weightTodayList[0]);
+    $: weightChart = paintWeightTracker(weightListMonth, today, DataViews.Month);
+    $: lastWeightTracker.set(dashboardData.weightTodayList[0]);
     $: foodCategories.set(dashboardData.foodCategories);
 
     $: dashboardData.caloriesWeekList;
@@ -151,9 +151,9 @@
                 event.detail.callback();
 
                 weightListToday = await response.json();
-                lastWeightTrackerEntry.set(weightListToday[0]);
+                lastWeightTracker.set(weightListToday[0]);
 
-                showToastSuccess(toastStore, `Set weight to ${$lastWeightTrackerEntry.amount}kg.`);
+                showToastSuccess(toastStore, `Set weight to ${$lastWeightTracker.amount}kg.`);
             }).then(refreshWeightChart).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
         } else {
             showToastWarning(toastStore, amountMessage);
@@ -196,7 +196,7 @@
     }
 
     const refreshCalorieDistribution = async () => {
-        const calorieTrackerRangeResponse = await listCalorieTrackerEntriesRange(lastWeek, today);
+        const calorieTrackerRangeResponse = await listCalorieTrackerRange(lastWeek, today);
 
         if (calorieTrackerRangeResponse.ok) {
             dashboardData.caloriesWeekList = await calorieTrackerRangeResponse.json();
@@ -214,7 +214,7 @@
     }
 
     const repaintWeightChart = () => {
-        weightChart = paintWeightTrackerEntries(weightListMonth, today, DataViews.Month);
+        weightChart = paintWeightTracker(weightListMonth, today, DataViews.Month);
     }
 
     const setCalorieTarget = async (e) => {
@@ -257,7 +257,7 @@
 
                 <div class="flex flex-col gap-8 lg:grid grid-cols-3">
                     <div class="card flex flex-col gap-4 p-4">
-                        <CalorieTracker calorieTrackerEntries={caloriesToday}
+                        <CalorieTracker calorieTracker={caloriesToday}
                                         categories={$foodCategories}
                                         bind:calorieTarget={calorieTarget}
                                         on:addCalories={onAddCalories}
@@ -269,14 +269,14 @@
                     <div class="card flex flex-col gap-4 p-4">
                         <CalorieDistribution displayClass="flex flex-col"
                                              foodCategories={$foodCategories}
-                                             bind:calorieTrackerEntries={dashboardData.caloriesWeekList}
+                                             bind:calorieTracker={dashboardData.caloriesWeekList}
                                              bind:calorieTarget={dashboardData.calorieTarget}
                         />
                     </div>
 
                     <div class="card p-4">
                         <CalorieQuickview displayClass="flex flex-col"
-                                          bind:calorieTrackerEntries={dashboardData.caloriesWeekList}
+                                          bind:calorieTracker={dashboardData.caloriesWeekList}
                                           bind:calorieTarget={calorieTarget}
                                           on:setTarget={setCalorieTarget}
                         />

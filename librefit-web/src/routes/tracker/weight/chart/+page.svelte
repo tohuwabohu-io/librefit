@@ -1,6 +1,6 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-	import {paintWeightTrackerEntries} from '$lib/weight-chart.js';
+	import {paintWeightTracker} from '$lib/weight-chart.js';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
 	import {showToastError} from '$lib/toast.js';
@@ -35,7 +35,7 @@
 		$indicator = $indicator.start();
 
 		await listWeightFiltered(filter).then(async (result) => {
-			/** @type Array<WeightTrackerEntry> */
+			/** @type Array<WeightTracker> */
 			entries = await result.json();
 
 			paint(entries);
@@ -43,7 +43,7 @@
 	}
 
 	const paint = (entries) => {
-		const paintMeta = paintWeightTrackerEntries(entries, today, filter);
+		const paintMeta = paintWeightTracker(entries, today, filter);
 
 		chartData = paintMeta.chartData;
 		chartOptions = paintMeta.chartOptions;

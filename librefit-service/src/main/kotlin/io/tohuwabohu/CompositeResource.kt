@@ -123,11 +123,11 @@ class CompositeResource(
     ): Uni<Response> {
         wizard.weightTarget.userId = UUID.fromString(securityIdentity.principal.name)
         wizard.calorieTarget.userId = UUID.fromString(securityIdentity.principal.name)
-        wizard.weightTrackerEntry.userId = UUID.fromString(securityIdentity.principal.name)
+        wizard.weightTracker.userId = UUID.fromString(securityIdentity.principal.name)
 
         return calorieTargetRepository.validateAndPersist(wizard.calorieTarget)
             .chain { _ -> weightTargetRepository.validateAndPersist(wizard.weightTarget) }
-            .chain { _ -> weightTrackerRepository.validateAndPersist(wizard.weightTrackerEntry) }
+            .chain { _ -> weightTrackerRepository.validateAndPersist(wizard.weightTracker) }
             .onItem().transform { _ ->
                 Response.status(Response.Status.CREATED).build()
             }.onFailure().recoverWithResponse()

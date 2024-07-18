@@ -13,8 +13,8 @@
 
     Chart.register(...registerables);
 
-    /** @type List<CalorieTrackerEntry> */
-    export let calorieTrackerEntries;
+    /** @type List<CalorieTracker> */
+    export let calorieTracker;
 
     export let displayClass = '';
     export let displayHeader = true;
@@ -30,24 +30,24 @@
     let polarAreaChart, dailyAverage;
 
     /**
-     * @param {Array<CalorieTrackerEntry>} entries
+     * @param {Array<CalorieTracker>} entries
      */
     const refreshChart = (entries) => {
         polarAreaChart = createDistributionChart(entries, foodCategories, displayHistory);
         dailyAverage = getAverageDailyIntake(entries);
     }
 
-    $: calorieTrackerEntries, refreshChart(calorieTrackerEntries);
+    $: calorieTracker, refreshChart(calorieTracker);
 
     observeToggle(document.documentElement, () => {
-        refreshChart(calorieTrackerEntries);
+        refreshChart(calorieTracker);
     });
 </script>
 
 <div class="{displayClass} gap-4 text-center justify-between items-center relative h-full">
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
-    {#if calorieTrackerEntries && calorieTrackerEntries.length > 0}
+    {#if calorieTracker && calorieTracker.length > 0}
         <div class="flex flex-col w-fit h-full justify-between gap-4">
             <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 

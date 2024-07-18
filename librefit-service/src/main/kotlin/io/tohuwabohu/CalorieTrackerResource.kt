@@ -36,7 +36,7 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "201", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = CalorieTrackerEntry::class)
+                schema = Schema(implementation = CalorieTracker::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -46,8 +46,8 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @Operation(operationId = "createCalorieTrackerEntry")
-    fun create(@Context securityIdentity: SecurityIdentity, @Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
+    @Operation(operationId = "createCalorieTracker")
+    fun create(@Context securityIdentity: SecurityIdentity, @Valid calorieTracker: CalorieTracker): Uni<Response> {
         calorieTracker.userId = UUID.fromString(securityIdentity.principal.name)
 
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
@@ -72,13 +72,13 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @Operation(operationId = "updateCalorieTrackerEntry")
-    fun update(@Context securityIdentity: SecurityIdentity, @Valid calorieTracker: CalorieTrackerEntry): Uni<Response> {
+    @Operation(operationId = "updateCalorieTracker")
+    fun update(@Context securityIdentity: SecurityIdentity, @Valid calorieTracker: CalorieTracker): Uni<Response> {
         calorieTracker.userId = UUID.fromString(securityIdentity.principal.name)
 
         Log.info("Updating calorie tracker entry $calorieTracker")
 
-        return calorieTrackerRepository.updateEntry(calorieTracker, CalorieTrackerEntry::class.java)
+        return calorieTrackerRepository.updateEntry(calorieTracker, CalorieTracker::class.java)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().recoverWithResponse()
     }
@@ -92,7 +92,7 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = CalorieTrackerEntry::class)
+                schema = Schema(implementation = CalorieTracker::class)
             )
         ]),
         APIResponse(responseCode = "404", description = "Not Found"),
@@ -103,7 +103,7 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @Operation(operationId = "readCalorieTrackerEntry")
+    @Operation(operationId = "readCalorieTracker")
     fun read(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
         return calorieTrackerRepository.readEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
@@ -125,7 +125,7 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @Operation(operationId = "deleteCalorieTrackerEntry")
+    @Operation(operationId = "deleteCalorieTracker")
     fun delete(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
         Log.info("Delete calorie tracker entry with added=$date sequence=$sequence")
 
@@ -167,7 +167,7 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Array<CalorieTrackerEntry>::class)
+                schema = Schema(implementation = Array<CalorieTracker>::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -177,7 +177,7 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "401", description = "Unauthorized"),
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
-    @Operation(operationId = "listCalorieTrackerEntriesForDate")
+    @Operation(operationId = "listCalorieTrackerForDate")
     fun listEntries(@Context securityIdentity: SecurityIdentity, date: LocalDate): Uni<Response> {
         return calorieTrackerRepository.listEntriesForUserAndDate(UUID.fromString(securityIdentity.principal.name), date)
             .onItem().transform { Response.ok(it).build() }
@@ -191,7 +191,7 @@ class CalorieTrackerResource(
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Array<CalorieTrackerEntry>::class)
+                schema = Schema(implementation = Array<CalorieTracker>::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -203,7 +203,7 @@ class CalorieTrackerResource(
     )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-        operationId = "listCalorieTrackerEntriesRange"
+        operationId = "listCalorieTrackerRange"
     )
     fun listEntries(@Context securityIdentity: SecurityIdentity, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         return calorieTrackerRepository.listEntriesForUserAndDateRange(UUID.fromString(securityIdentity.principal.name), dateFrom, dateTo)

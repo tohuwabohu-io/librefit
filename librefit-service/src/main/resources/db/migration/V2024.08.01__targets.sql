@@ -37,3 +37,6 @@ insert into weight_target (user_id, added, sequence, start_date, end_date, targe
     select user_id, added, sequence, start_date, end_date, target_weight, initial_weight, updated from goal;
 
 drop table goal;
+
+alter table calorie_tracker_entry rename to calorie_tracker;
+alter table weight_tracker_entry rename to weight_tracker;

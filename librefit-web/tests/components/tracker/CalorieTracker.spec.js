@@ -42,7 +42,7 @@ describe('CalorieTracker.svelte component', () => {
 	it('renders correctly', () => {
 		const { getByText, getByRole, getByTestId } = render(CalorieTracker, {
 			categories: mockCategories,
-			calorieTrackerEntries: mockEntries,
+			calorieTracker: mockEntries,
 			calorieTarget: mockCalorieTarget
 		});
 
@@ -155,7 +155,7 @@ describe('CalorieTracker.svelte component', () => {
 
 		const { component, getByText } = render(CalorieTracker, {
 			categories: mockCategories,
-			calorieTrackerEntries: mockEntries,
+			calorieTracker: mockEntries,
 			calorieTarget: mockCalorieTarget
 		});
 		component.$on('updateCalories', dispatchMock);
@@ -211,7 +211,7 @@ describe('CalorieTracker.svelte component', () => {
 
 		const { component, getByText } = render(CalorieTracker, {
 			categories: mockCategories,
-			calorieTrackerEntries: mockEntries,
+			calorieTracker: mockEntries,
 			calorieTarget: mockCalorieTarget
 		});
 

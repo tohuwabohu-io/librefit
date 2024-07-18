@@ -9,8 +9,8 @@
 
     const modalStore = getModalStore();
 
-    /** @type Array<CalorieTrackerEntry> */
-    export let calorieTrackerEntries = [];
+    /** @type Array<CalorieTracker> */
+    export let calorieTracker = [];
 
     /** @type Array<FoodCategory> */
     export let categories;
@@ -24,7 +24,7 @@
     let deficit;
 
     $: if (calorieTarget) {
-        deficit = calculateDeficit(calorieTrackerEntries)
+        deficit = calculateDeficit(calorieTracker)
     }
 
     const addCaloriesQuickly = (e) => {
@@ -94,7 +94,7 @@
             type: 'component',
             component: 'trackerModal',
             meta: {
-                entries: calorieTrackerEntries,
+                entries: calorieTracker,
                 categories: categories
             },
             response: (e) => {
@@ -109,7 +109,7 @@
     }
 
     /**
-     * @param entries {Array<CalorieTrackerEntry>}
+     * @param entries {Array<CalorieTracker>}
      */
     const calculateDeficit = (entries) => {
         const total = entries.reduce((totalCalories, entry) => totalCalories + entry.amount, 0);
@@ -124,7 +124,7 @@
     </h2>
     <div class="flex flex-col w-fit h-full justify-between gap-4 pt-4">
         <div class="self-center">
-            <TrackerRadial entries={calorieTrackerEntries.map(e => e.amount)} {calorieTarget} />
+            <TrackerRadial entries={calorieTracker.map(e => e.amount)} {calorieTarget} />
         </div>
         {#if calorieTarget}
             <div>

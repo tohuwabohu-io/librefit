@@ -1,5 +1,5 @@
 /**
- * @param {Array<CalorieTrackerEntry>} entries
+ * @param {Array<CalorieTracker>} entries
  * @param {Array<FoodCategory>} foodCategories
  */
 export const getAverageCategoryIntake = (entries, foodCategories) => {
@@ -27,7 +27,7 @@ export const getAverageCategoryIntake = (entries, foodCategories) => {
 	return null;
 };
 
-/** @param {Array<CalorieTrackerEntry>} entries */
+/** @param {Array<CalorieTracker>} entries */
 export const getAverageDailyIntake = (entries) => {
 	const nonEmpty = entries.filter((e) => e.amount > 0);
 

@@ -538,19 +538,19 @@ paths:
     post:
       tags:
       - Calorie Tracker Resource
-      operationId: createCalorieTrackerEntry
+      operationId: createCalorieTracker
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CalorieTrackerEntry"
+              $ref: "#/components/schemas/CalorieTracker"
       responses:
         "201":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CalorieTrackerEntry"
+                $ref: "#/components/schemas/CalorieTracker"
         "400":
           description: Bad Request
           content:
@@ -569,7 +569,7 @@ paths:
     delete:
       tags:
       - Calorie Tracker Resource
-      operationId: deleteCalorieTrackerEntry
+      operationId: deleteCalorieTracker
       parameters:
       - name: date
         in: path
@@ -646,7 +646,7 @@ paths:
     get:
       tags:
       - Calorie Tracker Resource
-      operationId: listCalorieTrackerEntriesRange
+      operationId: listCalorieTrackerRange
       parameters:
       - name: dateFrom
         in: path
@@ -666,7 +666,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CalorieTrackerEntry"
+                  $ref: "#/components/schemas/CalorieTracker"
         "400":
           description: Bad Request
           content:
@@ -685,7 +685,7 @@ paths:
     get:
       tags:
       - Calorie Tracker Resource
-      operationId: listCalorieTrackerEntriesForDate
+      operationId: listCalorieTrackerForDate
       parameters:
       - name: date
         in: path
@@ -700,7 +700,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CalorieTrackerEntry"
+                  $ref: "#/components/schemas/CalorieTracker"
         "400":
           description: Bad Request
           content:
@@ -719,7 +719,7 @@ paths:
     get:
       tags:
       - Calorie Tracker Resource
-      operationId: readCalorieTrackerEntry
+      operationId: readCalorieTracker
       parameters:
       - name: date
         in: path
@@ -738,7 +738,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CalorieTrackerEntry"
+                $ref: "#/components/schemas/CalorieTracker"
         "404":
           description: Not Found
         "400":
@@ -759,12 +759,12 @@ paths:
     put:
       tags:
       - Calorie Tracker Resource
-      operationId: updateCalorieTrackerEntry
+      operationId: updateCalorieTracker
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CalorieTrackerEntry"
+              $ref: "#/components/schemas/CalorieTracker"
       responses:
         "200":
           description: OK
@@ -790,19 +790,19 @@ paths:
     post:
       tags:
       - Weight Tracker Resource
-      operationId: createWeightTrackerEntry
+      operationId: createWeightTracker
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WeightTrackerEntry"
+              $ref: "#/components/schemas/WeightTracker"
       responses:
         "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WeightTrackerEntry"
+                $ref: "#/components/schemas/WeightTracker"
         "400":
           description: Bad Request
           content:
@@ -821,7 +821,7 @@ paths:
     delete:
       tags:
       - Weight Tracker Resource
-      operationId: deleteWeightTrackerEntry
+      operationId: deleteWeightTracker
       parameters:
       - name: date
         in: path
@@ -859,14 +859,14 @@ paths:
     get:
       tags:
       - Weight Tracker Resource
-      operationId: findLastWeightTrackerEntry
+      operationId: findLastWeightTracker
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WeightTrackerEntry"
+                $ref: "#/components/schemas/WeightTracker"
         "400":
           description: Bad Request
           content:
@@ -924,7 +924,7 @@ paths:
     get:
       tags:
       - Weight Tracker Resource
-      operationId: listWeightTrackerEntriesRange
+      operationId: listWeightTrackerRange
       parameters:
       - name: dateFrom
         in: path
@@ -944,7 +944,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/WeightTrackerEntry"
+                  $ref: "#/components/schemas/WeightTracker"
         "400":
           description: Bad Request
           content:
@@ -963,7 +963,7 @@ paths:
     get:
       tags:
       - Weight Tracker Resource
-      operationId: listWeightTrackerEntries
+      operationId: listWeightTracker
       parameters:
       - name: date
         in: path
@@ -978,7 +978,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/WeightTrackerEntry"
+                  $ref: "#/components/schemas/WeightTracker"
         "400":
           description: Bad Request
           content:
@@ -997,7 +997,7 @@ paths:
     get:
       tags:
       - Weight Tracker Resource
-      operationId: readWeightTrackerEntry
+      operationId: readWeightTracker
       parameters:
       - name: date
         in: path
@@ -1016,7 +1016,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WeightTrackerEntry"
+                $ref: "#/components/schemas/WeightTracker"
         "404":
           description: Not Found
         "400":
@@ -1037,12 +1037,12 @@ paths:
     put:
       tags:
       - Weight Tracker Resource
-      operationId: updateWeightTrackerEntry
+      operationId: updateWeightTracker
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WeightTrackerEntry"
+              $ref: "#/components/schemas/WeightTracker"
       responses:
         "200":
           description: OK
@@ -1090,8 +1090,6 @@ paths:
       responses:
         "200":
           description: OK
-          content:
-            text/plain: {}
         "400":
           description: Bad Request
           content:
@@ -1231,6 +1229,8 @@ components:
       - added
       - startDate
       - endDate
+      - targetCalories
+      - maximumCalories
       type: object
       properties:
         userId:
@@ -1261,7 +1261,7 @@ components:
           allOf:
           - $ref: "#/components/schemas/LocalDateTime"
           nullable: true
-    CalorieTrackerEntry:
+    CalorieTracker:
       required:
       - added
       - amount
@@ -1313,12 +1313,12 @@ components:
         caloriesTodayList:
           type: array
           items:
-            $ref: "#/components/schemas/CalorieTrackerEntry"
+            $ref: "#/components/schemas/CalorieTracker"
           nullable: true
         caloriesWeekList:
           type: array
           items:
-            $ref: "#/components/schemas/CalorieTrackerEntry"
+            $ref: "#/components/schemas/CalorieTracker"
           nullable: true
         weightTarget:
           type: object
@@ -1328,12 +1328,12 @@ components:
         weightTodayList:
           type: array
           items:
-            $ref: "#/components/schemas/WeightTrackerEntry"
+            $ref: "#/components/schemas/WeightTracker"
           nullable: true
         weightMonthList:
           type: array
           items:
-            $ref: "#/components/schemas/WeightTrackerEntry"
+            $ref: "#/components/schemas/WeightTracker"
           nullable: true
     ErrorDescription:
       required:
@@ -1546,7 +1546,7 @@ components:
           allOf:
           - $ref: "#/components/schemas/LocalDateTime"
           nullable: true
-    WeightTrackerEntry:
+    WeightTracker:
       required:
       - added
       type: object
@@ -1575,12 +1575,12 @@ components:
       required:
       - calorieTarget
       - weightTarget
-      - weightTrackerEntry
+      - weightTracker
       type: object
       properties:
         calorieTarget:
           $ref: "#/components/schemas/CalorieTarget"
         weightTarget:
           $ref: "#/components/schemas/WeightTarget"
-        weightTrackerEntry:
-          $ref: "#/components/schemas/WeightTrackerEntry"
+        weightTracker:
+          $ref: "#/components/schemas/WeightTracker"

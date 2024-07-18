@@ -13,8 +13,8 @@
 
     const toastStore = getToastStore();
 
-    /** @type List<CalorieTrackerEntry> */
-    $: calorieTrackerEntries = data.caloriesMonthList;
+    /** @type List<CalorieTracker> */
+    const calorieTracker = data.caloriesMonthList;
 
     /** @type Writable<LibreUser> */
     const user = getContext('user');
@@ -30,47 +30,48 @@
     if (!$user) goto('/');
 
     let filter = DataViews.Month;
-    let filteredData = calorieTrackerEntries;
+    let filteredData;
+    let categories;
 
-    let categories = skimCategories(calorieTrackerEntries);
-
-    $: filteredData;
-    $: categories;
+    $: if(calorieTracker) {
+        filteredData = calorieTracker;
+        categories = skimCategories(calorieTracker);
+    }
 
     const loadEntriesFiltered = async () => {
         $indicator = $indicator.start();
 
         await listCaloriesFiltered(filter).then(async (result) => {
-            /** @type Array<WeightTrackerEntry> */
+            /** @type Array<WeightTracker> */
             filteredData = await result.json();
         }).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
     }
 
     /**
-     * @param calorieTrackerEntries {Array<CalorieTrackerEntry>}
+     * @param calorieTracker {Array<CalorieTracker>}
      * @param category {string}
      */
-    const calculateAverage = (calorieTrackerEntries, category) => {
-        const filtered = calorieTrackerEntries.filter(entry => entry.category === category)
+    const calculateAverage = (calorieTracker, category) => {
+        const filtered = calorieTracker.filter(entry => entry.category === category)
         const total = filtered.map(entry => entry.amount).reduce((part, a) => part + a, 0);
 
         return Math.round(total / filtered.length);
     }
 
     /**
-     * @param calorieTrackerEntries {Array<CalorieTrackerEntry>}
+     * @param calorieTracker {Array<CalorieTracker>}
      * @param category {string}
      */
-    const findMinimum = (calorieTrackerEntries, category) => {
-        return Math.min(...calorieTrackerEntries.filter(entry => entry.category === category).map(entry => entry.amount));
+    const findMinimum = (calorieTracker, category) => {
+        return Math.min(...calorieTracker.filter(entry => entry.category === category).map(entry => entry.amount));
     }
 
     /**
-     * @param calorieTrackerEntries {Array<CalorieTrackerEntry>}
+     * @param calorieTracker {Array<CalorieTracker>}
      * @param category {string}
      */
-    const findMaximum = (calorieTrackerEntries, category) => {
-        return Math.max(...calorieTrackerEntries.filter(entry => entry.category === category).map(entry => entry.amount))
+    const findMaximum = (calorieTracker, category) => {
+        return Math.max(...calorieTracker.filter(entry => entry.category === category).map(entry => entry.amount))
     }
 
 </script>
@@ -93,7 +94,7 @@
                 {/each}
             </RadioGroup>
 
-            {#if calorieTrackerEntries.length > 0 }
+            {#if calorieTracker.length > 0 }
                 <div class="flex flex-col lg:flex-row gap-4">
                     <div class="lg:w-3/5 flex flex-col">
                         <h2 class="h2">Last {filter.toLowerCase()}:</h2>
@@ -130,7 +131,7 @@
                     </div>
                     <div class="lg:w-2/5 flex justify-center">
                         <CalorieDistribution displayClass="flex"
-                                calorieTrackerEntries={filteredData}
+                                calorieTracker={filteredData}
                                 displayHeader={false}
                                 displayHistory={false}
                                 foodCategories={$foodCategories}

@@ -12,7 +12,7 @@
     export let weightTarget;
 
     /**
-     * @type Array<WeightTrackerEntry>
+     * @type Array<WeightTracker>
      */
     export let weightList;
 

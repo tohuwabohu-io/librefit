@@ -6,9 +6,9 @@ data class Dashboard(
     val userData: LibreUser,
     val foodCategories: List<FoodCategory>,
     val calorieTarget: CalorieTarget?,
-    val caloriesTodayList: List<CalorieTrackerEntry>?,
-    val caloriesWeekList: List<CalorieTrackerEntry>?,
+    val caloriesTodayList: List<CalorieTracker>?,
+    val caloriesWeekList: List<CalorieTracker>?,
     val weightTarget: WeightTarget?,
-    val weightTodayList: List<WeightTrackerEntry>?,
-    val weightMonthList: List<WeightTrackerEntry>?
+    val weightTodayList: List<WeightTracker>?,
+    val weightMonthList: List<WeightTracker>?
 )

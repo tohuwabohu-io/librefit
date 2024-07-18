@@ -1,7 +1,7 @@
 import { display_date_format_day, getDateAsStr, parseStringAsDate } from '$lib/date.js';
 
 /**
- * @param {Array<CalorieTrackerEntry>} calories
+ * @param {Array<CalorieTracker>} calories
  * @param {CalorieTarget} calorieTarget
  * @return {{backgroundColor: *, data: number, label: string}[]}
  */
@@ -87,7 +87,7 @@ const createCalorieTrackerQuickviewDataset = (calories, calorieTarget) => {
 	};
 };
 /**
- * @param {Array<CalorieTrackerEntry>} entries
+ * @param {Array<CalorieTracker>} entries
  * @param {CalorieTarget} calorieTarget
  */
 export const paintCalorieTrackerQuickview = (entries, calorieTarget) => {

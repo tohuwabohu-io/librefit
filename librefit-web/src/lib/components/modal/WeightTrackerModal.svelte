@@ -5,7 +5,7 @@
 
     const modalStore = getModalStore();
 
-    /** @type Array<WeightTrackerEntry> */
+    /** @type Array<WeightTracker> */
     let weightList;
 
     if ($modalStore[0] && $modalStore[0].meta) {

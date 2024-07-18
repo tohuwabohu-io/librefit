@@ -170,7 +170,7 @@
 						<svelte:fragment slot="content">
 							<div class="flex md:flex-row flex-col gap-4 p-4">
 								{#if datesToEntries[dateStr]}
-									<CalorieTracker calorieTrackerEntries={datesToEntries[dateStr]}
+									<CalorieTracker calorieTracker={datesToEntries[dateStr]}
 										categories={$foodCategories}
 										bind:calorieTarget={$calorieTarget}
 										on:addCalories={addEntry}
@@ -178,7 +178,7 @@
 										on:deleteCalories={deleteEntry}
 									/>
 
-									<CalorieDistribution calorieTrackerEntries={datesToEntries[dateStr]}
+									<CalorieDistribution calorieTracker={datesToEntries[dateStr]}
 														 displayHistory={false}
 														 displayHeader={false}
 														 foodCategories={$foodCategories}
@@ -189,7 +189,7 @@
 										<p>... loading</p>
 									{:then entries}
 										{#if entries}
-											<CalorieTracker calorieTrackerEntries={entries}
+											<CalorieTracker calorieTracker={entries}
 												categories={$foodCategories}
 												bind:calorieTarget={$calorieTarget}
 												on:addCalories={addEntry}

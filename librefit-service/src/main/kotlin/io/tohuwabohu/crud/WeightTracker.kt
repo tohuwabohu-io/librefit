@@ -12,12 +12,12 @@ import java.util.*
 
 @Entity
 @NamedQueries(
-    NamedQuery(name = "WeightTrackerEntry.findLast", query = "from WeightTrackerEntry where userId = ?1 order by sequence desc, added desc, userId limit 1"),
-    NamedQuery(name = "WeightTrackerEntry.listDates",
-        query = "from WeightTrackerEntry where userId = ?1 and added between ?2 and ?3 group by added, userId, sequence order by added desc, userId, sequence"
+    NamedQuery(name = "WeightTracker.findLast", query = "from WeightTracker where userId = ?1 order by sequence desc, added desc, userId limit 1"),
+    NamedQuery(name = "WeightTracker.listDates",
+        query = "from WeightTracker where userId = ?1 and added between ?2 and ?3 group by added, userId, sequence order by added desc, userId, sequence"
     )
 )
-data class WeightTrackerEntry (
+data class WeightTracker (
     @field:Min(value = 0, message = "Your weight should not be less than zero.")
     var amount: Float = 0f,
     var updated: LocalDateTime? = null
@@ -29,14 +29,14 @@ data class WeightTrackerEntry (
 }
 
 @ApplicationScoped
-class WeightTrackerRepository : LibreUserRelatedRepository<WeightTrackerEntry>() {
-    fun findLastEntry(userId: UUID): Uni<WeightTrackerEntry?> {
-        return find("#WeightTrackerEntry.findLast", userId).firstResult()
+class WeightTrackerRepository : LibreUserRelatedRepository<WeightTracker>() {
+    fun findLastEntry(userId: UUID): Uni<WeightTracker?> {
+        return find("#WeightTracker.findLast", userId).firstResult()
             .onItem().ifNull().failWith { EntityNotFoundException() }
     }
 
     fun listDatesForUser(userId: UUID, dateFrom: LocalDate, dateTo: LocalDate): Uni<Set<LocalDate>?> =
-        find("#WeightTrackerEntry.listDates", userId, dateFrom, dateTo)
+        find("#WeightTracker.listDates", userId, dateFrom, dateTo)
             .list()
             .onItem().ifNotNull().transform { list -> list.map { entry -> entry.added }.toSet() }
             .onItem().ifNull().failWith(EntityNotFoundException())

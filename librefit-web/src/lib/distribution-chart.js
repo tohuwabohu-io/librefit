@@ -1,7 +1,7 @@
 import { getAverageCategoryIntake } from '$lib/calorie-util.js';
 
 /**
- * @param {Array<CalorieTrackerEntry>} entries
+ * @param {Array<CalorieTracker>} entries
  * @param {Array<FoodCategory>} foodCategories
  * @param {boolean} [displayHistory]
  */
