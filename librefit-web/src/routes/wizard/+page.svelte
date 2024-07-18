@@ -70,7 +70,7 @@
                 }
 			},
 			response: async (e) => {
-				if (!e.cancelled) {
+				if (e && !e.cancelled) {
 					await createTargetsAddWeight(e);
 				}
 

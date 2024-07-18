@@ -82,10 +82,10 @@
             type: 'component',
             component: 'targetModal',
             meta: {
-                weightTarget: weightTarget
+                weightTarget: !weightTarget ? { initialWeight: !weightList ? undefined : weightList[0].amount } : weightTarget
             },
             response: (e) => {
-                if (!e.cancelled) {
+                if (e && !e.cancelled) {
                    setTarget(e);
                 }
 

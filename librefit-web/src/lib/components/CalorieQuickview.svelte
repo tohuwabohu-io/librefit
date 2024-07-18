@@ -43,10 +43,10 @@
             component: 'targetModal',
             meta: {
                 /** @type CalorieTarget */
-                calorieTarget: calorieTarget
+                calorieTarget: !calorieTarget ? {} : calorieTarget
             },
             response: async (e) => {
-                if (!e.cancelled) {
+                if (e && !e.cancelled) {
                     setTarget(e);
                 }
 
