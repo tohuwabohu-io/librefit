@@ -1,5 +1,3 @@
-drop table auth_session;
-
 create table calorie_target
 (
     added            date   not null,
