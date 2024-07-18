@@ -68,7 +68,7 @@
 
     const toastStore = getToastStore();
 
-    if (!$user) goto('/');
+    if (!$user) user.set(dashboardData.userData);
 
     const today = new Date();
     const lastWeek = subWeeks(today, 1);
@@ -246,63 +246,59 @@
     <title>LibreFit - Dashboard</title>
 </svelte:head>
 
-{#if $user}
-    <section>
-        <div class="container md:w-fit mx-auto p-8 space-y-8">
-            {#if $user}
-                {@const name = $user.name}
+<section>
+    <div class="container md:w-fit mx-auto p-8 space-y-8">
+        {#if $user}
+        {@const name = $user.name}
+        <h1 class="h1">Good {getDaytimeGreeting(new Date())}{#if name}, {name}!{:else}!{/if}</h1>
+        <p>This is your daily summary.</p>
+        {/if}
+        <div class="flex flex-col gap-8 lg:grid grid-cols-3">
+            <div class="card flex flex-col gap-4 p-4">
+                <CalorieTracker calorieTracker={caloriesToday}
+                                categories={$foodCategories}
+                                bind:calorieTarget={calorieTarget}
+                                on:addCalories={onAddCalories}
+                                on:updateCalories={onUpdateCalories}
+                                on:deleteCalories={onDeleteCalories}
+                />
+            </div>
 
-                <h1 class="h1">Good {getDaytimeGreeting(new Date())}{#if name}, {name}!{:else}!{/if}</h1>
-                <p>This is your daily summary.</p>
+            <div class="card flex flex-col gap-4 p-4">
+                <CalorieDistribution displayClass="flex flex-col"
+                                     foodCategories={$foodCategories}
+                                     bind:calorieTracker={dashboardData.caloriesWeekList}
+                                     bind:calorieTarget={dashboardData.calorieTarget}
+                />
+            </div>
 
-                <div class="flex flex-col gap-8 lg:grid grid-cols-3">
-                    <div class="card flex flex-col gap-4 p-4">
-                        <CalorieTracker calorieTracker={caloriesToday}
-                                        categories={$foodCategories}
-                                        bind:calorieTarget={calorieTarget}
-                                        on:addCalories={onAddCalories}
-                                        on:updateCalories={onUpdateCalories}
-                                        on:deleteCalories={onDeleteCalories}
-                        />
-                    </div>
-
-                    <div class="card flex flex-col gap-4 p-4">
-                        <CalorieDistribution displayClass="flex flex-col"
-                                             foodCategories={$foodCategories}
-                                             bind:calorieTracker={dashboardData.caloriesWeekList}
-                                             bind:calorieTarget={dashboardData.calorieTarget}
-                        />
-                    </div>
-
-                    <div class="card p-4">
-                        <CalorieQuickview displayClass="flex flex-col"
-                                          bind:calorieTracker={dashboardData.caloriesWeekList}
-                                          bind:calorieTarget={calorieTarget}
-                                          on:setTarget={setCalorieTarget}
-                        />
-                    </div>
-                </div>
-
-                <div class="flex md:flex-row flex-col gap-8">
-                    <div class="flex flex-col gap-4 card p-4 object-fill justify-center items-center relative md:w-full">
-                        <h2 class="h3">Weight Tracker</h2>
-                        {#if weightChart && weightListMonth.length > 0}
-                            <Line class="md:w-full" options={weightChart.chartOptions} data={weightChart.chartData}/>
-                        {:else}
-                            <div>
-                                <ScaleOff width={100} height={100} class="self-center"/>
-                            </div>
-                        {/if}
-                        <WeightTracker weightList={weightListToday}
-                                       weightTarget={weightTarget}
-                                       on:addWeight={onAddWeight}
-                                       on:updateWeight={onUpdateWeight}
-                                       on:deleteWeight={onDeleteWeight}
-                                       on:setTarget={setWeightTarget}
-                        />
-                    </div>
-                </div>
-            {/if}
+            <div class="card p-4">
+                <CalorieQuickview displayClass="flex flex-col"
+                                  bind:calorieTracker={dashboardData.caloriesWeekList}
+                                  bind:calorieTarget={calorieTarget}
+                                  on:setTarget={setCalorieTarget}
+                />
+            </div>
         </div>
-    </section>
-{/if}
+
+        <div class="flex md:flex-row flex-col gap-8">
+            <div class="flex flex-col gap-4 card p-4 object-fill justify-center items-center relative md:w-full">
+                <h2 class="h3">Weight Tracker</h2>
+                {#if weightChart && weightListMonth.length > 0}
+                    <Line class="md:w-full" options={weightChart.chartOptions} data={weightChart.chartData}/>
+                {:else}
+                    <div>
+                        <ScaleOff width={100} height={100} class="self-center"/>
+                    </div>
+                {/if}
+                <WeightTracker weightList={weightListToday}
+                               weightTarget={weightTarget}
+                               on:addWeight={onAddWeight}
+                               on:updateWeight={onUpdateWeight}
+                               on:deleteWeight={onDeleteWeight}
+                               on:setTarget={setWeightTarget}
+                />
+            </div>
+        </div>
+    </div>
+</section>
