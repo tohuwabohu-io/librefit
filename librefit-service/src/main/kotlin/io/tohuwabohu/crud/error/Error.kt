@@ -1,8 +1,6 @@
 package io.tohuwabohu.crud.error
 
 import io.quarkus.logging.Log
-import io.quarkus.security.ForbiddenException
-import io.quarkus.security.UnauthorizedException
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.groups.UniOnFailure
 import jakarta.persistence.EntityNotFoundException
@@ -22,14 +20,6 @@ object ErrorHandler {
 
             is EntityNotFoundException -> {
                 Response.status(Response.Status.NOT_FOUND).build()
-            }
-
-            is UnauthorizedException -> {
-                UnauthorizedExceptionMapper().toResponse(throwable)
-            }
-
-            is ForbiddenException -> {
-                Response.status(Response.Status.FORBIDDEN).build()
             }
 
             else -> {
@@ -78,17 +68,6 @@ class ValidationErrorMapper : ExceptionMapper<ValidationError> {
         log.error("Validation failed", exception)
 
         return Response.status(Response.Status.BAD_REQUEST).entity(ErrorResponse("Validation Error", 400, exception.errors)).build()
-    }
-}
-
-@Provider
-class UnauthorizedExceptionMapper: ExceptionMapper<UnauthorizedException> {
-    private val log: Logger = Logger.getLogger(javaClass)
-
-    override fun toResponse(exception: UnauthorizedException): Response {
-        log.error("Authentication error", exception)
-
-        return Response.status(Response.Status.UNAUTHORIZED).build()
     }
 }
 
