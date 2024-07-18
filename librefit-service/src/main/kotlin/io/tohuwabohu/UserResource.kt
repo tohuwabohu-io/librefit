@@ -83,14 +83,10 @@ class UserResource(
         @Context securityIdentity: SecurityIdentity,
         @RestForm @PartType("text/plain") email: String,
         @RestForm @PartType("text/plain") password: String
-    ): Uni<Response> {
-        return Uni.createFrom().item(securityIdentity).onItem().transform { authenticationResponse ->
-            if (!authenticationResponse.isAnonymous) {
-                Response.ok().build()
-            } else Response.status(Response.Status.NOT_FOUND).build()
-        }.onItem().ifNull().continueWith { Response.status(Response.Status.NOT_FOUND).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+    ) {
+        /** This is just a placeholder to generate the OpenAPI spec.
+         * The Quarkus form based authentication intercepts calls to this operation and handles it.
+         * @see io.tohuwabohu.security.TrustedLibreUserIdentityProvider.authenticate */
     }
 
     @POST
