@@ -6,6 +6,7 @@ import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.*
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
+import io.tohuwabohu.crud.user.LibreUserSecurity
 import jakarta.annotation.security.RolesAllowed
 import jakarta.enterprise.context.RequestScoped
 import jakarta.validation.Valid
@@ -48,11 +49,9 @@ class CalorieTrackerResource(
     )
     @Operation(operationId = "createCalorieTracker")
     fun create(@Context securityIdentity: SecurityIdentity, @Valid calorieTracker: CalorieTracker): Uni<Response> {
-        calorieTracker.userId = UUID.fromString(securityIdentity.principal.name)
-
         Log.info("Creating a new calorie tracker entry=$calorieTracker")
 
-        return calorieTrackerRepository.validateAndPersist(calorieTracker)
+        return calorieTrackerRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, calorieTracker))
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().recoverWithResponse()
     }
@@ -74,11 +73,9 @@ class CalorieTrackerResource(
     )
     @Operation(operationId = "updateCalorieTracker")
     fun update(@Context securityIdentity: SecurityIdentity, @Valid calorieTracker: CalorieTracker): Uni<Response> {
-        calorieTracker.userId = UUID.fromString(securityIdentity.principal.name)
-
         Log.info("Updating calorie tracker entry $calorieTracker")
 
-        return calorieTrackerRepository.updateEntry(calorieTracker, CalorieTracker::class.java)
+        return calorieTrackerRepository.updateEntry(LibreUserSecurity.withPrincipal(securityIdentity, calorieTracker), CalorieTracker::class.java)
             .onItem().transform { entry -> Response.ok(entry).build() }
             .onFailure().recoverWithResponse()
     }

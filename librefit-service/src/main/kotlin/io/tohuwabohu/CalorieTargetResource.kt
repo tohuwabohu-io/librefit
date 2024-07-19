@@ -7,6 +7,7 @@ import io.tohuwabohu.crud.CalorieTarget
 import io.tohuwabohu.crud.CalorieTargetRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
+import io.tohuwabohu.crud.user.LibreUserSecurity
 import jakarta.annotation.security.RolesAllowed
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Valid
@@ -20,7 +21,6 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import jakarta.ws.rs.core.SecurityContext
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
@@ -58,9 +58,7 @@ class CalorieTargetResource(private val calorieTargetRepository: CalorieTargetRe
     fun create(@Context securityIdentity: SecurityIdentity, @Valid calorieTarget: CalorieTarget): Uni<Response> {
         Log.info("Creating a new calorieTarget=$calorieTarget")
 
-        calorieTarget.userId = UUID.fromString(securityIdentity.principal.name)
-
-        return calorieTargetRepository.validateAndPersist(calorieTarget)
+        return calorieTargetRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, calorieTarget))
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().recoverWithResponse()
     }
@@ -83,11 +81,10 @@ class CalorieTargetResource(private val calorieTargetRepository: CalorieTargetRe
     @Operation(
         operationId = "updateCalorieTarget"
     )
-    fun update(@Context securityContext: SecurityContext, @Valid calorieTarget: CalorieTarget): Uni<Response> {
+    fun update(@Context securityIdentity: SecurityIdentity, @Valid calorieTarget: CalorieTarget): Uni<Response> {
         Log.info("updating calorieTarget $calorieTarget")
 
-
-        return calorieTargetRepository.updateEntry(calorieTarget, CalorieTarget::class.java)
+        return calorieTargetRepository.updateEntry(LibreUserSecurity.withPrincipal(securityIdentity, calorieTarget), CalorieTarget::class.java)
             .onItem().transform { updated -> Response.ok(updated).build() }
             .onFailure().recoverWithResponse()
     }

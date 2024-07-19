@@ -12,6 +12,7 @@ import io.tohuwabohu.crud.WeightTargetRepository
 import io.tohuwabohu.crud.WeightTrackerRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
+import io.tohuwabohu.crud.user.LibreUserSecurity
 import jakarta.annotation.security.RolesAllowed
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
@@ -121,13 +122,9 @@ class CompositeResource(
         @Context securityIdentity: SecurityIdentity,
         wizard: Wizard
     ): Uni<Response> {
-        wizard.weightTarget.userId = UUID.fromString(securityIdentity.principal.name)
-        wizard.calorieTarget.userId = UUID.fromString(securityIdentity.principal.name)
-        wizard.weightTracker.userId = UUID.fromString(securityIdentity.principal.name)
-
-        return calorieTargetRepository.validateAndPersist(wizard.calorieTarget)
-            .chain { _ -> weightTargetRepository.validateAndPersist(wizard.weightTarget) }
-            .chain { _ -> weightTrackerRepository.validateAndPersist(wizard.weightTracker) }
+        return calorieTargetRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, wizard.calorieTarget))
+            .chain { _ -> weightTargetRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, wizard.weightTarget)) }
+            .chain { _ -> weightTrackerRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, wizard.weightTracker)) }
             .onItem().transform { _ ->
                 Response.status(Response.Status.CREATED).build()
             }.onFailure().recoverWithResponse()

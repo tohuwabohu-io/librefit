@@ -7,6 +7,7 @@ import io.tohuwabohu.crud.WeightTarget
 import io.tohuwabohu.crud.WeightTargetRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
+import io.tohuwabohu.crud.user.LibreUserSecurity
 import jakarta.annotation.security.RolesAllowed
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Valid
@@ -57,9 +58,7 @@ class WeightTargetResource(private val weightTargetRepository: WeightTargetRepos
     fun create(@Context securityIdentity: SecurityIdentity, @Valid weightTarget: WeightTarget): Uni<Response> {
         Log.info("Creating a new weightTargetl=$weightTarget")
 
-        weightTarget.userId = UUID.fromString(securityIdentity.principal.name)
-
-        return weightTargetRepository.validateAndPersist(weightTarget)
+        return weightTargetRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, weightTarget))
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().recoverWithResponse()
     }
@@ -82,10 +81,10 @@ class WeightTargetResource(private val weightTargetRepository: WeightTargetRepos
     @Operation(
         operationId = "updateWeightTarget"
     )
-    fun update(@Valid weightTarget: WeightTarget): Uni<Response> {
+    fun update(@Context securityIdentity: SecurityIdentity, @Valid weightTarget: WeightTarget): Uni<Response> {
         Log.info("updating weightTarget $weightTarget")
 
-        return weightTargetRepository.updateEntry(weightTarget, WeightTarget::class.java)
+        return weightTargetRepository.updateEntry(LibreUserSecurity.withPrincipal(securityIdentity, weightTarget), WeightTarget::class.java)
             .onItem().transform { updated -> Response.ok(updated).build() }
             .onFailure().recoverWithResponse()
     }

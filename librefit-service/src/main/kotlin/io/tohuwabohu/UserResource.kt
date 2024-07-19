@@ -89,7 +89,7 @@ class UserResource(
         @RestForm @PartType("text/plain") password: String
     ) {
         /** This is just a placeholder to generate the OpenAPI spec.
-         * The Quarkus form based authentication intercepts calls to this operation and handles it.
+         * The Quarkus form based authentication intercepts calls to this operation and handles them.
          * @see io.tohuwabohu.security.TrustedLibreUserIdentityProvider.authenticate */
     }
 

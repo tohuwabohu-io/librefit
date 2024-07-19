@@ -7,6 +7,7 @@ import io.tohuwabohu.crud.WeightTracker
 import io.tohuwabohu.crud.WeightTrackerRepository
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
+import io.tohuwabohu.crud.user.LibreUserSecurity
 import jakarta.annotation.security.RolesAllowed
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
@@ -51,9 +52,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     fun create(@Context securityIdentity: SecurityIdentity, @Valid weightTracker: WeightTracker): Uni<Response> {
         Log.info("Creating a new weight tracker entry=$weightTracker")
 
-        weightTracker.userId = UUID.fromString(securityIdentity.principal.name)
-
-        return weightTrackerRepository.validateAndPersist(weightTracker)
+        return weightTrackerRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, weightTracker))
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
             .onFailure().recoverWithResponse()
     }
@@ -77,12 +76,9 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         operationId = "updateWeightTracker"
     )
     fun update(@Context securityIdentity: SecurityIdentity, @Valid weightTracker: WeightTracker): Uni<Response> {
-        weightTracker.userId = UUID.fromString(securityIdentity.principal.name)
-
         Log.info("Updating weight tracker entry $weightTracker")
 
-
-        return weightTrackerRepository.updateEntry(weightTracker, WeightTracker::class.java)
+        return weightTrackerRepository.updateEntry(LibreUserSecurity.withPrincipal(securityIdentity, weightTracker), WeightTracker::class.java)
             .onItem().transform { updated -> Response.ok(updated).build() }
             .onFailure().recoverWithResponse()
     }
@@ -106,7 +102,6 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     )
     fun delete(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
         Log.info("Delete weight tracker entry with added=$date sequence=$sequence")
-
 
         return weightTrackerRepository.deleteEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }

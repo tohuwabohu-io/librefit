@@ -43,7 +43,7 @@ class TdeeCalculator {
             }
         }
 
-        tdee.tdee = round(tdee.activityLevel.toFloat() * tdee.bmr)
+        tdee.tdee = round(tdee.activityLevel * tdee.bmr)
 
         tdee.deficit = tdee.weeklyDifference.toFloat() / 10 * 7000 / 7
 
@@ -90,7 +90,9 @@ class TdeeCalculator {
             else -> arrayOf(24,29)
         }
 
-        tdee.targetWeight = round(((tdee.targetBmi!![0] + tdee.targetBmi!![1]).toFloat() / 2) * (tdee.height.toFloat() / 100).pow(2))
+        tdee.targetWeight = round(((tdee.targetBmi[0] + tdee.targetBmi[1]).toFloat() / 2) * (tdee.height.toFloat() / 100).pow(2))
+        tdee.targetWeightLower = round(((tdee.targetBmi[0]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
+        tdee.targetWeightUpper = round(((tdee.targetBmi[1]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
 
         tdee.durationDays = when (tdee.calculationGoal) {
             CalculationGoal.GAIN -> {
@@ -141,6 +143,8 @@ data class Tdee(
     var bmiCategory: BmiCategory = BmiCategory.STANDARD_WEIGHT,
     var targetBmi: Array<Int> = arrayOf(),
     var targetWeight: Float = 0f,
+    var targetWeightUpper: Float = 0f,
+    var targetWeightLower: Float = 0f,
     var durationDays: Number = 0
 )
 

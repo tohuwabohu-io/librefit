@@ -1,8 +1,8 @@
 package io.tohuwabohu.crud
 
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.relation.LibreUserRelatedRepository
-import io.tohuwabohu.crud.relation.LibreUserWeakEntity
+import io.tohuwabohu.crud.user.LibreUserRelatedRepository
+import io.tohuwabohu.crud.user.LibreUserWeakEntity
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
