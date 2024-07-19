@@ -23,7 +23,7 @@ class LibreUserRelationTest {
     private lateinit var mockSecurityIdentity: SecurityIdentity
 
     @Test
-    fun testWithPrincipal() {
+    fun `test withPrincipal`() {
         val uuidString = "123e4567-e89b-12d3-a456-426655440000"
         val expectedUserId = UUID.fromString(uuidString)
 
