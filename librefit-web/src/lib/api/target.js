@@ -2,7 +2,7 @@ import { proxyFetch } from '$lib/api/util.js';
 import { api } from '$lib/api/index.js';
 
 /**
- * @param {CalorieTarget} calorieTarget
+ * @param calorieTarget {CalorieTarget}
  * @return {Promise<* | undefined>}
  */
 export const createCalorieTarget = async (calorieTarget) => {
@@ -16,7 +16,7 @@ export const createCalorieTarget = async (calorieTarget) => {
 };
 
 /**
- * @param {WeightTarget} weightTarget
+ * @param weightTarget {WeightTarget}
  * @return {Promise<* | undefined>}
  */
 export const createWeightTarget = async (weightTarget) => {

@@ -124,8 +124,8 @@ export const getFieldError = (errorResponse, fieldName) => {
  */
 export const validateCalorieTarget = (target) => {
 	let endDateValidation = validateEndDate(target.startDate, target.endDate);
-	let targetCaloriesValidation = validateTrackerAmount({ value: target.targetCalories });
-	let maximumCaloriesValidation = validateTrackerAmount({ value: target.maximumCalories });
+	let targetCaloriesValidation = validateTargetAmount({ value: target.targetCalories });
+	let maximumCaloriesValidation = validateTargetAmount({ value: target.maximumCalories });
 
 	if (maximumCaloriesValidation.valid) {
 		maximumCaloriesValidation =
@@ -146,8 +146,8 @@ export const validateCalorieTarget = (target) => {
  */
 export const validateWeightTarget = (target) => {
 	let endDateValidation = validateEndDate(target.startDate, target.endDate);
-	let initialWeightMessage = validateTrackerAmount({ value: target.initialWeight });
-	let targetWeightMessage = validateTrackerAmount({ value: target.targetWeight });
+	let initialWeightMessage = validateTargetAmount({ value: target.initialWeight });
+	let targetWeightMessage = validateTargetAmount({ value: target.targetWeight });
 
 	return {
 		endDate: endDateValidation,
@@ -170,7 +170,7 @@ export const validateEndDate = (startDateStr, endDateStr) => {
 	return { valid: true };
 };
 
-export const validateTrackerAmount = (detail) => {
+export const validateTargetAmount = (detail) => {
 	if (!detail.value || detail.value <= 0) {
 		return {
 			valid: false,

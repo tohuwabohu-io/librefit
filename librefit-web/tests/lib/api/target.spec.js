@@ -3,7 +3,7 @@ import { assert, describe, expect, it, vi } from 'vitest';
 import {
 	validateCalorieTarget,
 	validateEndDate,
-	validateTrackerAmount,
+	validateTargetAmount,
 	validateWeightTarget
 } from '$lib/validation.js';
 
@@ -89,13 +89,13 @@ describe('validateEndDate', () => {
 
 describe('validateTrackerAmount', () => {
 	it('should return valid when detail value is greater than zero', () => {
-		const result = validateTrackerAmount({ value: 10, label: 'Weight' });
+		const result = validateTargetAmount({ value: 10, label: 'Weight' });
 		expect(result.valid).toBeTruthy();
 		expect(result.errorMessage).toBeUndefined();
 	});
 
 	it('should return invalid when detail value is less than or equal to zero', () => {
-		const result = validateTrackerAmount({ value: 0, label: 'Weight' });
+		const result = validateTargetAmount({ value: 0, label: 'Weight' });
 		expect(result.valid).toBeFalsy();
 		assert.strictEqual(result.errorMessage, 'Weight must be greater than zero.');
 	});

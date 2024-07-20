@@ -2,7 +2,7 @@
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
     import {getDateAsStr} from '$lib/date.js';
-    import {validateCalorieTarget, validateTrackerAmount, validateWeightTarget} from '$lib/validation.js';
+    import {validateCalorieTarget, validateTargetAmount, validateWeightTarget} from '$lib/validation.js';
 
     const today = new Date();
 
@@ -116,7 +116,7 @@
                     unit="kg"
                     bind:value={weightTarget.initialWeight}
                     emptyMessage="Please enter a valid initial weight."
-                    validateDetail={validateTrackerAmount}
+                    validateDetail={validateTargetAmount}
                     errorMessage={errors.weightTarget.initialWeight.errorMessage}
             />
 
@@ -128,7 +128,7 @@
                     unit="kg"
                     bind:value={weightTarget.targetWeight}
                     emptyMessage="Please enter a valid target weight."
-                    validateDetail={validateTrackerAmount}
+                    validateDetail={validateTargetAmount}
                     errorMessage={errors.weightTarget.targetWeight.errorMessage}
             />
             {/if}
@@ -142,7 +142,7 @@
                     unit="kcal"
                     bind:value={calorieTarget.targetCalories}
                     emptyMessage="Please enter a valid target amount."
-                    validateDetail={validateTrackerAmount}
+                    validateDetail={validateTargetAmount}
                     errorMessage={errors.calorieTarget.targetCalories.errorMessage}
             />
 
@@ -154,7 +154,7 @@
                     unit="kcal"
                     bind:value={calorieTarget.maximumCalories}
                     emptyMessage="Please enter a valid maximum amount."
-                    validateDetail={validateTrackerAmount}
+                    validateDetail={validateTargetAmount}
                     errorMessage={errors.calorieTarget.maximumCalories.errorMessage}
             />
             {/if}
