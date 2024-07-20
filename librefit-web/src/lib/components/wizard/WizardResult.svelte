@@ -113,33 +113,37 @@
         {/if}
 
         the optimal BMI range of {bmiMin} to {bmiMax}, leaving you
-        {bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label}.
+        <span class="font-bold">
+            {bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label.toLowerCase()}.
+        </span>
+
+        <span class="underline">
+            {#if calculationResult.bmiCategory !== BmiCategory.Standard_weight && calculationResult.bmiCategory !== BmiCategory.Overweight}
+                It is recommended to consult with a healthcare professional.
+            {:else if calculationResult.bmiCategory === BmiCategory.Obese}
+                It is recommended to consult with a healthcare professional.
+            {:else if calculationResult.bmiCategory === BmiCategory.Severely_obese}
+                It is recommended to consult with a healthcare professional.
+            {/if}
+        </span>
+
         Your weight should be around {calculationResult.targetWeight}kg or between
         {calculationResult.targetWeightLower}kg and {calculationResult.targetWeightUpper}kg.
     {/if}
 </p>
 
-{#if calculationResult.bmiCategory === BmiCategory.Standard_weight}
-<p>
-    Being standard weight, you are currently in the optimal weight range.
-</p>
-{:else if calculationResult.bmiCategory === BmiCategory.Underweight}
-<p>
-    You are underweight. First of all, it is recommended to consult with a healthcare professional.
-</p>
+
+{#if calculationResult.bmiCategory === BmiCategory.Underweight}
 <p>
     To reach the lower bound of the optimal weight within your standard weight range
     ({calculationResult.targetWeightLower}kg - {calculationResult.targetWeightUpper}kg), you will need to
     consume calories at a surplus of {calculationResult.deficit}kcal for {calculationResult.durationDaysLower}
     days. Your caloric intake should be around {calculationResult.target}kcal during that time.
 </p>
-{:else}
-<p>
-    You are {bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label.toLowerCase()}.
-    {#if BmiCategory.Obese === calculationResult.bmiCategory || BmiCategory.Severely_obese === calculationResult.bmiCategory }
-        Please consult with a healthcare professional.
-    {/if}
-</p>
+{:else if calculationResult.bmiCategory === BmiCategory.Overweight
+    || calculationResult.bmiCategory === BmiCategory.Obese
+    || calculationResult.bmiCategory === BmiCategory.Severely_obese
+}
 <p>
     To reach the optimal weight within the standard weight range
     ({calculationResult.targetWeightLower}kg - {calculationResult.targetWeightUpper}kg),

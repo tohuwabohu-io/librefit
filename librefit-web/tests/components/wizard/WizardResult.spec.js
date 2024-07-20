@@ -7,34 +7,10 @@ import { bmiCategoriesAsKeyValue } from '$lib/enum.js';
 /**
  * @vitest-environment jsdom
  */
-
 describe('WizardResult.svelte component', () => {
 	afterEach(() => cleanup());
 
-	it('should display "currently in the optimal weight range" for Standard_weight BMI category', async () => {
-		const calculationResult = {
-			bmr: 1500,
-			tdee: 2500,
-			deficit: 500,
-			target: 2000,
-			age: 24,
-			height: 180,
-			weight: 75,
-			bmi: 23,
-			bmiCategory: BmiCategory.Standard_weight,
-			targetWeight: 70,
-			targetWeightLower: 60,
-			targetWeightUpper: 80
-		};
-
-		const { getByText } = render(WizardResult, { props: { calculationResult } });
-
-		expect(
-			getByText(`Being standard weight, you are currently in the optimal weight range.`)
-		).toBeTruthy();
-	});
-
-	it('should display "You are underweight" for Underweight BMI category', async () => {
+	it('should display underweight warning message for Underweight BMI category', async () => {
 		const calculationResult = {
 			bmr: 1500,
 			tdee: 2500,
@@ -44,6 +20,7 @@ describe('WizardResult.svelte component', () => {
 			height: 180,
 			weight: 60,
 			bmi: 18,
+			targetBmi: 23,
 			bmiCategory: BmiCategory.Underweight,
 			targetWeight: 70,
 			targetWeightLower: 65,
@@ -52,14 +29,11 @@ describe('WizardResult.svelte component', () => {
 
 		const { getByText } = render(WizardResult, { props: { calculationResult } });
 
-		expect(
-			getByText(
-				'You are underweight. First of all, it is recommended to consult with a healthcare professional.'
-			)
-		).toBeTruthy();
+		expect(getByText('underweight.')).toBeTruthy();
+		expect(getByText('It is recommended to consult with a healthcare professional.')).toBeTruthy();
 	});
 
-	it('should display "You are Overweight" for Overweight BMI category', async () => {
+	it('should display "overweight." for Overweight BMI category', async () => {
 		const calculationResult = {
 			bmr: 1500,
 			tdee: 2500,
@@ -69,6 +43,7 @@ describe('WizardResult.svelte component', () => {
 			height: 180,
 			weight: 80,
 			bmi: 28,
+			targetBmi: 23,
 			bmiCategory: BmiCategory.Overweight,
 			targetWeight: 70,
 			targetWeightLower: 60,
@@ -77,10 +52,10 @@ describe('WizardResult.svelte component', () => {
 
 		const { getByText } = render(WizardResult, { props: { calculationResult } });
 
-		expect(getByText('You are overweight.')).toBeTruthy();
+		expect(getByText('overweight.')).toBeTruthy();
 	});
 
-	it('should display "You are obese" for Obese BMI category', async () => {
+	it('should display obesity warning message for Obese BMI category', async () => {
 		const calculationResult = {
 			bmr: 1500,
 			tdee: 2500,
@@ -90,6 +65,7 @@ describe('WizardResult.svelte component', () => {
 			height: 180,
 			weight: 90,
 			bmi: 30,
+			targetBmi: 23,
 			bmiCategory: BmiCategory.Obese,
 			targetWeight: 70,
 			targetWeightLower: 60,
@@ -98,10 +74,11 @@ describe('WizardResult.svelte component', () => {
 
 		const { getByText } = render(WizardResult, { props: { calculationResult } });
 
-		expect(getByText('You are obese. Please consult with a healthcare professional.')).toBeTruthy();
+		expect(getByText('obese.')).toBeTruthy();
+		expect(getByText('It is recommended to consult with a healthcare professional.')).toBeTruthy();
 	});
 
-	it('should display "You are severely obese" for Severely_obese BMI category', async () => {
+	it('should display severe obesity warning message for Severely_obese BMI category', async () => {
 		const calculationResult = {
 			bmr: 1500,
 			tdee: 2500,
@@ -111,6 +88,7 @@ describe('WizardResult.svelte component', () => {
 			height: 180,
 			weight: 100,
 			bmi: 35,
+			targetBmi: 23,
 			bmiCategory: BmiCategory.Severely_obese,
 			targetWeight: 70,
 			targetWeightLower: 60,
@@ -119,12 +97,11 @@ describe('WizardResult.svelte component', () => {
 
 		const { getByText } = render(WizardResult, { props: { calculationResult } });
 
-		expect(
-			getByText('You are severely obese. Please consult with a healthcare professional.')
-		).toBeTruthy();
+		expect(getByText('severely obese.')).toBeTruthy();
+		expect(getByText('It is recommended to consult with a healthcare professional.')).toBeTruthy();
 	});
 
-	it('should display correct values in "Your result" table', async () => {
+	it('should display correct values in "Result" table', async () => {
 		const calculationResult = {
 			bmr: 1500,
 			tdee: 2500,
@@ -134,6 +111,7 @@ describe('WizardResult.svelte component', () => {
 			height: 180,
 			weight: 75,
 			bmi: 23,
+			targetBmi: 23,
 			bmiCategory: BmiCategory.Standard_weight,
 			targetWeight: 70,
 			targetWeightLower: 60,
@@ -150,7 +128,7 @@ describe('WizardResult.svelte component', () => {
 		expect(utils.getByText(calculationResult.target.toString()).closest('td')).toBeTruthy();
 	});
 
-	it('should display correct values in "Body parameters" table', async () => {
+	it('should display correct values in "Body parameters" table', () => {
 		const calculationResult = {
 			bmr: 1500,
 			tdee: 2500,
@@ -160,6 +138,7 @@ describe('WizardResult.svelte component', () => {
 			height: 180,
 			weight: 75,
 			bmi: 23,
+			targetBmi: 23,
 			bmiCategory: BmiCategory.Standard_weight,
 			targetWeight: 70,
 			targetWeightLower: 60,
