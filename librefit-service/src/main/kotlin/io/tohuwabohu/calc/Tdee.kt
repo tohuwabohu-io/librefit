@@ -9,9 +9,10 @@ import jakarta.inject.Inject
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import kotlin.math.pow
 import kotlin.math.round
-
 
 @ApplicationScoped
 class TdeeCalculator {
@@ -55,6 +56,8 @@ class TdeeCalculator {
             CalculationGoal.LOSS -> {
                 tdee.tdee.toFloat() - tdee.deficit;
             }
+
+            null -> tdee.tdee as Float
         }
 
         tdee.bmi = round(tdee.weight.toFloat() / ((tdee.height.toFloat() / 100).pow(2)))
@@ -82,30 +85,87 @@ class TdeeCalculator {
         }
 
         tdee.targetBmi = when (tdee.age) {
-            in 19..24 -> arrayOf(19,24)
-            in 25..34 -> arrayOf(20,25)
-            in 35..44 -> arrayOf(21,26)
-            in 45..54 -> arrayOf(22,27)
-            in 55..64 -> arrayOf(23,28)
-            else -> arrayOf(24,29)
+            in 19..24 -> listOf(19,24)
+            in 25..34 -> listOf(20,25)
+            in 35..44 -> listOf(21,26)
+            in 45..54 -> listOf(22,27)
+            in 55..64 -> listOf(23,28)
+            else -> listOf(24,29)
         }
 
         tdee.targetWeight = round(((tdee.targetBmi[0] + tdee.targetBmi[1]).toFloat() / 2) * (tdee.height.toFloat() / 100).pow(2))
         tdee.targetWeightLower = round(((tdee.targetBmi[0]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
         tdee.targetWeightUpper = round(((tdee.targetBmi[1]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
 
-        tdee.durationDays = when (tdee.calculationGoal) {
+        when (tdee.calculationGoal) {
             CalculationGoal.GAIN -> {
-                (tdee.targetWeight - tdee.weight.toFloat()) * 7000 / tdee.deficit
+                tdee.durationDays = (tdee.targetWeight - tdee.weight.toFloat()) * 7000 / tdee.deficit
+                tdee.durationDaysUpper = (tdee.targetWeightUpper - tdee.weight.toFloat()) * 7000 / tdee.deficit
+                tdee.durationDaysLower = (tdee.targetWeightLower - tdee.weight.toFloat()) * 7000 / tdee.deficit
             }
 
             CalculationGoal.LOSS -> {
-                (tdee.weight.toFloat() - tdee.targetWeight) * 7000 / tdee.deficit
+                tdee.durationDays = (tdee.weight.toFloat() - tdee.targetWeight) * 7000 / tdee.deficit
+                tdee.durationDaysUpper = (tdee.weight.toFloat() - tdee.targetWeightUpper) * 7000 / tdee.deficit
+                tdee.durationDaysLower = (tdee.weight.toFloat() - tdee.targetWeightLower) * 7000 / tdee.deficit
+            }
+
+            null -> {
+                tdee.durationDays = 0
+                tdee.durationDaysLower = 0
+                tdee.durationDaysUpper = 0
             }
         }
 
+        tdee.recommendation = when (tdee.bmiCategory) {
+            BmiCategory.STANDARD_WEIGHT -> WizardRecommendation.HOLD
+            BmiCategory.UNDERWEIGHT -> WizardRecommendation.GAIN
+            BmiCategory.OVERWEIGHT -> WizardRecommendation.LOSE
+            BmiCategory.OBESE -> WizardRecommendation.LOSE
+            BmiCategory.SEVERELY_OBESE -> WizardRecommendation.LOSE
+        }
 
         return Uni.createFrom().item(tdee)
+    }
+
+    fun calculateForTargetDate(weight: Float, targetDate: LocalDate): Uni<WizardCustomization> {
+        val today = LocalDate.now()
+
+        val daysBetween = ChronoUnit.DAYS.between(today, targetDate)
+
+        val targetWeightPerRate = mapOf(
+            Pair(100, weight + (daysBetween * 100 / 7000)),
+            Pair(200, weight + (daysBetween * 200 / 7000)),
+            Pair(300, weight + (daysBetween * 300 / 7000)),
+            Pair(400, weight + (daysBetween * 400 / 7000)),
+            Pair(500, weight + (daysBetween * 500 / 7000)),
+            Pair(600, weight + (daysBetween * 600 / 7000)),
+            Pair(700, weight + (daysBetween * 700 / 7000)),
+        )
+        
+        return Uni.createFrom().item(WizardCustomization(null, targetWeight = targetWeightPerRate))
+    }
+
+    fun calculateForTargetWeight(age: Int, height: Int, weight: Int, targetWeight: Int): Uni<WizardCustomization> {
+        val today = LocalDate.now()
+
+        val difference = (if (targetWeight > weight) {
+            targetWeight - weight
+        } else {
+            weight - targetWeight
+        }).toDouble()
+
+        val durationDaysPerRate: Map<Int, LocalDate> = mapOf(
+            Pair(100, today.plusDays(Math.round(difference * 7000 / 100))),
+            Pair(200, today.plusDays(Math.round(difference * 7000 / 200))),
+            Pair(300, today.plusDays(Math.round(difference * 7000 / 300))),
+            Pair(400, today.plusDays(Math.round(difference * 7000 / 400))),
+            Pair(500, today.plusDays(Math.round(difference * 7000 / 500))),
+            Pair(600, today.plusDays(Math.round(difference * 7000 / 600))),
+            Pair(700, today.plusDays(Math.round(difference * 7000 / 700))),
+        )
+
+        return Uni.createFrom().item(WizardCustomization(durationDaysPerRate, null))
     }
 }
 
@@ -134,18 +194,26 @@ data class Tdee(
     @field:Min(value = 0, message = "Your weekly difference must be between 0 and 0.7kg.")
     @field:Max(value = 7, message = "Your weekly difference must be between 0 and 0.7kg.")
     val weeklyDifference: Number,
-    val calculationGoal: CalculationGoal,
+    val calculationGoal: CalculationGoal?,
     var bmr: Float = 0f,
     var tdee: Number = 0,
     var deficit: Float = 0f,
     var target: Float = 0f,
     var bmi: Float = 0f,
     var bmiCategory: BmiCategory = BmiCategory.STANDARD_WEIGHT,
-    var targetBmi: Array<Int> = arrayOf(),
+    var recommendation: WizardRecommendation = WizardRecommendation.HOLD,
+    var targetBmi: List<Int> = listOf(),
     var targetWeight: Float = 0f,
     var targetWeightUpper: Float = 0f,
     var targetWeightLower: Float = 0f,
-    var durationDays: Number = 0
+    var durationDays: Number = 0,
+    var durationDaysUpper: Number = 0,
+    var durationDaysLower: Number = 0
+)
+
+data class WizardCustomization (
+    var targetDate: Map<Int, LocalDate>?,
+    var targetWeight: Map<Int, Float>?
 )
 
 enum class CalculationGoal {
@@ -164,4 +232,10 @@ enum class BmiCategory {
     OVERWEIGHT,
     OBESE,
     SEVERELY_OBESE,
+}
+
+enum class WizardRecommendation {
+    HOLD,
+    LOSE,
+    GAIN
 }
