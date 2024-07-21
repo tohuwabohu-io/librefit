@@ -33,70 +33,81 @@ class TdeeCalculator {
 
     fun calculate(tdee: Tdee): Uni<Tdee> {
         validate(tdee)
+        tdee.bmr = calculateBmr(tdee)
+        tdee.tdee = calculateTdee(tdee)
+        tdee.deficit = calculateDeficit(tdee)
+        tdee.target = calculateTarget(tdee)
+        tdee.bmi = calculateBmi(tdee)
+        tdee.bmiCategory = calculateBmiCategory(tdee)
+        tdee.targetBmi = calculateTargetBmi(tdee)
+        tdee.targetWeight = calculateTargetWeight(tdee)
+        tdee.targetWeightLower = calculateTargetWeightLower(tdee)
+        tdee.targetWeightUpper = calculateTargetWeightUpper(tdee)
+        tdee.recommendation = calculateRecommendation(tdee)
 
-        tdee.bmr = when (tdee.sex) {
-            CalculationSex.MALE -> {
-                round(66 + (13.7 * tdee.weight.toFloat()) + (5 * tdee.height.toFloat()) - (6.8 * tdee.age.toFloat())).toFloat()
-            }
+        calculateDurationDays(tdee)
 
-            CalculationSex.FEMALE -> {
-                round(655 + (9.6 * tdee.weight.toFloat()) + (1.8 * tdee.height.toFloat()) - (4.7 * tdee.age.toFloat())).toFloat()
-            }
-        }
+        return Uni.createFrom().item(tdee)
+    }
 
-        tdee.tdee = round(tdee.activityLevel * tdee.bmr)
+    internal fun calculateBmr(tdee: Tdee): Float = when (tdee.sex) {
+        CalculationSex.MALE -> round(66 + (13.7 * tdee.weight.toFloat()) + (5 * tdee.height.toFloat()) - (6.8 * tdee.age.toFloat())).toFloat()
+        CalculationSex.FEMALE -> round(655 + (9.6 * tdee.weight.toFloat()) + (1.8 * tdee.height.toFloat()) - (4.7 * tdee.age.toFloat())).toFloat()
+    }
 
-        tdee.deficit = tdee.weeklyDifference.toFloat() / 10 * 7000 / 7
+    internal fun calculateTdee(tdee: Tdee) = round(tdee.activityLevel * tdee.bmr)
 
-        tdee.target = when (tdee.calculationGoal) {
-            CalculationGoal.GAIN -> {
-                tdee.tdee.toFloat() + tdee.deficit
-            }
+    internal fun calculateDeficit(tdee: Tdee) = tdee.weeklyDifference.toFloat() / 10 * 7000 / 7
 
-            CalculationGoal.LOSS -> {
-                tdee.tdee.toFloat() - tdee.deficit;
-            }
+    internal fun calculateTarget(tdee: Tdee): Float = when (tdee.calculationGoal) {
+        CalculationGoal.GAIN -> tdee.tdee.toFloat() + tdee.deficit
+        CalculationGoal.LOSS -> tdee.tdee.toFloat() - tdee.deficit;
+        null -> tdee.tdee as Float
+    }
 
-            null -> tdee.tdee as Float
-        }
+    internal fun calculateBmi(tdee: Tdee) = round(tdee.weight.toFloat() / ((tdee.height.toFloat() / 100).pow(2)))
 
-        tdee.bmi = round(tdee.weight.toFloat() / ((tdee.height.toFloat() / 100).pow(2)))
-
-        tdee.bmiCategory  = when (tdee.sex) {
-            CalculationSex.FEMALE -> {
-                when (tdee.bmi) {
-                    in 0f..18f -> BmiCategory.UNDERWEIGHT
-                    in 19f..24f -> BmiCategory.STANDARD_WEIGHT
-                    in 25f..30f -> BmiCategory.OVERWEIGHT
-                    in 31f..40f -> BmiCategory.OBESE
-                    else -> BmiCategory.SEVERELY_OBESE
-                }
-            }
-
-            CalculationSex.MALE -> {
-                when (tdee.bmi) {
-                    in 0f..19f -> BmiCategory.UNDERWEIGHT
-                    in 20f..25f -> BmiCategory.STANDARD_WEIGHT
-                    in 26f..30f -> BmiCategory.OVERWEIGHT
-                    in 31f..40f -> BmiCategory.OBESE
-                    else -> BmiCategory.SEVERELY_OBESE
-                }
+    internal fun calculateBmiCategory(tdee: Tdee): BmiCategory = when (tdee.sex) {
+        CalculationSex.FEMALE -> {
+            when (tdee.bmi) {
+                in 0f..18f -> BmiCategory.UNDERWEIGHT
+                in 19f..24f -> BmiCategory.STANDARD_WEIGHT
+                in 25f..30f -> BmiCategory.OVERWEIGHT
+                in 31f..40f -> BmiCategory.OBESE
+                else -> BmiCategory.SEVERELY_OBESE
             }
         }
 
-        tdee.targetBmi = when (tdee.age) {
-            in 19..24 -> listOf(19,24)
-            in 25..34 -> listOf(20,25)
-            in 35..44 -> listOf(21,26)
-            in 45..54 -> listOf(22,27)
-            in 55..64 -> listOf(23,28)
-            else -> listOf(24,29)
+        CalculationSex.MALE -> {
+            when (tdee.bmi) {
+                in 0f..19f -> BmiCategory.UNDERWEIGHT
+                in 20f..25f -> BmiCategory.STANDARD_WEIGHT
+                in 26f..30f -> BmiCategory.OVERWEIGHT
+                in 31f..40f -> BmiCategory.OBESE
+                else -> BmiCategory.SEVERELY_OBESE
+            }
         }
+    }
 
-        tdee.targetWeight = round(((tdee.targetBmi[0] + tdee.targetBmi[1]).toFloat() / 2) * (tdee.height.toFloat() / 100).pow(2))
-        tdee.targetWeightLower = round(((tdee.targetBmi[0]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
-        tdee.targetWeightUpper = round(((tdee.targetBmi[1]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
+    internal fun calculateTargetBmi(tdee: Tdee): List<Int> = when (tdee.age) {
+        in 19..24 -> listOf(19, 24)
+        in 25..34 -> listOf(20, 25)
+        in 35..44 -> listOf(21, 26)
+        in 45..54 -> listOf(22, 27)
+        in 55..64 -> listOf(23, 28)
+        else -> listOf(24, 29)
+    }
 
+    internal fun calculateTargetWeight(tdee: Tdee) =
+        round(((tdee.targetBmi[0] + tdee.targetBmi[1]).toFloat() / 2) * (tdee.height.toFloat() / 100).pow(2))
+
+    internal fun calculateTargetWeightLower(tdee: Tdee) =
+        round(((tdee.targetBmi[0]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
+
+    internal fun calculateTargetWeightUpper(tdee: Tdee) =
+        round(((tdee.targetBmi[1]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
+
+    internal fun calculateDurationDays(tdee: Tdee) {
         when (tdee.calculationGoal) {
             CalculationGoal.GAIN -> {
                 tdee.durationDays = (tdee.targetWeight - tdee.weight.toFloat()) * 7000 / tdee.deficit
@@ -116,16 +127,14 @@ class TdeeCalculator {
                 tdee.durationDaysUpper = 0
             }
         }
+    }
 
-        tdee.recommendation = when (tdee.bmiCategory) {
-            BmiCategory.STANDARD_WEIGHT -> WizardRecommendation.HOLD
-            BmiCategory.UNDERWEIGHT -> WizardRecommendation.GAIN
-            BmiCategory.OVERWEIGHT -> WizardRecommendation.LOSE
-            BmiCategory.OBESE -> WizardRecommendation.LOSE
-            BmiCategory.SEVERELY_OBESE -> WizardRecommendation.LOSE
-        }
-
-        return Uni.createFrom().item(tdee)
+    internal fun calculateRecommendation(tdee: Tdee): WizardRecommendation = when (tdee.bmiCategory) {
+        BmiCategory.STANDARD_WEIGHT -> WizardRecommendation.HOLD
+        BmiCategory.UNDERWEIGHT -> WizardRecommendation.GAIN
+        BmiCategory.OVERWEIGHT -> WizardRecommendation.LOSE
+        BmiCategory.OBESE -> WizardRecommendation.LOSE
+        BmiCategory.SEVERELY_OBESE -> WizardRecommendation.LOSE
     }
 
     fun calculateForTargetDate(weight: Float, targetDate: LocalDate): Uni<WizardCustomization> {
