@@ -19,8 +19,8 @@ class TdeeCalculator {
     @Inject
     private lateinit var validator: Validator
 
-    fun validate(tdee: Tdee) {
-        val violations = validator.validate(tdee)
+    fun validate(wizardInput: WizardInput) {
+        val violations = validator.validate(wizardInput)
 
         if (violations.isNotEmpty()) {
             val errors = violations.map { violation ->
@@ -31,23 +31,26 @@ class TdeeCalculator {
         }
     }
 
-    fun calculate(tdee: Tdee): Uni<Tdee> {
-        validate(tdee)
-        tdee.bmr = calculateBmr(tdee.sex, tdee.weight.toFloat(), tdee.height.toFloat(), tdee.age.toFloat())
-        tdee.tdee = calculateTdee(tdee.activityLevel, tdee.bmr)
-        tdee.deficit = calculateDeficit(tdee.weeklyDifference.toFloat())
-        tdee.target = calculateTarget(tdee.calculationGoal, tdee.tdee, tdee.deficit)
-        tdee.bmi = calculateBmi(tdee.weight, tdee.height)
-        tdee.bmiCategory = calculateBmiCategory(tdee.sex, tdee.bmi)
-        tdee.targetBmi = calculateTargetBmi(tdee.age)
-        tdee.targetWeight = calculateTargetWeight(tdee.targetBmi, tdee.height.toFloat())
-        tdee.targetWeightLower = calculateTargetWeightLower(tdee.targetBmi, tdee.height.toFloat())
-        tdee.targetWeightUpper = calculateTargetWeightUpper(tdee.targetBmi, tdee.height.toFloat())
-        tdee.recommendation = calculateRecommendation(tdee.bmiCategory)
+    fun calculate(wizardInput: WizardInput): Uni<WizardResult> {
+        validate(wizardInput)
+        
+        val wizardResult = WizardResult()
 
-        calculateDurationDays(tdee)
+        wizardResult.bmr = calculateBmr(wizardInput.sex, wizardInput.weight.toFloat(), wizardInput.height.toFloat(), wizardInput.age.toFloat())
+        wizardResult.tdee = calculateTdee(wizardInput.activityLevel, wizardResult.bmr)
+        wizardResult.deficit = calculateDeficit(wizardInput.weeklyDifference.toFloat())
+        wizardResult.target = calculateTarget(wizardInput.calculationGoal, wizardResult.tdee, wizardResult.deficit)
+        wizardResult.bmi = calculateBmi(wizardInput.weight, wizardInput.height)
+        wizardResult.bmiCategory = calculateBmiCategory(wizardInput.sex, wizardResult.bmi)
+        wizardResult.targetBmi = calculateTargetBmi(wizardInput.age)
+        wizardResult.targetWeight = calculateTargetWeight(wizardResult.targetBmi, wizardInput.height.toFloat())
+        wizardResult.targetWeightLower = calculateTargetWeightLower(wizardResult.targetBmi, wizardInput.height.toFloat())
+        wizardResult.targetWeightUpper = calculateTargetWeightUpper(wizardResult.targetBmi, wizardInput.height.toFloat())
+        wizardResult.recommendation = calculateRecommendation(wizardResult.bmiCategory)
 
-        return Uni.createFrom().item(tdee)
+        calculateDurationDays(wizardInput, wizardResult)
+
+        return Uni.createFrom().item(wizardResult)
     }
 
     internal fun calculateBmr(sex: CalculationSex, weight: Float, height: Float, age: Float): Float = when (sex) {
@@ -107,24 +110,24 @@ class TdeeCalculator {
     internal fun calculateTargetWeightUpper(targetBmi: List<Int>, height: Float) =
         round(((targetBmi[1]).toFloat()) * (height / 100).pow(2))
 
-    internal fun calculateDurationDays(tdee: Tdee) {
-        when (tdee.calculationGoal) {
+    internal fun calculateDurationDays(wizardInput: WizardInput, wizardResult: WizardResult) {
+        when (wizardInput.calculationGoal) {
             CalculationGoal.GAIN -> {
-                tdee.durationDays = (tdee.targetWeight - tdee.weight.toFloat()) * 7000 / tdee.deficit
-                tdee.durationDaysUpper = (tdee.targetWeightUpper - tdee.weight.toFloat()) * 7000 / tdee.deficit
-                tdee.durationDaysLower = (tdee.targetWeightLower - tdee.weight.toFloat()) * 7000 / tdee.deficit
+                wizardResult.durationDays = (wizardResult.targetWeight - wizardInput.weight.toFloat()) * 7000 / wizardResult.deficit
+                wizardResult.durationDaysUpper = (wizardResult.targetWeightUpper - wizardInput.weight.toFloat()) * 7000 / wizardResult.deficit
+                wizardResult.durationDaysLower = (wizardResult.targetWeightLower - wizardInput.weight.toFloat()) * 7000 / wizardResult.deficit
             }
 
             CalculationGoal.LOSS -> {
-                tdee.durationDays = (tdee.weight.toFloat() - tdee.targetWeight) * 7000 / tdee.deficit
-                tdee.durationDaysUpper = (tdee.weight.toFloat() - tdee.targetWeightUpper) * 7000 / tdee.deficit
-                tdee.durationDaysLower = (tdee.weight.toFloat() - tdee.targetWeightLower) * 7000 / tdee.deficit
+                wizardResult.durationDays = (wizardInput.weight.toFloat() - wizardResult.targetWeight) * 7000 / wizardResult.deficit
+                wizardResult.durationDaysUpper = (wizardInput.weight.toFloat() - wizardResult.targetWeightUpper) * 7000 / wizardResult.deficit
+                wizardResult.durationDaysLower = (wizardInput.weight.toFloat() - wizardResult.targetWeightLower) * 7000 / wizardResult.deficit
             }
 
             null -> {
-                tdee.durationDays = 0
-                tdee.durationDaysLower = 0
-                tdee.durationDaysUpper = 0
+                wizardResult.durationDays = 0
+                wizardResult.durationDaysLower = 0
+                wizardResult.durationDaysUpper = 0
             }
         }
     }
@@ -207,7 +210,7 @@ class TdeeCalculator {
  * Calculation of basic metabolic rate (BMR) and total daily energy expenditure (TDEE) based on the Harris-Benedict
  * formula.
  */
-data class Tdee(
+data class WizardInput(
     @field:Min(value = 18, message = "Your age must be between 18 and 99 years.")
     @field:Max(value = 99, message = "Your age must be between 18 and 99 years.")
     val age: Number,
@@ -229,6 +232,9 @@ data class Tdee(
     @field:Max(value = 7, message = "Your weekly difference must be between 0 and 0.7kg.")
     val weeklyDifference: Number,
     val calculationGoal: CalculationGoal?,
+)
+
+data class WizardResult (
     var bmr: Float = 0f,
     var tdee: Number = 0,
     var deficit: Float = 0f,
