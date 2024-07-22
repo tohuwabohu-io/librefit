@@ -7,11 +7,16 @@ import io.quarkus.test.vertx.UniAsserter
 import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
-import io.tohuwabohu.calc.*
+import io.tohuwabohu.calc.BmiCategory
+import io.tohuwabohu.calc.CalculationGoal
+import io.tohuwabohu.calc.CalculationSex
+import io.tohuwabohu.calc.Tdee
+import io.tohuwabohu.calc.TdeeCalculator
 import jakarta.inject.Inject
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 @QuarkusTest
 @TestHTTPEndpoint(TdeeResource::class)
@@ -19,6 +24,8 @@ class TdeeResourceTest {
 
     @Inject
     private lateinit var tdeeCalculator: TdeeCalculator
+
+    private val calculationStartDate = LocalDate.of(2024, 5, 1)
 
     @Test
     fun `should calculate weight loss for men`() {
@@ -337,4 +344,121 @@ class TdeeResourceTest {
             { result -> Assertions.assertEquals(BmiCategory.SEVERELY_OBESE, result.bmiCategory)}
         )
     }
+
+    @Test
+    @RunOnVertxContext
+    fun `should warn for underweight target`(uniAsserter: UniAsserter) {
+        uniAsserter.assertThat(
+            { tdeeCalculator.calculateForTargetWeight(calculationStartDate, 30, 170, 60, CalculationSex.MALE, 50) },
+            { result ->
+                Assertions.assertEquals(BmiCategory.UNDERWEIGHT, result.targetClassification)
+                Assertions.assertEquals(true, result.warning)
+                Assertions.assertEquals("Your target weight will classify you as underweight. You should revisit your choice.", result.message)
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should warn for obese target`(uniAsserter: UniAsserter) {
+        uniAsserter.assertThat(
+            { tdeeCalculator.calculateForTargetWeight(calculationStartDate, 30, 170, 60, CalculationSex.MALE, 110) },
+            { result ->
+                Assertions.assertEquals(BmiCategory.OBESE, result.targetClassification)
+                Assertions.assertEquals(true, result.warning)
+                Assertions.assertEquals("Your target weight will classify you as obese. You should revisit your choice.", result.message)
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should warn for severely obese target`(uniAsserter: UniAsserter) {
+        uniAsserter.assertThat(
+            { tdeeCalculator.calculateForTargetWeight(calculationStartDate, 30, 170, 60, CalculationSex.MALE, 150) },
+            { result ->
+                Assertions.assertEquals(BmiCategory.SEVERELY_OBESE, result.targetClassification)
+                Assertions.assertEquals(true, result.warning)
+                Assertions.assertEquals("Your target weight will classify you as severely obese. You should revisit your choice.", result.message)
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should calculate weight loss duration`(uniAsserter: UniAsserter) {
+        val expected = mapOf(
+            100 to 1190,
+            200 to 595,
+            300 to 397,
+            400 to 298,
+            500 to 238,
+            600 to 198,
+            700 to 170
+        )
+
+        uniAsserter.assertThat(
+            { tdeeCalculator.calculateForTargetWeight(calculationStartDate, 30, 170, 100, CalculationSex.MALE, 83) },
+            { result ->
+                Assertions.assertEquals(BmiCategory.OVERWEIGHT, result.targetClassification)
+                Assertions.assertEquals(false, result.warning)
+                Assertions.assertEquals("", result.message)
+
+                expected.forEach { (rate, differenceDays) -> Assertions.assertEquals(calculationStartDate.plusDays(differenceDays.toLong()), result.datePerRate[rate]) }
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should calculate weight gain duration`(uniAsserter: UniAsserter) {
+        val expected = mapOf(
+            100 to 350,
+            200 to 175,
+            300 to 117,
+            400 to 88,
+            500 to 70,
+            600 to 58,
+            700 to 50
+        )
+
+        uniAsserter.assertThat(
+            { tdeeCalculator.calculateForTargetWeight(calculationStartDate,30, 155, 45, CalculationSex.FEMALE, 50) },
+            { result ->
+                Assertions.assertEquals(BmiCategory.STANDARD_WEIGHT, result.targetClassification)
+                Assertions.assertEquals(false, result.warning)
+                Assertions.assertEquals("", result.message)
+
+                expected.forEach { (rate, differenceDays) -> Assertions.assertEquals(calculationStartDate.plusDays(differenceDays.toLong()), result.datePerRate[rate]) }
+            }
+        )
+    }
+/*
+    @Test
+    @RunOnVertxContext
+    fun `should calculate target weight on a specific date for different rates`(uniAsserter: UniAsserter) {
+        val weight = 70f // Adjust initial weight if needed
+        val targetDate = LocalDate.now().plusDays(180)
+
+        val expectedWeights = mapOf( // Define the expected weights for each deficit
+            100 to 63.0,
+            200 to Math.round(75.14),
+            300 to 49.0,
+            400 to 42.0,
+            500 to 35.0,
+            600 to 28.0,
+            700 to 21.0
+        )
+
+        uniAsserter.assertThat(
+            { tdeeCalculator.calculateForTargetDate(weight, targetDate)},
+            { result ->
+                for ((kcal, expectedWeight) in expectedWeights) {
+                    val actualWeight = result.targetWeight!![kcal]
+                    Assertions.assertEquals(expectedWeight, actualWeight?.toDouble(),
+                        "Failed for kcal = $kcal, expected $expectedWeight but got $actualWeight.")
+                }
+            }
+        )
+    }*/
 }

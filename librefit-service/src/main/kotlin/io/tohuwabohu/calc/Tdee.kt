@@ -33,43 +33,43 @@ class TdeeCalculator {
 
     fun calculate(tdee: Tdee): Uni<Tdee> {
         validate(tdee)
-        tdee.bmr = calculateBmr(tdee)
-        tdee.tdee = calculateTdee(tdee)
-        tdee.deficit = calculateDeficit(tdee)
-        tdee.target = calculateTarget(tdee)
-        tdee.bmi = calculateBmi(tdee)
-        tdee.bmiCategory = calculateBmiCategory(tdee)
-        tdee.targetBmi = calculateTargetBmi(tdee)
-        tdee.targetWeight = calculateTargetWeight(tdee)
-        tdee.targetWeightLower = calculateTargetWeightLower(tdee)
-        tdee.targetWeightUpper = calculateTargetWeightUpper(tdee)
-        tdee.recommendation = calculateRecommendation(tdee)
+        tdee.bmr = calculateBmr(tdee.sex, tdee.weight.toFloat(), tdee.height.toFloat(), tdee.age.toFloat())
+        tdee.tdee = calculateTdee(tdee.activityLevel, tdee.bmr)
+        tdee.deficit = calculateDeficit(tdee.weeklyDifference.toFloat())
+        tdee.target = calculateTarget(tdee.calculationGoal, tdee.tdee, tdee.deficit)
+        tdee.bmi = calculateBmi(tdee.weight, tdee.height)
+        tdee.bmiCategory = calculateBmiCategory(tdee.sex, tdee.bmi)
+        tdee.targetBmi = calculateTargetBmi(tdee.age)
+        tdee.targetWeight = calculateTargetWeight(tdee.targetBmi, tdee.height.toFloat())
+        tdee.targetWeightLower = calculateTargetWeightLower(tdee.targetBmi, tdee.height.toFloat())
+        tdee.targetWeightUpper = calculateTargetWeightUpper(tdee.targetBmi, tdee.height.toFloat())
+        tdee.recommendation = calculateRecommendation(tdee.bmiCategory)
 
         calculateDurationDays(tdee)
 
         return Uni.createFrom().item(tdee)
     }
 
-    internal fun calculateBmr(tdee: Tdee): Float = when (tdee.sex) {
-        CalculationSex.MALE -> round(66 + (13.7 * tdee.weight.toFloat()) + (5 * tdee.height.toFloat()) - (6.8 * tdee.age.toFloat())).toFloat()
-        CalculationSex.FEMALE -> round(655 + (9.6 * tdee.weight.toFloat()) + (1.8 * tdee.height.toFloat()) - (4.7 * tdee.age.toFloat())).toFloat()
+    internal fun calculateBmr(sex: CalculationSex, weight: Float, height: Float, age: Float): Float = when (sex) {
+        CalculationSex.MALE -> round(66 + (13.7 * weight) + (5 * height) - (6.8 * age)).toFloat()
+        CalculationSex.FEMALE -> round(655 + (9.6 * weight) + (1.8 * height) - (4.7 * age)).toFloat()
     }
 
-    internal fun calculateTdee(tdee: Tdee) = round(tdee.activityLevel * tdee.bmr)
+    internal fun calculateTdee(activityLevel: Float, bmr: Float) = round(activityLevel * bmr)
 
-    internal fun calculateDeficit(tdee: Tdee) = tdee.weeklyDifference.toFloat() / 10 * 7000 / 7
+    internal fun calculateDeficit(weeklyDifference: Float) = weeklyDifference / 10 * 7000 / 7
 
-    internal fun calculateTarget(tdee: Tdee): Float = when (tdee.calculationGoal) {
-        CalculationGoal.GAIN -> tdee.tdee.toFloat() + tdee.deficit
-        CalculationGoal.LOSS -> tdee.tdee.toFloat() - tdee.deficit;
-        null -> tdee.tdee as Float
+    internal fun calculateTarget(calculationGoal: CalculationGoal?, tdee: Number, deficit: Float): Float = when (calculationGoal) {
+        CalculationGoal.GAIN -> tdee.toFloat() + deficit
+        CalculationGoal.LOSS -> tdee.toFloat() - deficit;
+        null -> tdee as Float
     }
 
-    internal fun calculateBmi(tdee: Tdee) = round(tdee.weight.toFloat() / ((tdee.height.toFloat() / 100).pow(2)))
+    internal fun calculateBmi(weight: Number, height: Number) = round(weight.toFloat() / ((height.toFloat() / 100).pow(2)))
 
-    internal fun calculateBmiCategory(tdee: Tdee): BmiCategory = when (tdee.sex) {
+    internal fun calculateBmiCategory(sex: CalculationSex, bmi: Float): BmiCategory = when (sex) {
         CalculationSex.FEMALE -> {
-            when (tdee.bmi) {
+            when (bmi) {
                 in 0f..18f -> BmiCategory.UNDERWEIGHT
                 in 19f..24f -> BmiCategory.STANDARD_WEIGHT
                 in 25f..30f -> BmiCategory.OVERWEIGHT
@@ -79,7 +79,7 @@ class TdeeCalculator {
         }
 
         CalculationSex.MALE -> {
-            when (tdee.bmi) {
+            when (bmi) {
                 in 0f..19f -> BmiCategory.UNDERWEIGHT
                 in 20f..25f -> BmiCategory.STANDARD_WEIGHT
                 in 26f..30f -> BmiCategory.OVERWEIGHT
@@ -89,7 +89,7 @@ class TdeeCalculator {
         }
     }
 
-    internal fun calculateTargetBmi(tdee: Tdee): List<Int> = when (tdee.age) {
+    internal fun calculateTargetBmi(age: Number): List<Int> = when (age) {
         in 19..24 -> listOf(19, 24)
         in 25..34 -> listOf(20, 25)
         in 35..44 -> listOf(21, 26)
@@ -98,14 +98,14 @@ class TdeeCalculator {
         else -> listOf(24, 29)
     }
 
-    internal fun calculateTargetWeight(tdee: Tdee) =
-        round(((tdee.targetBmi[0] + tdee.targetBmi[1]).toFloat() / 2) * (tdee.height.toFloat() / 100).pow(2))
+    internal fun calculateTargetWeight(targetBmi: List<Int>, height: Float) =
+        round(((targetBmi[0] + targetBmi[1]).toFloat() / 2) * (height / 100).pow(2))
 
-    internal fun calculateTargetWeightLower(tdee: Tdee) =
-        round(((tdee.targetBmi[0]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
+    internal fun calculateTargetWeightLower(targetBmi: List<Int>, height: Float) =
+        round(((targetBmi[0]).toFloat()) * (height / 100).pow(2))
 
-    internal fun calculateTargetWeightUpper(tdee: Tdee) =
-        round(((tdee.targetBmi[1]).toFloat()) * (tdee.height.toFloat() / 100).pow(2))
+    internal fun calculateTargetWeightUpper(targetBmi: List<Int>, height: Float) =
+        round(((targetBmi[1]).toFloat()) * (height / 100).pow(2))
 
     internal fun calculateDurationDays(tdee: Tdee) {
         when (tdee.calculationGoal) {
@@ -129,7 +129,7 @@ class TdeeCalculator {
         }
     }
 
-    internal fun calculateRecommendation(tdee: Tdee): WizardRecommendation = when (tdee.bmiCategory) {
+    internal fun calculateRecommendation(bmiCategory: BmiCategory): WizardRecommendation = when (bmiCategory) {
         BmiCategory.STANDARD_WEIGHT -> WizardRecommendation.HOLD
         BmiCategory.UNDERWEIGHT -> WizardRecommendation.GAIN
         BmiCategory.OVERWEIGHT -> WizardRecommendation.LOSE
@@ -137,44 +137,69 @@ class TdeeCalculator {
         BmiCategory.SEVERELY_OBESE -> WizardRecommendation.LOSE
     }
 
-    fun calculateForTargetDate(weight: Float, targetDate: LocalDate): Uni<WizardCustomization> {
+    fun calculateForTargetDate(age: Int, height: Int, currentWeight: Float, sex: CalculationSex, targetDate: LocalDate): Uni<WizardTargetDate> {
         val today = LocalDate.now()
 
         val daysBetween = ChronoUnit.DAYS.between(today, targetDate)
 
-        val targetWeightPerRate = mapOf(
-            Pair(100, weight + (daysBetween * 100 / 7000)),
-            Pair(200, weight + (daysBetween * 200 / 7000)),
-            Pair(300, weight + (daysBetween * 300 / 7000)),
-            Pair(400, weight + (daysBetween * 400 / 7000)),
-            Pair(500, weight + (daysBetween * 500 / 7000)),
-            Pair(600, weight + (daysBetween * 600 / 7000)),
-            Pair(700, weight + (daysBetween * 700 / 7000)),
-        )
-        
-        return Uni.createFrom().item(WizardCustomization(null, targetWeight = targetWeightPerRate))
+        val currentBmi = calculateBmi(currentWeight, height)
+        val currentClassification = calculateBmiCategory(sex, currentBmi);
+
+        val warning = false
+        val message = ""
+
+        val rates: List<Int> = listOf(100, 200, 300, 400, 500, 600, 700)
+        val targetWeightPerRate: Map<Int, Float> = rates.associateWith { currentWeight + (daysBetween * it) / 700 }
+
+        return Uni.createFrom().item(WizardTargetDate(targetWeightPerRate, warning, message))
     }
 
-    fun calculateForTargetWeight(age: Int, height: Int, weight: Int, targetWeight: Int): Uni<WizardCustomization> {
-        val today = LocalDate.now()
+    fun calculateForTargetWeight(startDate: LocalDate, age: Int, height: Int, currentWeight: Int, sex: CalculationSex, targetWeight: Int): Uni<WizardTargetWeight> {
+        val currentBmi = calculateBmi(currentWeight, height)
+        val targetWeightBmi = calculateBmi(targetWeight, height)
 
-        val difference = (if (targetWeight > weight) {
-            targetWeight - weight
+        val currentClassification = calculateBmiCategory(sex, currentBmi);
+        val targetClassification = calculateBmiCategory(sex, targetWeightBmi)
+
+        val difference = (if (targetWeight > currentWeight) {
+            targetWeight - currentWeight
         } else {
-            weight - targetWeight
+            currentWeight - targetWeight
         }).toDouble()
 
-        val durationDaysPerRate: Map<Int, LocalDate> = mapOf(
-            Pair(100, today.plusDays(Math.round(difference * 7000 / 100))),
-            Pair(200, today.plusDays(Math.round(difference * 7000 / 200))),
-            Pair(300, today.plusDays(Math.round(difference * 7000 / 300))),
-            Pair(400, today.plusDays(Math.round(difference * 7000 / 400))),
-            Pair(500, today.plusDays(Math.round(difference * 7000 / 500))),
-            Pair(600, today.plusDays(Math.round(difference * 7000 / 600))),
-            Pair(700, today.plusDays(Math.round(difference * 7000 / 700))),
-        )
+        val warning = targetClassification == BmiCategory.UNDERWEIGHT || targetClassification == BmiCategory.OBESE || targetClassification == BmiCategory.SEVERELY_OBESE
+        var message = ""
 
-        return Uni.createFrom().item(WizardCustomization(durationDaysPerRate, null))
+        if (targetClassification == BmiCategory.UNDERWEIGHT) {
+            if (targetWeight < currentWeight) {
+                message = if (currentClassification == BmiCategory.UNDERWEIGHT) {
+                    "Your target weight is even lower that your current weight. Considering that you are currently underweight, I cannot recommend you to proceed."
+                } else {
+                    "Your target weight will classify you as underweight. You should revisit your choice."
+                }
+            }
+        } else if (targetClassification == BmiCategory.OBESE) {
+            if (targetWeight > currentWeight) {
+                message = if (currentClassification == BmiCategory.OBESE) {
+                    "Your target weight is even higher that your current weight. Considering that you are currently obese, I cannot recommend you to proceed."
+                } else {
+                    "Your target weight will classify you as obese. You should revisit your choice."
+                }
+            }
+        } else if (targetClassification == BmiCategory.SEVERELY_OBESE) {
+            if (targetWeight > currentWeight) {
+                message = if(currentClassification == BmiCategory.SEVERELY_OBESE) {
+                    "Your target weight is even higher that your current weight. Considering that you are currently severely obese, I cannot recommend you to proceed."
+                } else {
+                    "Your target weight will classify you as severely obese. You should revisit your choice."
+                }
+            }
+        }
+
+        val rates: List<Int> = listOf(100, 200, 300, 400, 500, 600, 700)
+        val datePerRate: Map<Int, LocalDate> = rates.associateWith { startDate.plusDays(Math.round(difference * 7000 / it)) }
+
+        return Uni.createFrom().item(WizardTargetWeight(datePerRate, targetClassification, warning, message))
     }
 }
 
@@ -220,9 +245,17 @@ data class Tdee(
     var durationDaysLower: Number = 0
 )
 
-data class WizardCustomization (
-    var targetDate: Map<Int, LocalDate>?,
-    var targetWeight: Map<Int, Float>?
+data class WizardTargetWeight (
+    var datePerRate: Map<Int, LocalDate>,
+    var targetClassification: BmiCategory,
+    val warning: Boolean,
+    val message: String
+)
+
+data class WizardTargetDate (
+    var targetWeightPerRate: Map<Int, Float>,
+    val warning: Boolean,
+    val message: String
 )
 
 enum class CalculationGoal {
