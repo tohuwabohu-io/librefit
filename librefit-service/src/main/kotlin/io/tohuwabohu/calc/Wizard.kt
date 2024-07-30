@@ -15,7 +15,7 @@ import kotlin.math.pow
 import kotlin.math.round
 
 @ApplicationScoped
-class TdeeCalculator {
+class Wizard {
     @Inject
     private lateinit var validator: Validator
 
@@ -92,23 +92,23 @@ class TdeeCalculator {
         }
     }
 
-    internal fun calculateTargetBmi(age: Number): List<Int> = when (age) {
-        in 19..24 -> listOf(19, 24)
-        in 25..34 -> listOf(20, 25)
-        in 35..44 -> listOf(21, 26)
-        in 45..54 -> listOf(22, 27)
-        in 55..64 -> listOf(23, 28)
-        else -> listOf(24, 29)
+    internal fun calculateTargetBmi(age: Number): IntRange = when (age) {
+        in 19..24 -> 19..24
+        in 25..34 -> 20..25
+        in 35..44 -> 21..26
+        in 45..54 -> 22..27
+        in 55..64 -> 23..28
+        else -> 24..29
     }
 
-    internal fun calculateTargetWeight(targetBmi: List<Int>, height: Float) =
-        round(((targetBmi[0] + targetBmi[1]).toFloat() / 2) * (height / 100).pow(2))
+    internal fun calculateTargetWeight(targetBmi: IntRange, height: Float) =
+        round(((targetBmi.first + targetBmi.last).toFloat() / 2) * (height / 100).pow(2))
 
-    internal fun calculateTargetWeightLower(targetBmi: List<Int>, height: Float) =
-        round(((targetBmi[0]).toFloat()) * (height / 100).pow(2))
+    internal fun calculateTargetWeightLower(targetBmi: IntRange, height: Float) =
+        round(((targetBmi.first).toFloat()) * (height / 100).pow(2))
 
-    internal fun calculateTargetWeightUpper(targetBmi: List<Int>, height: Float) =
-        round(((targetBmi[1]).toFloat()) * (height / 100).pow(2))
+    internal fun calculateTargetWeightUpper(targetBmi: IntRange, height: Float) =
+        round(((targetBmi.first).toFloat()) * (height / 100).pow(2))
 
     internal fun calculateDurationDays(wizardInput: WizardInput, wizardResult: WizardResult) {
         when (wizardInput.calculationGoal) {
@@ -140,24 +140,51 @@ class TdeeCalculator {
         BmiCategory.SEVERELY_OBESE -> WizardRecommendation.LOSE
     }
 
-    fun calculateForTargetDate(age: Int, height: Int, currentWeight: Float, sex: CalculationSex, targetDate: LocalDate): Uni<WizardTargetDate> {
+    fun calculateForTargetDate(age: Int, height: Int, currentWeight: Float, sex: CalculationSex, targetDate: LocalDate, calculationGoal: CalculationGoal): Uni<WizardTargetDateResult> {
         val today = LocalDate.now()
 
         val daysBetween = ChronoUnit.DAYS.between(today, targetDate)
 
         val currentBmi = calculateBmi(currentWeight, height)
-        val currentClassification = calculateBmiCategory(sex, currentBmi);
-
-        val warning = false
-        val message = ""
+        val currentClassification = calculateBmiCategory(sex, currentBmi)
 
         val rates: List<Int> = listOf(100, 200, 300, 400, 500, 600, 700)
-        val targetWeightPerRate: Map<Int, Float> = rates.associateWith { currentWeight + (daysBetween * it) / 700 }
+        val multiplier = if (calculationGoal === CalculationGoal.LOSS) -1 else 1
 
-        return Uni.createFrom().item(WizardTargetDate(targetWeightPerRate, warning, message))
+        val resultByRate: Map<Int, WizardResult> = rates.associateWith {
+            val weight = (currentWeight + Math.round((multiplier * (daysBetween * it) / 7000).toDouble()))
+
+            val result = WizardResult()
+            result.bmi = calculateBmi(weight, height)
+            result.bmiCategory = calculateBmiCategory(sex, result.bmi)
+            result.targetWeight = weight
+
+            result
+        }
+
+        val obeseList = listOf(BmiCategory.OBESE, BmiCategory.SEVERELY_OBESE)
+
+        /**
+         * filter non-recommendable results:
+         * - weight loss should not lead to an underweight BMI
+         * - weight gain should not lead to an obese or severally obese BMI
+         * - no weight gain option current BMI is of obese or severally obese category
+         */
+        return Uni.createFrom().item(WizardTargetDateResult(
+            resultByRate.filter { (_, result) ->
+                when (calculationGoal) {
+                    CalculationGoal.LOSS -> {
+                        result.bmiCategory != BmiCategory.UNDERWEIGHT
+                    }
+                    else -> {
+                        !obeseList.contains(result.bmiCategory) || obeseList.contains(currentClassification)
+                    }
+                }
+            }
+        ))
     }
 
-    fun calculateForTargetWeight(startDate: LocalDate, age: Int, height: Int, currentWeight: Int, sex: CalculationSex, targetWeight: Int): Uni<WizardTargetWeight> {
+    fun calculateForTargetWeight(startDate: LocalDate, age: Int, height: Int, currentWeight: Int, sex: CalculationSex, targetWeight: Int): Uni<WizardTargetWeightResult> {
         val currentBmi = calculateBmi(currentWeight, height)
         val targetWeightBmi = calculateBmi(targetWeight, height)
 
@@ -202,7 +229,7 @@ class TdeeCalculator {
         val rates: List<Int> = listOf(100, 200, 300, 400, 500, 600, 700)
         val datePerRate: Map<Int, LocalDate> = rates.associateWith { startDate.plusDays(Math.round(difference * 7000 / it)) }
 
-        return Uni.createFrom().item(WizardTargetWeight(datePerRate, targetClassification, warning, message))
+        return Uni.createFrom().item(WizardTargetWeightResult(datePerRate, targetClassification, warning, message))
     }
 }
 
@@ -242,7 +269,7 @@ data class WizardResult (
     var bmi: Float = 0f,
     var bmiCategory: BmiCategory = BmiCategory.STANDARD_WEIGHT,
     var recommendation: WizardRecommendation = WizardRecommendation.HOLD,
-    var targetBmi: List<Int> = listOf(),
+    var targetBmi: IntRange = 20..24,
     var targetWeight: Float = 0f,
     var targetWeightUpper: Float = 0f,
     var targetWeightLower: Float = 0f,
@@ -251,17 +278,15 @@ data class WizardResult (
     var durationDaysLower: Number = 0
 )
 
-data class WizardTargetWeight (
+data class WizardTargetWeightResult (
     var datePerRate: Map<Int, LocalDate>,
     var targetClassification: BmiCategory,
     val warning: Boolean,
     val message: String
 )
 
-data class WizardTargetDate (
-    var targetWeightPerRate: Map<Int, Float>,
-    val warning: Boolean,
-    val message: String
+data class WizardTargetDateResult (
+    var resultByRate: Map<Int, WizardResult>,
 )
 
 enum class CalculationGoal {

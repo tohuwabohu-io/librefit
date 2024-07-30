@@ -53,8 +53,8 @@ class WizardResourceTest {
         Assertions.assertEquals(wizardResult.bmi, 28f)
         Assertions.assertEquals(wizardResult.tdee, 2992.0)
         Assertions.assertEquals(wizardResult.bmiCategory, BmiCategory.OVERWEIGHT)
-        Assertions.assertEquals(wizardResult.targetBmi[0], 20)
-        Assertions.assertEquals(wizardResult.targetBmi[1], 25)
+        Assertions.assertEquals(wizardResult.targetBmi.first, 20)
+        Assertions.assertEquals(wizardResult.targetBmi.last, 25)
         Assertions.assertEquals(wizardResult.targetWeight, 73f)
         Assertions.assertEquals(wizardResult.target, 2492f)
         Assertions.assertEquals(wizardResult.durationDays, 238.0)
@@ -85,8 +85,8 @@ class WizardResourceTest {
         Assertions.assertEquals(wizardResult.bmi, 22f)
         Assertions.assertEquals(wizardResult.tdee, 1645.0)
         Assertions.assertEquals(wizardResult.bmiCategory, BmiCategory.STANDARD_WEIGHT)
-        Assertions.assertEquals(wizardResult.targetBmi[0], 20)
-        Assertions.assertEquals(wizardResult.targetBmi[1], 25)
+        Assertions.assertEquals(wizardResult.targetBmi.first, 20)
+        Assertions.assertEquals(wizardResult.targetBmi.last, 25)
         Assertions.assertEquals(wizardResult.targetWeight, 54f)
         Assertions.assertEquals(wizardResult.target, 1745f)
         Assertions.assertEquals(wizardResult.durationDays, 140.0)
@@ -434,32 +434,108 @@ class WizardResourceTest {
             }
         )
     }
-/*
+
     @Test
     @RunOnVertxContext
-    fun `should calculate target weight on a specific date for different rates`(uniAsserter: UniAsserter) {
-        val weight = 70f // Adjust initial weight if needed
-        val targetDate = LocalDate.now().plusDays(180)
+    fun `should calculate target weights for specific weight loss goal`(uniAsserter: UniAsserter) {
+        val targetDate = LocalDate.now().plusDays(250) // suppose we set the target date 250 days later
+        val rates = listOf(100, 200, 300, 400, 500)
 
-        val expectedWeights = mapOf( // Define the expected weights for each deficit
-            100 to 63.0,
-            200 to Math.round(75.14),
-            300 to 49.0,
-            400 to 42.0,
-            500 to 35.0,
-            600 to 28.0,
-            700 to 21.0
+        val expectedWeightByRate = mapOf(
+            100 to 82f,
+            200 to 78f,
+            300 to 75f,
+            400 to 71f,
+            500 to 68f
+        )
+
+        val expectedBmiByRate = mapOf(
+            100 to 28f,
+            200 to 27f,
+            300 to 26f,
+            400 to 25f,
+            500 to 24f
         )
 
         uniAsserter.assertThat(
-            { tdeeCalculator.calculateForTargetDate(weight, targetDate)},
+            { wizard.calculateForTargetDate(30, 170, 85f, CalculationSex.MALE, targetDate, CalculationGoal.LOSS) },
             { result ->
-                for ((kcal, expectedWeight) in expectedWeights) {
-                    val actualWeight = result.targetWeight!![kcal]
-                    Assertions.assertEquals(expectedWeight, actualWeight?.toDouble(),
-                        "Failed for kcal = $kcal, expected $expectedWeight but got $actualWeight.")
+                rates.forEach { rate ->
+                    val resultForRate = result.resultByRate[rate]!!
+
+                    Assertions.assertEquals(expectedWeightByRate[rate], resultForRate.targetWeight)
+                    Assertions.assertEquals(expectedBmiByRate[rate], resultForRate.bmi)
                 }
             }
         )
-    }*/
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should calculate target weights for specific weight gain goal`(uniAsserter: UniAsserter) {
+        val targetDate = LocalDate.now().plusDays(150) // suppose we set the target date 150 days later
+        val rates = listOf(100, 200, 300, 400, 500)
+
+        val expectedWeightByRate = mapOf(
+            100 to 47f,
+            200 to 49f,
+            300 to 51f,
+            400 to 53f,
+            500 to 55f,
+            600 to 57f,
+            700 to 59f
+        )
+
+        val expectedBmiByRate = mapOf(
+            100 to 20f,
+            200 to 20f,
+            300 to 21f,
+            400 to 22f,
+            500 to 23f,
+            600 to 24f,
+            700 to 25f
+        )
+
+        uniAsserter.assertThat(
+            { wizard.calculateForTargetDate(30, 155, 45f, CalculationSex.FEMALE, targetDate, CalculationGoal.GAIN) },
+            { result ->
+                rates.forEach { rate ->
+                    val resultForRate = result.resultByRate[rate]!!
+
+                    Assertions.assertEquals(expectedWeightByRate[rate], resultForRate.targetWeight)
+                    Assertions.assertEquals(expectedBmiByRate[rate], resultForRate.bmi)
+                }
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should filter non-recommendable results for weight loss goal`(uniAsserter: UniAsserter) {
+        val targetDate = LocalDate.now().plusDays(300) // suppose we set the target date 300 days later
+
+        uniAsserter.assertThat(
+            { wizard.calculateForTargetDate(30, 170, 60f, CalculationSex.MALE, targetDate, CalculationGoal.LOSS) },
+            { result ->
+                result.resultByRate.values.forEach { ratedResult ->
+                    Assertions.assertNotEquals(BmiCategory.UNDERWEIGHT, ratedResult.bmiCategory)
+                }
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should filter non-recommendable results for weight gain goal`(uniAsserter: UniAsserter) {
+        val targetDate = LocalDate.now().plusDays(300) // suppose we set the target date 300 days later
+
+        uniAsserter.assertThat(
+            { wizard.calculateForTargetDate(30, 155, 45f, CalculationSex.FEMALE, targetDate, CalculationGoal.GAIN) },
+            { result ->
+                result.resultByRate.values.forEach { ratedResult ->
+                    Assertions.assertTrue(ratedResult.bmiCategory != BmiCategory.OBESE && ratedResult.bmiCategory != BmiCategory.SEVERELY_OBESE)
+                }
+            }
+        )
+    }
 }

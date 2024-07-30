@@ -5,7 +5,7 @@ import io.tohuwabohu.calc.CalculationGoal
 import io.tohuwabohu.calc.CalculationSex
 import io.tohuwabohu.calc.Wizard
 import io.tohuwabohu.calc.WizardInput
-import io.tohuwabohu.calc.WizardTargetDate
+import io.tohuwabohu.calc.WizardTargetDateResult
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.ws.rs.GET
@@ -63,7 +63,7 @@ class WizardResource(private val calculator: Wizard) {
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WizardTargetDate::class)
+                schema = Schema(implementation = WizardTargetDateResult::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [
@@ -83,7 +83,7 @@ class WizardResource(private val calculator: Wizard) {
         targetDate: LocalDate,
         calculationGoal: CalculationGoal
     ): Uni<Response> {
-        return calculator.calculateForTargetDate(age, height, weight.toFloat(), sex, targetDate)
+        return calculator.calculateForTargetDate(age, height, weight.toFloat(), sex, targetDate, calculationGoal)
             .onItem().transform { result -> Response.ok(result).build() }
             .onFailure().recoverWithResponse()
     }
@@ -95,7 +95,7 @@ class WizardResource(private val calculator: Wizard) {
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WizardTargetDate::class)
+                schema = Schema(implementation = WizardTargetDateResult::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [
