@@ -13,6 +13,10 @@ import io.tohuwabohu.calc.CalculationSex
 import io.tohuwabohu.calc.Wizard
 import io.tohuwabohu.calc.WizardInput
 import io.tohuwabohu.calc.WizardResult
+import io.tohuwabohu.calc.WizardTargetDateInput
+import io.tohuwabohu.calc.WizardTargetDateResult
+import io.tohuwabohu.calc.WizardTargetWeightInput
+import io.tohuwabohu.calc.WizardTargetWeightResult
 import jakarta.inject.Inject
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
@@ -48,16 +52,18 @@ class WizardResourceTest {
             body().`as`(WizardResult::class.java)
         }
 
-        Assertions.assertEquals(wizardResult.bmr, 1995f)
-        Assertions.assertEquals(wizardResult.deficit, 500f)
-        Assertions.assertEquals(wizardResult.bmi, 28f)
-        Assertions.assertEquals(wizardResult.tdee, 2992.0)
-        Assertions.assertEquals(wizardResult.bmiCategory, BmiCategory.OVERWEIGHT)
-        Assertions.assertEquals(wizardResult.targetBmi.first, 20)
-        Assertions.assertEquals(wizardResult.targetBmi.last, 25)
-        Assertions.assertEquals(wizardResult.targetWeight, 73f)
-        Assertions.assertEquals(wizardResult.target, 2492f)
-        Assertions.assertEquals(wizardResult.durationDays, 238.0)
+        Assertions.assertEquals(1995f, wizardResult.bmr)
+        Assertions.assertEquals(500f, wizardResult.deficit)
+        Assertions.assertEquals(28f, wizardResult.bmi)
+        Assertions.assertEquals(2992.0, wizardResult.tdee)
+        Assertions.assertEquals(BmiCategory.OVERWEIGHT, wizardResult.bmiCategory)
+        Assertions.assertEquals(20, wizardResult.targetBmiLower)
+        Assertions.assertEquals(25, wizardResult.targetBmiUpper)
+        Assertions.assertEquals(65f, wizardResult.targetWeightLower)
+        Assertions.assertEquals(81f, wizardResult.targetWeightUpper)
+        Assertions.assertEquals(73f, wizardResult.targetWeight)
+        Assertions.assertEquals(2492f, wizardResult.target)
+        Assertions.assertEquals(238.0, wizardResult.durationDays)
     }
 
     @Test
@@ -80,16 +86,19 @@ class WizardResourceTest {
             body().`as`(WizardResult::class.java)
         }
 
-        Assertions.assertEquals(wizardResult.bmr, 1316f)
-        Assertions.assertEquals(wizardResult.deficit, 100f)
-        Assertions.assertEquals(wizardResult.bmi, 22f)
-        Assertions.assertEquals(wizardResult.tdee, 1645.0)
-        Assertions.assertEquals(wizardResult.bmiCategory, BmiCategory.STANDARD_WEIGHT)
-        Assertions.assertEquals(wizardResult.targetBmi.first, 20)
-        Assertions.assertEquals(wizardResult.targetBmi.last, 25)
-        Assertions.assertEquals(wizardResult.targetWeight, 54f)
-        Assertions.assertEquals(wizardResult.target, 1745f)
-        Assertions.assertEquals(wizardResult.durationDays, 140.0)
+        Assertions.assertEquals(1316f, wizardResult.bmr)
+        Assertions.assertEquals(100f, wizardResult.deficit)
+        Assertions.assertEquals(22f, wizardResult.bmi)
+        Assertions.assertEquals(1645.0, wizardResult.tdee)
+        Assertions.assertEquals(BmiCategory.STANDARD_WEIGHT, wizardResult.bmiCategory)
+        Assertions.assertEquals(20, wizardResult.targetBmiLower)
+        Assertions.assertEquals(25, wizardResult.targetBmiUpper)
+        Assertions.assertEquals(22, wizardResult.targetBmi)
+        Assertions.assertEquals(48f, wizardResult.targetWeightLower)
+        Assertions.assertEquals(60f, wizardResult.targetWeightUpper)
+        Assertions.assertEquals(54f, wizardResult.targetWeight)
+        Assertions.assertEquals(1745f, wizardResult.target)
+        Assertions.assertEquals(140.0, wizardResult.durationDays)
     }
 
     @Test
@@ -247,6 +256,46 @@ class WizardResourceTest {
     }
 
     @Test
+    fun `should calculate for target date`() {
+        val targetDate = LocalDate.now().plusDays(150)
+
+        val wizardResult: WizardTargetDateResult = When {
+            get("/custom/date/30/180/90/MALE/${targetDate}/LOSS")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(WizardTargetDateResult::class.java)
+        }
+
+        Assertions.assertNotNull(wizardResult.resultByRate)
+        Assertions.assertFalse(wizardResult.resultByRate.isEmpty())
+    }
+
+    @Test
+    fun `should calculate for target weight`() {
+        val wizardResult: WizardTargetWeightResult = When {
+            get("/custom/weight/30/180/90/MALE/80")
+        } Then {
+            statusCode(200)
+        } Extract {
+            body().`as`(WizardTargetWeightResult::class.java)
+        }
+
+        Assertions.assertNotNull(wizardResult.datePerRate)
+        Assertions.assertFalse(wizardResult.datePerRate.isEmpty())
+    }
+
+    @Test
+    fun `should fail with invalid target weight`() {
+        When {
+            get("/custom/weight/30/180/90/MALE/400") // invalid because it is larger than maximum weight
+        } Then {
+            statusCode(400)
+            body("errors[0].field", Matchers.equalTo("targetWeight"))
+        }
+    }
+
+    @Test
     @RunOnVertxContext
     fun `should calculate and return underweight, obese and severely obese for men`(uniAsserter: UniAsserter) {
         val underweight1 = WizardInput(
@@ -350,7 +399,16 @@ class WizardResourceTest {
     @RunOnVertxContext
     fun `should warn for underweight target`(uniAsserter: UniAsserter) {
         uniAsserter.assertThat(
-            { wizard.calculateForTargetWeight(calculationStartDate, 30, 170, 60, CalculationSex.MALE, 50) },
+            { wizard.calculateForTargetWeight(
+                WizardTargetWeightInput(
+                    age = 30,
+                    sex = CalculationSex.MALE,
+                    currentWeight = 60f,
+                    height = 170,
+                    targetWeight = 50f,
+                    startDate = calculationStartDate
+                ))
+            },
             { result ->
                 Assertions.assertEquals(BmiCategory.UNDERWEIGHT, result.targetClassification)
                 Assertions.assertEquals(true, result.warning)
@@ -363,7 +421,16 @@ class WizardResourceTest {
     @RunOnVertxContext
     fun `should warn for obese target`(uniAsserter: UniAsserter) {
         uniAsserter.assertThat(
-            { wizard.calculateForTargetWeight(calculationStartDate, 30, 170, 60, CalculationSex.MALE, 110) },
+            { wizard.calculateForTargetWeight(
+                WizardTargetWeightInput(
+                    age = 30,
+                    sex = CalculationSex.MALE,
+                    currentWeight = 60f,
+                    height = 170,
+                    targetWeight = 110f,
+                    startDate = calculationStartDate
+                )
+            ) },
             { result ->
                 Assertions.assertEquals(BmiCategory.OBESE, result.targetClassification)
                 Assertions.assertEquals(true, result.warning)
@@ -376,7 +443,16 @@ class WizardResourceTest {
     @RunOnVertxContext
     fun `should warn for severely obese target`(uniAsserter: UniAsserter) {
         uniAsserter.assertThat(
-            { wizard.calculateForTargetWeight(calculationStartDate, 30, 170, 60, CalculationSex.MALE, 150) },
+            { wizard.calculateForTargetWeight(
+                WizardTargetWeightInput(
+                    age = 30,
+                    sex = CalculationSex.MALE,
+                    currentWeight = 60f,
+                    height = 170,
+                    targetWeight = 150f,
+                    startDate = calculationStartDate
+                )
+            ) },
             { result ->
                 Assertions.assertEquals(BmiCategory.SEVERELY_OBESE, result.targetClassification)
                 Assertions.assertEquals(true, result.warning)
@@ -399,7 +475,16 @@ class WizardResourceTest {
         )
 
         uniAsserter.assertThat(
-            { wizard.calculateForTargetWeight(calculationStartDate, 30, 170, 100, CalculationSex.MALE, 83) },
+            { wizard.calculateForTargetWeight(
+                WizardTargetWeightInput(
+                    age = 30,
+                    sex = CalculationSex.MALE,
+                    currentWeight = 100f,
+                    height = 170,
+                    targetWeight = 83f,
+                    startDate = calculationStartDate
+                )
+            ) },
             { result ->
                 Assertions.assertEquals(BmiCategory.OVERWEIGHT, result.targetClassification)
                 Assertions.assertEquals(false, result.warning)
@@ -424,7 +509,16 @@ class WizardResourceTest {
         )
 
         uniAsserter.assertThat(
-            { wizard.calculateForTargetWeight(calculationStartDate,30, 155, 45, CalculationSex.FEMALE, 50) },
+            { wizard.calculateForTargetWeight(
+                WizardTargetWeightInput(
+                    age = 30,
+                    sex = CalculationSex.FEMALE,
+                    currentWeight = 50f,
+                    height = 155,
+                    targetWeight = 45f,
+                    startDate = calculationStartDate
+                )
+            ) },
             { result ->
                 Assertions.assertEquals(BmiCategory.STANDARD_WEIGHT, result.targetClassification)
                 Assertions.assertEquals(false, result.warning)
@@ -458,7 +552,14 @@ class WizardResourceTest {
         )
 
         uniAsserter.assertThat(
-            { wizard.calculateForTargetDate(30, 170, 85f, CalculationSex.MALE, targetDate, CalculationGoal.LOSS) },
+            { wizard.calculateForTargetDate(WizardTargetDateInput(
+                age = 30,
+                height = 170,
+                currentWeight = 85f,
+                sex = CalculationSex.MALE,
+                targetDate = targetDate,
+                calculationGoal = CalculationGoal.LOSS)
+            ) },
             { result ->
                 rates.forEach { rate ->
                     val resultForRate = result.resultByRate[rate]!!
@@ -497,7 +598,13 @@ class WizardResourceTest {
         )
 
         uniAsserter.assertThat(
-            { wizard.calculateForTargetDate(30, 155, 45f, CalculationSex.FEMALE, targetDate, CalculationGoal.GAIN) },
+            { wizard.calculateForTargetDate(WizardTargetDateInput(
+                age = 30,
+                height = 155,
+                currentWeight = 45f,
+                sex = CalculationSex.FEMALE,
+                targetDate = targetDate,
+                calculationGoal = CalculationGoal.GAIN)) },
             { result ->
                 rates.forEach { rate ->
                     val resultForRate = result.resultByRate[rate]!!
@@ -515,7 +622,16 @@ class WizardResourceTest {
         val targetDate = LocalDate.now().plusDays(300) // suppose we set the target date 300 days later
 
         uniAsserter.assertThat(
-            { wizard.calculateForTargetDate(30, 170, 60f, CalculationSex.MALE, targetDate, CalculationGoal.LOSS) },
+            { wizard.calculateForTargetDate(
+                WizardTargetDateInput(
+                    age = 30,
+                    height = 170,
+                    currentWeight = 60f,
+                    sex = CalculationSex.MALE,
+                    targetDate = targetDate,
+                    calculationGoal = CalculationGoal.LOSS
+                ))
+            },
             { result ->
                 result.resultByRate.values.forEach { ratedResult ->
                     Assertions.assertNotEquals(BmiCategory.UNDERWEIGHT, ratedResult.bmiCategory)
@@ -530,7 +646,14 @@ class WizardResourceTest {
         val targetDate = LocalDate.now().plusDays(300) // suppose we set the target date 300 days later
 
         uniAsserter.assertThat(
-            { wizard.calculateForTargetDate(30, 155, 45f, CalculationSex.FEMALE, targetDate, CalculationGoal.GAIN) },
+            { wizard.calculateForTargetDate(WizardTargetDateInput(
+                age = 30,
+                height = 155,
+                currentWeight = 45f,
+                sex = CalculationSex.FEMALE,
+                targetDate = targetDate,
+                calculationGoal = CalculationGoal.GAIN
+            )) },
             { result ->
                 result.resultByRate.values.forEach { ratedResult ->
                     Assertions.assertTrue(ratedResult.bmiCategory != BmiCategory.OBESE && ratedResult.bmiCategory != BmiCategory.SEVERELY_OBESE)

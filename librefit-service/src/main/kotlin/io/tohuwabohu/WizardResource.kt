@@ -5,7 +5,9 @@ import io.tohuwabohu.calc.CalculationGoal
 import io.tohuwabohu.calc.CalculationSex
 import io.tohuwabohu.calc.Wizard
 import io.tohuwabohu.calc.WizardInput
+import io.tohuwabohu.calc.WizardTargetDateInput
 import io.tohuwabohu.calc.WizardTargetDateResult
+import io.tohuwabohu.calc.WizardTargetWeightInput
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.ws.rs.GET
@@ -83,7 +85,7 @@ class WizardResource(private val calculator: Wizard) {
         targetDate: LocalDate,
         calculationGoal: CalculationGoal
     ): Uni<Response> {
-        return calculator.calculateForTargetDate(age, height, weight.toFloat(), sex, targetDate, calculationGoal)
+        return calculator.calculateForTargetDate(WizardTargetDateInput(age, sex, weight, height, calculationGoal, targetDate))
             .onItem().transform { result -> Response.ok(result).build() }
             .onFailure().recoverWithResponse()
     }
@@ -114,7 +116,7 @@ class WizardResource(private val calculator: Wizard) {
         sex: CalculationSex,
         targetWeight: Int
     ): Uni<Response> {
-        return calculator.calculateForTargetWeight(LocalDate.now(), age, height, weight, sex, targetWeight)
+        return calculator.calculateForTargetWeight(WizardTargetWeightInput(age, sex, weight.toFloat(), height, targetWeight.toFloat(), LocalDate.now()))
             .onItem().transform { result -> Response.ok(result).build() }
             .onFailure().recoverWithResponse()
     }

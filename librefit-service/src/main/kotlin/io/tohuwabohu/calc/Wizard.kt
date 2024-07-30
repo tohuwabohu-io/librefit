@@ -9,6 +9,7 @@ import jakarta.inject.Inject
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import kotlin.math.pow
@@ -31,10 +32,40 @@ class Wizard {
         }
     }
 
+    fun validate(wizardTargetWeightInput: WizardTargetWeightInput) {
+        val violations = validator.validate(wizardTargetWeightInput)
+
+        if (violations.isNotEmpty()) {
+            val errors = violations.map { violation ->
+                ErrorDescription(violation.propertyPath.filterNotNull()[0].name, violation.message)
+            }
+
+            throw ValidationError(errors)
+        }
+    }
+
+    fun validate(wizardTargetDateInput: WizardTargetDateInput) {
+        val violations = validator.validate(wizardTargetDateInput)
+
+        if (violations.isNotEmpty()) {
+            val errors = violations.map { violation ->
+                ErrorDescription(violation.propertyPath.filterNotNull()[0].name, violation.message)
+            }
+
+            throw ValidationError(errors)
+        }
+    }
+
+    /**
+     * Calculation of basic metabolic rate (BMR) and total daily energy expenditure (TDEE) based on the Harris-Benedict
+     * formula.
+     */
     fun calculate(wizardInput: WizardInput): Uni<WizardResult> {
         validate(wizardInput)
         
         val wizardResult = WizardResult()
+
+        val targetBmiRange = calculateTargetBmi(wizardInput.age)
 
         wizardResult.bmr = calculateBmr(wizardInput.sex, wizardInput.weight.toFloat(), wizardInput.height.toFloat(), wizardInput.age.toFloat())
         wizardResult.tdee = calculateTdee(wizardInput.activityLevel, wizardResult.bmr)
@@ -42,13 +73,15 @@ class Wizard {
         wizardResult.target = calculateTarget(wizardInput.calculationGoal, wizardResult.tdee, wizardResult.deficit)
         wizardResult.bmi = calculateBmi(wizardInput.weight, wizardInput.height)
         wizardResult.bmiCategory = calculateBmiCategory(wizardInput.sex, wizardResult.bmi)
-        wizardResult.targetBmi = calculateTargetBmi(wizardInput.age)
-        wizardResult.targetWeight = calculateTargetWeight(wizardResult.targetBmi, wizardInput.height.toFloat())
-        wizardResult.targetWeightLower = calculateTargetWeightLower(wizardResult.targetBmi, wizardInput.height.toFloat())
-        wizardResult.targetWeightUpper = calculateTargetWeightUpper(wizardResult.targetBmi, wizardInput.height.toFloat())
+        wizardResult.targetBmi = (targetBmiRange.first + targetBmiRange.last) / 2
+        wizardResult.targetBmiLower = targetBmiRange.first
+        wizardResult.targetBmiUpper = targetBmiRange.last
+        wizardResult.targetWeight = calculateTargetWeight(targetBmiRange, wizardInput.height.toFloat())
+        wizardResult.targetWeightLower = calculateTargetWeightLower(targetBmiRange, wizardInput.height.toFloat())
+        wizardResult.targetWeightUpper = calculateTargetWeightUpper(targetBmiRange, wizardInput.height.toFloat())
         wizardResult.recommendation = calculateRecommendation(wizardResult.bmiCategory)
 
-        calculateDurationDays(wizardInput, wizardResult)
+        calculateDurationDaysTotal(wizardInput, wizardResult)
 
         return Uni.createFrom().item(wizardResult)
     }
@@ -108,20 +141,20 @@ class Wizard {
         round(((targetBmi.first).toFloat()) * (height / 100).pow(2))
 
     internal fun calculateTargetWeightUpper(targetBmi: IntRange, height: Float) =
-        round(((targetBmi.first).toFloat()) * (height / 100).pow(2))
+        round(((targetBmi.last).toFloat()) * (height / 100).pow(2))
 
-    internal fun calculateDurationDays(wizardInput: WizardInput, wizardResult: WizardResult) {
+    internal fun calculateDurationDaysTotal(wizardInput: WizardInput, wizardResult: WizardResult) {
         when (wizardInput.calculationGoal) {
             CalculationGoal.GAIN -> {
-                wizardResult.durationDays = (wizardResult.targetWeight - wizardInput.weight.toFloat()) * 7000 / wizardResult.deficit
-                wizardResult.durationDaysUpper = (wizardResult.targetWeightUpper - wizardInput.weight.toFloat()) * 7000 / wizardResult.deficit
-                wizardResult.durationDaysLower = (wizardResult.targetWeightLower - wizardInput.weight.toFloat()) * 7000 / wizardResult.deficit
+                wizardResult.durationDays = calculateDurationDays(wizardResult.targetWeight, wizardInput.weight.toFloat(), wizardResult.deficit)
+                wizardResult.durationDaysUpper = calculateDurationDays(wizardResult.targetWeightUpper, wizardInput.weight.toFloat(), wizardResult.deficit)
+                wizardResult.durationDaysLower = calculateDurationDays(wizardResult.targetWeightLower, wizardInput.weight.toFloat(), wizardResult.deficit)
             }
 
             CalculationGoal.LOSS -> {
-                wizardResult.durationDays = (wizardInput.weight.toFloat() - wizardResult.targetWeight) * 7000 / wizardResult.deficit
-                wizardResult.durationDaysUpper = (wizardInput.weight.toFloat() - wizardResult.targetWeightUpper) * 7000 / wizardResult.deficit
-                wizardResult.durationDaysLower = (wizardInput.weight.toFloat() - wizardResult.targetWeightLower) * 7000 / wizardResult.deficit
+                wizardResult.durationDays = calculateDurationDays(wizardInput.weight.toFloat(), wizardResult.targetWeight, wizardResult.deficit)
+                wizardResult.durationDaysUpper = calculateDurationDays(wizardInput.weight.toFloat(), wizardResult.targetWeightUpper, wizardResult.deficit)
+                wizardResult.durationDaysLower = calculateDurationDays(wizardInput.weight.toFloat(), wizardResult.targetWeightLower, wizardResult.deficit)
             }
 
             null -> {
@@ -132,6 +165,8 @@ class Wizard {
         }
     }
 
+    internal fun calculateDurationDays(weight: Float, targetWeight: Float, deficit: Float) = ((weight - targetWeight) * 7000) / deficit
+
     internal fun calculateRecommendation(bmiCategory: BmiCategory): WizardRecommendation = when (bmiCategory) {
         BmiCategory.STANDARD_WEIGHT -> WizardRecommendation.HOLD
         BmiCategory.UNDERWEIGHT -> WizardRecommendation.GAIN
@@ -140,68 +175,103 @@ class Wizard {
         BmiCategory.SEVERELY_OBESE -> WizardRecommendation.LOSE
     }
 
-    fun calculateForTargetDate(age: Int, height: Int, currentWeight: Float, sex: CalculationSex, targetDate: LocalDate, calculationGoal: CalculationGoal): Uni<WizardTargetDateResult> {
+    /**
+     * Calculation of realistic weight loss/gain goals until a specific date occurs.
+     */
+    fun calculateForTargetDate(input: WizardTargetDateInput): Uni<WizardTargetDateResult> {
+        validate(input)
+
         val today = LocalDate.now()
 
-        val daysBetween = ChronoUnit.DAYS.between(today, targetDate)
+        val daysBetween = ChronoUnit.DAYS.between(today, input.targetDate)
 
-        val currentBmi = calculateBmi(currentWeight, height)
-        val currentClassification = calculateBmiCategory(sex, currentBmi)
+        val currentBmi = calculateBmi(input.currentWeight, input.height)
+        val currentClassification = calculateBmiCategory(input.sex, currentBmi)
 
         val rates: List<Int> = listOf(100, 200, 300, 400, 500, 600, 700)
-        val multiplier = if (calculationGoal === CalculationGoal.LOSS) -1 else 1
+        val multiplier = if (input.calculationGoal === CalculationGoal.LOSS) -1 else 1
+        val obeseList = listOf(BmiCategory.OBESE, BmiCategory.SEVERELY_OBESE)
 
-        val resultByRate: Map<Int, WizardResult> = rates.associateWith {
-            val weight = (currentWeight + Math.round((multiplier * (daysBetween * it) / 7000).toDouble()))
+        var resultByRate: Map<Int, WizardResult> = rates.associateWith {
+            val weight = (input.currentWeight.toFloat() + Math.round((multiplier * (daysBetween * it) / 7000).toDouble()))
 
             val result = WizardResult()
-            result.bmi = calculateBmi(weight, height)
-            result.bmiCategory = calculateBmiCategory(sex, result.bmi)
+            result.bmi = calculateBmi(weight, input.height)
+            result.bmiCategory = calculateBmiCategory(input.sex, result.bmi)
             result.targetWeight = weight
 
             result
-        }
-
-        val obeseList = listOf(BmiCategory.OBESE, BmiCategory.SEVERELY_OBESE)
-
-        /**
-         * filter non-recommendable results:
-         * - weight loss should not lead to an underweight BMI
-         * - weight gain should not lead to an obese or severally obese BMI
-         * - no weight gain option current BMI is of obese or severally obese category
-         */
-        return Uni.createFrom().item(WizardTargetDateResult(
-            resultByRate.filter { (_, result) ->
-                when (calculationGoal) {
-                    CalculationGoal.LOSS -> {
-                        result.bmiCategory != BmiCategory.UNDERWEIGHT
-                    }
-                    else -> {
-                        !obeseList.contains(result.bmiCategory) || obeseList.contains(currentClassification)
-                    }
+        }.filter { (_, result) ->
+            /**
+             * filter non-recommendable results:
+             * - weight loss should not lead to an underweight BMI
+             * - weight gain should not lead to an obese or severally obese BMI
+             * - no weight gain option current BMI is of obese or severally obese category
+             */
+            when (input.calculationGoal) {
+                CalculationGoal.LOSS -> {
+                    result.bmiCategory != BmiCategory.UNDERWEIGHT
+                }
+                else -> {
+                    !obeseList.contains(result.bmiCategory) || obeseList.contains(currentClassification)
                 }
             }
+        }
+
+        // calculate a custom rate to present at least one viable result
+        if (resultByRate.isEmpty()) {
+            val targetBmi = calculateTargetBmi(input.age)
+            val targetWeight = calculateTargetWeight(targetBmi, input.height.toFloat())
+
+            val difference = when (input.calculationGoal) {
+                CalculationGoal.GAIN -> {
+                    Math.round(targetWeight - input.currentWeight.toFloat())
+                }
+                CalculationGoal.LOSS -> {
+                    Math.round(input.currentWeight.toFloat() - targetWeight)
+                }
+
+                null -> 0
+            }
+
+            val rate = Math.round(difference.toFloat() * 7000 / daysBetween)
+
+            val result = WizardResult()
+            result.bmi = calculateBmi(targetWeight, input.height)
+            result.bmiCategory = calculateBmiCategory(input.sex, result.bmi)
+            result.targetWeight = targetWeight
+
+            resultByRate = mapOf(rate to result)
+        }
+
+        return Uni.createFrom().item(WizardTargetDateResult(
+            resultByRate
         ))
     }
 
-    fun calculateForTargetWeight(startDate: LocalDate, age: Int, height: Int, currentWeight: Int, sex: CalculationSex, targetWeight: Int): Uni<WizardTargetWeightResult> {
-        val currentBmi = calculateBmi(currentWeight, height)
-        val targetWeightBmi = calculateBmi(targetWeight, height)
+    /**
+     * Calculation of length until a specific weight can be obtained.
+     */
+    fun calculateForTargetWeight(input: WizardTargetWeightInput): Uni<WizardTargetWeightResult> {
+        validate(input)
 
-        val currentClassification = calculateBmiCategory(sex, currentBmi);
-        val targetClassification = calculateBmiCategory(sex, targetWeightBmi)
+        val currentBmi = calculateBmi(input.currentWeight, input.height)
+        val targetWeightBmi = calculateBmi(input.targetWeight, input.height)
 
-        val difference = (if (targetWeight > currentWeight) {
-            targetWeight - currentWeight
+        val currentClassification = calculateBmiCategory(input.sex, currentBmi);
+        val targetClassification = calculateBmiCategory(input.sex, targetWeightBmi)
+
+        val difference = (if (input.targetWeight > input.currentWeight) {
+            input.targetWeight - input.currentWeight
         } else {
-            currentWeight - targetWeight
+            input.currentWeight - input.targetWeight
         }).toDouble()
 
         val warning = targetClassification == BmiCategory.UNDERWEIGHT || targetClassification == BmiCategory.OBESE || targetClassification == BmiCategory.SEVERELY_OBESE
         var message = ""
 
         if (targetClassification == BmiCategory.UNDERWEIGHT) {
-            if (targetWeight < currentWeight) {
+            if (input.targetWeight < input.currentWeight) {
                 message = if (currentClassification == BmiCategory.UNDERWEIGHT) {
                     "Your target weight is even lower that your current weight. Considering that you are currently underweight, I cannot recommend you to proceed."
                 } else {
@@ -209,7 +279,7 @@ class Wizard {
                 }
             }
         } else if (targetClassification == BmiCategory.OBESE) {
-            if (targetWeight > currentWeight) {
+            if (input.targetWeight > input.currentWeight) {
                 message = if (currentClassification == BmiCategory.OBESE) {
                     "Your target weight is even higher that your current weight. Considering that you are currently obese, I cannot recommend you to proceed."
                 } else {
@@ -217,7 +287,7 @@ class Wizard {
                 }
             }
         } else if (targetClassification == BmiCategory.SEVERELY_OBESE) {
-            if (targetWeight > currentWeight) {
+            if (input.targetWeight > input.currentWeight) {
                 message = if(currentClassification == BmiCategory.SEVERELY_OBESE) {
                     "Your target weight is even higher that your current weight. Considering that you are currently severely obese, I cannot recommend you to proceed."
                 } else {
@@ -227,17 +297,13 @@ class Wizard {
         }
 
         val rates: List<Int> = listOf(100, 200, 300, 400, 500, 600, 700)
-        val datePerRate: Map<Int, LocalDate> = rates.associateWith { startDate.plusDays(Math.round(difference * 7000 / it)) }
+        val datePerRate: Map<Int, LocalDate> = rates.associateWith { input.startDate.plusDays(Math.round(difference * 7000 / it)) }
 
         return Uni.createFrom().item(WizardTargetWeightResult(datePerRate, targetClassification, warning, message))
     }
 }
 
-/**
- * Calculation of basic metabolic rate (BMR) and total daily energy expenditure (TDEE) based on the Harris-Benedict
- * formula.
- */
-data class WizardInput(
+data class WizardInput (
     @field:Min(value = 18, message = "Your age must be between 18 and 99 years.")
     @field:Max(value = 99, message = "Your age must be between 18 and 99 years.")
     val age: Number,
@@ -269,7 +335,9 @@ data class WizardResult (
     var bmi: Float = 0f,
     var bmiCategory: BmiCategory = BmiCategory.STANDARD_WEIGHT,
     var recommendation: WizardRecommendation = WizardRecommendation.HOLD,
-    var targetBmi: IntRange = 20..24,
+    var targetBmi: Int = 23,
+    var targetBmiUpper: Int = 24,
+    var targetBmiLower: Int = 20,
     var targetWeight: Float = 0f,
     var targetWeightUpper: Float = 0f,
     var targetWeightLower: Float = 0f,
@@ -278,15 +346,59 @@ data class WizardResult (
     var durationDaysLower: Number = 0
 )
 
+data class WizardTargetWeightInput (
+    @field:Min(value = 18, message = "Your age must be between 18 and 99 years.")
+    @field:Max(value = 99, message = "Your age must be between 18 and 99 years.")
+    val age: Number,
+
+    val sex: CalculationSex,
+
+    @field:Min(value = 30, message = "Please provide a weight between 30kg and 300kg.")
+    @field:Max(value = 300, message = "Please provide a weight between 30kg and 300kg.")
+    val currentWeight: Float,
+
+    @field:Min(value = 30, message = "Please provide a height between 100cm and 220cm.")
+    @field:Max(value = 300, message = "Please provide a height between 100cm and 220cm.")
+    val height: Number,
+
+    @field:Min(value = 30, message = "Please provide a weight between 30kg and 300kg.")
+    @field:Max(value = 300, message = "Please provide a weight between 30kg and 300kg.")
+    val targetWeight: Float,
+
+    val startDate: LocalDate
+)
+
 data class WizardTargetWeightResult (
-    var datePerRate: Map<Int, LocalDate>,
-    var targetClassification: BmiCategory,
+    var datePerRate: Map<Int, LocalDate> = emptyMap(),
+    var targetClassification: BmiCategory = BmiCategory.STANDARD_WEIGHT,
     val warning: Boolean,
     val message: String
 )
 
+data class WizardTargetDateInput (
+    @field:Min(value = 18, message = "Your age must be between 18 and 99 years.")
+    @field:Max(value = 99, message = "Your age must be between 18 and 99 years.")
+    val age: Number,
+
+    val sex: CalculationSex,
+
+    @field:Min(value = 30, message = "Please provide a weight between 30kg and 300kg.")
+    @field:Max(value = 300, message = "Please provide a weight between 30kg and 300kg.")
+    val currentWeight: Number,
+
+    @field:Min(value = 30, message = "Please provide a height between 100cm and 220cm.")
+    @field:Max(value = 300, message = "Please provide a height between 100cm and 220cm.")
+    val height: Number,
+
+    val calculationGoal: CalculationGoal?,
+
+    @field:NotNull
+    val targetDate: LocalDate
+)
+
+
 data class WizardTargetDateResult (
-    var resultByRate: Map<Int, WizardResult>,
+    var resultByRate: Map<Int, WizardResult> = emptyMap(),
 )
 
 enum class CalculationGoal {
