@@ -95,10 +95,9 @@ class Wizard {
 
     internal fun calculateDeficit(weeklyDifference: Float) = weeklyDifference / 10 * 7000 / 7
 
-    internal fun calculateTarget(calculationGoal: CalculationGoal?, tdee: Number, deficit: Float): Float = when (calculationGoal) {
+    internal fun calculateTarget(calculationGoal: CalculationGoal, tdee: Number, deficit: Float): Float = when (calculationGoal) {
         CalculationGoal.GAIN -> tdee.toFloat() + deficit
         CalculationGoal.LOSS -> tdee.toFloat() - deficit;
-        null -> tdee as Float
     }
 
     internal fun calculateBmi(weight: Number, height: Number) = round(weight.toFloat() / ((height.toFloat() / 100).pow(2)))
@@ -155,12 +154,6 @@ class Wizard {
                 wizardResult.durationDays = calculateDurationDays(wizardInput.weight.toFloat(), wizardResult.targetWeight, wizardResult.deficit)
                 wizardResult.durationDaysUpper = calculateDurationDays(wizardInput.weight.toFloat(), wizardResult.targetWeightUpper, wizardResult.deficit)
                 wizardResult.durationDaysLower = calculateDurationDays(wizardInput.weight.toFloat(), wizardResult.targetWeightLower, wizardResult.deficit)
-            }
-
-            null -> {
-                wizardResult.durationDays = 0
-                wizardResult.durationDaysLower = 0
-                wizardResult.durationDaysUpper = 0
             }
         }
     }
@@ -230,8 +223,6 @@ class Wizard {
                 CalculationGoal.LOSS -> {
                     Math.round(input.currentWeight.toFloat() - targetWeight)
                 }
-
-                null -> 0
             }
 
             val rate = Math.round(difference.toFloat() * 7000 / daysBetween)
@@ -324,7 +315,7 @@ data class WizardInput (
     @field:Min(value = 0, message = "Your weekly difference must be between 0 and 0.7kg.")
     @field:Max(value = 7, message = "Your weekly difference must be between 0 and 0.7kg.")
     val weeklyDifference: Number,
-    val calculationGoal: CalculationGoal?,
+    val calculationGoal: CalculationGoal,
 )
 
 data class WizardResult (
@@ -357,7 +348,7 @@ data class WizardTargetWeightInput (
     @field:Max(value = 300, message = "Please provide a weight between 30kg and 300kg.")
     val currentWeight: Float,
 
-    @field:Min(value = 30, message = "Please provide a height between 100cm and 220cm.")
+    @field:Min(value = 100, message = "Please provide a height between 100cm and 220cm.")
     @field:Max(value = 300, message = "Please provide a height between 100cm and 220cm.")
     val height: Number,
 
@@ -386,11 +377,11 @@ data class WizardTargetDateInput (
     @field:Max(value = 300, message = "Please provide a weight between 30kg and 300kg.")
     val currentWeight: Number,
 
-    @field:Min(value = 30, message = "Please provide a height between 100cm and 220cm.")
+    @field:Min(value = 100, message = "Please provide a height between 100cm and 220cm.")
     @field:Max(value = 300, message = "Please provide a height between 100cm and 220cm.")
     val height: Number,
 
-    val calculationGoal: CalculationGoal?,
+    val calculationGoal: CalculationGoal,
 
     @field:NotNull
     val targetDate: LocalDate

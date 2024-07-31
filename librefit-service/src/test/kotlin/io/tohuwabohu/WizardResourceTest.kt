@@ -272,6 +272,18 @@ class WizardResourceTest {
     }
 
     @Test
+    fun `should fail target date calculation with invalid height`() {
+        val targetDate = LocalDate.now().plusDays(150)
+
+        When {
+            get("/custom/date/30/90/90/MALE/${targetDate}/LOSS") // invalid because the height is less than the minimum acceptable value
+        } Then {
+            statusCode(400)
+            body("errors[0].field", Matchers.equalTo("height"))
+        }
+    }
+
+    @Test
     fun `should calculate for target weight`() {
         val wizardResult: WizardTargetWeightResult = When {
             get("/custom/weight/30/180/90/MALE/80")
@@ -457,6 +469,81 @@ class WizardResourceTest {
                 Assertions.assertEquals(BmiCategory.SEVERELY_OBESE, result.targetClassification)
                 Assertions.assertEquals(true, result.warning)
                 Assertions.assertEquals("Your target weight will classify you as severely obese. You should revisit your choice.", result.message)
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should not recommend lower target for current underweight`(uniAsserter: UniAsserter) {
+        uniAsserter.assertThat(
+            { wizard.calculateForTargetWeight(
+                WizardTargetWeightInput(
+                    age = 30,
+                    sex = CalculationSex.MALE,
+                    currentWeight = 50f, // Currently underweight
+                    height = 170,
+                    targetWeight = 45f, // Target even lower
+                    startDate = calculationStartDate
+                ))
+            },
+            { result ->
+                Assertions.assertEquals(BmiCategory.UNDERWEIGHT, result.targetClassification)
+                Assertions.assertEquals(true, result.warning)
+                Assertions.assertEquals(
+                    "Your target weight is even lower that your current weight. Considering that you are currently underweight, I cannot recommend you to proceed.",
+                    result.message
+                )
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should not recommend higher target for current obese`(uniAsserter: UniAsserter) {
+        uniAsserter.assertThat(
+            { wizard.calculateForTargetWeight(
+                WizardTargetWeightInput(
+                    age = 30,
+                    sex = CalculationSex.MALE,
+                    currentWeight = 100f, // Currently obese
+                    height = 170,
+                    targetWeight = 110f, // Target higher
+                    startDate = calculationStartDate)
+            )
+            },
+            { result ->
+                Assertions.assertEquals(BmiCategory.OBESE, result.targetClassification)
+                Assertions.assertEquals(true, result.warning)
+                Assertions.assertEquals(
+                    "Your target weight is even higher that your current weight. Considering that you are currently obese, I cannot recommend you to proceed.",
+                    result.message
+                )
+            }
+        )
+    }
+
+    @Test
+    @RunOnVertxContext
+    fun `should not recommend higher target for current severely obese`(uniAsserter: UniAsserter) {
+        uniAsserter.assertThat(
+            { wizard.calculateForTargetWeight(
+                WizardTargetWeightInput(
+                    age = 30,
+                    sex = CalculationSex.MALE,
+                    currentWeight = 150f, // Currently severely obese
+                    height = 170,
+                    targetWeight = 160f, // Target higher
+                    startDate = calculationStartDate)
+            )
+            },
+            { result ->
+                Assertions.assertEquals(BmiCategory.SEVERELY_OBESE, result.targetClassification)
+                Assertions.assertEquals(true, result.warning)
+                Assertions.assertEquals(
+                    "Your target weight is even higher that your current weight. Considering that you are currently severely obese, I cannot recommend you to proceed.",
+                    result.message
+                )
             }
         )
     }
