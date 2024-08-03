@@ -4,8 +4,11 @@
 
     const bmiCategories = bmiCategoriesAsKeyValue;
 
-    /** @type {Tdee} */
+    /** @type {WizardResult} */
     export let calculationResult;
+
+    /** @type {WizardInput} */
+    export let calculationInput;
 </script>
 <h2 class="h2">Your result</h2>
 
@@ -59,19 +62,19 @@
         <tr>
             <td>Age</td>
             <td></td>
-            <td>{calculationResult.age}</td>
+            <td>{calculationInput.age}</td>
         </tr>
 
         <tr>
             <td>Height</td>
             <td>cm</td>
-            <td>{calculationResult.height}</td>
+            <td>{calculationInput.height}</td>
         </tr>
 
         <tr>
             <td>Weight</td>
             <td>kg</td>
-            <td>{calculationResult.weight}</td>
+            <td>{calculationInput.weight}</td>
         </tr>
 
         <tr>
@@ -85,34 +88,37 @@
             <td></td>
             <td>{bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label}</td>
         </tr>
+
+        <tr>
+            <td>Recommendation</td>
+            <td></td>
+            <td>{calculationResult.recommendation.toLowerCase()}</td>
+        </tr>
         </tbody>
     </table>
 </div>
 
 
-<h2 class="h2">Next steps</h2>
+<h2 class="h2">Explanation</h2>
 <p>
     Based on your input, your basal metabolic rate is {calculationResult.bmr}kcal. Your daily calorie
     consumption to hold your weight should be around {calculationResult.tdee}kcal.
 </p>
 
 <p>
-    Having {calculationResult.weight}kg at {calculationResult.height}cm height means you have a BMI of
+    Having {calculationInput.weight}kg at {calculationInput.height}cm height means you have a BMI of
     {calculationResult.bmi}.
 
     {#if calculationResult.targetBmi}
-        At your age of {calculationResult.age},
+        At your age of {calculationInput.age},
 
-        {@const bmiMin = calculationResult.targetBmi[0]}
-        {@const bmiMax = calculationResult.targetBmi[1]}
-
-        {#if bmiMin <= calculationResult.bmi && calculationResult.bmi <= bmiMax}
+        {#if calculationResult.targetBmiLower <= calculationResult.bmi && calculationResult.bmi <= calculationResult.targetBmiUpper}
             you are currently in
         {:else}
             you are out of
         {/if}
 
-        the optimal BMI range of {bmiMin} to {bmiMax}, leaving you
+        the optimal BMI range of {calculationResult.targetBmiLower} to {calculationResult.targetBmiUpper}, leaving you
         <span class="font-bold">
             {bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label.toLowerCase()}.
         </span>
