@@ -5,9 +5,11 @@ import io.tohuwabohu.calc.CalculationGoal
 import io.tohuwabohu.calc.CalculationSex
 import io.tohuwabohu.calc.Wizard
 import io.tohuwabohu.calc.WizardInput
+import io.tohuwabohu.calc.WizardResult
 import io.tohuwabohu.calc.WizardTargetDateInput
 import io.tohuwabohu.calc.WizardTargetDateResult
 import io.tohuwabohu.calc.WizardTargetWeightInput
+import io.tohuwabohu.calc.WizardTargetWeightResult
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.ws.rs.GET
@@ -32,7 +34,7 @@ class WizardResource(private val calculator: Wizard) {
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WizardInput::class)
+                schema = Schema(implementation = WizardResult::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [
@@ -97,7 +99,7 @@ class WizardResource(private val calculator: Wizard) {
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WizardTargetDateResult::class)
+                schema = Schema(implementation = WizardTargetWeightResult::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [
