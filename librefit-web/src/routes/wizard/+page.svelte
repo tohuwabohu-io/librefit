@@ -81,7 +81,7 @@
                 targetDate: wizardDetails.targetDate,
                 calculationGoal: calculationInput.calculationGoal
             }).then(/** @type WizardTargetDateResult */ customWizardResult => {
-                const targetsByRate = createTargetDateTargets(calculationInput, customWizardResult, today, today);
+                const targetsByRate = createTargetDateTargets(calculationInput, calculationResult, customWizardResult, today, wizardDetails.targetDate);
 
                 showModal({
                     targetsByRate: targetsByRate
