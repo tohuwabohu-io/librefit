@@ -1,7 +1,8 @@
 import { proxyFetch } from '$lib/api/util.js';
 import { api } from '$lib/api/index.js';
-import { getDateAsStr } from '$lib/date.js';
+import { getDateAsStr, parseStringAsDate } from '$lib/date.js';
 import { CalculationGoal } from '$lib/api/model.js';
+import { isAfter } from 'date-fns';
 
 /**
  * @param wizard {Wizard}
@@ -115,4 +116,26 @@ export const createTargetDateTargets = (wizardInput, customWizardResult, startDa
 
 		return acc;
 	}, {});
+};
+
+export const validateCustomWeight = (detail) => {
+	if (detail.value < 30 || detail.value > 300) {
+		return {
+			valid: false,
+			errorMessage: 'Please provide a weight between 30kg and 300kg.'
+		};
+	}
+
+	return { valid: true };
+};
+
+export const validateCustomDate = (detail) => {
+	if (isAfter(new Date(), parseStringAsDate(detail.value))) {
+		return {
+			valid: false,
+			errorMessage: 'Your target date lies in the past.'
+		};
+	}
+
+	return { valid: true };
 };

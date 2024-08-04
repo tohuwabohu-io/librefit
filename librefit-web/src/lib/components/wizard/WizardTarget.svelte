@@ -1,8 +1,8 @@
 <script>
     import {WizardRecommendation} from '$lib/api/model.js';
-    import {createEventDispatcher} from 'svelte';
     import {WizardOptions} from '$lib/enum.js';
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
+    import {validateCustomDate, validateCustomWeight} from '$lib/api/wizard.js';
 
     /** @type {WizardResult} */
     export let calculationResult;
@@ -10,16 +10,12 @@
     /** @type {WizardInput} */
     export let calculationInput;
 
-    const dispatch = createEventDispatcher();
+    export let chosenOption;
 
     const activeClass = 'variant-ringed-primary';
 
     let activeElement;
     let anchorDefault, anchorRecommendation, anchorCustomWeight, anchorCustomDate, anchorCustom;
-
-    let targetWeightInput, targetDateInput;
-
-    let details;
 
     /**
      * @param a {HTMLAnchorElement}
@@ -28,25 +24,10 @@
     const choose = (a, param) => {
         if (activeElement) activeElement.classList.remove(activeClass);
 
-        if (param === WizardOptions.Custom_weight) {
-            details = {
-                targetWeight: targetWeightInput.value
-            }
-        } else if (param === WizardOptions.Custom_date) {
-            details = {
-                targetDate: targetDateInput.value
-            }
-        } else {
-            details = undefined;
-        }
-
         activeElement = a;
         activeElement.classList.add(activeClass);
 
-        dispatch('wizardOption', {
-            param: param,
-            customDetails: details
-        });
+        chosenOption.userChoice = param;
     }
 </script>
 
@@ -82,7 +63,11 @@
         <p>
             How can I get to my target weight as fast as possible?
         </p>
-        <ValidatedInput bind:this={targetWeightInput} type="number" label="Target weight" unit={'kg'}/>
+        <ValidatedInput bind:value={chosenOption.customDetails}
+                        type="number"
+                        label="Target weight"
+                        unit={'kg'}
+        />
     </a>
 
     {#if calculationResult.recommendation !== WizardRecommendation.Hold}
@@ -93,7 +78,10 @@
         <p>
             How much weight {calculationInput.calculationGoal.toLowerCase()} can I achieve until a specific date?
         </p>
-        <ValidatedInput bind:this={targetDateInput} type="date" label="Target date"/>
+        <ValidatedInput bind:value={chosenOption.customDetails}
+                        type="date"
+                        label="Target date"
+        />
     </a>
     {/if}
 
