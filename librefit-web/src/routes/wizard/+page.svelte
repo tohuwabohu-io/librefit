@@ -111,7 +111,8 @@
                 const targetsByRate = createTargetWeightTargets(calculationInput, calculationResult, customWizardResult, today, wizardDetails.targetWeight);
 
                 showModal({
-                    targetsByRate: targetsByRate
+                    targetsByRate: targetsByRate,
+                    warningMessage: customWizardResult.message
                 });
             }).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
         }

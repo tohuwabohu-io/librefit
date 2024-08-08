@@ -287,8 +287,12 @@ class Wizard {
             }
         }
 
-        val rates: List<Int> = listOf(100, 200, 300, 400, 500, 600, 700)
-        val datePerRate: Map<Int, LocalDate> = rates.associateWith { input.startDate.plusDays(Math.round(difference * 7000 / it)) }
+        var datePerRate: Map<Int, LocalDate> = emptyMap()
+
+        if ("" == message) {
+            val rates: List<Int> = listOf(100, 200, 300, 400, 500, 600, 700)
+            datePerRate = rates.associateWith { input.startDate.plusDays(Math.round(difference * 7000 / it)) }
+        }
 
         return Uni.createFrom().item(WizardTargetWeightResult(datePerRate, targetClassification, warning, message))
     }

@@ -27,6 +27,8 @@
     let rates
     let rateActive;
 
+    let warningMessage;
+
     let added = getDateAsStr(today);
     let startDate = getDateAsStr(today);
 
@@ -37,10 +39,11 @@
         weightTarget = $modalStore[0].meta.weightTarget;
 
         targetsByRate = $modalStore[0].meta.targetsByRate;
+        warningMessage = $modalStore[0].meta.warningMessage;
 
-        if (targetsByRate) {
-            rates = Object.keys(targetsByRate);
+        rates = Object.keys(targetsByRate);
 
+        if (rates.length > 0) {
             rateActive = rates[rates.length - 1];
             calorieTarget = targetsByRate[rateActive].calorieTarget;
             weightTarget = targetsByRate[rateActive].weightTarget;
@@ -112,15 +115,16 @@
 </script>
 
 <div class="modal block bg-surface-100-800-token w-modal h-auto p-4 space-y-4 rounded-container-token shadow-xl">
-    {#if rates}
+    {#if rates.length > 0}
         <header class="text-2xl font-bold">
-            Recommended deficit
+            Recommended rate
         </header>
 
         <div>
             <p>
-                The following caloric deficits help you achieve your goal with different run times. Pick the one you think
-                that suits you best. The outcome will be the same, but a lower deficit will take longer.
+                The following rates help you achieve your goal with different run times. Pick the one you think
+                that suits you best. The outcome will be the same, but a lower rate means it your progress will be
+                slower.
             </p>
         </div>
 
@@ -145,6 +149,12 @@
                 {/if}
             </svelte:fragment>
         </TabGroup>
+    {:else if warningMessage}
+        <header class="text-2xl font-bold">
+            Warning
+        </header>
+
+        <p>{warningMessage}</p>
     {:else}
         <header class="text-2xl font-bold">
             Set target
@@ -159,7 +169,7 @@
             Cancel
         </button>
 
-        <button on:click|preventDefault={onSubmit} class="btn variant-filled">
+        <button on:click|preventDefault={onSubmit} class="btn variant-filled" disabled={rateActive === undefined}>
             Submit
         </button>
     </footer>

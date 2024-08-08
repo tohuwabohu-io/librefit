@@ -56,14 +56,14 @@ export const createTargetWeightTargets = (
 	targetWeight
 ) => {
 	const rates = Object.keys(customWizardResult.datePerRate);
-	const multiplier = wizardInput.calculationGoal === CalculationGoal.Loss ? -1 : 1;
+	const multiplier = targetWeight < wizardInput.weight ? -1 : 1;
 
 	return rates.reduce((acc, rate) => {
 		/** @type CalorieTarget */
 		const calorieTarget = {
 			startDate: getDateAsStr(startDate),
 			endDate: customWizardResult.datePerRate[rate],
-			targetCalories: wizardResult.target + multiplier * rate,
+			targetCalories: wizardResult.tdee + multiplier * rate,
 			maximumCalories: wizardResult.tdee
 		};
 
