@@ -8,14 +8,14 @@ import { getDateAsStr, getDaytimeFoodCategory, parseStringAsDate } from '$lib/da
  * @param event
  */
 export const addCalories = (event) => {
-	/** @type {CalorieTrackerEntry} */
+	/** @type {CalorieTracker} */
 	const newEntry = {
 		added: event.detail.dateStr,
 		amount: event.detail.value,
 		category: event.detail.category
 	};
 
-	return proxyFetch(fetch, api.createCalorieTrackerEntry, newEntry).then(async (response) => {
+	return proxyFetch(fetch, api.createCalorieTracker, newEntry).then(async (response) => {
 		if (response.ok) {
 			return listCaloriesForDate(parseStringAsDate(newEntry.added));
 		} else throw response;
@@ -26,7 +26,7 @@ export const addCalories = (event) => {
  * @param event
  */
 export const updateCalories = (event) => {
-	/** @type {CalorieTrackerEntry} */
+	/** @type {CalorieTracker} */
 	const entry = {
 		sequence: event.detail.sequence,
 		added: event.detail.dateStr,
@@ -34,7 +34,7 @@ export const updateCalories = (event) => {
 		category: event.detail.category
 	};
 
-	return proxyFetch(fetch, api.updateCalorieTrackerEntry, entry).then(async (response) => {
+	return proxyFetch(fetch, api.updateCalorieTracker, entry).then(async (response) => {
 		if (response.ok) {
 			return listCaloriesForDate(parseStringAsDate(entry.added));
 		} else throw response;
@@ -50,7 +50,7 @@ export const deleteCalories = (event) => {
 		date: event.detail.dateStr
 	};
 
-	return proxyFetch(fetch, api.deleteCalorieTrackerEntry, params).then(async (response) => {
+	return proxyFetch(fetch, api.deleteCalorieTracker, params).then(async (response) => {
 		if (response.ok) {
 			return listCaloriesForDate(parseStringAsDate(params.date));
 		} else throw response;
@@ -63,16 +63,16 @@ export const deleteCalories = (event) => {
  */
 export const listCaloriesForDate = (date) => {
 	// add a blank entry for new input
-	/** @type {CalorieTrackerEntry} */
+	/** @type {CalorieTracker} */
 	const blankEntry = {
 		added: getDateAsStr(date),
 		amount: 0,
 		category: getDaytimeFoodCategory(date)
 	};
 
-	return proxyFetch(fetch, api.listCalorieTrackerEntriesForDate, { date: getDateAsStr(date) }).then(
+	return proxyFetch(fetch, api.listCalorieTrackerForDate, { date: getDateAsStr(date) }).then(
 		async (response) => {
-			/** @type {Array<CalorieTrackerEntry>} */
+			/** @type {Array<CalorieTracker>} */
 			const ctList = await response.json();
 			ctList.unshift(blankEntry);
 
@@ -100,8 +100,8 @@ export const listCalorieTrackerDatesRange = (dateFrom, dateTo) => {
  * @param dateTo {Date}
  * @return {Promise}
  */
-export const listCalorieTrackerEntriesRange = (dateFrom, dateTo) => {
-	return proxyFetch(fetch, api.listCalorieTrackerEntriesRange, {
+export const listCalorieTrackerRange = (dateFrom, dateTo) => {
+	return proxyFetch(fetch, api.listCalorieTrackerRange, {
 		dateFrom: getDateAsStr(dateFrom),
 		dateTo: getDateAsStr(dateTo)
 	});
@@ -128,7 +128,7 @@ export const listCaloriesFiltered = (filter) => {
 			break;
 	}
 
-	return proxyFetch(fetch, api.listCalorieTrackerEntriesRange, {
+	return proxyFetch(fetch, api.listCalorieTrackerRange, {
 		dateFrom: getDateAsStr(fromDate),
 		dateTo: getDateAsStr(toDate)
 	});
@@ -138,14 +138,14 @@ export const listCaloriesFiltered = (filter) => {
  * @param event
  */
 export const addWeight = (event) => {
-	/** @type {WeightTrackerEntry} */
+	/** @type {WeightTracker} */
 	const newEntry = {
 		sequence: event.detail.sequence,
 		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
-	return proxyFetch(fetch, api.createWeightTrackerEntry, newEntry).then(async (response) => {
+	return proxyFetch(fetch, api.createWeightTracker, newEntry).then(async (response) => {
 		if (response.ok) {
 			return listWeightForDate(parseStringAsDate(newEntry.added));
 		} else throw response;
@@ -156,14 +156,14 @@ export const addWeight = (event) => {
  * @param event
  */
 export const updateWeight = (event) => {
-	/** @type WeightTrackerEntry */
+	/** @type WeightTracker */
 	const entry = {
 		sequence: event.detail.sequence,
 		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
-	return proxyFetch(fetch, api.updateWeightTrackerEntry, entry).then(async (response) => {
+	return proxyFetch(fetch, api.updateWeightTracker, entry).then(async (response) => {
 		if (response.ok) {
 			return listWeightForDate(parseStringAsDate(entry.added));
 		} else throw response;
@@ -179,7 +179,7 @@ export const deleteWeight = (event) => {
 		date: event.detail.dateStr
 	};
 
-	return proxyFetch(fetch, api.deleteWeightTrackerEntry, params).then(async (response) => {
+	return proxyFetch(fetch, api.deleteWeightTracker, params).then(async (response) => {
 		if (response.ok) {
 			return listWeightForDate(parseStringAsDate(params.date));
 		} else throw response;
@@ -207,7 +207,7 @@ export const listWeightFiltered = (filter) => {
 			break;
 	}
 
-	return proxyFetch(fetch, api.listWeightTrackerEntriesRange, {
+	return proxyFetch(fetch, api.listWeightTrackerRange, {
 		dateFrom: getDateAsStr(fromDate),
 		dateTo: getDateAsStr(toDate)
 	});
@@ -232,7 +232,7 @@ export const listWeightTrackerDatesRange = (dateFrom, dateTo) => {
  * @return {Promise}
  */
 export const listWeightRange = (dateFrom, dateTo) => {
-	return proxyFetch(fetch, api.listWeightTrackerEntriesRange, {
+	return proxyFetch(fetch, api.listWeightTrackerRange, {
 		dateFrom: getDateAsStr(dateFrom),
 		dateTo: getDateAsStr(dateTo)
 	});
@@ -243,7 +243,7 @@ export const listWeightRange = (dateFrom, dateTo) => {
  * @return {Promise}
  */
 export const listWeightForDate = (date) => {
-	return proxyFetch(fetch, api.listWeightTrackerEntries, {
+	return proxyFetch(fetch, api.listWeightTracker, {
 		date: getDateAsStr(date)
 	});
 };

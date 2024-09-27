@@ -19,7 +19,9 @@
 	const indicator = getContext('indicator');
 	const user = getContext('user');
 	const foodCategories = getContext('foodCategories');
-	const currentGoal = getContext('currentGoal');
+
+	/** @type Writable<CalorieTarget> */
+	const calorieTarget = getContext('calorieTarget');
 
 	if (!$user) goto('/');
 
@@ -168,24 +170,28 @@
 						<svelte:fragment slot="content">
 							<div class="flex md:flex-row flex-col gap-4 p-4">
 								{#if datesToEntries[dateStr]}
-									<CalorieTracker entries={datesToEntries[dateStr]} categories={$foodCategories} currentGoal={$currentGoal}
+									<CalorieTracker calorieTracker={datesToEntries[dateStr]}
+										categories={$foodCategories}
+										calorieTarget={$calorieTarget}
 										on:addCalories={addEntry}
 										on:updateCalories={updateEntry}
 										on:deleteCalories={deleteEntry}
 									/>
 
-									<CalorieDistribution ctList={datesToEntries[dateStr]}
+									<CalorieDistribution calorieTracker={datesToEntries[dateStr]}
 														 displayHistory={false}
 														 displayHeader={false}
 														 foodCategories={$foodCategories}
-														 currentGoal={$currentGoal}
+														 calorieTarget={$calorieTarget}
 									/>
 								{:else}
 									{#await datesToEntries[dateStr]}
 										<p>... loading</p>
 									{:then entries}
 										{#if entries}
-											<CalorieTracker {entries} categories={$foodCategories} currentGoal={$currentGoal}
+											<CalorieTracker calorieTracker={entries}
+												categories={$foodCategories}
+												calorieTarget={$calorieTarget}
 												on:addCalories={addEntry}
 												on:updateCalories={updateEntry}
 												on:deleteCalories={deleteEntry}

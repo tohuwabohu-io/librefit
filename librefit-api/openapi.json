@@ -12,231 +12,70 @@
     "description" : "Auto generated value"
   } ],
   "paths" : {
-    "/api/goals/create" : {
+    "/api/composite/dashboard/{date}" : {
+      "get" : {
+        "tags" : [ "Composite Resource" ],
+        "operationId" : "getDashboard",
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/composite/wizard/result" : {
       "post" : {
-        "tags" : [ "Goals Resource" ],
-        "operationId" : "createGoal",
+        "tags" : [ "Composite Resource" ],
+        "operationId" : "postWizardResult",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/Goal"
+                "$ref" : "#/components/schemas/Wizard"
               }
             }
           }
         },
         "responses" : {
           "201" : {
-            "description" : "Created",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Goal"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "500" : {
-            "description" : "Internal Server Error"
-          },
-          "403" : {
-            "description" : "Not Allowed"
-          }
-        },
-        "security" : [ {
-          "SecurityScheme" : [ ]
-        } ]
-      }
-    },
-    "/api/goals/delete/{date}/{sequence}" : {
-      "delete" : {
-        "tags" : [ "Goals Resource" ],
-        "operationId" : "deleteGoal",
-        "parameters" : [ {
-          "name" : "date",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/LocalDate"
-          }
-        }, {
-          "name" : "sequence",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "int64",
-            "type" : "integer"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : { }
-            }
-          },
-          "404" : {
-            "description" : "Not Found"
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "500" : {
-            "description" : "Internal Server Error"
-          },
-          "403" : {
-            "description" : "Not Allowed"
-          }
-        },
-        "security" : [ {
-          "SecurityScheme" : [ ]
-        } ]
-      }
-    },
-    "/api/goals/last" : {
-      "get" : {
-        "tags" : [ "Goals Resource" ],
-        "operationId" : "findLastGoal",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Goal"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "500" : {
-            "description" : "Internal Server Error"
-          },
-          "403" : {
-            "description" : "Not Allowed"
-          }
-        },
-        "security" : [ {
-          "SecurityScheme" : [ ]
-        } ]
-      }
-    },
-    "/api/goals/read/{date}/{sequence}" : {
-      "get" : {
-        "tags" : [ "Goals Resource" ],
-        "operationId" : "readGoal",
-        "parameters" : [ {
-          "name" : "date",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/LocalDate"
-          }
-        }, {
-          "name" : "sequence",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "int64",
-            "type" : "integer"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Goal"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Not Found"
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "500" : {
-            "description" : "Internal Server Error"
-          },
-          "403" : {
-            "description" : "Not Allowed"
-          }
-        },
-        "security" : [ {
-          "SecurityScheme" : [ ]
-        } ]
-      }
-    },
-    "/api/goals/update" : {
-      "put" : {
-        "tags" : [ "Goals Resource" ],
-        "operationId" : "updateGoal",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/Goal"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : { }
-            }
-          },
-          "404" : {
-            "description" : "Not Found"
+            "description" : "Created"
           },
           "400" : {
             "description" : "Bad Request",
@@ -331,72 +170,26 @@
         } ]
       }
     },
-    "/api/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}" : {
-      "get" : {
-        "tags" : [ "Tdee Resource" ],
-        "operationId" : "calculateTdee",
-        "parameters" : [ {
-          "name" : "activityLevel",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "float",
-            "type" : "number"
+    "/api/target/calories/create" : {
+      "post" : {
+        "tags" : [ "Calorie Target Resource" ],
+        "operationId" : "createCalorieTarget",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CalorieTarget"
+              }
+            }
           }
-        }, {
-          "name" : "age",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        }, {
-          "name" : "calculationGoal",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/CalculationGoal"
-          }
-        }, {
-          "name" : "height",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        }, {
-          "name" : "sex",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/CalculationSex"
-          }
-        }, {
-          "name" : "weeklyDifference",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "float",
-            "type" : "number"
-          }
-        }, {
-          "name" : "weight",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        } ],
+        },
         "responses" : {
-          "200" : {
-            "description" : "OK",
+          "201" : {
+            "description" : "Created",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Tdee"
+                  "$ref" : "#/components/schemas/CalorieTarget"
                 }
               }
             }
@@ -411,10 +204,472 @@
               }
             }
           },
+          "401" : {
+            "description" : "Unauthorized"
+          },
           "500" : {
             "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/calories/delete/{date}/{sequence}" : {
+      "delete" : {
+        "tags" : [ "Calorie Target Resource" ],
+        "operationId" : "deleteCalorieTarget",
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "sequence",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/calories/last" : {
+      "get" : {
+        "tags" : [ "Calorie Target Resource" ],
+        "operationId" : "findLastCalorieTarget",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CalorieTarget"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/calories/read/{date}/{sequence}" : {
+      "get" : {
+        "tags" : [ "Calorie Target Resource" ],
+        "operationId" : "readCalorieTarget",
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "sequence",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CalorieTarget"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/calories/update" : {
+      "put" : {
+        "tags" : [ "Calorie Target Resource" ],
+        "operationId" : "updateCalorieTarget",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CalorieTarget"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/weight/create" : {
+      "post" : {
+        "tags" : [ "Weight Target Resource" ],
+        "operationId" : "createWeightTarget",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/WeightTarget"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WeightTarget"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/weight/delete/{date}/{sequence}" : {
+      "delete" : {
+        "tags" : [ "Weight Target Resource" ],
+        "operationId" : "deleteWeightTarget",
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "sequence",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/weight/last" : {
+      "get" : {
+        "tags" : [ "Weight Target Resource" ],
+        "operationId" : "findLastWeightTarget",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WeightTarget"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/weight/read/{date}/{sequence}" : {
+      "get" : {
+        "tags" : [ "Weight Target Resource" ],
+        "operationId" : "readWeightTarget",
+        "parameters" : [ {
+          "name" : "date",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "sequence",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WeightTarget"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/api/target/weight/update" : {
+      "put" : {
+        "tags" : [ "Weight Target Resource" ],
+        "operationId" : "updateWeightTarget",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/WeightTarget"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/api/tracker/calories/categories/list" : {
@@ -463,12 +718,12 @@
     "/api/tracker/calories/create" : {
       "post" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "createCalorieTrackerEntry",
+        "operationId" : "createCalorieTracker",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                "$ref" : "#/components/schemas/CalorieTracker"
               }
             }
           }
@@ -479,7 +734,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                  "$ref" : "#/components/schemas/CalorieTracker"
                 }
               }
             }
@@ -512,7 +767,7 @@
     "/api/tracker/calories/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "deleteCalorieTrackerEntry",
+        "operationId" : "deleteCalorieTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -625,7 +880,7 @@
     "/api/tracker/calories/list/{dateFrom}/{dateTo}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "listCalorieTrackerEntriesRange",
+        "operationId" : "listCalorieTrackerRange",
         "parameters" : [ {
           "name" : "dateFrom",
           "in" : "path",
@@ -649,7 +904,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                    "$ref" : "#/components/schemas/CalorieTracker"
                   }
                 }
               }
@@ -683,7 +938,7 @@
     "/api/tracker/calories/list/{date}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "listCalorieTrackerEntriesForDate",
+        "operationId" : "listCalorieTrackerForDate",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -700,7 +955,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                    "$ref" : "#/components/schemas/CalorieTracker"
                   }
                 }
               }
@@ -734,7 +989,7 @@
     "/api/tracker/calories/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "readCalorieTrackerEntry",
+        "operationId" : "readCalorieTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -757,7 +1012,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                  "$ref" : "#/components/schemas/CalorieTracker"
                 }
               }
             }
@@ -793,12 +1048,12 @@
     "/api/tracker/calories/update" : {
       "put" : {
         "tags" : [ "Calorie Tracker Resource" ],
-        "operationId" : "updateCalorieTrackerEntry",
+        "operationId" : "updateCalorieTracker",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/CalorieTrackerEntry"
+                "$ref" : "#/components/schemas/CalorieTracker"
               }
             }
           }
@@ -841,12 +1096,12 @@
     "/api/tracker/weight/create" : {
       "post" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "createWeightTrackerEntry",
+        "operationId" : "createWeightTracker",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/WeightTrackerEntry"
+                "$ref" : "#/components/schemas/WeightTracker"
               }
             }
           }
@@ -857,7 +1112,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/WeightTrackerEntry"
+                  "$ref" : "#/components/schemas/WeightTracker"
                 }
               }
             }
@@ -890,7 +1145,7 @@
     "/api/tracker/weight/delete/{date}/{sequence}" : {
       "delete" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "deleteWeightTrackerEntry",
+        "operationId" : "deleteWeightTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -945,14 +1200,14 @@
     "/api/tracker/weight/last" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "findLastWeightTrackerEntry",
+        "operationId" : "findLastWeightTracker",
         "responses" : {
           "200" : {
             "description" : "OK",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/WeightTrackerEntry"
+                  "$ref" : "#/components/schemas/WeightTracker"
                 }
               }
             }
@@ -1043,7 +1298,7 @@
     "/api/tracker/weight/list/{dateFrom}/{dateTo}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "listWeightTrackerEntriesRange",
+        "operationId" : "listWeightTrackerRange",
         "parameters" : [ {
           "name" : "dateFrom",
           "in" : "path",
@@ -1067,7 +1322,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/WeightTrackerEntry"
+                    "$ref" : "#/components/schemas/WeightTracker"
                   }
                 }
               }
@@ -1101,7 +1356,7 @@
     "/api/tracker/weight/list/{date}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "listWeightTrackerEntries",
+        "operationId" : "listWeightTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -1118,7 +1373,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/WeightTrackerEntry"
+                    "$ref" : "#/components/schemas/WeightTracker"
                   }
                 }
               }
@@ -1152,7 +1407,7 @@
     "/api/tracker/weight/read/{date}/{sequence}" : {
       "get" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "readWeightTrackerEntry",
+        "operationId" : "readWeightTracker",
         "parameters" : [ {
           "name" : "date",
           "in" : "path",
@@ -1175,7 +1430,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/WeightTrackerEntry"
+                  "$ref" : "#/components/schemas/WeightTracker"
                 }
               }
             }
@@ -1211,12 +1466,12 @@
     "/api/tracker/weight/update" : {
       "put" : {
         "tags" : [ "Weight Tracker Resource" ],
-        "operationId" : "updateWeightTrackerEntry",
+        "operationId" : "updateWeightTracker",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/WeightTrackerEntry"
+                "$ref" : "#/components/schemas/WeightTracker"
               }
             }
           }
@@ -1288,10 +1543,7 @@
         },
         "responses" : {
           "200" : {
-            "description" : "OK",
-            "content" : {
-              "text/plain" : { }
-            }
+            "description" : "OK"
           },
           "400" : {
             "description" : "Bad Request",
@@ -1471,6 +1723,240 @@
           "SecurityScheme" : [ ]
         } ]
       }
+    },
+    "/api/wizard/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}" : {
+      "get" : {
+        "tags" : [ "Wizard Resource" ],
+        "operationId" : "calculateTdee",
+        "parameters" : [ {
+          "name" : "activityLevel",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "float",
+            "type" : "number"
+          }
+        }, {
+          "name" : "age",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "calculationGoal",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationGoal"
+          }
+        }, {
+          "name" : "height",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "sex",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationSex"
+          }
+        }, {
+          "name" : "weeklyDifference",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "float",
+            "type" : "number"
+          }
+        }, {
+          "name" : "weight",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WizardResult"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/wizard/custom/date/{age}/{height}/{weight}/{sex}/{targetDate}/{calculationGoal}" : {
+      "get" : {
+        "tags" : [ "Wizard Resource" ],
+        "operationId" : "calculateForTargetDate",
+        "parameters" : [ {
+          "name" : "age",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "calculationGoal",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationGoal"
+          }
+        }, {
+          "name" : "height",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "sex",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationSex"
+          }
+        }, {
+          "name" : "targetDate",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "weight",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WizardTargetDateResult"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/wizard/custom/weight/{age}/{height}/{weight}/{sex}/{targetWeight}" : {
+      "get" : {
+        "tags" : [ "Wizard Resource" ],
+        "operationId" : "calculateForTargetWeight",
+        "parameters" : [ {
+          "name" : "age",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "height",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "sex",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationSex"
+          }
+        }, {
+          "name" : "targetWeight",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "weight",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WizardTargetWeightResult"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
     }
   },
   "components" : {
@@ -1487,7 +1973,51 @@
         "enum" : [ "MALE", "FEMALE" ],
         "type" : "string"
       },
-      "CalorieTrackerEntry" : {
+      "CalorieTarget" : {
+        "required" : [ "added", "startDate", "endDate", "targetCalories", "maximumCalories" ],
+        "type" : "object",
+        "properties" : {
+          "userId" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            } ],
+            "nullable" : true
+          },
+          "added" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "sequence" : {
+            "format" : "int64",
+            "type" : "integer",
+            "nullable" : true
+          },
+          "startDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "endDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "targetCalories" : {
+            "format" : "float",
+            "minimum" : 1,
+            "type" : "number"
+          },
+          "maximumCalories" : {
+            "format" : "float",
+            "minimum" : 1,
+            "type" : "number"
+          },
+          "updated" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            } ],
+            "nullable" : true
+          }
+        }
+      },
+      "CalorieTracker" : {
         "required" : [ "added", "amount", "category" ],
         "type" : "object",
         "properties" : {
@@ -1527,6 +2057,63 @@
           }
         }
       },
+      "Dashboard" : {
+        "required" : [ "userData", "foodCategories" ],
+        "type" : "object",
+        "properties" : {
+          "userData" : {
+            "$ref" : "#/components/schemas/LibreUser"
+          },
+          "foodCategories" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/FoodCategory"
+            }
+          },
+          "calorieTarget" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/CalorieTarget"
+            } ],
+            "nullable" : true
+          },
+          "caloriesTodayList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CalorieTracker"
+            },
+            "nullable" : true
+          },
+          "caloriesWeekList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CalorieTracker"
+            },
+            "nullable" : true
+          },
+          "weightTarget" : {
+            "type" : "object",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/WeightTarget"
+            } ],
+            "nullable" : true
+          },
+          "weightTodayList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/WeightTracker"
+            },
+            "nullable" : true
+          },
+          "weightMonthList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/WeightTracker"
+            },
+            "nullable" : true
+          }
+        }
+      },
       "ErrorDescription" : {
         "required" : [ "field", "message" ],
         "type" : "object",
@@ -1540,9 +2127,16 @@
         }
       },
       "ErrorResponse" : {
-        "required" : [ "errors" ],
+        "required" : [ "title", "errors" ],
         "type" : "object",
         "properties" : {
+          "title" : {
+            "type" : "string"
+          },
+          "status" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
           "errors" : {
             "type" : "array",
             "items" : {
@@ -1566,62 +2160,6 @@
           },
           "visible" : {
             "type" : "boolean"
-          }
-        }
-      },
-      "Goal" : {
-        "required" : [ "added", "initialWeight", "targetWeight", "startDate", "endDate" ],
-        "type" : "object",
-        "properties" : {
-          "userId" : {
-            "type" : "string",
-            "allOf" : [ {
-              "$ref" : "#/components/schemas/UUID"
-            } ],
-            "nullable" : true
-          },
-          "added" : {
-            "$ref" : "#/components/schemas/LocalDate"
-          },
-          "sequence" : {
-            "format" : "int64",
-            "type" : "integer",
-            "nullable" : true
-          },
-          "initialWeight" : {
-            "format" : "float",
-            "minimum" : 0,
-            "type" : "number"
-          },
-          "targetWeight" : {
-            "format" : "float",
-            "minimum" : 0,
-            "type" : "number"
-          },
-          "startDate" : {
-            "$ref" : "#/components/schemas/LocalDate"
-          },
-          "endDate" : {
-            "$ref" : "#/components/schemas/LocalDate"
-          },
-          "targetCalories" : {
-            "format" : "float",
-            "minimum" : 0,
-            "type" : "number",
-            "nullable" : true
-          },
-          "maximumCalories" : {
-            "format" : "float",
-            "minimum" : 0,
-            "type" : "number",
-            "nullable" : true
-          },
-          "updated" : {
-            "type" : "string",
-            "allOf" : [ {
-              "$ref" : "#/components/schemas/LocalDateTime"
-            } ],
-            "nullable" : true
           }
         }
       },
@@ -1706,84 +2244,64 @@
         "type" : "string",
         "example" : "2022-03-10T12:15:50"
       },
-      "Tdee" : {
-        "required" : [ "age", "sex", "weight", "height", "weeklyDifference", "calculationGoal", "tdee", "bmiCategory", "targetBmi", "durationDays" ],
-        "type" : "object",
-        "properties" : {
-          "age" : {
-            "maximum" : 99,
-            "minimum" : 18,
-            "type" : "number"
-          },
-          "sex" : {
-            "$ref" : "#/components/schemas/CalculationSex"
-          },
-          "weight" : {
-            "maximum" : 300,
-            "minimum" : 30,
-            "type" : "number"
-          },
-          "height" : {
-            "maximum" : 300,
-            "minimum" : 30,
-            "type" : "number"
-          },
-          "activityLevel" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "weeklyDifference" : {
-            "maximum" : 7,
-            "minimum" : 0,
-            "type" : "number"
-          },
-          "calculationGoal" : {
-            "$ref" : "#/components/schemas/CalculationGoal"
-          },
-          "bmr" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "tdee" : {
-            "type" : "number"
-          },
-          "deficit" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "target" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "bmi" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "bmiCategory" : {
-            "$ref" : "#/components/schemas/BmiCategory"
-          },
-          "targetBmi" : {
-            "type" : "array",
-            "items" : {
-              "format" : "int32",
-              "type" : "integer"
-            }
-          },
-          "targetWeight" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "durationDays" : {
-            "type" : "number"
-          }
-        }
-      },
       "UUID" : {
         "format" : "uuid",
         "pattern" : "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}",
         "type" : "string"
       },
-      "WeightTrackerEntry" : {
+      "WeightTarget" : {
+        "required" : [ "added", "startDate", "endDate", "initialWeight", "targetWeight" ],
+        "type" : "object",
+        "properties" : {
+          "userId" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/UUID"
+            } ],
+            "nullable" : true
+          },
+          "added" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "sequence" : {
+            "format" : "int64",
+            "type" : "integer",
+            "nullable" : true
+          },
+          "startDate" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDate"
+            } ],
+            "nullable" : true
+          },
+          "endDate" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDate"
+            } ],
+            "nullable" : true
+          },
+          "initialWeight" : {
+            "format" : "float",
+            "minimum" : 0,
+            "type" : "number"
+          },
+          "targetWeight" : {
+            "format" : "float",
+            "minimum" : 0,
+            "type" : "number"
+          },
+          "updated" : {
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/LocalDateTime"
+            } ],
+            "nullable" : true
+          }
+        }
+      },
+      "WeightTracker" : {
         "required" : [ "added" ],
         "type" : "object",
         "properties" : {
@@ -1813,6 +2331,124 @@
               "$ref" : "#/components/schemas/LocalDateTime"
             } ],
             "nullable" : true
+          }
+        }
+      },
+      "Wizard" : {
+        "required" : [ "calorieTarget", "weightTarget", "weightTracker" ],
+        "type" : "object",
+        "properties" : {
+          "calorieTarget" : {
+            "$ref" : "#/components/schemas/CalorieTarget"
+          },
+          "weightTarget" : {
+            "$ref" : "#/components/schemas/WeightTarget"
+          },
+          "weightTracker" : {
+            "$ref" : "#/components/schemas/WeightTracker"
+          }
+        }
+      },
+      "WizardRecommendation" : {
+        "enum" : [ "HOLD", "LOSE", "GAIN" ],
+        "type" : "string"
+      },
+      "WizardResult" : {
+        "required" : [ "tdee", "bmiCategory", "recommendation", "durationDays", "durationDaysUpper", "durationDaysLower" ],
+        "type" : "object",
+        "properties" : {
+          "bmr" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "tdee" : {
+            "type" : "number"
+          },
+          "deficit" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "target" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "bmi" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "bmiCategory" : {
+            "$ref" : "#/components/schemas/BmiCategory"
+          },
+          "recommendation" : {
+            "$ref" : "#/components/schemas/WizardRecommendation"
+          },
+          "targetBmi" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "targetBmiUpper" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "targetBmiLower" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "targetWeight" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "targetWeightUpper" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "targetWeightLower" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "durationDays" : {
+            "type" : "number"
+          },
+          "durationDaysUpper" : {
+            "type" : "number"
+          },
+          "durationDaysLower" : {
+            "type" : "number"
+          }
+        }
+      },
+      "WizardTargetDateResult" : {
+        "required" : [ "resultByRate" ],
+        "type" : "object",
+        "properties" : {
+          "resultByRate" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/WizardResult"
+            }
+          }
+        }
+      },
+      "WizardTargetWeightResult" : {
+        "required" : [ "datePerRate", "targetClassification", "message" ],
+        "type" : "object",
+        "properties" : {
+          "datePerRate" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "format" : "date",
+              "type" : "string",
+              "example" : "2022-03-10"
+            }
+          },
+          "targetClassification" : {
+            "$ref" : "#/components/schemas/BmiCategory"
+          },
+          "warning" : {
+            "type" : "boolean"
+          },
+          "message" : {
+            "type" : "string"
           }
         }
       }

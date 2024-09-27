@@ -6,7 +6,7 @@ import { getDateAsStr, parseStringAsDate } from '$lib/date.js';
 /**
  * @param {DataViews} view
  * @param {Date} start
- * @param {Array<WeightTrackerEntry>} entries
+ * @param {Array<WeightTracker>} entries
  */
 export const createWeightChart = (view, start, entries) => {
 	const legend = [];
@@ -108,11 +108,11 @@ export const createWeightChartDataset = (weight) => {
 
 /**
  *
- * @param {Array<WeightTrackerEntry>} entries
+ * @param {Array<WeightTracker>} entries
  * @param {Date} date
  * @param {DataViews} filter
  */
-export const paintWeightTrackerEntries = (entries, date, filter) => {
+export const paintWeightTracker = (entries, date, filter) => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 

@@ -3,27 +3,27 @@ package io.tohuwabohu
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
-import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
-import io.tohuwabohu.crud.Goal
+import io.tohuwabohu.crud.CalorieTarget
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.*
 
 @QuarkusTest
-@TestHTTPEndpoint(GoalsResource::class)
-class GoalsTest {
+@TestHTTPEndpoint(CalorieTargetResource::class)
+class CalorieTargetResourceTest {
+
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     fun `should create an entry`() {
         Given {
             header("Content-Type", ContentType.JSON)
-            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            body(calorieTargetResource(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
         } When {
             post("/create")
         } Then {
@@ -36,24 +36,24 @@ class GoalsTest {
     fun `should create two entries`() {
         val created1 = Given {
             header("Content-Type", ContentType.JSON)
-            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            body(calorieTargetResource(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
         } When {
             post("/create")
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(Goal::class.java)
+            body().`as`(CalorieTarget::class.java)
         }
 
         val created2 = Given {
             header("Content-Type", ContentType.JSON)
-            body(goal(UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            body(calorieTargetResource(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
         } When {
             post("/create")
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(Goal::class.java)
+            body().`as`(CalorieTarget::class.java)
         }
 
         assert(created1.sequence != created2.sequence)
@@ -62,9 +62,8 @@ class GoalsTest {
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     fun `should fail on creation`() {
-        var faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
-
-        faultyEntry.initialWeight = -100f
+        var faultyEntry = calorieTargetResource(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
+        faultyEntry.targetCalories = -100f
 
         Given {
             header("Content-Type", ContentType.JSON)
@@ -75,9 +74,8 @@ class GoalsTest {
             statusCode(400)
         }
 
-
-        faultyEntry = goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
-        faultyEntry.targetWeight = -200f
+        faultyEntry = calorieTargetResource(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002"))
+        faultyEntry.maximumCalories = -200f
 
         Given {
             header("Content-Type", ContentType.JSON)
@@ -94,13 +92,13 @@ class GoalsTest {
     fun `should create and read an entry`() {
         val created = Given {
             header("Content-Type", ContentType.JSON)
-            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            body(calorieTargetResource(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
         } When {
             post("/create")
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(Goal::class.java)
+            body().`as`(CalorieTarget::class.java)
         }
 
         val read = When {
@@ -108,14 +106,12 @@ class GoalsTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Goal::class.java)
+            body().`as`(CalorieTarget::class.java)
         }
 
         assert(created.added == read.added)
         assert(created.sequence == read.sequence)
         assert(created.userId == read.userId)
-        assert(created.initialWeight == read.initialWeight)
-        assert(created.targetWeight == read.targetWeight)
         assert(created.startDate == read.startDate)
         assert(created.endDate == read.endDate)
     }
@@ -123,20 +119,20 @@ class GoalsTest {
     @Test
     @TestSecurity(user = "410a1496-7fc7-11ee-b962-0242ac120002", roles = ["User"])
     fun `should create, update and read an entry`() {
-        val goal = goal(userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
+        val calorieTarget = calorieTargetResource(userId = UUID.fromString("410a1496-7fc7-11ee-b962-0242ac120002"))
 
         val created = Given {
             header("Content-Type", ContentType.JSON)
-            body(goal)
+            body(calorieTarget)
         } When {
             post("/create")
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(Goal::class.java)
+            body().`as`(CalorieTarget::class.java)
         }
 
-        created.targetWeight = 80.4f
+        created.targetCalories = 80.4f
 
         Given {
             header("Content-Type", ContentType.JSON)
@@ -152,11 +148,11 @@ class GoalsTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Goal::class.java)
+            body().`as`(CalorieTarget::class.java)
         }
 
         assert(created.sequence == read.sequence)
-        assert(goal.targetWeight != read.targetWeight)
+        assert(created.targetCalories == read.targetCalories)
         assert(read.updated != null)
     }
 
@@ -165,13 +161,12 @@ class GoalsTest {
     fun `should fail on update`() {
         Given {
             header("Content-Type", ContentType.JSON)
-            body(goal(userId = UUID.fromString("9f93b4fc-7fb3-11ee-b962-0242ac120002")))
+            body(calorieTargetResource(userId = UUID.fromString("9f93b4fc-7fb3-11ee-b962-0242ac120002")))
         } When {
             put("/update")
         } Then {
             statusCode(404)
         }
-
     }
 
     @Test
@@ -179,13 +174,13 @@ class GoalsTest {
     fun `should create and delete an entry`() {
         val created = Given {
             header("Content-Type", ContentType.JSON)
-            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            body(calorieTargetResource(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
         } When {
             post("/create")
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(Goal::class.java)
+            body().`as`(CalorieTarget::class.java)
         }
 
         When {
@@ -198,10 +193,10 @@ class GoalsTest {
     @Test
     @TestSecurity(user = "9f93c5fc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
     fun `should fail on delete`() {
-        val goalId = 123L
+        val targetId = 123L
 
         When {
-            delete("/delete/$goalId")
+            delete("/delete/${targetId}")
         } Then {
             statusCode(404)
         }
@@ -212,26 +207,26 @@ class GoalsTest {
     fun `should create and delete an entry and fail on read`() {
         val created = Given {
             header("Content-Type", ContentType.JSON)
-            body(goal(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
+            body(calorieTargetResource(userId = UUID.fromString("9f93c5fc-7fb3-11ee-b962-0242ac120002")))
         } When {
             post("/create")
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(Goal::class.java)
+            body().`as`(CalorieTarget::class.java)
         }
 
-        RestAssured.given()
-            .delete("/delete/${created.added}/${created.sequence}")
-            .then()
-            .assertThat()
-            .statusCode(200)
+        When {
+            delete("/delete/${created.added}/${created.sequence}")
+        } Then {
+            statusCode(200)
+        }
 
-        RestAssured.given()
-            .get("/read/${created.added}/${created.sequence}")
-            .then()
-            .assertThat()
-            .statusCode(404)
+        When {
+            get("/read/${created.added}/${created.sequence}")
+        } Then {
+            statusCode(404)
+        }
     }
 
     @Test
@@ -247,15 +242,15 @@ class GoalsTest {
     @Test
     @TestSecurity(user = "07225bfc-7fb4-11ee-b962-0242ac120002", roles = ["User"])
     fun `should create two entries and find the last`() {
-        val goal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
-        goal.initialWeight = 100f
-        goal.targetWeight = 200f
+        val calorieTarget1 = calorieTargetResource(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
+        calorieTarget1.targetCalories = 100f
+        calorieTarget1.maximumCalories = 200f
 
-        val lastGoal = goal(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
-        lastGoal.initialWeight = 50f
-        lastGoal.targetWeight = 250f
+        val calorieTarget2 = calorieTargetResource(UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002"))
+        calorieTarget2.targetCalories = 50f
+        calorieTarget2.maximumCalories = 250f
 
-        listOf(goal, lastGoal).forEach { item ->
+        listOf(calorieTarget1, calorieTarget2).forEach { item ->
             Given {
                 header("Content-Type", ContentType.JSON)
                 body(item)
@@ -270,10 +265,10 @@ class GoalsTest {
             get("/last")
         } Then {
             statusCode(200)
-            body("added", equalTo(lastGoal.added.toString()))
-            body("userId", equalTo(lastGoal.userId.toString()))
-            body("initialWeight", equalTo(lastGoal.initialWeight))
-            body("targetWeight", equalTo(lastGoal.targetWeight))
+            body("added", equalTo(calorieTarget2.added.toString()))
+            body("userId", equalTo(calorieTarget2.userId.toString()))
+            body("targetCalories", equalTo(calorieTarget2.targetCalories))
+            body("maximumCalories", equalTo(calorieTarget2.maximumCalories))
         }
     }
 
@@ -282,7 +277,7 @@ class GoalsTest {
     fun `should fail with 401`() {
         val userId = UUID.fromString("07225bfc-7fb4-11ee-b962-0242ac120002") // unrelated user's data
 
-        val entry = goal(userId)
+        val entry = calorieTargetResource(userId)
 
         Given {
             header("Content-Type", ContentType.JSON)
@@ -294,19 +289,17 @@ class GoalsTest {
         }
     }
 
-    private fun goal(userId: UUID): Goal {
-        val goal = Goal(
+    private fun calorieTargetResource(userId: UUID): CalorieTarget {
+        val target = CalorieTarget(
             startDate = LocalDate.now(),
             endDate = LocalDate.now().plusYears(1),
-            initialWeight = 95.3f,
-            targetWeight = 75.4f,
             targetCalories = 1921f,
             maximumCalories = 2200f
         )
 
-        goal.userId = userId
-        goal.added = LocalDate.now()
+        target.userId = userId
+        target.added = LocalDate.now()
 
-        return goal
+        return target
     }
 }

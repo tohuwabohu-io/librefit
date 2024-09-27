@@ -3,10 +3,11 @@ package io.tohuwabohu
 import io.quarkus.logging.Log
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.WeightTrackerEntry
+import io.tohuwabohu.crud.WeightTracker
 import io.tohuwabohu.crud.WeightTrackerRepository
 import io.tohuwabohu.crud.error.ErrorResponse
-import io.tohuwabohu.crud.error.createErrorResponse
+import io.tohuwabohu.crud.error.recoverWithResponse
+import io.tohuwabohu.crud.user.LibreUserSecurity
 import jakarta.annotation.security.RolesAllowed
 import jakarta.validation.Valid
 import jakarta.ws.rs.*
@@ -33,7 +34,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "201", description = "Created", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WeightTrackerEntry::class)
+                schema = Schema(implementation = WeightTracker::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [
@@ -46,17 +47,14 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "createWeightTrackerEntry"
+        operationId = "createWeightTracker"
     )
-    fun create(@Context securityIdentity: SecurityIdentity, @Valid weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
-        Log.info("Creating a new weight tracker entry=$weightTrackerEntry")
+    fun create(@Context securityIdentity: SecurityIdentity, @Valid weightTracker: WeightTracker): Uni<Response> {
+        Log.info("Creating a new weight tracker entry=$weightTracker")
 
-        weightTrackerEntry.userId = UUID.fromString(securityIdentity.principal.name)
-
-        return weightTrackerRepository.validateAndPersist(weightTrackerEntry)
+        return weightTrackerRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, weightTracker))
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @PUT
@@ -75,18 +73,14 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "updateWeightTrackerEntry"
+        operationId = "updateWeightTracker"
     )
-    fun update(@Context securityIdentity: SecurityIdentity, @Valid weightTrackerEntry: WeightTrackerEntry): Uni<Response> {
-        weightTrackerEntry.userId = UUID.fromString(securityIdentity.principal.name)
+    fun update(@Context securityIdentity: SecurityIdentity, @Valid weightTracker: WeightTracker): Uni<Response> {
+        Log.info("Updating weight tracker entry $weightTracker")
 
-        Log.info("Updating weight tracker entry $weightTrackerEntry")
-
-
-        return weightTrackerRepository.updateEntry(weightTrackerEntry, WeightTrackerEntry::class.java)
+        return weightTrackerRepository.updateEntry(LibreUserSecurity.withPrincipal(securityIdentity, weightTracker), WeightTracker::class.java)
             .onItem().transform { updated -> Response.ok(updated).build() }
-            .onFailure().invoke{ e -> Log.error(e)}
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @DELETE
@@ -104,16 +98,14 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "deleteWeightTrackerEntry"
+        operationId = "deleteWeightTracker"
     )
     fun delete(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
         Log.info("Delete weight tracker entry with added=$date sequence=$sequence")
 
-
         return weightTrackerRepository.deleteEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -124,7 +116,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WeightTrackerEntry::class)
+                schema = Schema(implementation = WeightTracker::class)
             )
         ]),
         APIResponse(responseCode = "404", description = "Not Found"),
@@ -136,13 +128,12 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "readWeightTrackerEntry"
+        operationId = "readWeightTracker"
     )
     fun read(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> =
         weightTrackerRepository.readEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
 
     @GET
     @Path("/list/dates/{dateFrom}/{dateTo}")
@@ -167,8 +158,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
 
         return weightTrackerRepository.listDatesForUser(UUID.fromString(securityIdentity.principal.name), dateFrom, dateTo)
             .onItem().transform { Response.ok(it).build() }
-            .onFailure().invoke { throwable -> Log.error(throwable) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -178,7 +168,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Array<WeightTrackerEntry>::class)
+                schema = Schema(implementation = Array<WeightTracker>::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -190,13 +180,12 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-        operationId = "listWeightTrackerEntries"
+        operationId = "listWeightTracker"
     )
     fun listEntries(@Context securityIdentity: SecurityIdentity, date: LocalDate): Uni<Response> {
         return weightTrackerRepository.listEntriesForUserAndDate(UUID.fromString(securityIdentity.principal.name), date)
             .onItem().transform { list -> Response.ok(list).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -206,7 +195,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Array<WeightTrackerEntry>::class)
+                schema = Schema(implementation = Array<WeightTracker>::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -218,13 +207,12 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-        operationId = "listWeightTrackerEntriesRange"
+        operationId = "listWeightTrackerRange"
     )
     fun listEntries(@Context securityIdentity: SecurityIdentity, dateFrom: LocalDate, dateTo: LocalDate): Uni<Response> {
         return weightTrackerRepository.listEntriesForUserAndDateRange(UUID.fromString(securityIdentity.principal.name), dateFrom, dateTo)
             .onItem().transform { list -> Response.ok(list).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -234,7 +222,7 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = WeightTrackerEntry::class)
+                schema = Schema(implementation = WeightTracker::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -246,11 +234,10 @@ class WeightTrackerResource(private val weightTrackerRepository: WeightTrackerRe
     )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-        operationId = "findLastWeightTrackerEntry"
+        operationId = "findLastWeightTracker"
     )
     fun findLast(@Context securityIdentity: SecurityIdentity, @Context securityContext: SecurityContext): Uni<Response> = weightTrackerRepository
         .findLastEntry(UUID.fromString(securityIdentity.principal.name))
         .onItem().transform { entry -> Response.ok(entry).build() }
-        .onFailure().invoke { e -> Log.error(e) }
-        .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+        .onFailure().recoverWithResponse()
 }

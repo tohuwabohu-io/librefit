@@ -29,7 +29,8 @@
 	export let validate = () => {
 		let valid = false;
 		let detail = validateDetail({
-			value: value
+			value: value,
+			label: label
 		});
 
 		if (required && isEmpty()) {

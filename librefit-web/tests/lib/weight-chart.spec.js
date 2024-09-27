@@ -1,7 +1,7 @@
 import {
 	createWeightChart,
 	createWeightChartDataset,
-	paintWeightTrackerEntries
+	paintWeightTracker
 } from '$lib/weight-chart.js';
 import { describe, expect, it, vi } from 'vitest';
 import { DataViews } from '$lib/enum.js';
@@ -127,7 +127,7 @@ describe('createWeightChartDataset function', async () => {
 /**
  * @vitest-environment jsdom
  */
-describe('paintWeightTrackerEntries function', () => {
+describe('paintWeightTracker function', () => {
 	it('should paint weight tracker entries with dark theme', async () => {
 		// Mock getComputedStyle
 		window.getComputedStyle = vi.fn().mockReturnValue({
@@ -152,7 +152,7 @@ describe('paintWeightTrackerEntries function', () => {
 		// Add 'dark' class to documentElement
 		document.documentElement.classList.add('dark');
 
-		const chart = paintWeightTrackerEntries(entries, date, DataViews.Month);
+		const chart = paintWeightTracker(entries, date, DataViews.Month);
 
 		expect(chart.chartData.datasets[0].label).toBe('Weight (kg)'); // Ensuring a dataset got created
 		expect(chart.chartOptions.scales.y.suggestedMin).toBe(67.5); // Min 2.5 less than the smallest weight
@@ -186,7 +186,7 @@ describe('paintWeightTrackerEntries function', () => {
 		// Ensure 'dark' class is not present
 		document.documentElement.classList.remove('dark');
 
-		const chart = paintWeightTrackerEntries(entries, date, DataViews.Month);
+		const chart = paintWeightTracker(entries, date, DataViews.Month);
 
 		expect(chart.chartData.datasets[0].label).toBe('Weight (kg)'); // Ensuring a dataset got created
 		expect(chart.chartOptions.scales.y.suggestedMin).toBe(67.5); // Min 2.5 less than the smallest weight

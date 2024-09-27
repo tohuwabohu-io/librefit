@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import WeightModal from '$lib/components/modal/WeightModal.svelte';
+import WeightModal from '$lib/components/modal/WeightTrackerModal.svelte';
 import { tick } from 'svelte';
 import { updateModalStoreMock } from '../../__mocks__/skeletonProxy.js'; // Adapt this to your needs
 

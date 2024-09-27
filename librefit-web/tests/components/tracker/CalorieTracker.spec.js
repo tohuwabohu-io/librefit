@@ -22,11 +22,10 @@ const mockEntries = [
 	{ added: '2023-11-10', sequence: 5, amount: 150, category: 's' }
 ];
 
-const mockGoal = {
+/** @type CalorieTarget */
+const mockCalorieTarget = {
 	added: '2023-01-01',
 	sequence: 1,
-	initialWeight: 70,
-	targetWeight: 60,
 	startDate: '2023-01-01',
 	endDate: '2023-12-31',
 	targetCalories: 2000,
@@ -41,21 +40,10 @@ describe('CalorieTracker.svelte component', () => {
 
 	// Test that the CalorieTracker component renders correctly
 	it('renders correctly', () => {
-		const mockGoal = {
-			added: '2023-01-01',
-			sequence: 1,
-			initialWeight: 70,
-			targetWeight: 60,
-			startDate: '2023-01-01',
-			endDate: '2023-12-31',
-			targetCalories: 2000,
-			maximumCalories: 2400
-		};
-
 		const { getByText, getByRole, getByTestId } = render(CalorieTracker, {
 			categories: mockCategories,
-			entries: mockEntries,
-			currentGoal: mockGoal
+			calorieTracker: mockEntries,
+			calorieTarget: mockCalorieTarget
 		});
 
 		// heading
@@ -167,8 +155,8 @@ describe('CalorieTracker.svelte component', () => {
 
 		const { component, getByText } = render(CalorieTracker, {
 			categories: mockCategories,
-			entries: mockEntries,
-			currentGoal: mockGoal
+			calorieTracker: mockEntries,
+			calorieTarget: mockCalorieTarget
 		});
 		component.$on('updateCalories', dispatchMock);
 
@@ -223,8 +211,8 @@ describe('CalorieTracker.svelte component', () => {
 
 		const { component, getByText } = render(CalorieTracker, {
 			categories: mockCategories,
-			entries: mockEntries,
-			currentGoal: mockGoal
+			calorieTracker: mockEntries,
+			calorieTarget: mockCalorieTarget
 		});
 
 		component.$on('deleteCalories', dispatchMock);

@@ -36,6 +36,7 @@ dependencies {
     testImplementation("io.quarkus:quarkus-test-security")
     testImplementation("io.quarkus:quarkus-jacoco")
     testImplementation("io.quarkus:quarkus-junit5:3.9.2")
+    testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("io.rest-assured:rest-assured:5.4.0")
     testImplementation("io.rest-assured:kotlin-extensions:5.3.2")
     testImplementation("io.quarkus:quarkus-test-vertx")

@@ -40,22 +40,22 @@ class ImportHelper(val calorieTrackerRepository: CalorieTrackerRepository, val w
         )
     }
 
-    private fun collectWeightEntries(userId: UUID, csvData: CsvData): List<WeightTrackerEntry> {
+    private fun collectWeightTracker(userId: UUID, csvData: CsvData): List<WeightTracker> {
         val dateFormatter = DateTimeFormatter.ofPattern(csvData.config.datePattern)
 
         return csvData.csv.map { line ->
-            val weightTrackerEntry = WeightTrackerEntry(
+            val weightTracker = WeightTracker(
                 amount = parseFloat(line.weight)
             )
 
-            weightTrackerEntry.userId = userId
-            weightTrackerEntry.added = LocalDate.parse(line.date, dateFormatter)
+            weightTracker.userId = userId
+            weightTracker.added = LocalDate.parse(line.date, dateFormatter)
 
-            weightTrackerEntry
+            weightTracker
         }
     }
 
-    private fun collectCalorieTrackerEntries(userId: UUID, csvData: CsvData): List<CalorieTrackerEntry> {
+    private fun collectCalorieTracker(userId: UUID, csvData: CsvData): List<CalorieTracker> {
         val dateFormatter = DateTimeFormatter.ofPattern(csvData.config.datePattern)
 
         return csvData.csv.flatMap { line ->
@@ -69,14 +69,14 @@ class ImportHelper(val calorieTrackerRepository: CalorieTrackerRepository, val w
                 "s" to line.snacks
             ).map { entry ->
                 if (entry.value.isNotEmpty()) {
-                    val calorieTrackerEntry = CalorieTrackerEntry(
+                    val calorieTracker = CalorieTracker(
                         amount = parseFloat(entry.value),
                         category = entry.key
                     )
 
-                    calorieTrackerEntry.added = parsedDate;
-                    calorieTrackerEntry.userId = userId;
-                    calorieTrackerEntry
+                    calorieTracker.added = parsedDate;
+                    calorieTracker.userId = userId;
+                    calorieTracker
                 } else null
             }.filterNotNull()
         }
@@ -84,16 +84,16 @@ class ImportHelper(val calorieTrackerRepository: CalorieTrackerRepository, val w
 
     @WithTransaction
     fun import(userId: UUID, csvData: CsvData): Uni<Void> {
-        val calorieTrackerEntries = collectCalorieTrackerEntries(userId, csvData)
-        val weightTrackerEntries = collectWeightEntries(userId, csvData)
+        val calorieTracker = collectCalorieTracker(userId, csvData)
+        val weightTracker = collectWeightTracker(userId, csvData)
 
         return if (csvData.config.updateCalorieTracker && csvData.config.updateWeightTracker) {
-            calorieTrackerRepository.importBulk(calorieTrackerEntries, csvData.config)
-                .chain { _ -> weightTrackerRepository.importBulk(weightTrackerEntries, csvData.config) }
+            calorieTrackerRepository.importBulk(calorieTracker, csvData.config)
+                .chain { _ -> weightTrackerRepository.importBulk(weightTracker, csvData.config) }
         } else if (csvData.config.updateCalorieTracker) {
-            calorieTrackerRepository.importBulk(calorieTrackerEntries, csvData.config)
+            calorieTrackerRepository.importBulk(calorieTracker, csvData.config)
         } else if (csvData.config.updateWeightTracker) {
-            weightTrackerRepository.importBulk(weightTrackerEntries, csvData.config)
+            weightTrackerRepository.importBulk(weightTracker, csvData.config)
         } else {
             return Uni.createFrom().failure(ValidationError(listOf(
                 ErrorDescription("importer", "At least one importer must be selected.")

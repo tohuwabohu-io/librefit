@@ -3,11 +3,9 @@
     import {convertDateStrToDisplayDateStr} from '$lib/date.js';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
 
-    let value;
-
     const modalStore = getModalStore();
 
-    /** @type Array<WeightTrackerEntry> */
+    /** @type Array<WeightTracker> */
     let weightList;
 
     if ($modalStore[0] && $modalStore[0].meta) {
@@ -55,10 +53,6 @@
 
         <button on:click|preventDefault={onCancel} class="btn variant-ringed">
             Cancel
-        </button>
-
-        <button on:click|preventDefault={onSubmit} class="btn variant-filled">
-            Submit
         </button>
     </footer>
 </div>

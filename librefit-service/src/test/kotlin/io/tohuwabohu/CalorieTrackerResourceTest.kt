@@ -8,7 +8,7 @@ import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
-import io.tohuwabohu.crud.CalorieTrackerEntry
+import io.tohuwabohu.crud.CalorieTracker
 import io.tohuwabohu.crud.FoodCategory
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
@@ -43,7 +43,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         val createdEntry2 = Given {
@@ -54,7 +54,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         assert(createdEntry1.sequence != createdEntry2.sequence)
@@ -87,7 +87,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         val readEntry = When {
@@ -95,7 +95,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         assert(createdEntry.added == readEntry.added)
@@ -118,7 +118,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         created.amount = 200f
@@ -132,7 +132,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         assert(created.sequence == updated.sequence)
@@ -165,7 +165,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         When {
@@ -198,7 +198,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
 
@@ -286,7 +286,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Array<CalorieTrackerEntry>::class.java)
+            body().`as`(Array<CalorieTracker>::class.java)
         }
 
         assert(entries.size == 2)
@@ -353,7 +353,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Array<CalorieTrackerEntry>::class.java)
+            body().`as`(Array<CalorieTracker>::class.java)
         }
 
         assert(entries.size == 2)
@@ -385,8 +385,8 @@ class CalorieTrackerResourceTest {
         assert(!shortcodes.contains("u"))
     }
 
-    private fun entry(userId: UUID): CalorieTrackerEntry {
-        val entry = CalorieTrackerEntry(
+    private fun entry(userId: UUID): CalorieTracker {
+        val entry = CalorieTracker(
             amount = 100f,
             category = "s",
         )

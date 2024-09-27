@@ -1,14 +1,13 @@
 package io.tohuwabohu;
 
-import io.quarkus.logging.Log
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.ImportConfig
 import io.tohuwabohu.crud.ImportHelper
+import io.tohuwabohu.crud.error.ErrorHandler.transformDateTimeParseException
+import io.tohuwabohu.crud.error.ErrorHandler.transformNumberFormatException
 import io.tohuwabohu.crud.error.ErrorResponse
-import io.tohuwabohu.crud.error.createErrorResponse
-import io.tohuwabohu.crud.error.transformDateTimeParseException
-import io.tohuwabohu.crud.error.transformNumberFormatException
+import io.tohuwabohu.crud.error.recoverWithResponse
 import jakarta.annotation.security.RolesAllowed
 import jakarta.enterprise.context.RequestScoped
 import jakarta.ws.rs.Consumes
@@ -57,12 +56,11 @@ class ImportResource(private val importHelper: ImportHelper) {
         return importHelper.readCsv(file.uploadedFile().toFile(), config)
             .chain { csv -> importHelper.import(userId, csv) }
         .onItem().transform { _ -> Response.ok().build() }
-            .onFailure().invoke { e -> Log.error(e) }
             .onFailure(DateTimeParseException::class.java)
                 .transform { t -> transformDateTimeParseException(t as DateTimeParseException, config.datePattern) }
             .onFailure(NumberFormatException::class.java)
                 .transform { _ -> transformNumberFormatException() }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
 
     }
 }

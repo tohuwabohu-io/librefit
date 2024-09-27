@@ -5,7 +5,7 @@
 
     const modalStore = getModalStore();
 
-    /** @type Array<CalorieTrackerEntry> */
+    /** @type Array<CalorieTracker> */
     export let entries;
 
     /** @type Array<FoodCategory> */

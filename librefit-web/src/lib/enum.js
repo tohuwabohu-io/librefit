@@ -11,6 +11,18 @@ export const DataViews = {
 };
 
 /**
+ * @readonly
+ * @enum {string}
+ */
+export const WizardOptions = {
+	Default: 'DEFAULT',
+	Recommended: 'RECOMMENDED',
+	Custom_weight: 'CUSTOM_WEIGHT',
+	Custom_date: 'CUSTOM_DATE',
+	Custom: 'CUSTOM'
+};
+
+/**
  * @type {{label: String, value: String}[]}
  */
 export const bmiCategoriesAsKeyValue = Object.keys(BmiCategory).map((key) => {

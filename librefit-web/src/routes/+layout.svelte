@@ -2,8 +2,8 @@
     import '../app.pcss';
     import {autoModeWatcher, AppShell, Drawer, initializeStores, Modal, Toast} from '@skeletonlabs/skeleton';
     import TopBar from '$lib/components/TopBar.svelte';
-    import WeightModal from '$lib/components/modal/WeightModal.svelte';
-    import GoalModal from '$lib/components/modal/GoalModal.svelte';
+    import WeightModal from '$lib/components/modal/WeightTrackerModal.svelte';
+    import TargetModal from '$lib/components/modal/TargetModal.svelte';
     import UserPanel from '$lib/components/UserPanel.svelte';
     import {onMount, setContext} from 'svelte';
     import {writable} from 'svelte/store';
@@ -26,8 +26,8 @@
             ref: WeightModal,
         },
 
-        goalModal: {
-            ref: GoalModal,
+        targetModal: {
+            ref: TargetModal,
         },
 
         avatarModal: {
@@ -49,19 +49,19 @@
 
     const user = writable();
     const indicator = writable();
-    const currentGoal = writable();
+    const weightTarget = writable();
+    const calorieTarget = writable();
     const lastWeight = writable();
     const foodCategories = writable();
-    const ctList = writable();
 
     $: indicator.set(new Indicator());
 
     setContext('user', user);
     setContext('indicator', indicator);
-    setContext('currentGoal', currentGoal);
+    setContext('weightTarget', weightTarget);
+    setContext('calorieTarget', calorieTarget);
     setContext('lastWeight', lastWeight);
     setContext('foodCategories', foodCategories);
-    setContext('ctList', ctList);
 
     const logout = () => {
         user.set(null);

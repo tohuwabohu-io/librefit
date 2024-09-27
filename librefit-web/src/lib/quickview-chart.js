@@ -1,11 +1,11 @@
 import { display_date_format_day, getDateAsStr, parseStringAsDate } from '$lib/date.js';
 
 /**
- * @param {Array<CalorieTrackerEntry>} calories
- * @param {Goal} goal
+ * @param {Array<CalorieTracker>} calories
+ * @param {CalorieTarget} calorieTarget
  * @return {{backgroundColor: *, data: number, label: string}[]}
  */
-const createCalorieTrackerQuickviewDataset = (calories, goal) => {
+const createCalorieTrackerQuickviewDataset = (calories, calorieTarget) => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 
@@ -47,17 +47,17 @@ const createCalorieTrackerQuickviewDataset = (calories, goal) => {
 		const total = sum[dateStr];
 		const date = parseStringAsDate(dateStr);
 
-		if (total <= goal.targetCalories) {
+		if (total <= calorieTarget.targetCalories) {
 			color = deficitColor;
-		} else if (total > goal.targetCalories && total <= goal.maximumCalories) {
+		} else if (total > calorieTarget.targetCalories && total <= calorieTarget.maximumCalories) {
 			color = surplusColor;
-		} else if (total > goal.maximumCalories) {
+		} else if (total > calorieTarget.maximumCalories) {
 			color = maximumColor;
 		}
 
 		labels.push(getDateAsStr(date, display_date_format_day));
 		data.push(total);
-		lineData.push(goal.targetCalories);
+		lineData.push(calorieTarget.targetCalories);
 		colors.push(`rgb(${color} / .7)`);
 		borderColors.push(`rgb(${borderColor})`);
 	});
@@ -87,10 +87,10 @@ const createCalorieTrackerQuickviewDataset = (calories, goal) => {
 	};
 };
 /**
- * @param {Array<CalorieTrackerEntry>} entries
- * @param {Goal} goal
+ * @param {Array<CalorieTracker>} entries
+ * @param {CalorieTarget} calorieTarget
  */
-export const paintCalorieTrackerQuickview = (entries, goal) => {
+export const paintCalorieTrackerQuickview = (entries, calorieTarget) => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 
@@ -104,7 +104,7 @@ export const paintCalorieTrackerQuickview = (entries, goal) => {
 
 	const noNaN = entries.map((entry) => entry.amount);
 
-	const chartData = createCalorieTrackerQuickviewDataset(entries, goal);
+	const chartData = createCalorieTrackerQuickviewDataset(entries, calorieTarget);
 
 	if (noNaN.length > 0) {
 		return {

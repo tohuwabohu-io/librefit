@@ -8,7 +8,7 @@ import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
-import io.tohuwabohu.crud.WeightTrackerEntry
+import io.tohuwabohu.crud.WeightTracker
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.*
@@ -40,7 +40,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         val createdEntry2 = Given {
@@ -51,7 +51,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         assert(createdEntry1.sequence != createdEntry2.sequence)
@@ -84,7 +84,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         val readEntry = When {
@@ -92,7 +92,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         assert(createdEntry.added == readEntry.added)
@@ -114,7 +114,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         created.amount = 200f
@@ -133,7 +133,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         assert(created.sequence == readEntry.sequence)
@@ -165,7 +165,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         When {
@@ -198,7 +198,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         When {
@@ -243,7 +243,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Array<WeightTrackerEntry>::class.java)
+            body().`as`(Array<WeightTracker>::class.java)
         }
 
         assert(entries.size == 2)
@@ -283,7 +283,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Array<WeightTrackerEntry>::class.java)
+            body().`as`(Array<WeightTracker>::class.java)
         }
 
         val entries2 = When {
@@ -291,7 +291,7 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Array<WeightTrackerEntry>::class.java)
+            body().`as`(Array<WeightTracker>::class.java)
         }
 
         val range1Keys = entries1.map { it.getPrimaryKey() }
@@ -393,15 +393,15 @@ class WeightTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(WeightTrackerEntry::class.java)
+            body().`as`(WeightTracker::class.java)
         }
 
         assert(lastEntry.added == entry2.added)
         assert(lastEntry.userId == entry2.userId)
     }
 
-    private fun entry(userId: UUID): WeightTrackerEntry {
-        val entry = WeightTrackerEntry(
+    private fun entry(userId: UUID): WeightTracker {
+        val entry = WeightTracker(
             amount = 100f
         )
 

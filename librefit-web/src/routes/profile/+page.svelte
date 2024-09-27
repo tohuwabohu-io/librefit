@@ -54,7 +54,7 @@
             type: 'component',
             component: 'avatarModal',
             response: (e) => {
-                if (!e.cancelled) {
+                if (e && !e.cancelled) {
                     selectedAvatar = e.avatar;
                 }
 

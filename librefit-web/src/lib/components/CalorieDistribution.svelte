@@ -13,7 +13,9 @@
 
     Chart.register(...registerables);
 
-    export let ctList;
+    /** @type List<CalorieTracker> */
+    export let calorieTracker;
+
     export let displayClass = '';
     export let displayHeader = true;
     export let displayHistory = true;
@@ -22,31 +24,31 @@
     /** @type Array<FoodCategory> */
     export let foodCategories;
 
-    /** @type Goal */
-    export let currentGoal;
+    /** @type CalorieTarget */
+    export let calorieTarget;
 
     let polarAreaChart, dailyAverage;
 
     /**
-     * @param {Array<CalorieTrackerEntry>} entries
+     * @param {Array<CalorieTracker>} entries
      */
     const refreshChart = (entries) => {
         polarAreaChart = createDistributionChart(entries, foodCategories, displayHistory);
         dailyAverage = getAverageDailyIntake(entries);
     }
 
-    $: ctList, refreshChart(ctList);
+    $: calorieTracker, refreshChart(calorieTracker);
 
     observeToggle(document.documentElement, () => {
-        refreshChart(ctList);
+        refreshChart(calorieTracker);
     });
 </script>
 
 <div class="{displayClass} gap-4 text-center justify-between items-center relative h-full">
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
-    {#if ctList && ctList.length > 0}
-        <div class="flex flex-col w-fit h-full justify-between gap-4">
+    {#if calorieTracker && calorieTracker.length > 0}
+        <div class="flex flex-col md:max-2xl:w-fit h-full justify-between gap-4">
             <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
             <div>
@@ -55,8 +57,8 @@
                     <div class="flex flex-row text">
                         ~{dailyAverage}kcal
 
-                        {#if currentGoal}
-                            {@const targetAverageRatio = dailyAverage / currentGoal.targetCalories}
+                        {#if calorieTarget}
+                            {@const targetAverageRatio = dailyAverage / calorieTarget.targetCalories}
                             <span>
                                 {#if targetAverageRatio <= 1}
                                     <Check color="rgb(var(--color-primary-700))"/>
@@ -69,12 +71,12 @@
                         {/if}
                     </div>
 
-                    {#if currentGoal}
+                    {#if calorieTarget}
                         <div class="text-right">
                             &empty; target intake:
                         </div>
                         <div class="text-left">
-                            ~{currentGoal.targetCalories}kcal
+                            ~{calorieTarget.targetCalories}kcal
                         </div>
                     {/if}
                 </div>

@@ -1,10 +1,11 @@
-package io.tohuwabohu.crud.relation
+package io.tohuwabohu.crud.user
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
+import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.ImportConfig
@@ -70,11 +71,26 @@ abstract class LibreUserWeakEntity : PanacheEntityBase {
     }
 }
 
+object LibreUserSecurity {
+    @JsonIgnore
+    fun <Entity: LibreUserWeakEntity> withPrincipal(securityIdentity: SecurityIdentity, entity: Entity): Entity {
+        entity.userId = UUID.fromString(securityIdentity.principal.name)
+
+        return entity
+    }
+}
+
 abstract class LibreUserRelatedRepository<Entity : LibreUserWeakEntity> : PanacheRepositoryBase<Entity, LibreUserCompositeKey> {
     @Inject
     lateinit var validator: Validator
 
-    fun validate(entity: Entity) {
+    fun withPrincipal(securityIdentity: SecurityIdentity, entity: Entity): LibreUserRelatedRepository<Entity> {
+        entity.userId = UUID.fromString(securityIdentity.principal.name)
+
+        return this
+    }
+
+    private fun validate(entity: Entity) {
         val violations = validator.validate(entity)
 
         if (violations.isNotEmpty()) {

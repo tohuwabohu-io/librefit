@@ -3,17 +3,24 @@ package io.tohuwabohu
 import io.quarkus.logging.Log
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
-import io.tohuwabohu.crud.Goal
-import io.tohuwabohu.crud.GoalsRepository
+import io.tohuwabohu.crud.CalorieTarget
+import io.tohuwabohu.crud.CalorieTargetRepository
 import io.tohuwabohu.crud.error.ErrorResponse
-import io.tohuwabohu.crud.error.createErrorResponse
+import io.tohuwabohu.crud.error.recoverWithResponse
+import io.tohuwabohu.crud.user.LibreUserSecurity
 import jakarta.annotation.security.RolesAllowed
+import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Valid
-import jakarta.ws.rs.*
+import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.DELETE
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.POST
+import jakarta.ws.rs.PUT
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import jakarta.ws.rs.core.SecurityContext
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
@@ -22,8 +29,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import java.time.LocalDate
 import java.util.*
 
-@Path("/api/goals")
-class GoalsResource(private val goalsRepository: GoalsRepository) {
+@Path("/api/target/calories")
+class CalorieTargetResource(private val calorieTargetRepository: CalorieTargetRepository) {
     @POST
     @Path("/create")
     @RolesAllowed("User", "Admin")
@@ -33,7 +40,7 @@ class GoalsResource(private val goalsRepository: GoalsRepository) {
         APIResponse(responseCode = "201", description = "Created", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Goal::class)
+                schema = Schema(implementation = CalorieTarget::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [
@@ -46,17 +53,14 @@ class GoalsResource(private val goalsRepository: GoalsRepository) {
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "createGoal"
+        operationId = "createCalorieTarget"
     )
-    fun create(@Context securityIdentity: SecurityIdentity, @Valid goal: Goal): Uni<Response> {
-        Log.info("Creating a new goal=$goal")
+    fun create(@Context securityIdentity: SecurityIdentity, @Valid calorieTarget: CalorieTarget): Uni<Response> {
+        Log.info("Creating a new calorieTarget=$calorieTarget")
 
-        goal.userId = UUID.fromString(securityIdentity.principal.name)
-
-        return goalsRepository.validateAndPersist(goal)
+        return calorieTargetRepository.validateAndPersist(LibreUserSecurity.withPrincipal(securityIdentity, calorieTarget))
             .onItem().transform { entry -> Response.ok(entry).status(Response.Status.CREATED).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem{throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @PUT
@@ -75,16 +79,14 @@ class GoalsResource(private val goalsRepository: GoalsRepository) {
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "updateGoal"
+        operationId = "updateCalorieTarget"
     )
-    fun update(@Context securityContext: SecurityContext, @Valid goal: Goal): Uni<Response> {
-        Log.info("updating goal $goal")
+    fun update(@Context securityIdentity: SecurityIdentity, @Valid calorieTarget: CalorieTarget): Uni<Response> {
+        Log.info("updating calorieTarget $calorieTarget")
 
-
-        return goalsRepository.updateEntry(goal, Goal::class.java)
+        return calorieTargetRepository.updateEntry(LibreUserSecurity.withPrincipal(securityIdentity, calorieTarget), CalorieTarget::class.java)
             .onItem().transform { updated -> Response.ok(updated).build() }
-            .onFailure().invoke{ e -> Log.error(e)}
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -95,7 +97,7 @@ class GoalsResource(private val goalsRepository: GoalsRepository) {
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Goal::class)
+                schema = Schema(implementation = CalorieTarget::class)
             )
         ]),
         APIResponse(responseCode = "404", description = "Not Found"),
@@ -107,13 +109,12 @@ class GoalsResource(private val goalsRepository: GoalsRepository) {
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "readGoal"
+        operationId = "readCalorieTarget"
     )
     fun read(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
-        return goalsRepository.readEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
+        return calorieTargetRepository.readEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { entry -> Response.ok(entry).build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem { throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @DELETE
@@ -131,15 +132,14 @@ class GoalsResource(private val goalsRepository: GoalsRepository) {
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(
-        operationId = "deleteGoal"
+        operationId = "deleteCalorieTarget"
     )
     fun delete(@Context securityIdentity: SecurityIdentity, date: LocalDate, sequence: Long): Uni<Response> {
-        Log.info("deleting goal with added=$date Ssequence=$sequence")
+        Log.info("deleting calorieTarget with added=$date Ssequence=$sequence")
 
-        return goalsRepository.deleteEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
+        return calorieTargetRepository.deleteEntry(UUID.fromString(securityIdentity.principal.name), date, sequence)
             .onItem().transform { deleted -> if (deleted == true) Response.ok().build() else Response.serverError().build() }
-            .onFailure().invoke { e -> Log.error(e) }
-            .onFailure().recoverWithItem {throwable -> createErrorResponse(throwable) }
+            .onFailure().recoverWithResponse()
     }
 
     @GET
@@ -149,7 +149,7 @@ class GoalsResource(private val goalsRepository: GoalsRepository) {
         APIResponse(responseCode = "200", description = "OK", content = [
             Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = Goal::class)
+                schema = Schema(implementation = CalorieTarget::class)
             )
         ]),
         APIResponse(responseCode = "400", description = "Bad Request", content = [ Content(
@@ -161,11 +161,11 @@ class GoalsResource(private val goalsRepository: GoalsRepository) {
     )
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-        operationId = "findLastGoal"
+        operationId = "findLastCalorieTarget"
     )
-    fun latest(@Context securityIdentity: SecurityIdentity): Uni<Response> = goalsRepository
-        .findLastGoal(UUID.fromString(securityIdentity.principal.name))
-        .onItem().transform { entry -> Response.ok(entry).build() }
-        .onFailure().invoke { e -> Log.error(e) }
-        .onFailure().recoverWithItem{ throwable -> createErrorResponse(throwable) }
+    fun latest(@Context securityIdentity: SecurityIdentity): Uni<Response> = calorieTargetRepository
+        .findLatestCalorieTarget(UUID.fromString(securityIdentity.principal.name))
+        .onItem().ifNotNull().transform { entry -> Response.ok(entry).build() }
+        .onItem().ifNull().failWith(EntityNotFoundException())
+        .onFailure().recoverWithResponse()
 }
