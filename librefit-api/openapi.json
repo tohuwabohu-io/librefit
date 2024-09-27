@@ -672,92 +672,6 @@
         } ]
       }
     },
-    "/api/tdee/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}" : {
-      "get" : {
-        "tags" : [ "Tdee Resource" ],
-        "operationId" : "calculateTdee",
-        "parameters" : [ {
-          "name" : "activityLevel",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "float",
-            "type" : "number"
-          }
-        }, {
-          "name" : "age",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        }, {
-          "name" : "calculationGoal",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/CalculationGoal"
-          }
-        }, {
-          "name" : "height",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        }, {
-          "name" : "sex",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/components/schemas/CalculationSex"
-          }
-        }, {
-          "name" : "weeklyDifference",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "float",
-            "type" : "number"
-          }
-        }, {
-          "name" : "weight",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "format" : "int32",
-            "type" : "integer"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Tdee"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error"
-          }
-        }
-      }
-    },
     "/api/tracker/calories/categories/list" : {
       "get" : {
         "tags" : [ "Calorie Tracker Resource" ],
@@ -1809,6 +1723,240 @@
           "SecurityScheme" : [ ]
         } ]
       }
+    },
+    "/api/wizard/calculate/{age}/{sex}/{weight}/{height}/{activityLevel}/{weeklyDifference}/{calculationGoal}" : {
+      "get" : {
+        "tags" : [ "Wizard Resource" ],
+        "operationId" : "calculateTdee",
+        "parameters" : [ {
+          "name" : "activityLevel",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "float",
+            "type" : "number"
+          }
+        }, {
+          "name" : "age",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "calculationGoal",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationGoal"
+          }
+        }, {
+          "name" : "height",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "sex",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationSex"
+          }
+        }, {
+          "name" : "weeklyDifference",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "float",
+            "type" : "number"
+          }
+        }, {
+          "name" : "weight",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WizardResult"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/wizard/custom/date/{age}/{height}/{weight}/{sex}/{targetDate}/{calculationGoal}" : {
+      "get" : {
+        "tags" : [ "Wizard Resource" ],
+        "operationId" : "calculateForTargetDate",
+        "parameters" : [ {
+          "name" : "age",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "calculationGoal",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationGoal"
+          }
+        }, {
+          "name" : "height",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "sex",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationSex"
+          }
+        }, {
+          "name" : "targetDate",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "weight",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WizardTargetDateResult"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/wizard/custom/weight/{age}/{height}/{weight}/{sex}/{targetWeight}" : {
+      "get" : {
+        "tags" : [ "Wizard Resource" ],
+        "operationId" : "calculateForTargetWeight",
+        "parameters" : [ {
+          "name" : "age",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "height",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "sex",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/CalculationSex"
+          }
+        }, {
+          "name" : "targetWeight",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "name" : "weight",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WizardTargetWeightResult"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          }
+        }
+      }
     }
   },
   "components" : {
@@ -2096,78 +2244,6 @@
         "type" : "string",
         "example" : "2022-03-10T12:15:50"
       },
-      "Tdee" : {
-        "required" : [ "age", "sex", "weight", "height", "weeklyDifference", "calculationGoal", "tdee", "bmiCategory", "targetBmi", "durationDays" ],
-        "type" : "object",
-        "properties" : {
-          "age" : {
-            "maximum" : 99,
-            "minimum" : 18,
-            "type" : "number"
-          },
-          "sex" : {
-            "$ref" : "#/components/schemas/CalculationSex"
-          },
-          "weight" : {
-            "maximum" : 300,
-            "minimum" : 30,
-            "type" : "number"
-          },
-          "height" : {
-            "maximum" : 300,
-            "minimum" : 30,
-            "type" : "number"
-          },
-          "activityLevel" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "weeklyDifference" : {
-            "maximum" : 7,
-            "minimum" : 0,
-            "type" : "number"
-          },
-          "calculationGoal" : {
-            "$ref" : "#/components/schemas/CalculationGoal"
-          },
-          "bmr" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "tdee" : {
-            "type" : "number"
-          },
-          "deficit" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "target" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "bmi" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "bmiCategory" : {
-            "$ref" : "#/components/schemas/BmiCategory"
-          },
-          "targetBmi" : {
-            "type" : "array",
-            "items" : {
-              "format" : "int32",
-              "type" : "integer"
-            }
-          },
-          "targetWeight" : {
-            "format" : "float",
-            "type" : "number"
-          },
-          "durationDays" : {
-            "type" : "number"
-          }
-        }
-      },
       "UUID" : {
         "format" : "uuid",
         "pattern" : "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}",
@@ -2270,6 +2346,109 @@
           },
           "weightTracker" : {
             "$ref" : "#/components/schemas/WeightTracker"
+          }
+        }
+      },
+      "WizardRecommendation" : {
+        "enum" : [ "HOLD", "LOSE", "GAIN" ],
+        "type" : "string"
+      },
+      "WizardResult" : {
+        "required" : [ "tdee", "bmiCategory", "recommendation", "durationDays", "durationDaysUpper", "durationDaysLower" ],
+        "type" : "object",
+        "properties" : {
+          "bmr" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "tdee" : {
+            "type" : "number"
+          },
+          "deficit" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "target" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "bmi" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "bmiCategory" : {
+            "$ref" : "#/components/schemas/BmiCategory"
+          },
+          "recommendation" : {
+            "$ref" : "#/components/schemas/WizardRecommendation"
+          },
+          "targetBmi" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "targetBmiUpper" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "targetBmiLower" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "targetWeight" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "targetWeightUpper" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "targetWeightLower" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "durationDays" : {
+            "type" : "number"
+          },
+          "durationDaysUpper" : {
+            "type" : "number"
+          },
+          "durationDaysLower" : {
+            "type" : "number"
+          }
+        }
+      },
+      "WizardTargetDateResult" : {
+        "required" : [ "resultByRate" ],
+        "type" : "object",
+        "properties" : {
+          "resultByRate" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/WizardResult"
+            }
+          }
+        }
+      },
+      "WizardTargetWeightResult" : {
+        "required" : [ "datePerRate", "targetClassification", "message" ],
+        "type" : "object",
+        "properties" : {
+          "datePerRate" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "format" : "date",
+              "type" : "string",
+              "example" : "2022-03-10"
+            }
+          },
+          "targetClassification" : {
+            "$ref" : "#/components/schemas/BmiCategory"
+          },
+          "warning" : {
+            "type" : "boolean"
+          },
+          "message" : {
+            "type" : "string"
           }
         }
       }
