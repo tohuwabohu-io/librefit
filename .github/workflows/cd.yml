@@ -36,7 +36,7 @@ jobs:
         uses: StephaneBour/actions-calver@master
         id: calver
         with:
-          date_format: '%Y.%m.%d'
+          date_format: '+%y.%V'
           release: true
           release_branch: main
         env:
