@@ -41,7 +41,7 @@
         targetsByRate = $modalStore[0].meta.targetsByRate;
         warningMessage = $modalStore[0].meta.warningMessage;
 
-        rates = Object.keys(targetsByRate);
+        rates = targetsByRate ? Object.keys(targetsByRate) : [];
 
         if (rates.length > 0) {
             rateActive = rates[rates.length - 1];
