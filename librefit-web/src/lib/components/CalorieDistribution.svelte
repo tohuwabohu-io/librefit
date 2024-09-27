@@ -48,7 +48,7 @@
     {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
     {#if calorieTracker && calorieTracker.length > 0}
-        <div class="flex flex-col w-fit h-full justify-between gap-4">
+        <div class="flex flex-col md:max-2xl:w-fit h-full justify-between gap-4">
             <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
             <div>
