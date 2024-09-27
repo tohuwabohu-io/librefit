@@ -172,7 +172,7 @@
 								{#if datesToEntries[dateStr]}
 									<CalorieTracker calorieTracker={datesToEntries[dateStr]}
 										categories={$foodCategories}
-										bind:calorieTarget={$calorieTarget}
+										calorieTarget={$calorieTarget}
 										on:addCalories={addEntry}
 										on:updateCalories={updateEntry}
 										on:deleteCalories={deleteEntry}
@@ -182,7 +182,7 @@
 														 displayHistory={false}
 														 displayHeader={false}
 														 foodCategories={$foodCategories}
-														 bind:calorieTarget={$calorieTarget}
+														 calorieTarget={$calorieTarget}
 									/>
 								{:else}
 									{#await datesToEntries[dateStr]}
@@ -191,7 +191,7 @@
 										{#if entries}
 											<CalorieTracker calorieTracker={entries}
 												categories={$foodCategories}
-												bind:calorieTarget={$calorieTarget}
+												calorieTarget={$calorieTarget}
 												on:addCalories={addEntry}
 												on:updateCalories={updateEntry}
 												on:deleteCalories={deleteEntry}
