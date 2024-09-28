@@ -9,7 +9,6 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.flywaydb.core.Flyway
-import java.io.File
 import java.util.*
 import javax.sql.DataSource
 
@@ -34,6 +33,9 @@ class FlywayMigration {
     @ConfigProperty(name = "quarkus.datasource.password")
     private lateinit var datasourcePassword: String
 
+    @ConfigProperty(name = "librefit.flyway.migration.folder")
+    private lateinit var flywayMigrationFolder: String
+
     @ConfigProperty(name = "librefit.flyway.migration.files")
     private lateinit var flywayMigrationFiles: List<String>
 
@@ -43,7 +45,9 @@ class FlywayMigration {
         Log.info("Checking migration... flag is set to $migrate.")
 
         if (migrate) {
-            Log.info("Flyway migration files set to $flywayMigrationFiles")
+            Log.info("Flyway migration files set to $flywayMigrationFiles in folder $flywayMigrationFolder.")
+
+            flywayMigrationFiles = flywayMigrationFiles.map { file -> "$flywayMigrationFolder/$file" }
 
             QuarkusPathLocationScanner.setApplicationMigrationFiles(flywayMigrationFiles)
 
