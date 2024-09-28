@@ -19,9 +19,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -36,7 +33,7 @@ jobs:
         uses: StephaneBour/actions-calver@master
         id: calver
         with:
-          date_format: '+%y.%V'
+          date_format: '%y.%V'
           release: true
           release_branch: main
         env:
