@@ -28,7 +28,7 @@ alter table calorie_target
     owner to librefit;
 
 alter table weight_target
-    owner to libreift;
+    owner to librefit;
 
 insert into calorie_target (user_id, added, sequence, start_date, end_date, target_calories, maximum_calories, updated)
     select user_id, added, sequence, start_date, end_date, target_calories, maximum_calories, updated from goal;
