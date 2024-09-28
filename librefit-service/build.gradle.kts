@@ -18,7 +18,7 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
-    implementation("io.quarkiverse.quinoa:quarkus-quinoa:2.3.6")
+    implementation("io.quarkiverse.quinoa:quarkus-quinoa:2.4.9")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-flyway")
