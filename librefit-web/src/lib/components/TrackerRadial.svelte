@@ -1,19 +1,25 @@
 <script>
-	import {getContext} from 'svelte';
 
-	const currentGoal = getContext('currentGoal');
-
-	export let limit = $currentGoal && $currentGoal.targetCalories ? $currentGoal.targetCalories : 0,
-		maximum = $currentGoal && $currentGoal.maximumCalories ? $currentGoal.maximumCalories : 0,
-		total = 0;
-	export let width = 512,
-		height = 512;
+	/** @type CalorieTarget */
+	export let calorieTarget;
 
 	/** @type {Array<number>} */
-	export let entries = [];
+	export let entries;
 
-	$: if (entries.length > 0) {
+	let limit = calorieTarget && calorieTarget.targetCalories ? calorieTarget.targetCalories : 0,
+		maximum = calorieTarget && calorieTarget.maximumCalories ? calorieTarget.maximumCalories : 0,
+		total = 0;
+
+	let width = 512,
+		height = 512;
+
+	$: if (entries && entries.length > 0) {
 		total = entries.reduce((a, b) => a + b);
+	}
+
+	$: if (calorieTarget) {
+		limit = calorieTarget.targetCalories;
+		maximum = calorieTarget.maximumCalories;
 	}
 
 	let innerEnd, outerEnd;
@@ -66,7 +72,7 @@
 				stroke-linecap="round"
 			/>
 
-			{#if $currentGoal}
+			{#if calorieTarget}
 				<path
 					d={arc(width / 2, height / 2, outerRadius, 0, outerEnd)}
 					class="progress-radial-track fill-transparent {strokeClass}"
@@ -89,7 +95,7 @@
 				stroke-linecap="round"
 			/>
 
-			{#if $currentGoal}
+			{#if calorieTarget}
 				<path
 					d={arc(width / 2, height / 2, innerRadius, 0, innerEnd)}
 					class="progress-radial-track fill-transparent stroke-secondary-500"
@@ -113,10 +119,10 @@
 			font-size="56"
 			class="progress-radial-text fill-token"
 		>
-			{total} {#if $currentGoal} / {limit} {/if}
+			{total} {#if calorieTarget} / {limit} {/if}
 		</text>
 
-		{#if $currentGoal}
+		{#if calorieTarget}
 			<text
 				x={width / 2}
 				y={height / 2 + 60}

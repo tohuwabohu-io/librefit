@@ -1,248 +1,260 @@
 <script>
-	import TdeeStepper from '$lib/components/TdeeStepper.svelte';
-	import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
-	import {showToastError, showToastSuccess} from '$lib/toast.js';
-	import * as dateUtil from 'date-fns';
-	import {getContext} from 'svelte';
-	import {proxyFetch} from '$lib/api/util.js';
-	import {api} from '$lib/api/index.js';
-    import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
+    import TdeeStepper from '$lib/components/TdeeStepper.svelte';
+    import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
+    import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
+    import {getContext} from 'svelte';
+    import {proxyFetch} from '$lib/api/util.js';
+    import {api} from '$lib/api/index.js';
+    import {goto} from '$app/navigation';
+    import {
+        postWizardResult,
+        calculateForTargetDate,
+        calculateForTargetWeight,
+        createTargetWeightTargets,
+        createTargetDateTargets,
+        validateCustomDate,
+        validateCustomWeight
+    } from '$lib/api/wizard.js';
+    import WizardResult from '$lib/components/wizard/WizardResult.svelte';
+    import WizardTarget from '$lib/components/wizard/WizardTarget.svelte';
+    import {addDays} from 'date-fns';
     import {getDateAsStr} from '$lib/date.js';
-	import {goto} from '$app/navigation';
+    import {WizardOptions} from '$lib/enum.js';
+    import {WizardRecommendation} from '$lib/api/model.js';
 
-	const modalStore = getModalStore();
-	const toastStore = getToastStore();
+    const toastStore = getToastStore();
+    const modalStore = getModalStore();
 
-	const lastWeightEntry = getContext('lastWeight');
-	const currentGoal = getContext('currentGoal');
-	const indicator = getContext('indicator');
-	const user = getContext('user');
+    const indicator = getContext('indicator');
+    const user = getContext('user');
 
-	if (!$user) goto('/');
+    if (!$user) goto('/');
 
-	/** @type Tdee */
-	let calculationResult;
+    /** @type WizardResult */
+    let calculationResult;
 
-	let calculationError;
+    /** @type WizardInput */
+    let calculationInput;
 
-	const bmiCategories = bmiCategoriesAsKeyValue;
-	const today = new Date();
+    let calculationError;
 
-	const calculate = async (e) => {
-		$indicator = $indicator.start();
+    let chosenOption = {
+        userChoice: undefined,
+        customDetails: undefined
+    };
 
-		await proxyFetch(fetch, api.calculateTdee, e.detail.tdee).then(async response => {
-			if (response.ok) {
-				calculationResult = await response.json();
-			} else {
-				calculationError = true;
-			}
-		}).catch(console.error).finally(() => $indicator = $indicator.finish());
-	}
+    let customErrors = {
+        weight: undefined,
+        date: undefined
+    }
 
-	const reset = () => {
-		calculationResult = undefined;
-		calculationError = false;
-	}
+    const today = new Date();
 
-	/** @param {Tdee} calculationResult */
-	const showGoalModal = (calculationResult) => {
-		const endDate = dateUtil.addDays(today, calculationResult.durationDays);
+    const calculate = async (e) => {
+        $indicator = $indicator.start();
 
-		modalStore.trigger({
-			type: 'component',
-			component: 'goalModal',
-			meta: {
-				/** @type Goal */
-				goal: {
-					added: getDateAsStr(today),
-					endDate: getDateAsStr(endDate),
-					startDate: getDateAsStr(today),
-					initialWeight: calculationResult.weight,
-					targetWeight: calculationResult.targetWeight,
-					targetCalories: calculationResult.target,
-					maximumCalories: calculationResult.tdee
-				}
-			},
-			response: async (e) => {
-				if (!e.cancelled) {
-					await createGoalAddWeight(e.goal);
-				}
+        await proxyFetch(fetch, api.calculateTdee, e.detail.input).then(async response => {
+            if (response.ok) {
+                calculationResult = await response.json();
+                calculationInput = e.detail.input;
+            } else {
+                calculationError = true;
+            }
+        }).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
+    }
 
-				modalStore.close();
-			}
-		})
-	}
+    const calculateCustomDate = async (wizardDetails) => {
+        const validation = validateCustomDate({
+            value: wizardDetails.targetDate
+        });
 
-	const createGoalAddWeight = async (goal) => {
-		$indicator = $indicator.start();
+        if (!validation.valid) {
+            showToastWarning(toastStore, validation.errorMessage)
+        } else {
+            $indicator = $indicator.start();
 
-		await proxyFetch(fetch, api.createGoal, goal).then(async response => {
-			if (response.ok) {
-				showToastSuccess(toastStore, 'Successfully created goal.');
+            await calculateForTargetDate({
+                age: calculationInput.age,
+                height: calculationInput.height,
+                weight: calculationInput.weight,
+                sex: calculationInput.sex,
+                targetDate: wizardDetails.targetDate,
+                calculationGoal: calculationInput.calculationGoal
+            }).then(/** @type WizardTargetDateResult */ customWizardResult => {
+                const targetsByRate = createTargetDateTargets(calculationInput, calculationResult, customWizardResult, today, wizardDetails.targetDate);
 
-				currentGoal.set(await response.json());
+                showModal({
+                    targetsByRate: targetsByRate
+                });
+            }).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
+        }
 
-				return proxyFetch(fetch, api.createWeightTrackerEntry, {
-					added: getDateAsStr(today),
-					amount: goal.initialWeight
-				})
-			} else {
-				throw Error();
-			}
-		}).then(async response => {
-			if (response.ok) {
-				lastWeightEntry.set(await response.json());
-			}
-		}).catch((error) => showToastError(toastStore, error)).finally(() => $indicator = $indicator.finish())
-	}
+    }
+
+    const calculateCustomWeight = async (wizardDetails) => {
+        const validation = validateCustomWeight({
+            value: wizardDetails.targetWeight
+        });
+
+        if (!validation.valid) {
+            showToastWarning(toastStore, validation.errorMessage)
+        } else {
+            $indicator = $indicator.start();
+
+            await calculateForTargetWeight({
+                age: calculationInput.age,
+                height: calculationInput.height,
+                weight: calculationInput.weight,
+                sex: calculationInput.sex,
+                targetWeight: wizardDetails.targetWeight
+            }).then(/** @type WizardTargetWeightResult */ customWizardResult => {
+                const targetsByRate = createTargetWeightTargets(calculationInput, calculationResult, customWizardResult, today, wizardDetails.targetWeight);
+
+                showModal({
+                    targetsByRate: targetsByRate,
+                    warningMessage: customWizardResult.message
+                });
+            }).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
+        }
+
+    }
+
+    const reset = () => {
+        calculationResult = undefined;
+        calculationError = false;
+        chosenOption.userChoice = undefined;
+        chosenOption.customDetails = undefined;
+    }
+
+    /** @param {WizardResult} calculationResult */
+    const processResult =  async (calculationResult) => {
+        const endDate = addDays(today, calculationResult.durationDays);
+
+        const wizardDetails = {
+            /** @type CalorieTarget */
+            calorieTarget: {
+                added: getDateAsStr(today),
+                endDate: getDateAsStr(endDate),
+                startDate: getDateAsStr(today),
+            },
+
+            /** @type WeightTarget */
+            weightTarget: {
+                added: getDateAsStr(today),
+                endDate: getDateAsStr(endDate),
+                startDate: getDateAsStr(today),
+                initialWeight: calculationInput.weight
+            }
+        }
+
+        if (chosenOption.userChoice === WizardOptions.Default) {
+            wizardDetails.calorieTarget.targetCalories = calculationResult.target;
+            wizardDetails.calorieTarget.maximumCalories = calculationResult.tdee;
+
+            wizardDetails.weightTarget.targetWeight = calculationResult.targetWeight;
+
+            showModal(wizardDetails);
+        } else if (chosenOption.userChoice === WizardOptions.Recommended) {
+            if (calculationResult.recommendation === WizardRecommendation.Hold) {
+                wizardDetails.calorieTarget.targetCalories = calculationResult.tdee;
+                wizardDetails.calorieTarget.maximumCalories = calculationResult.tdee;
+
+                wizardDetails.weightTarget.targetWeight = calculationInput.weight;
+
+                showModal(wizardDetails);
+            } else {
+                wizardDetails.calorieTarget.targetCalories = calculationResult.target;
+                wizardDetails.calorieTarget.maximumCalories = calculationResult.tdee;
+
+                // calculate for recommendation
+                await calculateCustomWeight({
+                    targetWeight: calculationResult.recommendation === WizardRecommendation.Gain
+                        ? calculationResult.targetWeightLower : calculationResult.targetWeightUpper
+                });
+            }
+        } else if (chosenOption.userChoice === WizardOptions.Custom_date) {
+            // calculate with custom weight input
+            await calculateCustomDate({targetDate: chosenOption.customDetails});
+        } else if (chosenOption.userChoice === WizardOptions.Custom_weight) {
+            // calculate with custom date input
+            await calculateCustomWeight({targetWeight: chosenOption.customDetails});
+        } else if (chosenOption.userChoice === WizardOptions.Custom) {
+            showModal(wizardDetails);
+        }
+    }
+
+    const showModal = (wizardDetails) => {
+        modalStore.trigger({
+            type: 'component',
+            component: 'targetModal',
+            meta: wizardDetails,
+            response: async (e) => {
+                if (e && !e.cancelled) {
+                    await createTargetsAddWeight(e);
+                }
+
+                modalStore.close();
+            }
+        })
+    }
+
+
+    const createTargetsAddWeight = async (detail) => {
+        $indicator = $indicator.start();
+
+        /** @type {Wizard} */
+        const wizard = {
+            calorieTarget: detail.calorieTarget,
+            weightTarget: detail.weightTarget,
+            weightTracker: {
+                added: getDateAsStr(today),
+                sequence: 1,
+                amount: detail.weightTarget.initialWeight
+            }
+        }
+
+        await postWizardResult(wizard).then(async _ => showToastSuccess(toastStore, 'Successfully saved your targets.'))
+            .catch((error) => showToastError(toastStore, error))
+            .finally(() => $indicator = $indicator.finish());
+    }
 </script>
 
 <svelte:head>
-	<title>LibreFit - TDEE Wizard</title>
+    <title>LibreFit - TDEE Wizard</title>
 </svelte:head>
 
-{#if $user}
 <section>
-	<div class="container mx-auto p-8 space-y-8">
-		<h1>TDEE Calculator</h1>
+    <div class="container mx-auto p-8 space-y-8">
+        <h1 class="h1">TDEE Calculator</h1>
 
-		{#if !calculationResult && !calculationError}
-			<TdeeStepper on:calculate={calculate}/>
-		{:else if !calculationError}
-			<h2>Your result</h2>
+        {#if !calculationResult && !calculationError}
+            <TdeeStepper on:calculate={calculate}/>
+        {:else if !calculationError}
+            <WizardResult {calculationResult}
+                          {calculationInput}
+            />
 
-			<div class="table-container">
-				<table class="table table-compact">
-					<thead>
-						<tr>
-							<th>Description</th>
-							<th colspan="2">Value</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>Basal Metabolic Rate</td>
-							<td>kcal</td>
-							<td>{calculationResult.bmr}</td>
-						</tr>
+            <WizardTarget {calculationResult}
+                          {calculationInput}
+                          bind:chosenOption={chosenOption}
+                          on:setTargets={createTargetsAddWeight}
+            />
 
-						<tr>
-							<td>Total Daily Energy Expediture</td>
-							<td>kcal</td>
-							<td>{calculationResult.tdee}</td>
-						</tr>
+            <div class="flex flex-grow justify-between">
+                <button on:click|preventDefault={reset} class="btn variant-filled">Recalculate</button>
+                <button on:click|preventDefault={() => processResult(calculationResult)}
+                        class="btn variant-filled-primary"
+                        disabled={chosenOption.userChoice === undefined}
+                >
+                    Review
+                </button>
+            </div>
+        {:else}
+            <p>
+                An error occurred. Please try again later.
 
-						<tr>
-							<td>Target deficit</td>
-							<td>kcal</td>
-							<td>{calculationResult.deficit}</td>
-						</tr>
-
-						<tr>
-							<td>Target intake</td>
-							<td>kcal</td>
-							<td>{calculationResult.target}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-			<h2>Body parameters</h2>
-
-			<div class="table-container">
-				<table class="table table-compact">
-					<thead>
-						<tr>
-							<th>Description</th>
-							<th colspan="2">Value</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>Age</td>
-							<td></td>
-							<td>{calculationResult.age}</td>
-						</tr>
-
-						<tr>
-							<td>Height</td>
-							<td>cm</td>
-							<td>{calculationResult.height}</td>
-						</tr>
-
-						<tr>
-							<td>Weight</td>
-							<td>kg</td>
-							<td>{calculationResult.weight}</td>
-						</tr>
-
-						<tr>
-							<td>Body Mass Index</td>
-							<td></td>
-							<td>{calculationResult.bmi}</td>
-						</tr>
-
-						<tr>
-							<td>Classification</td>
-							<td></td>
-							<td>{bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-
-			<h2>Next steps</h2>
-			<p>
-				Based on your input, your basal metabolic rate is {calculationResult.bmr}kcal. Your daily calorie
-				consumption to hold your weight should be around {calculationResult.tdee}kcal.
-			</p>
-
-			<p>
-				Having {calculationResult.weight}kg at {calculationResult.height}cm height means you have a BMI of
-				{calculationResult.bmi}.
-
-				{#if calculationResult.targetBmi}
-					At your age of {calculationResult.age},
-
-					{@const bmiMin = calculationResult.targetBmi[0]}
-					{@const bmiMax = calculationResult.targetBmi[1]}
-
-					{#if bmiMin <= calculationResult.bmi && calculationResult.bmi <= bmiMax}
-						you are currently in
-					{:else}
-						you are out of
-					{/if}
-
-					the optimal BMI range of {bmiMin} to {bmiMax}, leaving you
-					{bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label}.
-					Your weight should be around {calculationResult.targetWeight}kg.
-				{/if}
-			</p>
-
-			<p>
-				To reach the optimal weight within the standard weight range, you will need to consume calories at a
-				difference of {calculationResult.deficit}kcal for {calculationResult.durationDays} days.
-				Your caloric intake should be around {calculationResult.target}kcal during that time.
-			</p>
-
-			<p>
-				If you like to proceed, you can create a new goal taking over those values. Alternatively, you can
-				define a custom goal on the dashboard.
-			</p>
-
-			<div class="flex flex-grow justify-between">
-				<button on:click|preventDefault={reset} class="btn variant-filled">Recalculate</button>
-				<button on:click|preventDefault={() => showGoalModal(calculationResult)} class="btn variant-filled-primary">Create Goal</button>
-			</div>
-		{:else}
-			<p>
-				An error occured. Please try again later.
-
-				<button on:click|preventDefault={reset} class="btn variant-filled">Recalculate</button>
-			</p>
-		{/if}
-	</div>
+                <button on:click|preventDefault={reset} class="btn variant-filled">Recalculate</button>
+            </p>
+        {/if}
+    </div>
 </section>
-{/if}

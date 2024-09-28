@@ -6,7 +6,7 @@ export const showToastError = (toastStore, err) => {
 	console.error(err);
 
 	toastStore.trigger({
-		message: 'An error occured. Please try again later.',
+		message: 'An error occurred. Please try again later.',
 		background: 'variant-filled-warning',
 		autohide: false
 	});

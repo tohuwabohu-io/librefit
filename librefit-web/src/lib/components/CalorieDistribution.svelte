@@ -1,185 +1,104 @@
 <script>
     import {goto} from '$app/navigation';
+    import Check from '$lib/assets/icons/check.svg?component';
+    import History from '$lib/assets/icons/history.svg?component';
+    import NoFood from '$lib/assets/icons/food-off.svg?component';
     import Overflow1 from '$lib/assets/icons/overflow-1.svg?component';
     import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
-    import Check from '$lib/assets/icons/check.svg?component';
     import {PolarArea} from 'svelte-chartjs';
     import {Chart, registerables} from 'chart.js';
-    import {getContext} from 'svelte';
+    import {observeToggle} from '$lib/theme-toggle.js';
+    import {createDistributionChart} from '$lib/distribution-chart.js';
+    import {getAverageDailyIntake} from '$lib/calorie-util.js';
 
     Chart.register(...registerables);
 
-    export let ctList;
+    /** @type List<CalorieTracker> */
+    export let calorieTracker;
+
     export let displayClass = '';
     export let displayHeader = true;
     export let displayHistory = true;
-
-    let chartData, chartOptions, dailyAverage;
-
-    const currentGoal = getContext('currentGoal');
+    export let headerText = 'Average distribution';
 
     /** @type Array<FoodCategory> */
-    const foodCategories = getContext('foodCategories');
+    export let foodCategories;
+
+    /** @type CalorieTarget */
+    export let calorieTarget;
+
+    let polarAreaChart, dailyAverage;
 
     /**
-     * @param {Array<CalorieTrackerEntry>} entries
+     * @param {Array<CalorieTracker>} entries
      */
     const refreshChart = (entries) => {
-        chartData = getData(entries);
-        chartOptions = getConfig(chartData);
+        polarAreaChart = createDistributionChart(entries, foodCategories, displayHistory);
         dailyAverage = getAverageDailyIntake(entries);
     }
 
-    $: ctList, refreshChart(ctList);
+    $: calorieTracker, refreshChart(calorieTracker);
 
-    /**
-     * @param {Array<CalorieTrackerEntry>} entries
-     */
-    const getData = (entries) => {
-        const labels = [];
-        const values = [];
-
-        const averageCategoryIntake = getAverageCategoryIntake(entries);
-
-
-        if (averageCategoryIntake != null) {
-            $foodCategories.forEach(cat => {
-                const averageIntake = averageCategoryIntake.get(cat.shortvalue);
-
-                if (averageIntake > 0) {
-                    values.push(averageCategoryIntake.get(cat.shortvalue));
-                    labels.push(cat.longvalue);
-                }
-            });
-        }
-
-        return {
-            labels: labels,
-            datasets: [{
-                label: '∅ kcal',
-                data: values,
-                hoverOffset: 4,
-                backgroundColor: [
-                    'rgb(182 200 0 / .3)',
-                    'rgb(140 67 210 / .3)',
-                    'rgb(14 165 233 / .3)',
-                    'rgb(234 179 8 / .3)',
-                    'rgb(165 29 45 / .3)'
-                ]
-            }]
-        };
-    }
-
-    const getAverageCategoryIntake = (entries) => {
-        const nonEmpty = entries.filter(e => e.amount > 0);
-
-        if (nonEmpty.length > 0) {
-            const catMap = new Map();
-
-            const sum = nonEmpty.map(e => e.amount).reduce((a, b) => a + b);
-            const dailyAverage = getAverageDailyIntake(entries);
-
-            $foodCategories.forEach(cat => {
-                const catEntries = nonEmpty.filter(e => e.category === cat.shortvalue);
-
-                if (catEntries.length > 0) {
-                    const catSum = catEntries.map(e => e.amount).reduce((a, b) => a + b);
-
-                    catMap.set(cat.shortvalue, Math.round(dailyAverage * (catSum / sum)));
-                }
-            });
-
-            return catMap;
-        }
-
-        return null;
-    }
-
-    /** @param {Array<CalorieTrackerEntry>} entries */
-    const getAverageDailyIntake = (entries) => {
-        const nonEmpty = entries.filter(e => e.amount > 0);
-
-        if (nonEmpty.length > 0) {
-            const days = new Set(nonEmpty.map(e => e.added));
-
-            let sum = 0;
-
-            for (let day of days) {
-                sum += entries.filter(e => e.added === day).map(e => e.amount).reduce((a, b) => a + b)
-            }
-
-            return Math.round(sum / days.size);
-        }
-
-        return 0;
-    }
-
-
-    const getConfig = (chartData) => {
-        return {
-            type: 'polarArea',
-            data: chartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Chart.js Polar Area Chart'
-                    }
-                }
-            },
-            animation: {
-                duration: 0
-            }
-        };
-    }
-
+    observeToggle(document.documentElement, () => {
+        refreshChart(calorieTracker);
+    });
 </script>
 
-<div class="{displayClass} p-4 text-center justify-between ">
-    {#if ctList}
-        {#if displayHeader}<h3 class="h3">Average distribution</h3>{/if}
+<div class="{displayClass} gap-4 text-center justify-between items-center relative h-full">
+    {#if displayHeader}<h2 class="h3">{headerText}</h2>{/if}
 
-        <PolarArea options={chartOptions} data={chartData}/>
+    {#if calorieTracker && calorieTracker.length > 0}
+        <div class="flex flex-col md:max-2xl:w-fit h-full justify-between gap-4">
+            <PolarArea data={polarAreaChart.chartData} options={polarAreaChart.chartOptions}/>
 
-        <div>
-            <div class="w-full grid grid-cols-[auto_1fr_auto]">
-                <div>&empty; daily intake:</div>
-                <div>
-                    ~{dailyAverage}kcal
-                </div>
-                <div>
-                    {#if $currentGoal}
-                        {@const targetAverageRatio = dailyAverage / $currentGoal.targetCalories}
-                        <span>
-                            {#if targetAverageRatio <= 1}
-                                <Check color="rgb(var(--color-primary-700))"/>
-                            {:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
-                                <Overflow1 color="rgb(var(--color-warning-500))"/>
-                            {:else}
-                                <Overflow2 color="rgb(var(--color-error-500))"/>
-                            {/if}
-                        </span>
+            <div>
+                <div class="w-full grid grid-cols-2 gap-2">
+                    <div class="text-right">&empty; daily intake:</div>
+                    <div class="flex flex-row text">
+                        ~{dailyAverage}kcal
+
+                        {#if calorieTarget}
+                            {@const targetAverageRatio = dailyAverage / calorieTarget.targetCalories}
+                            <span>
+                                {#if targetAverageRatio <= 1}
+                                    <Check color="rgb(var(--color-primary-700))"/>
+                                {:else if targetAverageRatio > 1 && targetAverageRatio <= 1.15}
+                                    <Overflow1 color="rgb(var(--color-warning-500))"/>
+                                {:else}
+                                    <Overflow2 color="rgb(var(--color-error-500))"/>
+                                {/if}
+                            </span>
+                        {/if}
+                    </div>
+
+                    {#if calorieTarget}
+                        <div class="text-right">
+                            &empty; target intake:
+                        </div>
+                        <div class="text-left">
+                            ~{calorieTarget.targetCalories}kcal
+                        </div>
                     {/if}
                 </div>
-
-                {#if $currentGoal}
-                    <div>
-                        &empty; target intake:
-                    </div>
-                    <div>
-                        ~{$currentGoal.targetCalories}kcal
-                    </div>
-                    <div>
-
-                    </div>
-                {/if}
             </div>
         </div>
+    {:else}
+        <div class="flex flex-col gap-4 m-auto">
+            <NoFood height={100} width={100} class="self-center"/>
+            <p>
+                Nothing tracked yet.
+            </p>
+        </div>
+    {/if}
 
-        {#if displayHistory}<button class="btn variant-filled" on:click|preventDefault={() => goto('/tracker/calories')}>Show history</button>{/if}
+    {#if displayHistory}
+        <button class="btn variant-filled w-full" on:click|preventDefault={() => goto('/tracker/calories')}>
+            <span>
+                <History/>
+            </span>
+            <span>
+                History
+            </span>
+        </button>
     {/if}
 </div>

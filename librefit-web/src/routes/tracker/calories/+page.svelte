@@ -10,6 +10,7 @@
 	import { addCalories, updateCalories, deleteCalories, listCaloriesForDate, listCalorieTrackerDatesRange} from '$lib/api/tracker.js';
 	import FoodOff from '$lib/assets/icons/food-off.svg';
 	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
+	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
 
 	let today = new Date();
 	let todayStr = getDateAsStr(today);
@@ -18,6 +19,9 @@
 	const indicator = getContext('indicator');
 	const user = getContext('user');
 	const foodCategories = getContext('foodCategories');
+
+	/** @type Writable<CalorieTarget> */
+	const calorieTarget = getContext('calorieTarget');
 
 	if (!$user) goto('/');
 
@@ -150,33 +154,44 @@
 
 {#if $user}
 <section>
-	<div class="container mx-auto p-8 space-y-10">
-		<h1>History</h1>
+	<div class="container 2xl:w-2/5 xl:w-3/5 lg:w-4/5 mx-auto p-8 space-y-10 justify-between">
+		<h1 class="h1">Tracker History</h1>
 
 		{#if data.availableDates}
 			{#if availableDates.length > 0}
 				<FilterComponent on:change={onFilterChanged}/>
 
 				{#each paginatedSource as dateStr}
-				<Accordion class="variant-ghost-surface rounded-xl">
+				<Accordion class="card rounded-xl">
 					<AccordionItem id={dateStr} on:toggle={loadEntries(dateStr)}>
 						<svelte:fragment slot="summary">
 							{convertDateStrToDisplayDateStr(dateStr)}
 						</svelte:fragment>
 						<svelte:fragment slot="content">
-							<div class="flex lg:flex-row flex-col gap-4 grow">
+							<div class="flex md:flex-row flex-col gap-4 p-4">
 								{#if datesToEntries[dateStr]}
-									<CalorieTracker entries={datesToEntries[dateStr]} categories={$foodCategories}
+									<CalorieTracker calorieTracker={datesToEntries[dateStr]}
+										categories={$foodCategories}
+										calorieTarget={$calorieTarget}
 										on:addCalories={addEntry}
 										on:updateCalories={updateEntry}
 										on:deleteCalories={deleteEntry}
+									/>
+
+									<CalorieDistribution calorieTracker={datesToEntries[dateStr]}
+														 displayHistory={false}
+														 displayHeader={false}
+														 foodCategories={$foodCategories}
+														 calorieTarget={$calorieTarget}
 									/>
 								{:else}
 									{#await datesToEntries[dateStr]}
 										<p>... loading</p>
 									{:then entries}
 										{#if entries}
-											<CalorieTracker {entries} categories={$foodCategories}
+											<CalorieTracker calorieTracker={entries}
+												categories={$foodCategories}
+												calorieTarget={$calorieTarget}
 												on:addCalories={addEntry}
 												on:updateCalories={updateEntry}
 												on:deleteCalories={deleteEntry}

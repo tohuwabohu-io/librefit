@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm")
     id("com.github.node-gradle.node") version "3.5.1"
 }
 
@@ -38,7 +38,7 @@ tasks.named<com.github.gradle.node.npm.task.NpmTask>("npm_run_dev") {
     dependsOn(tasks.npmInstall)
 }
 
-tasks.build {
+tasks.test {
     dependsOn("npm_ci")
-    dependsOn("npm_run_build")
+    dependsOn("npm_run_test")
 }

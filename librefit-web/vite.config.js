@@ -7,7 +7,7 @@ export default defineConfig({
 		sveltekit(),
 		purgeCss(),
 		svg({
-			includePaths: ['./src/lib/assets/icons/'],
+			includePaths: ['./src/lib/assets/icons/', './src/lib/assets/images/'],
 			svgoOptions: {
 				multipass: true,
 				plugins: [
@@ -20,5 +20,8 @@ export default defineConfig({
 				]
 			}
 		})
-	]
+	],
+	test: {
+		setupFiles: ['./tests/__mocks__/skeletonProxy.js']
+	}
 });

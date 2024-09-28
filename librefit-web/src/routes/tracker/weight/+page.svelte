@@ -19,26 +19,26 @@
 
     export let data;
 
-    let wtList = [];
+    let weightList = [];
     let paginatedSource = [];
 
     let toDate = new Date();
     let fromDate = subDays(toDate, 6);
 
-    $: wtList;
+    $: weightList;
 
     let paginationSettings = {
         page: 0,
         limit: 7,
-        size: data.wtList.length,
+        size: data.weightWeekList.length,
         amounts: [1, 7, 14, 31],
     }
 
     $: if (data) {
-        wtList = data.wtList;
+        weightList = data.weightWeekList;
     }
 
-    $: paginatedSource = wtList.slice(
+    $: paginatedSource = weightList.slice(
         paginationSettings.page * paginationSettings.limit,
         paginationSettings.page * paginationSettings.limit + paginationSettings.limit
     );
@@ -57,8 +57,8 @@
 
         await listWeightRange(fromDate, toDate).then(async response => {
             if (response.ok) {
-                wtList = await response.json();
-                paginationSettings.size = wtList.length;
+                weightList = await response.json();
+                paginationSettings.size = weightList.length;
             } else throw response
         }).catch((e) => { showToastError(toastStore, e) }).finally(() => $indicator = $indicator.finish())
     }
@@ -116,10 +116,10 @@
 {#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-10">
-        <h1>History</h1>
+        <h1 class="h1">Weight History</h1>
 
-        {#if data.wtList}
-            {#if wtList.length > 0}
+        {#if data.weightWeekList}
+            {#if weightList.length > 0}
                 <div class=" overflow-x-auto space-y-2">
                     <header>
                         <FilterComponent on:change={onFilterChanged} />
@@ -140,7 +140,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <TrackerInput
+                                    <TrackerInput compact={true}
                                                   value={entry.amount}
                                                   dateStr={entry.added}
                                                   sequence={entry.sequence}
@@ -149,7 +149,10 @@
                                                   on:remove={deleteWeightEntry}
                                                   existing={entry.sequence !== undefined}
                                                   disabled={entry.sequence !== undefined}
-                                                  unit={'kg'}/>
+                                                  placeholder={''}
+                                                  unit={'kg'}
+                                                  maxWidthCss="max-sm:max-w-12"
+                                    />
                                 </td>
                             </tr>
                         {/each}

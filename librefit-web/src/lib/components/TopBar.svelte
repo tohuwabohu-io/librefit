@@ -21,15 +21,18 @@
 <AppBar shadow="drop-shadow">
 	<svelte:fragment slot="lead">
 		<a href="/dashboard" class="h1 text-2xl">
-			<span class="text-primary-500"> Libre </span>
-			<span class="text-secondary-500"> Fit </span>
+			<span class="flex flex-row gap-1">
+				<span class="text-primary-500"> Libre </span>
+				<span class="text-secondary-500"> Fit </span>
+			</span>
 		</a>
 	</svelte:fragment>
 	<svelte:fragment slot="trail">
-		<Avatar src={$user.avatar} initials="LU" width="w-12"
-				border="border-4 border-surface-300-600-token hover:!border-primary-500"
-				cursor="cursor-pointer"
-				on:click={showDrawer}
-		/>
+		<button on:click={showDrawer}>
+			<Avatar src={$user.avatar} initials="LU" width="w-12"
+					border="border-4 border-surface-300-600-token hover:!border-primary-500"
+					cursor="cursor-pointer"
+			/>
+		</button>
 	</svelte:fragment>
 </AppBar>

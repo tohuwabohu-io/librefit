@@ -3,14 +3,12 @@ package io.tohuwabohu
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
-import io.quarkus.test.security.jwt.Claim
-import io.quarkus.test.security.jwt.JwtSecurity
 import io.restassured.http.ContentType
 import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
-import io.tohuwabohu.crud.CalorieTrackerEntry
+import io.tohuwabohu.crud.CalorieTracker
 import io.tohuwabohu.crud.FoodCategory
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
@@ -22,11 +20,6 @@ import java.util.*
 class CalorieTrackerResourceTest {
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create an entry`() {
         Given {
             header("Content-Type", ContentType.JSON)
@@ -41,11 +34,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create two entries`() {
         val createdEntry1 = Given {
             header("Content-Type", ContentType.JSON)
@@ -55,7 +43,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         val createdEntry2 = Given {
@@ -66,7 +54,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         assert(createdEntry1.sequence != createdEntry2.sequence)
@@ -74,11 +62,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail on creation`() {
         val faultyEntry = entry(userId = UUID.fromString("e24c313c-7fb2-11ee-b962-0242ac120002"))
         faultyEntry.amount = -100f
@@ -95,11 +78,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create and read an entry`() {
         val createdEntry = Given {
             header("Content-Type", ContentType.JSON)
@@ -109,7 +87,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         val readEntry = When {
@@ -117,7 +95,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         assert(createdEntry.added == readEntry.added)
@@ -129,11 +107,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "3902536c-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create, update and read an entry`() {
         val entry = entry(userId = UUID.fromString("3902536c-7fb3-11ee-b962-0242ac120002"))
 
@@ -145,7 +118,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         created.amount = 200f
@@ -159,7 +132,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         assert(created.sequence == updated.sequence)
@@ -170,11 +143,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "e27c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail on update`() {
         Given {
             header("Content-Type", ContentType.JSON)
@@ -188,11 +156,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create and delete an entry`() {
         val created = Given {
             header("Content-Type", ContentType.JSON)
@@ -202,7 +165,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
         When {
@@ -214,11 +177,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "1", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail on delete`() {
         val calorieTrackerId = 123L
 
@@ -231,11 +189,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create and delete an entry and fail on read`() {
         val createdEntry = Given {
             header("Content-Type", ContentType.JSON)
@@ -245,7 +198,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(201)
         } Extract {
-            body().`as`(CalorieTrackerEntry::class.java)
+            body().`as`(CalorieTracker::class.java)
         }
 
 
@@ -264,11 +217,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "534662cc-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create three entries and return two dates`() {
         val userId = UUID.fromString("534662cc-7fb3-11ee-b962-0242ac120002")
 
@@ -314,11 +262,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "69f01b4e-7fb3-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should create two entries and list them`() {
         val userId = UUID.fromString("69f01b4e-7fb3-11ee-b962-0242ac120002")
 
@@ -343,7 +286,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Array<CalorieTrackerEntry>::class.java)
+            body().`as`(Array<CalorieTracker>::class.java)
         }
 
         assert(entries.size == 2)
@@ -352,11 +295,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "e24c313c-7fb2-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test@libre.fitness"),
-        ]
-    )
     fun `should fail with 404`() {
         val userId = UUID.fromString("85b6a2e4-7fb3-11ee-b962-0242ac120002") // unrelated user's data
 
@@ -390,11 +328,6 @@ class CalorieTrackerResourceTest {
 
     @Test
     @TestSecurity(user = "69f01b4e-7fb3-11ee-b962-0242ac120003", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test3@libre.fit"),
-        ]
-    )
     fun `should create two entries and list with range`() {
         val userId = UUID.fromString("69f01b4e-7fb3-11ee-b962-0242ac120003")
 
@@ -420,7 +353,7 @@ class CalorieTrackerResourceTest {
         } Then {
             statusCode(200)
         } Extract {
-            body().`as`(Array<CalorieTrackerEntry>::class.java)
+            body().`as`(Array<CalorieTracker>::class.java)
         }
 
         assert(entries.size == 2)
@@ -452,8 +385,8 @@ class CalorieTrackerResourceTest {
         assert(!shortcodes.contains("u"))
     }
 
-    private fun entry(userId: UUID): CalorieTrackerEntry {
-        val entry = CalorieTrackerEntry(
+    private fun entry(userId: UUID): CalorieTracker {
+        val entry = CalorieTracker(
             amount = 100f,
             category = "s",
         )

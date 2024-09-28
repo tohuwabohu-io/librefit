@@ -1,5 +1,5 @@
 -- default dev user with pwd 'test1'
-insert into weight_tracker_entry (added, sequence, user_id, amount)
+insert into weight_tracker (added, sequence, user_id, amount)
 values (CURRENT_DATE - 58, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 100),
        (CURRENT_DATE - 57, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 100),
        (CURRENT_DATE - 56, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 100),
@@ -33,7 +33,7 @@ INSERT INTO public.libre_user (activated, last_login, registered, id, avatar, em
 INSERT INTO public.libre_user (activated, last_login, registered, id, avatar, email, name, password, role) VALUES (false, null, NOW(), '4dd0a829-1bfa-48cc-b13c-a80eb36b1e3f', '/assets/images/avatars/buffdude-1.png', 'test2@test.dev', 'Testuser 2', '$2a$10$gKye9AdO/HeGqcbF5Cg1eObW3kmz26d107xmzSEHAtBaB/dkDWoa2', 'User');
 INSERT INTO public.libre_user (activated, last_login, registered, id, avatar, email, name, password, role) VALUES (false, null, NOW(), '8d45c705-feb3-4daf-80f0-dd89bbccd746', '/assets/images/avatars/lady-1.png', 'test3@test.dev', 'Testuser 3', '$2a$10$HooeSwYKozLREB36NVXWoumq5LH.gTh6KFJpuO8WnPPHyxBIsfea6', 'User');
 
-insert into calorie_tracker_entry (added, sequence, user_id, amount, category)
+insert into calorie_tracker (added, sequence, user_id, amount, category)
 values (CURRENT_DATE - 58, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 240, 'b'),
        (CURRENT_DATE - 58, 2, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 270, 'l'),
        (CURRENT_DATE - 58, 3, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 900, 'd'),
@@ -148,7 +148,7 @@ values (CURRENT_DATE - 58, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 240, 'b'),
        (CURRENT_DATE - 31, 4, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 400, 's');
 
 
-insert into calorie_tracker_entry (added, sequence, user_id, amount, category)
+insert into calorie_tracker (added, sequence, user_id, amount, category)
 values (CURRENT_DATE - 30, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 0, 'b'),
        (CURRENT_DATE - 30, 2, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 650, 'l'),
        (CURRENT_DATE - 30, 3, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 1200, 'd'),
@@ -256,7 +256,7 @@ values (CURRENT_DATE - 30, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 0, 'b'),
        (CURRENT_DATE, 2, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 1000, 'l'),
        (CURRENT_DATE, 3, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 800, 'd');
 
-insert into weight_tracker_entry (added, sequence, user_id, amount)
+insert into weight_tracker (added, sequence, user_id, amount)
 values (CURRENT_DATE - 30, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97),
        (CURRENT_DATE - 29, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97),
        (CURRENT_DATE - 28, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97),
@@ -289,8 +289,11 @@ values (CURRENT_DATE - 30, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 97),
        (CURRENT_DATE - 1, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 93),
        (CURRENT_DATE, 1, 'b21291e5-db51-4a52-a997-25f4021c0ac6', 93);
 
-insert into goal (user_id, added, sequence, start_date, end_date, initial_weight, target_weight, target_calories, maximum_calories )
-    values ('b21291e5-db51-4a52-a997-25f4021c0ac6', CURRENT_DATE - 58, 1, CURRENT_DATE - 58, CURRENT_DATE + 307, 104, 77, 1849, 2398);
+insert into calorie_target (user_id, added, sequence, start_date, end_date, target_calories, maximum_calories )
+values ('b21291e5-db51-4a52-a997-25f4021c0ac6', CURRENT_DATE - 58, 1, CURRENT_DATE - 58, CURRENT_DATE + 307, 1849, 2398);
+
+insert into weight_target (user_id, added, sequence, start_date, end_date, initial_weight, target_weight )
+values ('b21291e5-db51-4a52-a997-25f4021c0ac6', CURRENT_DATE - 58, 1, CURRENT_DATE - 58, CURRENT_DATE + 307, 104, 77);
 
 insert into food_category (shortvalue, longvalue, visible)
 values ('b', 'Breakfast', true),

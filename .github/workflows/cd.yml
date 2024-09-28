@@ -36,7 +36,7 @@ jobs:
         uses: StephaneBour/actions-calver@master
         id: calver
         with:
-          date_format: '%Y.%m.%d'
+          date_format: '+%y.%V'
           release: true
           release_branch: main
         env:
@@ -47,7 +47,8 @@ jobs:
           rm librefit-web/.env \
           && echo "PUBLIC_API_BASE_PATH=${{ vars.API_BASE_PATH }}" > librefit-web/.env \
           && echo "PUBLIC_VERSION=${{ steps.calver.outputs.release }}" >> librefit-web/.env \
-          && ./gradlew build -Dquarkus.package.type=native -Dversion=${{ steps.calver.outputs.release }}
+          && ./gradlew build -Dquarkus.package.type=native -Dversion=${{ steps.calver.outputs.release }} \
+          -Dquarkus.http.auth.session.encryption-key=$(uuidgen)
 
       - name: Build librefit native-micro image
         run: |

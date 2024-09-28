@@ -1,15 +1,10 @@
 <script>
     import AvatarPicker from '$lib/components/AvatarPicker.svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
+    import {getContext} from 'svelte';
 
     const modalStore = getModalStore();
-
-    const files = [];
-    const fileList = ['buffdude-1.png', 'buffdude-2.png', 'lady-1.png', 'lady-2.png', 'panda-1.png', 'tiger-1.png'];
-
-    fileList.forEach(fileName => {
-        files.push(`/assets/images/avatars/${fileName}`);
-    });
+    const user = getContext('user');
 
     let selected;
 
@@ -30,12 +25,12 @@
     }
 </script>
 
-<div class="modal block bg-surface-100-800-token w-modal h-auto p-4 space-y-4 rounded-container-token shadow-xl">
+<div class="modal block bg-surface-100-800-token sm-lg:w-modal h-auto p-4 space-y-4 rounded-container-token shadow-xl">
     <header class="text-2xl font-bold">
         Choose avatar
     </header>
 
-    <AvatarPicker on:chooseAvatar={(e) => selected = e.detail.avatar} />
+    <AvatarPicker chosen={$user.avatar} on:chooseAvatar={(e) => selected = e.detail.avatar} />
 
     <footer class="modal-footer flex justify-between space-x-2">
         <div>

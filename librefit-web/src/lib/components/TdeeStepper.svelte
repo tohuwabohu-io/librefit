@@ -3,8 +3,8 @@
     import {CalculationGoal, CalculationSex} from '$lib/api/model.js';
     import {createEventDispatcher} from 'svelte';
 
-    /** @type Tdee */
-    const tdee = {
+    /** @type WizardInput */
+    const wizardInput = {
         age: 30,
         height: 160,
         sex: CalculationSex.Female,
@@ -36,7 +36,7 @@
     const dispatch = createEventDispatcher();
 
     const calculate = () => {
-        dispatch('calculate', {tdee});
+        dispatch('calculate', {input: wizardInput});
     }
 
 </script>
@@ -53,14 +53,14 @@
         <RangeSlider
                 accent="accent-primary-500"
                 name="age"
-                bind:value={tdee.age}
+                bind:value={wizardInput.age}
                 min={15}
                 max={99}>Age</RangeSlider
         >
         <input
                 class="input variant-ringed-secondary"
                 type="text"
-                bind:value={tdee.age}
+                bind:value={wizardInput.age}
                 aria-label="Age"
         />
 
@@ -68,7 +68,7 @@
 
         <RadioGroup>
             {#each sexes as sex}
-                <RadioItem bind:group={tdee.sex} value={sex.value} name="sex">
+                <RadioItem bind:group={wizardInput.sex} value={sex.value} name="sex">
                     {sex.label}
                 </RadioItem>
             {/each}
@@ -77,7 +77,7 @@
         <RangeSlider
                 accent="accent-primary-500"
                 name="height"
-                bind:value={tdee.height}
+                bind:value={wizardInput.height}
                 min={100}
                 max={220}
                 aria-hidden="true">Height in cm</RangeSlider
@@ -86,14 +86,14 @@
                 class="input"
                 name="height"
                 type="text"
-                bind:value={tdee.height}
+                bind:value={wizardInput.height}
                 aria-label="Height in cm"
         />
 
         <RangeSlider
                 accent="accent-primary-500"
                 name="weight"
-                bind:value={tdee.weight}
+                bind:value={wizardInput.weight}
                 min={30}
                 max={300}
                 aria-hidden="true">Weight in kg</RangeSlider
@@ -102,7 +102,7 @@
                 class="input"
                 name="weight"
                 type="text"
-                bind:value={tdee.weight}
+                bind:value={wizardInput.weight}
                 aria-label="Weight in cm"
         />
     </Step>
@@ -124,7 +124,7 @@
             <RadioGroup flexDirection="flex-col" rounded="rounded-container-token">
                 {#each activityLevels as activityLevel}
                     <RadioItem
-                            bind:group={tdee.activityLevel}
+                            bind:group={wizardInput.activityLevel}
                             name="activityLevel"
                             value={activityLevel.value}
                     >
@@ -134,35 +134,35 @@
             </RadioGroup>
 
             <div class="card variant-glass-secondary p-4 text-left space-y-2 flex-auto w-64">
-                {#if tdee.activityLevel === 1}
+                {#if wizardInput.activityLevel === 1}
                     <strong>Level 1 - Mostly Sedentary</strong>
                     <p>
                         You likely have an office job and try your best reaching your daily step goal.
                         Apart from that, you do not work out regularly and spend most of your day
                         stationary.
                     </p>
-                {:else if tdee.activityLevel === 1.25}
+                {:else if wizardInput.activityLevel === 1.25}
                     <strong>Level 2 - Light Activity</strong>
                     <p>
                         You either have a job that requires you to move around frequently or you hit the
                         gym 2x - 3x times a week. In either way, you are regularly lifting weight and
                         training your cardiovascular system.
                     </p>
-                {:else if tdee.activityLevel === 1.5}
+                {:else if wizardInput.activityLevel === 1.5}
                     <strong>Level 3 - Moderate Activity</strong>
                     <p>
                         You consistently train your body 3x - 4x times a week. Your training plan became
                         more sophisticated over the years and include cardiovascular HIIT sessions. You
                         realized how important nutrition is and want to improve your sportive results.
                     </p>
-                {:else if tdee.activityLevel === 1.75}
+                {:else if wizardInput.activityLevel === 1.75}
                     <strong>Level 4 - Highly Active</strong>
                     <p>
                         Fitness is your top priority in life. You dedicate large parts of your week to
                         train your body, maybe even regularly visit sportive events. You work out almost
                         every day and certainly know what you are doing.
                     </p>
-                {:else if tdee.activityLevel === 2}
+                {:else if wizardInput.activityLevel === 2}
                     <strong>Level 5 - Athlete</strong>
                     <p>
                         Your fitness level reaches into the (semi-) professional realm. Calculators like
@@ -180,7 +180,7 @@
 
         <RadioGroup>
             {#each goals as goal}
-                <RadioItem bind:group={tdee.calculationGoal} name="gain" value={goal.value}>
+                <RadioItem bind:group={wizardInput.calculationGoal} name="gain" value={goal.value}>
                     {goal.label}
                 </RadioItem>
             {/each}
@@ -191,7 +191,7 @@
         <RangeSlider
                 accent="accent-primary-500"
                 name="diff"
-                bind:value={tdee.weeklyDifference}
+                bind:value={wizardInput.weeklyDifference}
                 min={0}
                 max={7}
                 ticked
@@ -202,7 +202,7 @@
                 </div>
                 <div class="text-xs">
                     <p>
-                        {tdee.weeklyDifference / 10} kg
+                        {wizardInput.weeklyDifference / 10} kg
                     </p>
                 </div>
             </div>

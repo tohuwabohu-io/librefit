@@ -4,7 +4,7 @@ import { proxyFetch } from '$lib/api/util.js';
 import { getDateAsStr } from '$lib/date.js';
 
 export const load = async ({ fetch }) => {
-	const listWeightApi = api.listWeightTrackerEntriesRange;
+	const listWeightApi = api.listWeightTrackerRange;
 
 	const today = new Date();
 	const fromDate = new Date();

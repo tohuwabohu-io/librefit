@@ -17,14 +17,10 @@
     let indicator = new Indicator();
     let status;
 
-    const expired = $page.url.searchParams.get('expired');
+    const expired = $page.url.searchParams.get('session_expired');
 
     if (expired) {
-        status = {
-            errors: [{
-                field: 'email', message: 'Your session expired. Please login again.'
-            }]
-        }
+        status = {errors: [{field: 'email', message: 'Your session expired. Please log in again.' }]}
     }
 
     const handleLogin = async (event) => {
@@ -72,13 +68,14 @@
     <title>LibreFit</title>
 </svelte:head>
 
-<section class="variant-ghost-surface h-full flex">
+<section class="h-full flex">
     <div class="container mx-auto p-12 space-y-8 self-center">
-        <div class="md:grid md:grid-cols-[auto_1fr_auto] xl:grid-cols-2 flex flex-col gap-4 align-middle justify-items-center">
+        <div class="lg:grid lg:grid-cols-[auto_1fr_auto] xl:grid-cols-2 flex flex-col gap-4 align-middle justify-items-center">
             <div class="flex flex-col gap-4">
-                <h1 class="font-logo flex flex-row md:justify-start md:gap-4">
-                    <span class="text-primary-500 lg:text-9xl md:text-8xl text-7xl">Libre</span>
-                    <span class="text-secondary-500 lg:text-9xl md:text-8xl text-7xl">Fit</span>
+                <h1 class="font-logo md:flex md:flex-row lg:justify-start sm:gap-4 grid grid-cols-2 grid-rows-2 gap-1">
+                    <span class="text-primary-500 md:text-9xl text-7xl text-right">Libre</span>
+                    <img src="/favicon-128x128.png" role="presentation" alt="" class="max-sm:pl-4 row-span-2 self-center">
+                    <span class="text-secondary-500 md:text-9xl text-7xl text-right">Fit</span>
                 </h1>
 
                 <div class="flex flex-col gap-4">

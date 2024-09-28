@@ -1,6 +1,6 @@
 <script>
 	import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-	import {paintWeightTrackerEntries} from '$lib/chart.js';
+	import {paintWeightTracker} from '$lib/weight-chart.js';
 	import {Line} from 'svelte-chartjs';
 	import {Chart, registerables} from 'chart.js';
 	import {showToastError} from '$lib/toast.js';
@@ -9,6 +9,7 @@
 	import {listWeightFiltered} from '$lib/api/tracker.js';
 	import {DataViews, enumKeys} from '$lib/enum.js';
 	import {goto} from '$app/navigation';
+	import {observeToggle} from '$lib/theme-toggle.js';
 
 	Chart.register(...registerables);
 
@@ -28,11 +29,13 @@
 	let entries;
 	let chartData, chartOptions;
 
+	observeToggle(document.documentElement, () => paint(entries));
+
 	const loadEntriesFiltered = async () => {
 		$indicator = $indicator.start();
 
 		await listWeightFiltered(filter).then(async (result) => {
-			/** @type Array<WeightTrackerEntry> */
+			/** @type Array<WeightTracker> */
 			entries = await result.json();
 
 			paint(entries);
@@ -40,7 +43,7 @@
 	}
 
 	const paint = (entries) => {
-		const paintMeta = paintWeightTrackerEntries(entries, today, filter);
+		const paintMeta = paintWeightTracker(entries, today, filter);
 
 		chartData = paintMeta.chartData;
 		chartOptions = paintMeta.chartOptions;
@@ -60,7 +63,7 @@
 {#if $user}
 <section>
 	<div class="container mx-auto p-8 space-y-10">
-		<h1>
+		<h1 class="h1">
 			Weight Progress
 		</h1>
 

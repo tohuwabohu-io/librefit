@@ -55,8 +55,8 @@
 {#if $user}
 <section>
     <div class="container mx-auto p-8 space-y-8">
-        <h1>Import</h1>
-        <h2>Upload data from existing sources.</h2>
+        <h1 class="h1">Import</h1>
+        <p>Upload data from existing sources.</p>
 
         <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" enctype="multipart/form-data"
               on:submit|preventDefault={handleImport}>
@@ -64,8 +64,8 @@
             <ValidatedInput
                     name="datePattern"
                     type="text"
-                    placeholder="d-MMM-yyyy"
-                    value="d-MMM-yyyy"
+                    placeholder="dd-MM-yyyy"
+                    value="dd-MM-yyyy"
                     label="Date format"
                     required
                     errorMessage={getFieldError(status, 'datePattern')}

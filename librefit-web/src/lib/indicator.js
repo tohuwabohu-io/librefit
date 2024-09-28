@@ -1,12 +1,15 @@
-const defaultProgressClass = 'bg-surface-900';
+const lightProgressClass = 'bg-surface-900';
+const darkProgressClass = 'bg-surface-100';
 const successProgressClass = 'bg-success-500';
 const errorProgressClass = 'bg-error-500';
 
+let theme;
+
 const indicator = {
 	/** css class for progress meter */
-	meter: defaultProgressClass,
+	meter: theme === 'dark' ? darkProgressClass : lightProgressClass,
 	/** css class for progress track */
-	track: defaultProgressClass + '/30',
+	track: theme === 'dark' ? darkProgressClass : lightProgressClass + '/30',
 	/** progress indicator */
 	progress: 0,
 	/** assign to disabled property of component that started the interaction */
@@ -69,11 +72,24 @@ const indicator = {
 	 */
 	reset: function () {
 		this.progress = 0;
-		this.meter = defaultProgressClass;
+		this.meter = theme === 'dark' ? darkProgressClass : lightProgressClass;
 
 		if (this.actor) {
 			this.actor.disabled = false;
 			this.actor = undefined;
+		}
+
+		return this;
+	},
+	toggle: function (toggle) {
+		theme = toggle;
+
+		if ('dark' === toggle) {
+			this.meter = darkProgressClass;
+			this.track = darkProgressClass + '/30';
+		} else {
+			this.meter = lightProgressClass;
+			this.track = lightProgressClass + '/30';
 		}
 
 		return this;

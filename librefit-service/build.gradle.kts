@@ -1,8 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    kotlin("jvm") version "1.9.0"
-    kotlin("plugin.allopen") version "1.9.0"
-    kotlin("plugin.noarg") version "1.9.0"
-    kotlin("plugin.jpa") version "1.9.0"
+    kotlin("jvm")
+    kotlin("plugin.allopen")
+    kotlin("plugin.noarg")
+    kotlin("plugin.jpa")
     id("io.quarkus")
 }
 
@@ -16,13 +18,12 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
-    implementation("io.quarkiverse.quinoa:quarkus-quinoa:2.3.5")
+    implementation("io.quarkiverse.quinoa:quarkus-quinoa:2.4.9")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-flyway")
+    implementation("io.quarkus:quarkus-security")
     implementation("io.quarkus:quarkus-security-jpa-reactive")
-    implementation("io.quarkus:quarkus-smallrye-jwt")
-    implementation("io.quarkus:quarkus-smallrye-jwt-build")
     implementation("io.quarkus:quarkus-hibernate-validator")
     implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
     implementation("io.quarkus:quarkus-reactive-pg-client")
@@ -32,21 +33,16 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-resteasy-reactive")
+    testImplementation("io.quarkus:quarkus-test-security")
     testImplementation("io.quarkus:quarkus-jacoco")
-    testImplementation("io.quarkus:quarkus-junit5:3.6.3")
-    testImplementation("io.quarkus:quarkus-junit5-mockito:3.6.3")
-    testImplementation("io.rest-assured:rest-assured:5.3.2")
+    testImplementation("io.quarkus:quarkus-junit5:3.9.2")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("io.rest-assured:rest-assured:5.4.0")
     testImplementation("io.rest-assured:kotlin-extensions:5.3.2")
-    testImplementation("io.quarkus:quarkus-test-security-jwt")
     testImplementation("io.quarkus:quarkus-test-vertx")
 }
 
 group = "io.tohuwabohu"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
 
 tasks.withType<Test> {
     systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
@@ -61,18 +57,8 @@ allOpen {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
-    kotlinOptions.javaParameters = true
-}
-
-tasks.register("generateKeypair") {
-    doFirst {
-        exec {
-            commandLine("./generate-keypair.sh")
-        }
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+        javaParameters = true
     }
-}
-
-tasks.testClasses {
-    dependsOn("generateKeypair")
 }

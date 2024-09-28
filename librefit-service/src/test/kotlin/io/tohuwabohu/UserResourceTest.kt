@@ -3,20 +3,22 @@ package io.tohuwabohu
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.security.TestSecurity
-import io.quarkus.test.security.jwt.Claim
-import io.quarkus.test.security.jwt.JwtSecurity
 import io.restassured.http.ContentType
 import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import io.tohuwabohu.crud.LibreUser
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
 @TestHTTPEndpoint(UserResource::class)
 class UserResourceTest {
+    @ConfigProperty(name = "quarkus.http.auth.form.cookie-name")
+    lateinit var authCookieName: String
+
     @Test
     fun `should register user`() {
         Given {
@@ -41,7 +43,7 @@ class UserResourceTest {
         }
 
         Given {
-            header("Content-Type", "application/json")
+            header("Content-Type", ContentType.JSON)
             body(user("duplicate-test@test.dev"))
         } When {
             post("/register")
@@ -51,7 +53,7 @@ class UserResourceTest {
     }
 
     @Test
-    fun `should login user`() {
+    fun `should register, login, logout a user`() {
         Given {
             header("Content-Type", ContentType.JSON)
             body(user("login-test@test.dev"))
@@ -61,45 +63,44 @@ class UserResourceTest {
             statusCode(201)
         }
 
-        Given {
-            header("Content-Type", "application/json")
-            body(user("login-test@test.dev"))
+        val authToken = Given {
+            header("Content-Type", ContentType.MULTIPART)
+            multiPart("email", "login-test@test.dev", "text/plain")
+            multiPart("password", "tastb1", "text/plain")
         } When {
             post("/login")
         } Then {
             statusCode(200)
+        } Extract {
+            detailedCookie(authCookieName)
+        }
+
+        Given {
+            cookie(authToken)
+            header("Content-Type", ContentType.JSON)
+        } When {
+            post("/logout")
+        } Then {
+            statusCode(204)
         }
     }
 
     @Test
     fun `should fail on login`() {
         Given {
-            header("Content-Type", "application/json")
-            body(user("not-existing@test.dev"))
+            header("Content-Type", ContentType.MULTIPART)
+            multiPart("email", "not-existing@test.dev", "text/plain")
+            multiPart("password", "test1234", "text/plain")
         } When {
             post("/login")
         } Then {
-            statusCode(404)
+            statusCode(401)
         }
     }
 
     @Test
     @TestSecurity(user = "1171b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "unit-test1@test.dev")
-        ]
-    )
     fun `should return user data`() {
-        Given {
-            header("Content-Type", ContentType.JSON)
-            body(user("data-test@test.dev"))
-        } When {
-            post("/register")
-        } Then {
-            statusCode(201)
-        }
-
         When {
             get("/read")
         } Then {
@@ -113,11 +114,6 @@ class UserResourceTest {
 
     @Test
     @TestSecurity(user = "2271b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "unit-test2@test.dev")
-        ]
-    )
     fun `should fail on reading user data`() {
         When {
             get("/read")
@@ -128,27 +124,13 @@ class UserResourceTest {
 
     @Test
     @TestSecurity(user = "1171b08c-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "unit-test1@test.dev"),
-        ]
-    )
     fun `should update user data`() {
-        val userOriginal = user("update-test@test.dev")
         val user = LibreUser(
             email = "unit-test1@test.dev",
             password = "password",
+            name = "Fridolin",
             avatar = "/path"
         )
-
-        Given {
-            header("Content-Type", ContentType.JSON)
-            body(userOriginal)
-        } When {
-            post("/register")
-        } Then {
-            statusCode(201)
-        }
 
         Given {
             header("Content-Type", "application/json")
@@ -186,21 +168,7 @@ class UserResourceTest {
 
     @Test
     @TestSecurity(user = "11e45d14-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    @JwtSecurity(
-        claims = [
-            Claim(key = "email", value = "test1@test.dev"),
-        ]
-    )
     fun `should fail on updating user data with wrong password`() {
-        Given {
-            header("Content-Type", ContentType.JSON)
-            body(user("wrong-pwd@test.dev"))
-        } When {
-            post("/register")
-        } Then {
-            statusCode(201)
-        }
-
         val user = user("wrong-pwd@test.dev")
         user.avatar = "/path"
         user.password = "notquiteright"
@@ -212,36 +180,6 @@ class UserResourceTest {
             post("/update")
         } Then {
             statusCode(404)
-        }
-    }
-
-    @Test
-    @TestSecurity(user = "11e45d14-7fb5-11ee-b962-0242ac120002", roles = ["User"])
-    fun `should login and logout a user`() {
-        Given {
-            header("Content-Type", ContentType.JSON)
-            body(user("auth-test1@test.dev"))
-        } When {
-            post("/register")
-        } Then {
-            statusCode(201)
-        }
-
-        Given {
-            header("Content-Type", "application/json")
-            body(user("auth-test1@test.dev"))
-        } When {
-            post("/login")
-        } Then {
-            statusCode(200)
-        }
-
-        Given {
-            header("Content-Type", "application/json")
-        } When {
-            post("/logout")
-        } Then {
-            statusCode(204)
         }
     }
 
@@ -260,19 +198,20 @@ class UserResourceTest {
             statusCode(201)
         }
 
-        val cookies = Given {
-            header("Content-Type", ContentType.JSON)
-            body(user)
+        val authToken = Given {
+            header("Content-Type", ContentType.MULTIPART)
+            multiPart("email", user.email, "text/plain")
+            multiPart("password", user.password, "text/plain")
         } When {
             post("/login")
         } Then {
             statusCode(200)
         } Extract {
-            detailedCookies()
+            detailedCookie(authCookieName)
         }
 
         Given {
-            cookie(cookies.get("auth"))
+            cookie(authToken)
         } When {
             get("/read")
         } Then {
@@ -281,12 +220,6 @@ class UserResourceTest {
             body("avatar", equalTo(user.avatar))
             body("name", equalTo(user.name))
             body("password", equalTo(""))
-        }
-
-        When {
-            get("/read")
-        } Then {
-            statusCode(401)
         }
     }
 
@@ -302,30 +235,6 @@ class UserResourceTest {
             post("/register")
         } Then {
             statusCode(400)
-        }
-    }
-
-    @Test
-    fun `should activate a user account`() {
-        // valid activation link - expires in 14 days
-        val activationId = "89a4e017-8781-3658-b9e6-3930cd79b078";
-
-        When {
-            get("/activate/$activationId")
-        } Then {
-            statusCode(200)
-        }
-    }
-
-    @Test
-    fun `should fail on user account activation`() {
-        // invalid activation link - expired 14 days ago
-        val activationId = "89a4e017-8481-3658-b9e6-3930cd79b077";
-
-        When {
-            get("/activate/$activationId")
-        } Then {
-            statusCode(404)
         }
     }
 
