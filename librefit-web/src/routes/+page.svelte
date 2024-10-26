@@ -8,7 +8,7 @@
     import {getContext} from 'svelte';
     import {login} from '$lib/api/user.js';
     import {page} from '$app/stores';
-    import { env } from '$env/dynamic/public';
+    import {env} from '$env/dynamic/public';
 
     const modalStore = getModalStore();
 
@@ -30,6 +30,10 @@
         indicator = indicator.start();
 
         const formData = new FormData(event.currentTarget);
+
+        if (expired) {
+            await logout();
+        }
 
         await login(formData).then(async response => {
             if (response.ok) {
