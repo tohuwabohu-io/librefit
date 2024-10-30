@@ -3,12 +3,15 @@ package io.tohuwabohu
 import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
 import io.quarkus.security.identity.SecurityIdentity
+import io.quarkus.vertx.http.runtime.FormAuthRuntimeConfig.CookieSameSite
 import io.smallrye.mutiny.Uni
 import io.tohuwabohu.crud.LibreUser
 import io.tohuwabohu.crud.LibreUserRepository
 import io.tohuwabohu.crud.error.ErrorHandler.createErrorResponse
 import io.tohuwabohu.crud.error.ErrorResponse
 import io.tohuwabohu.crud.error.recoverWithResponse
+import io.tohuwabohu.security.convertSameSite
+import io.vertx.ext.web.RoutingContext
 import jakarta.annotation.security.PermitAll
 import jakarta.annotation.security.RolesAllowed
 import jakarta.validation.Valid
@@ -39,6 +42,9 @@ class UserResource(
 ) {
     @ConfigProperty(name = "quarkus.http.auth.form.cookie-name")
     lateinit var cookieName: String
+
+    @ConfigProperty(name = "quarkus.http.auth.form.cookie-same-site")
+    lateinit var cookieSameSite: CookieSameSite
 
     @POST
     @Path("/register")
@@ -103,14 +109,19 @@ class UserResource(
         APIResponse(responseCode = "500", description = "Internal Server Error")
     )
     @Operation(operationId = "postUserLogout")
-    fun logout(@Context securityIdentity: SecurityIdentity): Uni<Response> {
+    fun logout(@Context securityIdentity: SecurityIdentity, @Context routingContext: RoutingContext): Uni<Response> {
         return Uni.createFrom().item(securityIdentity).onItem().transformToUni { identity ->
             if (identity.isAnonymous) {
                 Uni.createFrom().item(createErrorResponse(UnauthorizedException()))
             } else {
                 Uni.createFrom().item(
                     Response.noContent().cookie(
-                        NewCookie.Builder(cookieName).maxAge(0).expiry(Date.from(Instant.EPOCH)).path("/").build()
+                        NewCookie.Builder(cookieName)
+                            .maxAge(0)
+                            .expiry(Date.from(Instant.EPOCH))
+                            .sameSite(convertSameSite(cookieSameSite))
+                            .secure(routingContext.request().isSSL)
+                            .path("/").build()
                     ).build()
                 )
             }
