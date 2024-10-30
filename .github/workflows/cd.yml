@@ -67,4 +67,4 @@ jobs:
 
       - name: Update librefit image versions
         run: |
-          flyctl image update -a librefit -y
+          flyctl image update -a librefit --image registry.fly.io/librefit:${{ steps.calver.outputs.release }}  -y
