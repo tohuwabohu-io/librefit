@@ -21,6 +21,7 @@
 
     if (expired) {
         status = {errors: [{field: 'email', message: 'Your session expired. Please log in again.' }]}
+        $page.url.searchParams.delete('session_expired');
     }
 
     const handleLogin = async (event) => {
@@ -30,10 +31,6 @@
         indicator = indicator.start();
 
         const formData = new FormData(event.currentTarget);
-
-        if (expired) {
-            await logout();
-        }
 
         await login(formData).then(async response => {
             if (response.ok) {
