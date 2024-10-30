@@ -56,6 +56,13 @@ export const login = async (formData) => {
 		errors: [{ field: 'email', message: 'An error occurred. Please try again later.' }]
 	});
 };
+
+export const logout = async () => {
+	const logoutApi = api.postUserLogout;
+
+	await proxyFetch(fetch, logoutApi);
+};
+
 /**
  * @param formData {FormData}
  * @return {Promise<*>}
