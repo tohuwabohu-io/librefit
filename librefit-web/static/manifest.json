@@ -5,6 +5,8 @@
   "start_url": "/",
   "display": "standalone",
   "scope": "/",
+  "background_color": "#242c46",
+  "theme_color": "#242c46",
   "icons": [
     {
       "src": "favicon-16x16.png",
@@ -46,6 +48,5 @@
       "sizes": "144x144",
       "type": "image/png"
     }
-  ],
-  "background_color": "#242c46"
+  ]
 }
