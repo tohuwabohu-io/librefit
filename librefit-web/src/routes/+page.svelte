@@ -32,10 +32,6 @@
 
         const formData = new FormData(event.currentTarget);
 
-        if (expired) {
-            await logout();
-        }
-
         await login(formData).then(async response => {
             if (response.ok) {
                 user.set(await response.json());
