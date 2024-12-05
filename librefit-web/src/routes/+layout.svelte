@@ -38,10 +38,6 @@
             ref: TosModal
         },
 
-        registrationModal: {
-            ref: RegistrationModal
-        },
-
         trackerModal: {
             ref: CalorieTrackerModal
         }

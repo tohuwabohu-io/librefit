@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/public';
 import { error } from '@sveltejs/kit';
+import {invoke} from '@tauri-apps/api/core';
 
 /**
  * @param {function} fetchApi
@@ -10,6 +11,8 @@ import { error } from '@sveltejs/kit';
 export const proxyFetch = async (fetchApi, api, data) => {
 	let response;
 	let call;
+
+	await invoke('custom_command', { name: 'test' } );
 
 	const method = api.method.toUpperCase();
 	let path = api.path;

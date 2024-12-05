@@ -100,21 +100,6 @@
                 <div>
                     <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST"
                           on:submit|preventDefault={handleLogin}>
-                        <ValidatedInput
-                                label="E-Mail"
-                                type="email"
-                                name="email"
-                                placeholder="Your E-Mail"
-                                required
-                                errorMessage={getFieldError(status, 'email')}
-                        />
-                        <ValidatedInput
-                                label="Password"
-                                type="password"
-                                name="password"
-                                placeholder="Your Password"
-                                required
-                        />
 
                         <div class="flex justify-between gap-4">
                             <button class="btn variant-filled-primary" disabled={indicator.actorDisabled}>
@@ -124,12 +109,6 @@
 
                                 <Login/>
                             </button>
-
-                            <div class="flex flex-row gap-4">
-                                <button class="hyperlink self-center text-sm"
-                                        on:click|preventDefault={showRegisterModal}>Not signed up yet?
-                                </button>
-                            </div>
                         </div>
                         <ProgressBar value={indicator.progress} max={100} meter={indicator.meter} track={indicator.track}/>
                     </form>
