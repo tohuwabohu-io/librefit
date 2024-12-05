@@ -29,6 +29,14 @@ diesel::table! {
 }
 
 diesel::table! {
+    libre_user (id) {
+        id -> Integer,
+        avatar -> Nullable<Text>,
+        name -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     weight_target (id) {
         id -> Integer,
         added -> Text,
@@ -51,6 +59,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     calorie_target,
     calorie_tracker,
     food_category,
+    libre_user,
     weight_target,
     weight_tracker,
 );

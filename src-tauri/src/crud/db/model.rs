@@ -1,5 +1,15 @@
 use diesel::prelude::*;
+use diesel::sql_types::Binary;
 use serde::{Deserialize, Serialize};
+
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
+#[diesel(table_name = crate::crud::db::schema::libre_user)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct LibreUser {
+    pub id: i32,
+    pub avatar: Option<String>,
+    pub name: Option<String>
+}
 
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::calorie_tracker)]
