@@ -1,68 +1,10 @@
 <script>
-    import {getFieldError} from '$lib/validation.js';
-    import {getModalStore, ProgressBar} from '@skeletonlabs/skeleton';
-    import ValidatedInput from '$lib/components/ValidatedInput.svelte';
+    import {ProgressBar} from '@skeletonlabs/skeleton';
     import Login from '$lib/assets/icons/login.svg?component';
-    import {Indicator} from '$lib/indicator.js';
-    import {goto} from '$app/navigation';
-    import {getContext} from 'svelte';
-    import {login} from '$lib/api/user.js';
-    import {page} from '$app/stores';
     import {env} from '$env/dynamic/public';
+    import {goto} from '$app/navigation';
 
-    const modalStore = getModalStore();
-
-    const user = getContext('user');
-
-    let indicator = new Indicator();
-    let status;
-
-    const expired = $page.url.searchParams.get('session_expired');
-
-    if (expired) {
-        status = {errors: [{field: 'email', message: 'Your session expired. Please log in again.' }]}
-        $page.url.searchParams.delete('session_expired');
-    }
-
-    const handleLogin = async (event) => {
-        status = undefined;
-
-        indicator = indicator.reset();
-        indicator = indicator.start();
-
-        const formData = new FormData(event.currentTarget);
-
-        await login(formData).then(async response => {
-            if (response.ok) {
-                user.set(await response.json());
-                indicator = indicator.finishSuccess();
-
-                await goto('/dashboard');
-            } else {
-                throw response;
-            }
-        }).catch(e => {
-            indicator = indicator.finishError();
-
-            console.error(e);
-
-            status = e.data;
-
-            if (!status) {
-                status = {errors: [{field: 'email', message: 'An error occurred. Please try again later.' }]}
-            }
-        });
-    }
-
-    const showRegisterModal = () => {
-        modalStore.trigger({
-            type: 'component',
-            component: 'registrationModal',
-            response: (e) => {
-                if (!e) modalStore.close()
-            }
-        });
-    }
+    goto('/dashboard');
 </script>
 
 <svelte:head>
@@ -100,6 +42,10 @@
                 <div>
                     <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST"
                           on:submit|preventDefault={handleLogin}>
+
+                        <p>
+                            { greetMsg }
+                        </p>
 
                         <div class="flex justify-between gap-4">
                             <button class="btn variant-filled-primary" disabled={indicator.actorDisabled}>

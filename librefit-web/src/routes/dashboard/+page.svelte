@@ -44,6 +44,8 @@
     /** @type Dashboard */
     const dashboardData = data.dashboardData;
 
+    Object.keys(dashboardData).forEach(key => { console.log(key) });
+
     /** @type List<CalorieTracker> */
     let caloriesToday = dashboardData.caloriesTodayList;
 

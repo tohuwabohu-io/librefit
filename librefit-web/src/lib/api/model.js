@@ -56,7 +56,7 @@ export const WizardRecommendation = {
 
 /**
  * @typedef {Object} FoodCategory
- * @property {string} longvalue - The full name of the food category.
+ * @property {string}  - The full name of the food category.
  * @property {string} shortvalue - The abbreviated name of the food category.
  */
 
@@ -64,20 +64,20 @@ export const WizardRecommendation = {
  * @typedef {Object} CalorieTarget
  * @property {number} id - The unique identifier of the calorie target.
  * @property {string} added - The date the target was added.
- * @property {string} end_date - The end date for the calorie target.
- * @property {number} maximum_calories - The maximum calorie limit.
- * @property {string} start_date - The start date for the calorie target.
- * @property {number} target_calories - The target calorie intake.
+ * @property {string} endDate - The end date for the calorie target.
+ * @property {number} maximumCalories - The maximum calorie limit.
+ * @property {string} startDate - The start date for the calorie target.
+ * @property {number} targetCalories - The target calorie intake.
  */
 
 /**
  * @typedef {Object} WeightTarget
  * @property {number} id - The unique identifier of the weight target.
  * @property {string} added - The date the target was added.
- * @property {string} end_date - The end date for the weight target.
- * @property {number} initial_weight - The initial weight at the start of the target period.
- * @property {string} start_date - The start date for the weight target.
- * @property {number} target_weight - The target weight.
+ * @property {string} endDate - The end date for the weight target.
+ * @property {number} initialWeight - The initial weight at the start of the target period.
+ * @property {string} startDate - The start date for the weight target.
+ * @property {number} targetWeight - The target weight.
  */
 
 /**
@@ -103,17 +103,17 @@ export const WizardRecommendation = {
 /**
  * @typedef {Object} NewCalorieTarget
  * @property {string} added - The date the target is added.
- * @property {string} end_date - The end date for the calorie target.
- * @property {number} maximum_calories - The maximum calorie limit.
- * @property {string} start_date - The start date for the calorie target.
- * @property {number} target_calories - The target calorie intake.
+ * @property {string} endDate - The end date for the calorie target.
+ * @property {number} maximumCalories - The maximum calorie limit.
+ * @property {string} startDate - The start date for the calorie target.
+ * @property {number} targetCalories - The target calorie intake.
  */
 
 /**
  * @typedef {Object} NewWeightTarget
  * @property {string} added - The date the target is added.
- * @property {string} end_date - The end date for the weight target.
- * @property {number} initial_weight - The initial weight at the start of the target period.
- * @property {string} start_date - The start date for the weight target.
- * @property {number} target_weight - The target weight.
+ * @property {string} endDate - The end date for the weight target.
+ * @property {number} initialWeight - The initial weight at the start of the target period.
+ * @property {string} startDate - The start date for the weight target.
+ * @property {number} targetWeight - The target weight.
  */
