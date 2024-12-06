@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::libre_user)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct LibreUser {
     pub id: i32,
     pub avatar: Option<String>,
@@ -13,6 +14,7 @@ pub struct LibreUser {
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::calorie_tracker)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct CalorieTracker {
     pub id: i32,
     pub added: String,
@@ -24,6 +26,7 @@ pub struct CalorieTracker {
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::weight_tracker)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct WeightTracker {
     pub id: i32,
     pub added: String,
@@ -41,6 +44,7 @@ pub struct FoodCategory {
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::calorie_target)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct CalorieTarget {
     pub id: i32,
     pub added: String,
@@ -53,6 +57,7 @@ pub struct CalorieTarget {
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::weight_target)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct WeightTarget {
     pub id: i32,
     pub added: String,
@@ -66,6 +71,7 @@ pub struct WeightTarget {
 #[derive(Insertable, AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::calorie_tracker)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct NewCalorieTracker {
     pub added: String,
     pub amount: i32,
@@ -77,6 +83,7 @@ pub struct NewCalorieTracker {
 #[derive(Insertable, AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::weight_tracker)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct NewWeightTracker {
     pub added: String,
     pub amount: f32,
@@ -94,6 +101,7 @@ pub struct NewFoodCategory {
 #[derive(Insertable, AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::calorie_target)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct NewCalorieTarget {
     pub added: String,
     pub end_date: String,
@@ -106,6 +114,7 @@ pub struct NewCalorieTarget {
 #[derive(Insertable, AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = crate::crud::db::schema::weight_target)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[serde(rename_all = "camelCase")]
 pub struct NewWeightTarget {
     pub added: String,
     pub end_date: String,
