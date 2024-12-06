@@ -71,6 +71,8 @@
 
 	if (!$user) user.set(dashboardData.userData);
 
+
+
 	const today = new Date();
 	const lastWeek = subWeeks(today, 1);
 	const lastMonth = subMonths(today, 1);
@@ -205,7 +207,7 @@
 
 	const refreshWeightChart = async () => {
 		const weightRangeResponse = await listWeightRange(
-			getDateAsStr(lastMonth), 
+			getDateAsStr(lastMonth),
 			getDateAsStr(today)
 		);
 
