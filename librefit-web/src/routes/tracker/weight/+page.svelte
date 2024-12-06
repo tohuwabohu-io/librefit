@@ -1,7 +1,7 @@
 <script>
     import FilterComponent from '$lib/components/FilterComponent.svelte';
     import {getContext} from 'svelte';
-    import {deleteWeight, listWeightForDate, listWeightRange, updateWeight} from '$lib/api/tracker.js';
+    import {deleteWeight, listWeightRange, updateWeight} from '$lib/api/tracker.js';
     import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
     import {goto} from '$app/navigation';
     import {getToastStore, Paginator} from '@skeletonlabs/skeleton';
@@ -72,11 +72,9 @@
             await updateWeight(event).then(async response => {
                 event.detail.callback();
 
-                if (response.ok) {
-                    showToastSuccess(toastStore, 'Successfully updated weight.')
+                showToastSuccess(toastStore, 'Successfully updated weight.')
 
-                    await reload(fromDate, toDate);
-                }
+                await reload(fromDate, toDate);
             }).catch((e) => {
                 showToastError(toastStore, e);
                 event.detail.callback(true);

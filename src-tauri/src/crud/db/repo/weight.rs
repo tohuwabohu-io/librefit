@@ -52,10 +52,10 @@ pub fn find_last_weight_target(conn: &mut SqliteConnection) -> QueryResult<Weigh
 /// Insert a new weight entry to the tracker
 pub fn create_weight_tracker_entry(
     conn: &mut SqliteConnection,
-    new_entry: NewWeightTracker,
+    new_entry: &NewWeightTracker,
 ) -> QueryResult<WeightTracker> {
     diesel::insert_into(weight_tracker)
-        .values(&new_entry)
+        .values(new_entry)
         .returning(WeightTracker::as_returning())
         .get_result(conn)
 }
@@ -70,13 +70,13 @@ pub fn get_weight_tracker_entries(conn: &mut SqliteConnection) -> QueryResult<Ve
 /// Update a weight tracker entry by ID
 pub fn update_weight_tracker_entry(
     conn: &mut SqliteConnection,
-    tracker_id: i32,
-    updated_entry: NewWeightTracker,
+    tracker_id: &i32,
+    updated_entry: &NewWeightTracker,
 ) -> QueryResult<WeightTracker> {
     use crate::crud::db::schema::weight_tracker::dsl::id;
 
     diesel::update(weight_tracker.filter(id.eq(tracker_id)))
-        .set(&updated_entry)
+        .set(updated_entry)
         .returning(WeightTracker::as_returning())
         .get_result(conn)
 }

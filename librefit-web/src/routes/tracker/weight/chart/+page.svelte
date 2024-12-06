@@ -36,7 +36,7 @@
 
 		await listWeightFiltered(filter).then(async (result) => {
 			/** @type Array<WeightTracker> */
-			entries = await result.json();
+			entries = result;
 
 			paint(entries);
 		}).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());

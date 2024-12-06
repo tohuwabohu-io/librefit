@@ -45,7 +45,7 @@ export const deleteCalories = (event) => {
 	return invoke('delete_calorie_tracker_entry', {
 		trackerId: event.detail.id,
 		addedStr: event.detail.dateStr
-	})
+	});
 };
 
 /**
@@ -64,7 +64,7 @@ export const listCaloriesForDate = (dateStr) => {
 	return listCalorieTrackerRange(dateStr, dateStr).then(
 		async (response) => {
 			/** @type {Array<CalorieTracker>} */
-			const ctList = await response.json();
+			const ctList = await response;
 			ctList.unshift(blankEntry);
 
 			return Promise.resolve(ctList);
@@ -81,7 +81,7 @@ export const listCalorieTrackerDatesRange = (dateFrom, dateTo) => {
 	return invoke('get_calorie_tracker_dates_in_range', {
 		dateFromStr: dateFrom,
 		dateToStr: dateTo
-	})
+	});
 };
 
 /**
@@ -116,7 +116,7 @@ export const listCaloriesFiltered = (filter) => {
 		default:
 			break;
 	}
-	
+
 	return listCalorieTrackerRange(getDateAsStr(fromDate), getDateAsStr(toDate));
 };
 
@@ -124,35 +124,29 @@ export const listCaloriesFiltered = (filter) => {
  * @param event
  */
 export const addWeight = (event) => {
-	/** @type {WeightTracker} */
+	/** @type {NewWeightTracker} */
 	const newEntry = {
 		id: event.detail.id,
 		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
-	return proxyFetch(fetch, api.createWeightTracker, newEntry).then(async (response) => {
-		if (response.ok) {
-			return listWeightForDate(parseStringAsDate(newEntry.added));
-		} else throw response;
-	});
+	return invoke('create_weight_tracker_entry', { newEntry });
 };
 
 /**
  * @param event
  */
 export const updateWeight = (event) => {
-	/** @type WeightTracker */
+	/** @type NewWeightTracker */
 	const entry = {
-		id: event.detail.id,
 		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
 
-	return proxyFetch(fetch, api.updateWeightTracker, entry).then(async (response) => {
-		if (response.ok) {
-			return listWeightForDate(parseStringAsDate(entry.added));
-		} else throw response;
+	return invoke('update_weight_tracker_entry', {
+		trackerId: event.detail.id,
+		updatedEntry: entry
 	});
 };
 
@@ -160,15 +154,9 @@ export const updateWeight = (event) => {
  * @param event
  */
 export const deleteWeight = (event) => {
-	const params = {
-		id: event.detail.id,
-		date: event.detail.dateStr
-	};
-
-	return proxyFetch(fetch, api.deleteWeightTracker, params).then(async (response) => {
-		if (response.ok) {
-			return listWeightForDate(parseStringAsDate(params.date));
-		} else throw response;
+	return invoke('delete_weight_tracker_entry', {
+		trackerId: event.detail.id,
+		addedStr: event.detail.dateStr
 	});
 };
 
@@ -193,44 +181,22 @@ export const listWeightFiltered = (filter) => {
 			break;
 	}
 
-	return proxyFetch(fetch, api.listWeightTrackerRange, {
-		dateFrom: getDateAsStr(fromDate),
-		dateTo: getDateAsStr(toDate)
-	});
-};
-
-/**
- * @param dateFrom {Date}
- * @param dateTo {Date}
- * @return {Promise}
- */
-export const listWeightTrackerDatesRange = (dateFrom, dateTo) => {
-	return proxyFetch(fetch, api.listWeightTrackerDatesRange, {
-		dateFrom: getDateAsStr(dateFrom),
-		dateTo: getDateAsStr(dateTo)
+	return invoke('get_weight_tracker_for_date_range', {
+		dateFromStr: getDateAsStr(fromDate),
+		dateToStr: getDateAsStr(toDate)
 	});
 };
 
 /**
  *
- * @param dateFrom {Date}
- * @param dateTo {Date}
+ * @param dateFrom {String}
+ * @param dateTo {String}
  * @return {Promise}
  */
 export const listWeightRange = (dateFrom, dateTo) => {
-	return proxyFetch(fetch, api.listWeightTrackerRange, {
-		dateFrom: getDateAsStr(dateFrom),
-		dateTo: getDateAsStr(dateTo)
-	});
-};
-
-/**
- * @param date {Date}
- * @return {Promise}
- */
-export const listWeightForDate = (date) => {
-	return proxyFetch(fetch, api.listWeightTracker, {
-		date: getDateAsStr(date)
+	return invoke('get_weight_tracker_for_date_range',{
+		dateFromStr: dateFrom,
+		dateToStr: dateTo
 	});
 };
 
