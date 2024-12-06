@@ -5,8 +5,8 @@
     import {FileDropzone, getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
     import FileUpload from '$lib/assets/icons/file-upload.svg?component';
     import {getContext} from 'svelte';
-    import {startImport} from '$lib/api/tracker.js';
     import {goto} from '$app/navigation';
+		import { startImport } from '$lib/api/importer.js';
 
     const toastStore = getToastStore();
     const indicator = getContext('indicator');
