@@ -1,14 +1,14 @@
 <script>
     import {Avatar} from '@skeletonlabs/skeleton';
-    import {createEventDispatcher, getContext} from 'svelte';
-
+    import {createEventDispatcher} from 'svelte';
+    
     const dispatch = createEventDispatcher();
 
     const files = [];
     export let fileList = ['buffdude-1.png', 'buffdude-2.png', 'cat-1.png', 'dog-1.png', 'lady-1.png', 'lady-2.png', 'skull-1.png', 'panda-1.png', 'tiger-1.png'];
 
     fileList.forEach(fileName => {
-        files.push(`/assets/images/avatars/${fileName}`);
+        files.push(`/images/avatars/${fileName}`);
     });
 
     export let chosen = 'dog-1.png';

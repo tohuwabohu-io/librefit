@@ -11,7 +11,6 @@
 	import TosModal from '$lib/components/modal/TosModal.svelte';
 	import { Indicator } from '$lib/indicator.js';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import RegistrationModal from '$lib/components/modal/RegistrationModal.svelte';
 	import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
 	import { observeToggle } from '$lib/theme-toggle.js';
 

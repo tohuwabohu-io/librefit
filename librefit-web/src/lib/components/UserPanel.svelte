@@ -23,15 +23,6 @@
 
     $: classesActive = (href) => (href === $page.url.pathname ? '!variant-soft-primary' : '');
 
-    const dispatch = createEventDispatcher();
-
-    const logout = (e) => {
-        drawerStore.close();
-        goto('/logout')
-
-        dispatch('logout');
-    }
-
     const navigate = () => {
         drawerStore.close();
     }
@@ -45,9 +36,6 @@
                 <Avatar src={$user.avatar} initials="LU" width="w-16"/>
             </span>
             <div class="flex flex-col justify-evenly">
-                <p>
-                    {$user.email}
-                </p>
                 <p>
                     {$user.name}
                 </p>
@@ -153,7 +141,5 @@
             </li>
         </ul>
     </nav>
-
-    <button data-sveltekit-reload class="btn variant-filled-secondary" on:click|preventDefault={logout}>Log out</button>
 </div>
 {/if}

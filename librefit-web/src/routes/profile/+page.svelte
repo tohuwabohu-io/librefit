@@ -8,8 +8,6 @@
     import {goto} from '$app/navigation';
 
     const user = getContext('user');
-    if (!$user) goto('/');
-
     $: user;
 
     const indicator = getContext('indicator');
@@ -21,8 +19,6 @@
 
     let selectedAvatar = $user.avatar;
 
-    let status;
-
     const handleSubmit = async (event) => {
         const formData = new FormData(event.currentTarget);
 
@@ -32,19 +28,17 @@
             $indicator = $indicator.start(btnSubmit);
 
             await updateProfile(formData).then(async response => {
-                if (response.ok) {
-                    showToastSuccess(toastStore, 'Successfully updated profile.');
+                showToastSuccess(toastStore, 'Successfully updated profile.');
 
-                    user.set(await response.json());
-                } else throw response
+                user.set(response);
             }).catch(error => {
+                console.log(error);
+                
                 if (!error.data.error) {
                     showToastWarning(toastStore, 'Please check your input.')
                 } else {
                     showToastError(toastStore, error);
                 }
-
-                status = error.data;
             }).finally(() => $indicator = $indicator.finish());
         }
     }
@@ -75,14 +69,6 @@
         <p>Change your user settings.</p>
 
         <form class="variant-ringed p-4 space-y-4 rounded-container-token" method="POST" on:submit|preventDefault={handleSubmit}>
-            <ValidatedInput readOnly={true}
-                    value={$user.email}
-                    name="email"
-                    type="email"
-                    placeholder="Enter E-Mail"
-                    label="E-Mail"
-            />
-
             <label class="label">
                 <span>Nickname</span>
                 <input
@@ -90,7 +76,7 @@
                         name="username"
                         class="input"
                         type="text"
-                        placeholder="Enter Nickname (optional)"
+                        placeholder="Enter Nickname"
                 />
             </label>
 
@@ -108,17 +94,7 @@
                     </div>
                     <input bind:value={selectedAvatar} name="avatar" type="text" style="visibility:hidden"/>
                 </div>
-
             </div>
-
-            <ValidatedInput
-                    name="currentPassword"
-                    type="password"
-                    placeholder="Enter Password"
-                    label="Current password"
-                    required
-                    errorMessage={getFieldError(status, 'password')}
-            />
 
             <div class="flex justify-between">
                 <button bind:this={btnSubmit} class="btn variant-filled-primary">Update</button>

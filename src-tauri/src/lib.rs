@@ -4,6 +4,7 @@ use crate::crud::cmd::calorie::{
     update_calorie_tracker_entry,
 };
 use crate::crud::cmd::dashboard::daily_dashboard;
+use crate::crud::cmd::user::update_user;
 use crate::crud::cmd::weight::{
     create_weight_target, create_weight_tracker_entry, delete_weight_tracker_entry,
     get_weight_tracker_for_date_range, update_weight_tracker_entry,
@@ -36,7 +37,8 @@ pub fn run() {
             delete_weight_tracker_entry,
             get_weight_tracker_for_date_range,
             create_calorie_target,
-            create_weight_target
+            create_weight_target,
+            update_user
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
