@@ -1,18 +1,14 @@
-import { proxyFetch } from '$lib/api/util.js';
-import { api } from '$lib/api/index.js';
+import { invoke } from '@tauri-apps/api/core';
 
 /**
  * @param calorieTarget {CalorieTarget}
  * @return {Promise<* | undefined>}
  */
 export const createCalorieTarget = async (calorieTarget) => {
-	return proxyFetch(fetch, api.createCalorieTarget, calorieTarget).then(async (response) => {
-		if (response.ok) {
-			const calorieTarget = await response.json();
+	calorieTarget.targetCalories = +calorieTarget.targetCalories;
+	calorieTarget.maximumCalories = +calorieTarget.maximumCalories;
 
-			return Promise.resolve(calorieTarget);
-		} else throw response;
-	});
+	return invoke('create_calorie_target', { newTarget: calorieTarget });
 };
 
 /**
@@ -20,11 +16,8 @@ export const createCalorieTarget = async (calorieTarget) => {
  * @return {Promise<* | undefined>}
  */
 export const createWeightTarget = async (weightTarget) => {
-	return proxyFetch(fetch, api.createWeightTarget, weightTarget).then(async (response) => {
-		if (response.ok) {
-			const weightTarget = await response.json();
-
-			return Promise.resolve(weightTarget);
-		} else throw response;
-	});
+	weightTarget.targetWeight = +weightTarget.targetWeight;
+	weightTarget.initialWeight = +weightTarget.initialWeight;
+	
+	return invoke('create_weight_target', { newTarget: weightTarget });
 };

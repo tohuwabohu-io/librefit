@@ -27,13 +27,14 @@
 	};
 
 	export let validate = () => {
+
 		let valid = false;
 		let detail = validateDetail({
 			value: value,
 			label: label
 		});
-
 		if (required && isEmpty()) {
+
 			errorMessage = emptyMessage;
 		} else if (!detail.skip) {
 			valid = detail.valid;
@@ -42,11 +43,11 @@
 			errorMessage = undefined;
 			valid = true;
 		}
-
 		return valid;
-	};
 
+	};
 	const isEmpty = () => {
+
 		return value === undefined || value === null || value.length <= 0;
 	};
 

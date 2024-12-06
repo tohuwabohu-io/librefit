@@ -169,7 +169,7 @@
             Cancel
         </button>
 
-        <button on:click|preventDefault={onSubmit} class="btn variant-filled" disabled={rateActive === undefined}>
+        <button on:click|preventDefault={onSubmit} class="btn variant-filled">
             Submit
         </button>
     </footer>

@@ -6,7 +6,7 @@ use crate::crud::cmd::error_handler::handle_error;
 
 /// Create a new calorie target
 #[command]
-fn create_calorie_target(new_target: NewCalorieTarget) -> Result<CalorieTarget, String> {
+pub fn create_calorie_target(new_target: NewCalorieTarget) -> Result<CalorieTarget, String> {
     let conn = &mut create_db_connection(); // Your function to create database connections
     calories::create_calorie_target(conn, new_target).map_err(handle_error)
 }

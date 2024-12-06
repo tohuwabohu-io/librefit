@@ -1,11 +1,12 @@
 use crate::crud::cmd::calorie::{
-    create_calorie_tracker_entry, delete_calorie_tracker_entry, get_calorie_tracker_dates_in_range,
-    get_calorie_tracker_for_date_range, update_calorie_tracker_entry,
+    create_calorie_target, create_calorie_tracker_entry, delete_calorie_tracker_entry,
+    get_calorie_tracker_dates_in_range, get_calorie_tracker_for_date_range,
+    update_calorie_tracker_entry,
 };
 use crate::crud::cmd::dashboard::daily_dashboard;
 use crate::crud::cmd::weight::{
-    create_weight_tracker_entry, delete_weight_tracker_entry, get_weight_tracker_for_date_range,
-    update_weight_tracker_entry
+    create_weight_target, create_weight_tracker_entry, delete_weight_tracker_entry,
+    get_weight_tracker_for_date_range, update_weight_tracker_entry,
 };
 
 pub mod crud;
@@ -33,7 +34,9 @@ pub fn run() {
             create_weight_tracker_entry,
             update_weight_tracker_entry,
             delete_weight_tracker_entry,
-            get_weight_tracker_for_date_range
+            get_weight_tracker_for_date_range,
+            create_calorie_target,
+            create_weight_target
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
