@@ -15,7 +15,7 @@
         entries = $modalStore[0].meta.entries
 
         if (entries) {
-            entries = entries.sort((a, b) => a.sequence - b.sequence);
+            entries = entries.sort((a, b) => a.id - b.id);
         }
         categories = $modalStore[0].meta.categories;
     }
@@ -65,13 +65,13 @@
             <TrackerInput {categories}
                           value={entry.amount}
                           dateStr={entry.added}
-                          sequence={entry.sequence}
+                          id={entry.id}
                           category={entry.category}
                           on:add={(e) => onSubmit('add', e)}
                           on:update={(e) => onSubmit('update', e)}
                           on:remove={(e) => onSubmit('remove', e)}
-                          existing={entry.sequence !== undefined}
-                          disabled={entry.sequence !== undefined}
+                          existing={entry.id !== undefined}
+                          disabled={entry.id !== undefined}
                           unit={'kcal'}
             />
             {/each}

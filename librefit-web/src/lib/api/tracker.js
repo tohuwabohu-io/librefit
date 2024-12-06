@@ -3,41 +3,38 @@ import { api } from '$lib/api/index.js';
 import { fail } from '@sveltejs/kit';
 import { DataViews } from '$lib/enum.js';
 import { getDateAsStr, getDaytimeFoodCategory, parseStringAsDate } from '$lib/date.js';
+import { invoke } from '@tauri-apps/api/core';
 
 /**
  * @param event
  */
 export const addCalories = (event) => {
-	/** @type {CalorieTracker} */
+	/** @type {NewCalorieTracker} */
 	const newEntry = {
 		added: event.detail.dateStr,
 		amount: event.detail.value,
-		category: event.detail.category
+		category: event.detail.category,
+		description: ''
 	};
 
-	return proxyFetch(fetch, api.createCalorieTracker, newEntry).then(async (response) => {
-		if (response.ok) {
-			return listCaloriesForDate(parseStringAsDate(newEntry.added));
-		} else throw response;
-	});
+	return invoke('create_calorie_tracker_entry', { newEntry });
 };
 
 /**
  * @param event
  */
 export const updateCalories = (event) => {
-	/** @type {CalorieTracker} */
+	/** @type {NewCalorieTracker} */
 	const entry = {
-		sequence: event.detail.sequence,
 		added: event.detail.dateStr,
 		amount: event.detail.value,
-		category: event.detail.category
+		category: event.detail.category,
+		description: ''
 	};
 
-	return proxyFetch(fetch, api.updateCalorieTracker, entry).then(async (response) => {
-		if (response.ok) {
-			return listCaloriesForDate(parseStringAsDate(entry.added));
-		} else throw response;
+	return invoke('update_calorie_tracker_entry', {
+		trackerId: event.detail.id,
+		updatedEntry: entry
 	});
 };
 
@@ -45,16 +42,10 @@ export const updateCalories = (event) => {
  * @param event
  */
 export const deleteCalories = (event) => {
-	const params = {
-		sequence: event.detail.sequence,
-		date: event.detail.dateStr
-	};
-
-	return proxyFetch(fetch, api.deleteCalorieTracker, params).then(async (response) => {
-		if (response.ok) {
-			return listCaloriesForDate(parseStringAsDate(params.date));
-		} else throw response;
-	});
+	return invoke('delete_calorie_tracker_entry', {
+		trackerId: event.detail.id,
+		addedStr: event.detail.dateStr
+	})
 };
 
 /**
@@ -140,7 +131,7 @@ export const listCaloriesFiltered = (filter) => {
 export const addWeight = (event) => {
 	/** @type {WeightTracker} */
 	const newEntry = {
-		sequence: event.detail.sequence,
+		id: event.detail.id,
 		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
@@ -158,7 +149,7 @@ export const addWeight = (event) => {
 export const updateWeight = (event) => {
 	/** @type WeightTracker */
 	const entry = {
-		sequence: event.detail.sequence,
+		id: event.detail.id,
 		added: event.detail.dateStr,
 		amount: event.detail.value
 	};
@@ -175,7 +166,7 @@ export const updateWeight = (event) => {
  */
 export const deleteWeight = (event) => {
 	const params = {
-		sequence: event.detail.sequence,
+		id: event.detail.id,
 		date: event.detail.dateStr
 	};
 

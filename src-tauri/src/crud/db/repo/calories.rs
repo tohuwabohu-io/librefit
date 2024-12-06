@@ -50,10 +50,10 @@ pub fn find_last_calorie_target(conn: &mut SqliteConnection) -> QueryResult<Calo
 /// Insert a new calorie entry to the tracker
 pub fn create_calorie_tracker_entry(
     conn: &mut SqliteConnection,
-    new_entry: NewCalorieTracker,
+    new_entry: &NewCalorieTracker,
 ) -> QueryResult<CalorieTracker> {
     diesel::insert_into(calorie_tracker)
-        .values(&new_entry)
+        .values(new_entry)
         .returning(CalorieTracker::as_returning())
         .get_result(conn)
 }
@@ -69,12 +69,12 @@ pub fn get_calorie_tracker_entries(
 pub fn update_calorie_tracker_entry(
     conn: &mut SqliteConnection,
     tracker_id: i32,
-    updated_entry: NewCalorieTracker,
+    updated_entry: &NewCalorieTracker,
 ) -> QueryResult<CalorieTracker> {
     use crate::crud::db::schema::calorie_tracker::dsl::id;
 
     diesel::update(calorie_tracker.filter(id.eq(tracker_id)))
-        .set(&updated_entry)
+        .set(updated_entry)
         .returning(CalorieTracker::as_returning())
         .get_result(conn)
 }
@@ -82,7 +82,7 @@ pub fn update_calorie_tracker_entry(
 /// Delete a calorie tracker entry by ID
 pub fn delete_calorie_tracker_entry(
     conn: &mut SqliteConnection,
-    tracker_id: i32,
+    tracker_id: &i32,
 ) -> QueryResult<usize> {
     use crate::crud::db::schema::calorie_tracker::dsl::id;
 

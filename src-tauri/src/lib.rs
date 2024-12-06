@@ -14,7 +14,10 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            crud::cmd::dashboard::daily_dashboard
+            crud::cmd::dashboard::daily_dashboard,
+            crud::cmd::calorie::create_calorie_tracker_entry,
+            crud::cmd::calorie::update_calorie_tracker_entry,
+            crud::cmd::calorie::delete_calorie_tracker_entry
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

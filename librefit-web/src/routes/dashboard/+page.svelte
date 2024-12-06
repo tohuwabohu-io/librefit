@@ -85,6 +85,8 @@
             await addCalories(event).then(async response => {
                 event.detail.callback();
 
+                console.log(response);
+
                 caloriesToday = await response;
 
                 showToastSuccess(

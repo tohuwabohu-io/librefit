@@ -9,11 +9,6 @@ import {invoke} from '@tauri-apps/api/core';
  * @returns Response
  */
 export const proxyFetch = async (fetchApi, api, data) => {
-	let response;
-	let call;
-
-	$state("")
-
 	return await invoke("greet", { name });
 };
 

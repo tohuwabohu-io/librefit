@@ -3,7 +3,7 @@
 	import {getDaytimeFoodCategory} from '$lib/date.js';
 	import TrackerButtons from './TrackerButtons.svelte';
 
-	export let value, dateStr, sequence;
+	export let value, dateStr, id;
 	export let existing = false;
 	export let disabled = false;
 	export let compact = false;
@@ -26,7 +26,7 @@
 
 	const add = (e) => {
 		dispatch('add', {
-			sequence: sequence,
+			id: id,
 			dateStr: dateStr,
 			value: value,
 			category: category,
@@ -39,7 +39,7 @@
 
 		if (value !== previous.value || category !== previous.category) {
 			dispatch('update', {
-				sequence: sequence,
+				id: id,
 				dateStr: dateStr,
 				value: value,
 				category: category,
@@ -54,7 +54,7 @@
 		e.preventDefault();
 
 		dispatch('remove', {
-			sequence: sequence,
+			id: id,
 			dateStr: dateStr,
 			target: e.target,
 			callback: () => e.detail.callback()

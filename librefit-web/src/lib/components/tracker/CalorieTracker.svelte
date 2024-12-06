@@ -55,7 +55,7 @@
 
     const updateCalories = (e) => {
         dispatch('updateCalories', {
-            sequence: e.detail.sequence,
+            id: e.detail.id,
             dateStr: e.detail.dateStr,
             value: e.detail.value,
             category: e.detail.category,
@@ -66,7 +66,7 @@
 
     const deleteCalories = (e) => {
         dispatch('deleteCalories', {
-            sequence: e.detail.sequence,
+            id: e.detail.id,
             dateStr: e.detail.dateStr,
             target: e.detail.target,
             callback: e.detail.callback
