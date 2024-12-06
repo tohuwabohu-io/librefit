@@ -1,5 +1,4 @@
 use diesel::prelude::*;
-use diesel::sql_types::Binary;
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
@@ -8,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct LibreUser {
     pub id: i32,
     pub avatar: Option<String>,
-    pub name: Option<String>
+    pub name: Option<String>,
 }
 
 #[derive(Queryable, Selectable, Serialize, Deserialize)]

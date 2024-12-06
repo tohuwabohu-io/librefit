@@ -1,7 +1,4 @@
-#[tauri::command]
-fn custom_command(name: &str) -> String {
-    format!("Hello {}!", name)
-}
+pub mod crud;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -17,10 +14,8 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            custom_command
+            crud::cmd::dashboard::daily_dashboard
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-pub mod crud;
