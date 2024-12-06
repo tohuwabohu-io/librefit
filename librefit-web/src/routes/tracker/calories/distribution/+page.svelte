@@ -41,9 +41,9 @@
     const loadEntriesFiltered = async () => {
         $indicator = $indicator.start();
 
-        await listCaloriesFiltered(filter).then(async (result) => {
+        await listCaloriesFiltered(filter).then(result => {
             /** @type Array<WeightTracker> */
-            filteredData = await result.json();
+            filteredData = result;
         }).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
     }
 

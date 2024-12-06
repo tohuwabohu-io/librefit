@@ -1,21 +1,26 @@
-import { listCaloriesForDate, listCalorieTrackerDatesRange } from '$lib/api/tracker.js';
 import { subDays } from 'date-fns';
+import { invoke } from '@tauri-apps/api/core';
+import { listCalorieTrackerDatesRange } from '$lib/api/tracker.js';
 
 export const load = async ({ fetch }) => {
-	const today = new Date();
-	const fromDate = subDays(today, 6);
-	const ctDateResponse = await listCalorieTrackerDatesRange(fromDate, today);
-	const listCtForDateResponse = await listCaloriesForDate(today);
+	const today = getDateAsStr(new Date());
+	const fromDate = getDateAsStr(subDays(today, 6));
+	
+	/** @type Array<String> */
+	const trackedDaysWeek = await listCalorieTrackerDatesRange(fromDate, today);
+	
+	/** @type Array<CalorieTracker> */
+	const calorieTrackerToday = await invoke('get_calorie_tracker_for_date_range', { 
+		dateFromStr: fromDate, 
+		dateToStr: today 
+	});
 
-	if (ctDateResponse.ok && listCtForDateResponse) {
-		/** @type {Array<String>} */
-		const availableDates = await ctDateResponse.json();
-
+	if (calorieTrackerToday && trackedDaysWeek) {
 		return {
-			availableDates: availableDates,
-			entryToday: listCtForDateResponse
+			availableDates: trackedDaysWeek,
+			entryToday: calorieTrackerToday
 		};
 	} else {
-		return { error: 'An error has occured. Please try again later.' };
+		return { error: 'An error has occurred. Please try again later.' };
 	}
 };

@@ -1,3 +1,9 @@
+use crate::crud::cmd::calorie::{
+    create_calorie_tracker_entry, delete_calorie_tracker_entry, get_calorie_tracker_dates_in_range,
+    get_calorie_tracker_for_date_range, update_calorie_tracker_entry,
+};
+use crate::crud::cmd::dashboard::daily_dashboard;
+
 pub mod crud;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -14,10 +20,12 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            crud::cmd::dashboard::daily_dashboard,
-            crud::cmd::calorie::create_calorie_tracker_entry,
-            crud::cmd::calorie::update_calorie_tracker_entry,
-            crud::cmd::calorie::delete_calorie_tracker_entry
+            daily_dashboard,
+            create_calorie_tracker_entry,
+            update_calorie_tracker_entry,
+            delete_calorie_tracker_entry,
+            get_calorie_tracker_for_date_range,
+            get_calorie_tracker_dates_in_range
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

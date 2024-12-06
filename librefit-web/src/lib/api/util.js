@@ -1,6 +1,4 @@
-import { env } from '$env/dynamic/public';
-import { error } from '@sveltejs/kit';
-import {invoke} from '@tauri-apps/api/core';
+import { invoke } from '@tauri-apps/api/core';
 
 /**
  * @param {function} fetchApi

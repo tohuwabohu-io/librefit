@@ -49,19 +49,19 @@ export const deleteCalories = (event) => {
 };
 
 /**
- * @param date {Date}
+ * @param dateStr {String}
  * @return {Promise}
  */
-export const listCaloriesForDate = (date) => {
+export const listCaloriesForDate = (dateStr) => {
 	// add a blank entry for new input
 	/** @type {CalorieTracker} */
 	const blankEntry = {
-		added: getDateAsStr(date),
+		added: dateStr,
 		amount: 0,
-		category: getDaytimeFoodCategory(date)
+		category: getDaytimeFoodCategory(dateStr)
 	};
 
-	return proxyFetch(fetch, api.listCalorieTrackerForDate, { date: getDateAsStr(date) }).then(
+	return listCalorieTrackerRange(dateStr, dateStr).then(
 		async (response) => {
 			/** @type {Array<CalorieTracker>} */
 			const ctList = await response.json();
@@ -73,28 +73,26 @@ export const listCaloriesForDate = (date) => {
 };
 
 /**
- * @param dateFrom {Date}
- * @param dateTo {Date}
+ * @param dateFrom {String}
+ * @param dateTo {String}
  * @return {Promise}
  */
 export const listCalorieTrackerDatesRange = (dateFrom, dateTo) => {
-	const loadCtDateApi = api.listCalorieTrackerDatesRange;
-
-	return proxyFetch(fetch, loadCtDateApi, {
-		dateFrom: getDateAsStr(dateFrom),
-		dateTo: getDateAsStr(dateTo)
-	});
+	return invoke('get_calorie_tracker_dates_in_range', {
+		dateFromStr: dateFrom,
+		dateToStr: dateTo
+	})
 };
 
 /**
- * @param dateFrom {Date}
- * @param dateTo {Date}
+ * @param dateFrom {String}
+ * @param dateTo {String}
  * @return {Promise}
  */
 export const listCalorieTrackerRange = (dateFrom, dateTo) => {
-	return proxyFetch(fetch, api.listCalorieTrackerRange, {
-		dateFrom: getDateAsStr(dateFrom),
-		dateTo: getDateAsStr(dateTo)
+	return invoke('get_calorie_tracker_for_date_range', {
+		dateFromStr: dateFrom,
+		dateToStr: dateTo
 	});
 };
 
@@ -118,11 +116,8 @@ export const listCaloriesFiltered = (filter) => {
 		default:
 			break;
 	}
-
-	return proxyFetch(fetch, api.listCalorieTrackerRange, {
-		dateFrom: getDateAsStr(fromDate),
-		dateTo: getDateAsStr(toDate)
-	});
+	
+	return listCalorieTrackerRange(getDateAsStr(fromDate), getDateAsStr(toDate));
 };
 
 /**

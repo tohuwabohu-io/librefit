@@ -39,6 +39,25 @@ export const WizardRecommendation = {
 }
 
 /**
+ * @typedef {Object} Dashboard
+ * @property {LibreUser} userData - The user data associated with the dashboard.
+ * @property {CalorieTarget|null} [calorieTarget] - The optional calorie target for the user.
+ * @property {CalorieTracker[]} caloriesTodayList - A list of calorie tracker entries for today.
+ * @property {CalorieTracker[]} caloriesWeekList - A list of calorie tracker entries for the week.
+ * @property {WeightTarget|null} [weightTarget] - The optional weight target for the user.
+ * @property {WeightTracker[]} weightTodayList - A list of weight tracker entries for today.
+ * @property {WeightTracker[]} weightMonthList - A list of weight tracker entries for the month.
+ * @property {FoodCategory[]} foodCategories - A list of food categories.
+ */
+
+/**
+ * @typedef {Object} LibreUser
+ * @property {number} id - The unique identifier for the user.
+ * @property {string|null} [avatar] - The optional avatar URL of the user.
+ * @property {string|null} [name] - The optional name of the user.
+ */
+
+/**
  * @typedef {Object} CalorieTracker
  * @property {number} id - The unique identifier of the calorie tracker entry.
  * @property {string} added - The date the entry was added.

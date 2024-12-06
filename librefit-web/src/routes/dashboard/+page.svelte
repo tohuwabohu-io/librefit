@@ -27,6 +27,7 @@
     import {observeToggle} from '$lib/theme-toggle.js';
     import CalorieQuickview from '$lib/components/CalorieQuickview.svelte';
     import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
+    import {getDateAsStr} from '$lib/date.js';
 
     Chart.register(...registerables);
 
@@ -200,11 +201,10 @@
     }
 
     const refreshCalorieDistribution = async () => {
-        const calorieTrackerRangeResponse = await listCalorieTrackerRange(lastWeek, today);
-
-        if (calorieTrackerRangeResponse.ok) {
-            dashboardData.caloriesWeekList = await calorieTrackerRangeResponse.json();
-        }
+        listCalorieTrackerRange(
+          getDateAsStr(lastWeek), 
+          getDateAsStr(today)
+        ).then(response => dashboardData.caloriesWeekList = response);
     }
 
     const refreshWeightChart = async () => {

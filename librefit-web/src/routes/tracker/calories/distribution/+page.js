@@ -1,16 +1,15 @@
 import { subMonths } from 'date-fns';
 import { listCalorieTrackerRange } from '$lib/api/tracker.js';
+import { getDateAsStr } from '$lib/date.js';
 
 /** @type {import('./$types').PageLoad} */
 export const load = async ({ fetch }) => {
 	const today = new Date();
 	const lastMonth = subMonths(today, 1);
 
-	const monthList = await listCalorieTrackerRange(lastMonth, today);
+	const monthList = await listCalorieTrackerRange(getDateAsStr(lastMonth), getDateAsStr(today));
 
-	if (monthList.ok) {
-		return {
-			caloriesMonthList: await monthList.json()
-		};
-	}
+	return {
+		caloriesMonthList: monthList
+	};
 };

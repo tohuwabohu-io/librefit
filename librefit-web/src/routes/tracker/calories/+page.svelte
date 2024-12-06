@@ -125,8 +125,8 @@
 		if (!datesToEntries[added]) {
 			$indicator = $indicator.start();
 
-			await listCaloriesForDate(parseStringAsDate(added)).then(async response => {
-				datesToEntries[added] = await response;
+			await listCaloriesForDate(added).then(response => {
+				datesToEntries[added] = response;
 			}).catch((e) => { showToastError(toastStore, e) }).finally(() => $indicator = $indicator.finish())
 		}
 	}
@@ -138,11 +138,9 @@
 		if (fromDateStr && toDateStr) {
 			$indicator = $indicator.start();
 
-			await listCalorieTrackerDatesRange(fromDateStr, toDateStr).then(async response => {
-				if (response.ok) {
-					availableDates = await response.json();
-					paginationSettings.size = availableDates.length;
-				} else throw response
+			await listCalorieTrackerDatesRange(fromDateStr, toDateStr).then(response => {
+				availableDates = response;
+				paginationSettings.size = availableDates.length;
 			}).catch((e) => { showToastError(toastStore, e) }).finally(() => $indicator = $indicator.finish())
 		}
 	}
