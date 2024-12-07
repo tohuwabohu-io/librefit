@@ -1,4 +1,4 @@
-import { CalorieTracker, FoodCategory } from './model';
+import type { CalorieTracker, FoodCategory } from './model';
 
 export const getAverageCategoryIntake = (entries: Array<CalorieTracker>, foodCategories: Array<FoodCategory>) => {
 	const nonEmpty = entries.filter((e) => e.amount > 0);

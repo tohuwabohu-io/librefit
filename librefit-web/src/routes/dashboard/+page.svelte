@@ -1,6 +1,6 @@
-<script>
-	import { paintWeightTracker } from '$lib/weight-chart.ts';
-	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
+<script lang="ts">
+	import { paintWeightTracker } from '$lib/weight-chart';
+	import CalorieTrackerComponent from '$lib/components/tracker/CalorieTrackerComponent.svelte';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import {
 		addCalories,
@@ -11,51 +11,50 @@
 		listWeightRange,
 		updateCalories,
 		updateWeight
-	} from '$lib/api/tracker.ts';
-	import { createCalorieTarget, createWeightTarget } from '$lib/api/target.ts';
+	} from '$lib/api/tracker';
+	import { createCalorieTarget, createWeightTarget } from '$lib/api/target';
 	import { getContext } from 'svelte';
 	import { Chart, registerables } from 'chart.js';
 	import { Line } from 'svelte-chartjs';
 	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
-	import { validateAmount } from '$lib/validation.ts';
-	import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast.ts';
-	import { DataViews } from '$lib/enum.ts';
-	import { getDaytimeGreeting } from '$lib/date.ts';
+	import { validateAmount } from '$lib/validation';
+	import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast';
+	import { DataViews } from '$lib/enum';
+	import { getDaytimeGreeting } from '$lib/date';
 	import { getFoodCategoryLongvalue } from '$lib/api/category';
 	import { subMonths, subWeeks } from 'date-fns';
 	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg?component';
-	import { observeToggle } from '$lib/theme-toggle.ts';
+	import { observeToggle } from '$lib/theme-toggle';
 	import CalorieQuickview from '$lib/components/CalorieQuickview.svelte';
-	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-	import { getDateAsStr } from '$lib/date.ts';
+	import WeightTrackerComponent from '$lib/components/tracker/WeightTrackerComponent.svelte';
+	import { getDateAsStr } from '$lib/date';
+	import type {
+		CalorieTarget,
+		CalorieTracker,
+		Dashboard,
+		FoodCategory,
+		LibreUser,
+		WeightTarget,
+		WeightTracker
+	} from '$lib/model';
+	import type { Writable } from 'svelte/store';
+	import type { Indicator } from '$lib/indicator';
 
 	Chart.register(...registerables);
 
-	/** @type Writable<WeightTracker> */
-	const lastWeightTracker = getContext('lastWeight');
-
-	/** @type Writable<List<FoodCategory>> */
-	const foodCategories = getContext('foodCategories');
-
-	/** @type Writable<CalorieTarget> */
-	const calorieTarget = getContext('calorieTarget');
+	const lastWeightTracker: Writable<WeightTracker> = getContext('lastWeight');
+	const foodCategories: Writable<Array<FoodCategory>> = getContext('foodCategories');
+	const calorieTarget: Writable<CalorieTarget> = getContext('calorieTarget');
 
 	export let data;
 
-	/** @type Dashboard */
-	const dashboardData = data.dashboardData;
+	const dashboardData: Dashboard = data.dashboardData;
 
-	/** @type List<CalorieTracker> */
-	let caloriesToday = dashboardData.caloriesTodayList;
+	let caloriesToday: Array<CalorieTracker> = dashboardData.caloriesTodayList;
+	let weightListToday: Array<WeightTracker> = dashboardData.weightTodayList;
+	let weightListMonth: Array<WeightTracker> = dashboardData.weightMonthList;
 
-	/** @type List<WeightTracker> */
-	let weightListToday = dashboardData.weightTodayList;
-
-	/** @type List<WeightTracker> */
-	let weightListMonth = dashboardData.weightMonthList;
-
-	/** @type WeightTracker */
-	let weightTarget = dashboardData.weightTarget;
+	let weightTarget: WeightTarget = dashboardData.weightTarget;
 
 	$: weightChart = paintWeightTracker(weightListMonth, today, DataViews.Month);
 	$: lastWeightTracker.set(dashboardData.weightTodayList[0]);
@@ -64,14 +63,12 @@
 
 	$: dashboardData.caloriesWeekList;
 
-	const user = getContext('user');
-	const indicator = getContext('indicator');
+	const user: Writable<LibreUser> = getContext('user');
+	const indicator: Writable<Indicator> = getContext('indicator');
+
+	$: user.set(dashboardData.userData);
 
 	const toastStore = getToastStore();
-
-	if (!$user) user.set(dashboardData.userData);
-
-
 
 	const today = new Date();
 	const lastWeek = subWeeks(today, 1);
@@ -86,7 +83,7 @@
 			await addCalories(event).then(async response => {
 				event.detail.callback();
 
-				caloriesToday = await response;
+				caloriesToday = response;
 
 				showToastSuccess(
 					toastStore,
@@ -113,7 +110,7 @@
 			await updateCalories(event).then(async response => {
 				event.detail.callback();
 
-				caloriesToday = await response;
+				caloriesToday = response;
 
 				showToastSuccess(
 					toastStore,
@@ -135,7 +132,7 @@
 		await deleteCalories(event).then(async response => {
 			event.detail.callback();
 
-			caloriesToday = await response;
+			caloriesToday = response;
 
 			showToastSuccess(toastStore, `Deletion successful.`);
 		}).then(refreshCalorieDistribution).catch((e) => {
@@ -206,16 +203,13 @@
 	};
 
 	const refreshWeightChart = async () => {
-		const weightRangeResponse = await listWeightRange(
+		await listWeightRange(
 			getDateAsStr(lastMonth),
 			getDateAsStr(today)
-		);
-
-		if (weightRangeResponse.ok) {
-			weightListMonth = await weightRangeResponse.json();
-
+		).then(response => {
+			weightListMonth = response;
 			repaintWeightChart();
-		}
+		});
 	};
 
 	const repaintWeightChart = () => {
@@ -262,7 +256,7 @@
 		{/if}
 		<div class="flex flex-col gap-8 lg:grid grid-cols-3">
 			<div class="card flex flex-col gap-4 p-4">
-				<CalorieTracker calorieTracker={caloriesToday}
+				<CalorieTrackerComponent calorieTracker={caloriesToday}
 												categories={$foodCategories}
 												calorieTarget={$calorieTarget}
 												on:addCalories={onAddCalories}
@@ -298,7 +292,7 @@
 						<ScaleOff width={100} height={100} class="self-center" />
 					</div>
 				{/if}
-				<WeightTracker weightList={weightListToday}
+				<WeightTrackerComponent weightList={weightListToday}
 											 weightTarget={weightTarget}
 											 on:addWeight={onAddWeight}
 											 on:updateWeight={onUpdateWeight}

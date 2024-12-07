@@ -1,4 +1,3 @@
-import { api } from '$lib/api/index.js';
 import { fail } from '@sveltejs/kit';
 import { proxyFetch } from '$lib/api/util.ts';
 
@@ -7,11 +6,10 @@ import { proxyFetch } from '$lib/api/util.ts';
  * @return {Promise}
  */
 export const startImport = async (formData) => {
-	const importApi = api.postImportBulk;
+	/*const importApi = api.postImportBulk;
 
 	const importerSelection = formData['importer'];
 
-	/** @type File */
 	const file = formData.get('file');
 
 	if (file.type !== 'text/csv') {
@@ -25,6 +23,7 @@ export const startImport = async (formData) => {
 	}
 
 	/** @type ImportConfig */
+	/*
 	const config = {
 		datePattern: formData['datePattern'],
 		headerLength: formData['headerLength'],
@@ -49,11 +48,7 @@ export const startImport = async (formData) => {
 			success: true
 		};
 	} else {
-		/** @type ErrorResponse */
-		const errorResponse = await response.json();
-
-		result = fail(response.status, errorResponse);
 	}
 
-	return result;
+	return result;*/
 };

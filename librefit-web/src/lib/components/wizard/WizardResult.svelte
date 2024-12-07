@@ -1,12 +1,9 @@
-<script>
-    import {BmiCategory} from '$lib/model';
+<script lang="ts">
+    import { BmiCategory, type WizardInput, type WizardResult } from '$lib/model';
     import {getBmiCategoryDisplayValue} from '$lib/enum';
 
-    /** @type {WizardResult} */
-    export let calculationResult;
-
-    /** @type {WizardInput} */
-    export let calculationInput;
+    export let calculationResult: WizardResult;
+    export let calculationInput: WizardInput;
 </script>
 <h2 class="h2">Your result</h2>
 
@@ -122,11 +119,7 @@
         </span>
 
         <span class="underline">
-            {#if calculationResult.bmiCategory !== BmiCategory.Standard_weight && calculationResult.bmiCategory !== BmiCategory.Overweight}
-                It is recommended to consult with a healthcare professional.
-            {:else if calculationResult.bmiCategory === BmiCategory.Obese}
-                It is recommended to consult with a healthcare professional.
-            {:else if calculationResult.bmiCategory === BmiCategory.Severely_obese}
+            {#if calculationResult.bmiCategory !== BmiCategory.Standard_Weight && calculationResult.bmiCategory !== BmiCategory.Overweight}
                 It is recommended to consult with a healthcare professional.
             {/if}
         </span>

@@ -1,6 +1,6 @@
 <script>
 	import { Accordion, AccordionItem, getToastStore, Paginator } from '@skeletonlabs/skeleton';
-	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
+	import CalorieTracker from '$lib/components/tracker/CalorieTrackerComponent.svelte';
 	import { validateAmount } from '$lib/validation.ts';
 	import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast.ts';
 	import { getContext } from 'svelte';

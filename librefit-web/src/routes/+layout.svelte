@@ -8,7 +8,6 @@
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
-	import TosModal from '$lib/components/modal/TosModal.svelte';
 	import { Indicator } from '$lib/indicator.ts';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
@@ -31,10 +30,6 @@
 
 		avatarModal: {
 			ref: AvatarModal
-		},
-
-		tosModal: {
-			ref: TosModal
 		},
 
 		trackerModal: {

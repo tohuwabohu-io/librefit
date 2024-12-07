@@ -1,7 +1,9 @@
 <svelte:options accessors={true} />
 
-<script>
-	export let value = '';
+<script lang="ts">
+	import type { ValidationMessage } from '$lib/model';
+
+	export let value: any = '';
 	export let name = 'control';
 	export let label = '';
 	export let type = 'text';
@@ -9,7 +11,7 @@
 	export let placeholder = '';
 	export let unit = '';
 
-	export let validateDetail = (e) => {
+	export let validateDetail = (e): ValidationMessage => {
 		return {
 			valid: false,
 			skip: true

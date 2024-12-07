@@ -1,20 +1,18 @@
-<script>
+<script lang="ts">
     import {Bar} from 'svelte-chartjs';
     import {createEventDispatcher} from 'svelte';
     import Target from '$lib/assets/icons/target-arrow.svg?component';
     import TargetOff from '$lib/assets/icons/target-off.svg?component';
     import Wand from '$lib/assets/icons/wand.svg?component';
 
-    import {paintCalorieTrackerQuickview} from '$lib/quickview-chart.ts';
+    import { type BarChartConfig, paintCalorieTrackerQuickview } from '$lib/quickview-chart';
     import {goto} from '$app/navigation';
     import {getModalStore} from '@skeletonlabs/skeleton';
-    import {observeToggle} from '$lib/theme-toggle.ts';
+    import {observeToggle} from '$lib/theme-toggle';
+    import type { CalorieTarget, CalorieTracker } from '$lib/model';
 
-    /** @type Array<CalorieTracker> */
-    export let calorieTracker;
-
-    /** @type CalorieTarget */
-    export let calorieTarget;
+    export let calorieTracker: Array<CalorieTracker>;
+    export let calorieTarget: CalorieTarget;
 
     export let displayClass = '';
     export let displayHeader = true;
@@ -23,8 +21,8 @@
     const modalStore = getModalStore();
     const dispatch = createEventDispatcher();
 
-    let targetButton;
-    let quickview;
+    let targetButton: HTMLButtonElement;
+    let quickview: BarChartConfig;
 
     $: if (calorieTracker && calorieTarget) {
         quickview = paintCalorieTrackerQuickview(calorieTracker, calorieTarget);

@@ -1,14 +1,13 @@
-<script>
+<script lang="ts">
     import {getModalStore, Tab, TabGroup} from '@skeletonlabs/skeleton';
-    import {getDateAsStr} from '$lib/date.ts';
-    import {validateCalorieTarget, validateWeightTarget} from '$lib/validation.ts';
+    import {getDateAsStr} from '$lib/date';
+    import {validateCalorieTarget, validateWeightTarget} from '$lib/validation';
     import TargetComponent from '$lib/components/TargetComponent.svelte';
+    import type { CalorieTarget, WeightTarget } from '$lib/model';
 
     const today = new Date();
 
-    /** @type {any} */
-    let errors;
-
+    let errors: any;
     let errorEndDate = {
         valid: true
     };
@@ -16,18 +15,15 @@
     const modalStore = getModalStore();
 
     // either one of those must be present (dashboard) or both (wizard default results)
-    /** @type CalorieTarget */
-    let calorieTarget;
-
-    /** @type WeightTarget */
-    let weightTarget;
+    let calorieTarget: CalorieTarget;
+    let weightTarget: WeightTarget;
 
     // used for customized wizard results only
-    let targetsByRate;
-    let rates
-    let rateActive;
+    let targetsByRate: Map<number, { calorieTarget: CalorieTarget; weightTarget: WeightTarget }>;
+    let rates: Array<string>
+    let rateActive: string;
 
-    let warningMessage;
+    let warningMessage: string;
 
     let added = getDateAsStr(today);
     let startDate = getDateAsStr(today);
@@ -62,7 +58,7 @@
         }
     }
 
-    const onTabChange = (e) => {
+    const onTabChange = () => {
         calorieTarget = targetsByRate[rateActive].calorieTarget;
         weightTarget = targetsByRate[rateActive].weightTarget;
 

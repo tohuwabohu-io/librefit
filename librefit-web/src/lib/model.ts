@@ -185,10 +185,11 @@ export interface ErrorDescription {
 
 export interface ErrorResponse {
 	success: boolean;
-	errors: Array<ErrorDescription>;
+	errors?: Array<ErrorDescription>;
 }
 
 export interface ValidationMessage {
 	valid: boolean,
-	errorMessage?: string
+	errorMessage?: string,
+	skip?: boolean
 }

@@ -2,7 +2,7 @@ import { format, sub } from 'date-fns';
 import { enGB } from 'date-fns/locale';
 import { DataViews } from './enum';
 import { getDateAsStr, parseStringAsDate } from './date';
-import { WeightTracker } from './model';
+import type { WeightTracker } from './model';
 
 export const createWeightChart = (view: DataViews, start: Date, entries: Array<WeightTracker>) => {
 	const legend = [];

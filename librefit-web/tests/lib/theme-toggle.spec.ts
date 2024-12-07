@@ -1,5 +1,5 @@
 import { expect, describe, it, vi } from 'vitest';
-import { observeToggle } from '$lib/theme-toggle.ts';
+import { observeToggle } from '../../src/lib/theme-toggle';
 
 describe('themeToggle', () => {
 	/**
@@ -30,7 +30,8 @@ describe('themeToggle', () => {
 
 		// Trigger callback manually
 		const mutation = [{ type: 'attributes', attributeName: 'class', target: mockElement }];
-		MutationObserverMock.mock.calls[0][0](mutation);
+
+		(MutationObserverMock.mock.calls[0] as any[])[0]?.(mutation);
 
 		// Asserting that callback was called
 		expect(mockCallback).toBeCalledWith(mockElement);

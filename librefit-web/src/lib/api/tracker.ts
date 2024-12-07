@@ -1,11 +1,10 @@
 import { DataViews } from '../enum';
 import { getDateAsStr, getDaytimeFoodCategory } from '../date';
 import { invoke } from '@tauri-apps/api/core';
-import { CalorieTracker, NewCalorieTracker, NewWeightTracker, WeightTracker } from '../model';
+import type { CalorieTracker, NewCalorieTracker, NewWeightTracker, WeightTracker } from '../model';
 
-export const addCalories = (event) => {
-	/** @type {NewCalorieTracker} */
-	const newEntry = {
+export const addCalories = (event): Promise<Array<CalorieTracker>> => {
+	const newEntry: NewCalorieTracker = {
 		added: event.detail.dateStr,
 		amount: event.detail.value,
 		category: event.detail.category,
@@ -15,9 +14,8 @@ export const addCalories = (event) => {
 	return invoke('create_calorie_tracker_entry', { newEntry });
 };
 
-export const updateCalories = (event) => {
-	/** @type {NewCalorieTracker} */
-	const entry = {
+export const updateCalories = (event): Promise<Array<CalorieTracker>> => {
+	const entry: NewCalorieTracker = {
 		added: event.detail.dateStr,
 		amount: event.detail.value,
 		category: event.detail.category,
@@ -30,7 +28,7 @@ export const updateCalories = (event) => {
 	});
 };
 
-export const deleteCalories = (event) => {
+export const deleteCalories = (event): Promise<Array<CalorieTracker>> => {
 	return invoke('delete_calorie_tracker_entry', {
 		trackerId: event.detail.id,
 		addedStr: event.detail.dateStr
@@ -63,7 +61,7 @@ export const listCalorieTrackerDatesRange = (dateFrom: string, dateTo: string): 
 	});
 };
 
-export const listCalorieTrackerRange = (dateFrom: string, dateTo: string): Promise<Array<CalorieTracker | NewCalorieTracker>> => {
+export const listCalorieTrackerRange = (dateFrom: string, dateTo: string): Promise<Array<CalorieTracker>> => {
 	return invoke('get_calorie_tracker_for_date_range', {
 		dateFromStr: dateFrom,
 		dateToStr: dateTo
@@ -94,7 +92,7 @@ export const listCaloriesFiltered = (filter: DataViews) => {
 /**
  * @param event
  */
-export const addWeight = (event): Promise<WeightTracker> => {
+export const addWeight = (event): Promise<Array<WeightTracker>> => {
 	const newEntry: NewWeightTracker = {
 		added: event.detail.dateStr,
 		amount: event.detail.value
@@ -106,7 +104,7 @@ export const addWeight = (event): Promise<WeightTracker> => {
 /**
  * @param event
  */
-export const updateWeight = (event): Promise<WeightTracker> => {
+export const updateWeight = (event): Promise<Array<WeightTracker>> => {
 	/** @type NewWeightTracker */
 	const entry: NewWeightTracker = {
 		added: event.detail.dateStr,
@@ -122,7 +120,7 @@ export const updateWeight = (event): Promise<WeightTracker> => {
 /**
  * @param event
  */
-export const deleteWeight = (event): Promise<WeightTracker> => {
+export const deleteWeight = (event): Promise<Array<WeightTracker>> => {
 	return invoke('delete_weight_tracker_entry', {
 		trackerId: event.detail.id,
 		addedStr: event.detail.dateStr
@@ -153,7 +151,7 @@ export const listWeightFiltered = (filter: DataViews): Promise<Array<WeightTrack
 	});
 };
 
-export const listWeightRange = (dateFrom: string, dateTo: string): Promise<WeightTracker> => {
+export const listWeightRange = (dateFrom: string, dateTo: string): Promise<Array<WeightTracker>> => {
 	return invoke('get_weight_tracker_for_date_range', {
 		dateFromStr: dateFrom,
 		dateToStr: dateTo

@@ -1,27 +1,26 @@
-<script>
+<script lang="ts">
 	import {createEventDispatcher} from 'svelte';
-	import {getDaytimeFoodCategory} from '$lib/date.ts';
+	import {getDaytimeFoodCategory} from '$lib/date';
 	import TrackerButtons from './TrackerButtons.svelte';
+	import type { FoodCategory } from '$lib/model';
 
-	export let value, dateStr, id;
+	export let value: any, dateStr: string, id: number | undefined = undefined;
 	export let existing = false;
 	export let disabled = false;
 	export let compact = false;
 
-	/** @type Array<FoodCategory> */
-	export let categories;
+	export let categories: Array<FoodCategory> | undefined = undefined;
 
-	/** @type FoodCategory */
-	export let category = categories ? categories.filter(c => c.shortvalue === getDaytimeFoodCategory(new Date()))[0] : undefined;
+	export let category: FoodCategory = categories ? categories.filter(c => c.shortvalue === getDaytimeFoodCategory(new Date()))[0] : undefined;
 
-	export let unit;
+	export let unit: string;
 
 	export let maxWidthCss = '';
 	export let placeholder = 'Amount...';
 
 	const dispatch = createEventDispatcher();
 
-	let previous;
+	let previous: any;
 	let changeAction;
 
 	const add = (e) => {
@@ -45,8 +44,6 @@
 				category: category,
 				callback: () => e.detail.callback()
 			});
-		} else {
-			postAction();
 		}
 	};
 

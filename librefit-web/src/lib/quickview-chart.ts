@@ -1,7 +1,8 @@
-import { display_date_format_day, getDateAsStr, parseStringAsDate } from './date';
-import { CalorieTarget, CalorieTracker } from './model';
+import { display_date_format_day, getDateAsStr, parseStringAsDate } from '$lib/date';
+import type { CalorieTarget, CalorieTracker } from '$lib/model';
+import type { ChartData, ChartOptions } from 'chart.js';
 
-const createCalorieTrackerQuickviewDataset = (calories: Array<CalorieTracker>, calorieTarget: CalorieTarget)=> {
+const createCalorieTrackerQuickviewDataset = (calories: Array<CalorieTracker>, calorieTarget: CalorieTarget) => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 
@@ -82,11 +83,8 @@ const createCalorieTrackerQuickviewDataset = (calories: Array<CalorieTracker>, c
 		]
 	};
 };
-/**
- * @param {Array<CalorieTracker>} entries
- * @param {CalorieTarget} calorieTarget
- */
-export const paintCalorieTrackerQuickview = (entries, calorieTarget) => {
+
+export const paintCalorieTrackerQuickview = (entries: Array<CalorieTracker>, calorieTarget: CalorieTarget): BarChartConfig => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 
@@ -145,3 +143,8 @@ export const paintCalorieTrackerQuickview = (entries, calorieTarget) => {
 		chartOptions: undefined
 	};
 };
+
+export interface BarChartConfig {
+	chartData: ChartData<any>,
+	chartOptions: ChartOptions<any>
+}

@@ -1,10 +1,8 @@
-<script>
+<script lang="ts">
+	import type { CalorieTarget } from '$lib/model';
 
-	/** @type CalorieTarget */
-	export let calorieTarget;
-
-	/** @type {Array<number>} */
-	export let entries;
+	export let calorieTarget: CalorieTarget;
+	export let entries: Array<number>;
 
 	let limit = calorieTarget && calorieTarget.targetCalories ? calorieTarget.targetCalories : 0,
 		maximum = calorieTarget && calorieTarget.maximumCalories ? calorieTarget.maximumCalories : 0,
@@ -22,14 +20,14 @@
 		maximum = calorieTarget.maximumCalories;
 	}
 
-	let innerEnd, outerEnd;
+	let innerEnd: number, outerEnd: number;
 
 	const stroke = 40;
 
 	const outerRadius = (width - stroke) / 2;
 	const innerRadius = outerRadius - stroke;
 
-	const polarToCartesian = (cx, cy, radius, angleDeg) => {
+	const polarToCartesian = (cx: number, cy: number, radius: number, angleDeg: number) => {
 		const angleInRadians = ((angleDeg - 90) * Math.PI) / 180.0;
 
 		return {
@@ -38,7 +36,7 @@
 		};
 	};
 
-	const arc = (cx, cy, radius, startAngle, endAngle) => {
+	const arc = (cx: number, cy: number, radius: number, startAngle: number, endAngle: number) => {
 		const start = polarToCartesian(cx, cy, radius, endAngle);
 		const end = polarToCartesian(cx, cy, radius, startAngle);
 
@@ -47,7 +45,7 @@
 		return ['M', start.x, start.y, 'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(' ');
 	};
 
-	const calculateEnd = (value, max) => {
+	const calculateEnd = (value: number, max: number) => {
 		if (value >= max) {
 			return 359;
 		} else {

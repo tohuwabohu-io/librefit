@@ -1,14 +1,13 @@
-import { vi } from 'vitest';
+import { Mock, vi } from 'vitest';
 import { writable } from 'svelte/store';
 
-/**
- * @typedef {Object} ModalStoreSettingsMock
- * @property {any} meta arbitrary (display) data passed to the modal
- * @property {Mock<any, any>} [callback] callback function (submit, close, ...)
- * @property {Mock<any, any>} [trigger] mock modalStore.trigger({})
- * @property {Mock<any, any>} [close] mock modalStore.close()
- * @property {Mock<any, any>} [clear] mock modalStore.clear()
- */
+interface ModalStoreSettingsMock {
+	meta: any;
+	callback?: Mock;
+	trigger?: Mock;
+	close?: Mock;
+	clear?: Mock;
+}
 
 const defaultModalStoreMock = {
 	...writable([
@@ -24,10 +23,7 @@ const defaultModalStoreMock = {
 
 let modalStoreMock = { ...defaultModalStoreMock };
 
-/**
- * @param {ModalStoreSettingsMock} settings
- */
-export const updateModalStoreMock = (settings) => {
+export const updateModalStoreMock = (settings: ModalStoreSettingsMock) => {
 	modalStoreMock = {
 		...writable([
 			{
@@ -50,10 +46,11 @@ export const extractModalStoreMockTriggerCallback = () => {
 };
 
 vi.mock('@skeletonlabs/skeleton', async (importOriginal) => {
-	const actualSkelton = await importOriginal();
+	const actualSkeleton = await importOriginal();
 
 	return {
-		...actualSkelton,
+		// @ts-ignore
+		...actualSkeleton,
 		getModalStore: vi.fn(() => modalStoreMock),
 		initializeModalStore: vi.fn(() => modalStoreMock)
 	};

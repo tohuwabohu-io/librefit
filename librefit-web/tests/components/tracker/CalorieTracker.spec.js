@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, getByRole, getByText, render, screen } from '@testing-library/svelte';
-import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
+import CalorieTracker from '$lib/components/tracker/CalorieTrackerComponent.svelte';
 import * as skeleton from '@skeletonlabs/skeleton';
 import { tick } from 'svelte';
-import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.js';
+import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.ts';
 import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.ts';
 
 const mockCategories = [

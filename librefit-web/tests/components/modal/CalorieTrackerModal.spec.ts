@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
 import { tick } from 'svelte';
-import { updateModalStoreMock } from '../../__mocks__/skeletonProxy.js';
+import { updateModalStoreMock } from '../../__mocks__/skeletonProxy';
+import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
 
 /**
  * @vitest-environment jsdom
@@ -37,22 +37,22 @@ describe('CalorieTrackerModal.svelte component', () => {
 
 		updateModalStoreMock({ meta: mockData, callback: responseCallback });
 
-		const { getByRole, getAllByRole } = render(CalorieTrackerModal);
+		const { getByRole } = render(CalorieTrackerModal);
 
 		// for now there should be only one of those components each
-		const amountInput = getByRole('spinbutton', { name: 'amount' });
-		const categoryCombobox = getByRole('combobox', { name: 'category' });
+		const amountInput: HTMLElement = getByRole('spinbutton', { name: 'amount' });
+		const categoryCombobox: HTMLElement = getByRole('combobox', { name: 'category' });
 
-		expect(amountInput.placeholder).toEqual('Amount...');
-		expect(amountInput.value).toBeFalsy();
-		expect(categoryCombobox.value).toStrictEqual('l');
+		expect(amountInput['placeholder']).toEqual('Amount...');
+		expect(amountInput['value']).toBeFalsy();
+		expect(categoryCombobox['value']).toStrictEqual('l');
 
 		// change amount + category and click 'add'
 		await fireEvent.input(amountInput, { target: { value: 100 } });
 		await fireEvent.change(categoryCombobox, { target: { value: 'd' } });
 
-		expect(amountInput.value).toStrictEqual('100');
-		expect(categoryCombobox.value).toStrictEqual('d');
+		expect(amountInput['value']).toStrictEqual('100');
+		expect(categoryCombobox['value']).toStrictEqual('d');
 
 		await fireEvent.click(getByRole('button', { name: 'add' }));
 		await tick();

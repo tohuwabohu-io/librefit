@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DataViews, enumKeys } from '$lib/enum.ts';
+import { DataViews, enumKeys } from '../../src/lib/enum';
 
 describe('Enum', () => {
 	it('should correctly define DataViews', () => {

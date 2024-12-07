@@ -4,7 +4,7 @@ import TargetModal from '$lib/components/modal/TargetModal.svelte';
 import { tick } from 'svelte';
 import { getDateAsStr } from '$lib/date.ts';
 import { addYears } from 'date-fns';
-import { updateModalStoreMock } from '../../__mocks__/skeletonProxy.js';
+import { updateModalStoreMock } from '../../__mocks__/skeletonProxy.ts';
 
 /**
  * @vitest-environment jsdom

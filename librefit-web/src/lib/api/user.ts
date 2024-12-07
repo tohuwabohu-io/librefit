@@ -1,6 +1,6 @@
 import { convertFormDataToJson } from './util.js';
 import { invoke } from '@tauri-apps/api/core';
-import { LibreUser } from '../model';
+import type { LibreUser } from '../model';
 
 export const updateProfile = async (formData: FormData): Promise<LibreUser> => {
 	const userData = convertFormDataToJson(formData);

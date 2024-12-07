@@ -18,7 +18,7 @@ export function parseStringAsDate(str: string, dateFormat?: string | undefined) 
 	return parse(str.valueOf(), dateFormat.valueOf(), new Date());
 }
 
-export function convertDateStrToDisplayDateStr(str: string, displayFormat: string | undefined) {
+export function convertDateStrToDisplayDateStr(str: string, displayFormat?: string | undefined) {
 	const date = parseStringAsDate(str, displayFormat);
 	return getDisplayDateAsStr(date);
 }

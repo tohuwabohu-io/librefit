@@ -1,13 +1,26 @@
 import { expect, describe, it, vi } from 'vitest';
-import { createDistributionChart } from '$lib/distribution-chart.ts';
+import { createDistributionChart } from '../../src/lib/distribution-chart';
+import { CalorieTracker } from '../../src/lib/model';
 
 /**
  * @vitest-environment jsdom
  */
 describe('createDistributionChart', () => {
-	const entry1 = { shortvalue: 'fruit', longvalue: 'Fruits' };
-	const entry2 = { shortvalue: 'meat', longvalue: 'Meats' };
-	const foodCategories = [entry1, entry2];
+	const entry1 : CalorieTracker = {
+		id: 1,
+		amount: 100,
+		category: 'fruit',
+		added: '2022-01-01',
+	};
+
+	const entry2 : CalorieTracker = {
+		id: 1,
+		amount: 100,
+		category: 'fruit',
+		added: '2022-01-01',
+	};
+
+	const foodCategories = [{ shortvalue: 'fruit', longvalue: 'Fruits' }, { shortvalue: 'meat', longvalue: 'Meats' }];
 
 	it('should return an object with chartData and chartOptions for input entries', () => {
 		const result = createDistributionChart([entry1, entry2], foodCategories, false);

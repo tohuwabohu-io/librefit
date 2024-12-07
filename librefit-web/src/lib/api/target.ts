@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { CalorieTarget, NewCalorieTarget, NewWeightTarget, WeightTarget } from '../model';
+import type { CalorieTarget, NewCalorieTarget, NewWeightTarget, WeightTarget } from '../model';
 
 export const createCalorieTarget = async (calorieTarget: NewCalorieTarget): Promise<CalorieTarget> => {
 	calorieTarget.targetCalories = +calorieTarget.targetCalories;

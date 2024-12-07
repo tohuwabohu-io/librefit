@@ -1,5 +1,6 @@
-/** @type import('@skeletonlabs/tw-plugin').CustomThemeConfig */
-export const librefitTheme = {
+import type { CustomThemeConfig } from '@skeletonlabs/tw-plugin';
+
+export const librefitTheme: CustomThemeConfig = {
 	name: 'librefit-theme',
 	properties: {
 		'--theme-font-family-base':

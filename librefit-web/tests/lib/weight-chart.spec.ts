@@ -2,21 +2,22 @@ import {
 	createWeightChart,
 	createWeightChartDataset,
 	paintWeightTracker
-} from '$lib/weight-chart.ts';
+} from '../../src/lib/weight-chart';
 import { describe, expect, it, vi } from 'vitest';
-import { DataViews } from '$lib/enum.ts';
+import { DataViews } from '../../src/lib/enum';
+import type { CalorieTracker } from '../../src/lib/model';
 
 describe('createWeightChart function', () => {
 	it('should create data and legend for a week', () => {
 		// We will use a simplified approximation of the real data for brevity
 		const start = new Date(2024, 7, 1);
-		const entries = [
-			{ added: '2024-08-01', amount: 70 },
-			{ added: '2024-08-02', amount: 71 },
-			{ added: '2024-08-03', amount: 70 },
-			{ added: '2024-08-04', amount: 69 },
-			{ added: '2024-08-05', amount: 70 },
-			{ added: '2024-08-06', amount: 70 }
+		const entries: Array<CalorieTracker> = [
+			{ id: 1, added: '2024-08-01', amount: 70, category: 'a' },
+			{ id: 2, added: '2024-08-02', amount: 71, category: 'b' },
+			{ id: 3, added: '2024-08-03', amount: 70, category: 'c' },
+			{ id: 4, added: '2024-08-04', amount: 69, category: 'd' },
+			{ id: 5, added: '2024-08-05', amount: 70, category: 'e' },
+			{ id: 6, added: '2024-08-06', amount: 70, category: 'f' }
 		];
 
 		const chart = createWeightChart(DataViews.Week, start, entries);
@@ -32,9 +33,11 @@ describe('createWeightChart function', () => {
 	it('should create data and legend for a month', async () => {
 		// We will use a simplified approximation of the real data for brevity
 		const start = new Date(2024, 7, 1);
-		const entries = Array.from({ length: 31 }, (_, i) => ({
+		const entries: Array<CalorieTracker> = Array.from({ length: 31 }, (_, i) => ({
+			id: i,
 			added: `2024-08-${String(i + 1).padStart(2, '0')}`,
-			amount: 70 + i
+			amount: 70 + i,
+			category: 'f'
 		}));
 
 		const chart = createWeightChart(DataViews.Month, start, entries);
@@ -46,8 +49,10 @@ describe('createWeightChart function', () => {
 		// We will use a simplified approximation of the real data for brevity
 		const start = new Date(2024, 0, 1);
 		const entries = Array.from({ length: 12 }, (_, i) => ({
+			id: i,
 			added: `2024-${String(i + 1).padStart(2, '0')}-15`,
-			amount: 70 + i
+			amount: 70 + i,
+			category: 'e'
 		}));
 
 		const chart = createWeightChart(DataViews.Year, start, entries);

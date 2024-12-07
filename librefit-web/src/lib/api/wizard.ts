@@ -1,6 +1,6 @@
-import { getDateAsStr, parseStringAsDate } from '../date';
-import {
-	CalculationGoal,
+import { getDateAsStr, parseStringAsDate } from '$lib/date';
+import { CalculationGoal } from '$lib/model';
+import type {
 	CalorieTarget,
 	NewCalorieTarget,
 	NewWeightTarget,
@@ -10,7 +10,7 @@ import {
 	WizardResult, WizardTargetDateInput,
 	WizardTargetDateResult, WizardTargetWeightInput,
 	WizardTargetWeightResult
-} from '../model';
+} from '$lib/model';
 import { isAfter } from 'date-fns';
 import { invoke } from '@tauri-apps/api/core';
 

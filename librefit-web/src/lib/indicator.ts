@@ -4,13 +4,13 @@ const successProgressClass = 'bg-success-500';
 const errorProgressClass = 'bg-error-500';
 
 export class Indicator {
-	private meter: string;
-	private track: string;
-	private progress: number;
-	private actorDisabled: boolean;
-	private actor: { disabled: boolean } | undefined;
-	private invisible: string;
-	private theme: string | undefined;
+	meter: string;
+	track: string;
+	progress: number;
+	actorDisabled: boolean;
+	actor: { disabled: boolean } | undefined;
+	invisible: string;
+	theme: string | undefined;
 
 	constructor() {
 		this.theme = undefined; // This should be set outside or passed in

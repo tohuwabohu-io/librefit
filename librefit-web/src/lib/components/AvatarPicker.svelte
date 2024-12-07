@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import {Avatar} from '@skeletonlabs/skeleton';
     import {createEventDispatcher} from 'svelte';
 
@@ -17,11 +17,11 @@
 
     const dispatch = createEventDispatcher();
 
-    const avatarClicked = (file) => {
-        chosen = file;
+    const avatarClicked = (fileName: string) => {
+        chosen = fileName;
 
         dispatch('chooseAvatar', {
-            avatar: file
+            avatar: fileName
         });
     }
 </script>

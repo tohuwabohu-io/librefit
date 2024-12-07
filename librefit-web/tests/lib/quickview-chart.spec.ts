@@ -1,5 +1,5 @@
 import { expect, describe, it, vi } from 'vitest';
-import { paintCalorieTrackerQuickview } from '$lib/quickview-chart.ts';
+import { paintCalorieTrackerQuickview } from '../../src/lib/quickview-chart';
 
 /**
  * @vitest-environment jsdom

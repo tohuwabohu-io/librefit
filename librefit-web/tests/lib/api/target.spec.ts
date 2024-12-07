@@ -1,19 +1,21 @@
-import { createCalorieTarget, createWeightTarget } from '$lib/api/target.ts';
 import { assert, describe, expect, it, vi } from 'vitest';
+import { CalorieTarget, NewCalorieTarget, NewWeightTarget, WeightTarget } from '../../../src/lib/model';
+import { createCalorieTarget, createWeightTarget } from '../../../src/lib/api/target';
 import {
 	validateCalorieTarget,
 	validateEndDate,
 	validateTargetAmount,
 	validateWeightTarget
-} from '$lib/validation.ts';
+} from '../../../src/lib/validation';
 
 describe('createTarget functions', () => {
 	it('createCalorieTarget should make API call and handle responses correctly', async () => {
-		/** @type CalorieTarget */
-		const mockCalorieTarget = {
+		const mockCalorieTarget: NewCalorieTarget = {
 			added: '2022-08-12',
 			targetCalories: 2000,
-			maximumCalories: 2500
+			maximumCalories: 2500,
+			startDate: '2025-01-01',
+			endDate: '2025-12-31'
 		};
 
 		// mocking successful API call response
@@ -41,11 +43,12 @@ describe('createTarget functions', () => {
 	});
 
 	it('createWeightTarget should make API call and handle responses correctly', async () => {
-		/** @type WeightTarget */
-		const mockWeightTarget = {
+		const mockWeightTarget: NewWeightTarget = {
 			added: '2022-08-12',
 			initialWeight: 80,
-			targetWeight: 70
+			targetWeight: 70,
+			startDate: '2025-01-01',
+			endDate: '2025-12-31'
 		};
 
 		// mocking successful API call response
@@ -66,7 +69,7 @@ describe('createTarget functions', () => {
 		global.fetch = vi.fn().mockResolvedValueOnce(mockApiResponseNotOk);
 
 		try {
-			await createCalorieTarget(mockWeightTarget);
+			await createWeightTarget(mockWeightTarget);
 		} catch (error) {
 			assert.strictEqual(error, mockApiResponseNotOk);
 		}
@@ -103,8 +106,8 @@ describe('validateTrackerAmount', () => {
 
 describe('validateTarget functions', () => {
 	it('should correctly validate Calorie and Weight targets', () => {
-		/** @type CalorieTarget */
-		const mockCalorieTarget = {
+		const mockCalorieTarget: CalorieTarget = {
+			id: 1,
 			added: '2022-08-12',
 			targetCalories: 2000,
 			maximumCalories: 2500,
@@ -112,8 +115,8 @@ describe('validateTarget functions', () => {
 			endDate: '2023-08-12'
 		};
 
-		/** @type WeightTarget */
-		const mockWeightTarget = {
+		const mockWeightTarget: WeightTarget = {
+			id: 1,
 			added: '2022-08-12',
 			initialWeight: 80,
 			targetWeight: 70,

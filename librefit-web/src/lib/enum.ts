@@ -1,4 +1,4 @@
-import { BmiCategory } from './model';
+import { BmiCategory } from '$lib/model';
 
 export enum DataViews {
 	Week = 'WEEK',

@@ -1,6 +1,6 @@
 // Importing the required dependencies
 import { expect, describe, it } from 'vitest';
-import { getFieldError, validateAmount, validateFields } from '$lib/validation.ts';
+import { getFieldError, validateAmount } from '../../src/lib/validation';
 
 describe('validateAmount', () => {
 	it('should return error when amount is null or undefined', () => {

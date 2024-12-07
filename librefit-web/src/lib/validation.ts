@@ -1,6 +1,6 @@
 import { parseStringAsDate } from './date';
 import { isAfter } from 'date-fns';
-import { CalorieTarget, ErrorDescription, ErrorResponse, ValidationMessage, WeightTarget } from './model';
+import type { CalorieTarget, ErrorDescription, ErrorResponse, ValidationMessage, WeightTarget } from './model';
 
 export const validateAmount = (amount): string => {
 	if (!amount || amount <= 0) {

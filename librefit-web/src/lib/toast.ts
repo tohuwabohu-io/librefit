@@ -1,4 +1,4 @@
-import { ToastStore } from '@skeletonlabs/skeleton';
+import type { ToastStore } from '@skeletonlabs/skeleton';
 
 export const showToastError = (toastStore: ToastStore, err: string) => {
 	console.error(err);
