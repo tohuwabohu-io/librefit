@@ -1,8 +1,6 @@
 <script>
     import {BmiCategory} from '$lib/api/model.js';
-    import {bmiCategoriesAsKeyValue} from '$lib/enum.js';
-
-    const bmiCategories = bmiCategoriesAsKeyValue;
+    import {getBmiCategoryDisplayValue} from '$lib/enum.js';
 
     /** @type {WizardResult} */
     export let calculationResult;
@@ -86,7 +84,7 @@
         <tr>
             <td>Classification</td>
             <td></td>
-            <td>{bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label}</td>
+            <td>{getBmiCategoryDisplayValue(calculationResult.bmiCategory)}</td>
         </tr>
 
         <tr>
@@ -120,7 +118,7 @@
 
         the optimal BMI range of {calculationResult.targetBmiLower} to {calculationResult.targetBmiUpper}, leaving you
         <span class="font-bold">
-            {bmiCategories.filter(e => e.value === calculationResult.bmiCategory)[0].label.toLowerCase()}.
+            {getBmiCategoryDisplayValue(calculationResult.bmiCategory).toLowerCase()}.
         </span>
 
         <span class="underline">

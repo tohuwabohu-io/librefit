@@ -14,7 +14,7 @@
 
     export let fileList = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6, avatar7, avatar8, avatar9];
     export let chosen = 'dog-1.png';
-    
+
     const dispatch = createEventDispatcher();
 
     const avatarClicked = (file) => {

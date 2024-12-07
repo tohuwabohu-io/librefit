@@ -136,3 +136,69 @@ export const WizardRecommendation = {
  * @property {string} startDate - The start date for the weight target.
  * @property {number} targetWeight - The target weight.
  */
+
+/**
+ * @typedef {Object} Wizard
+ * @property {CalorieTarget} calorieTarget - The calorie target.
+ * @property {WeightTarget} weightTarget - The weight target.
+ * @property {WeightTracker} weightTracker - The weight tracker.
+ */
+
+/**
+ * @typedef {Object} WizardInput
+ * @property {number} age - The age of the user (must be between 18 and 99).
+ * @property {string} sex - The sex of the user (CalculationSex).
+ * @property {number} weight - The weight of the user (must be between 30 and 300).
+ * @property {number} height - The height of the user (must be between 100 and 300).
+ * @property {number} activityLevel - The activity level of the user, validated with a custom function.
+ * @property {number} weeklyDifference - The weekly difference (must be between 0 and 7).
+ * @property {string} calculationGoal - The calculation goal (CalculationGoal).
+ */
+
+/**
+ * @typedef {Object} WizardResult
+ * @property {number} bmr - Basal Metabolic Rate.
+ * @property {number} tdee - Total Daily Energy Expenditure.
+ * @property {number} deficit - Calorie deficit.
+ * @property {number} target - Target calories.
+ * @property {number} bmi - Body Mass Index.
+ * @property {string} bmiCategory - BMI category (BmiCategory).
+ * @property {string} recommendation - Recommendation (WizardRecommendation).
+ * @property {number} targetBmi - Target BMI.
+ * @property {number} targetBmiUpper - Upper target BMI.
+ * @property {number} targetBmiLower - Lower target BMI.
+ * @property {number} targetWeight - Target weight.
+ * @property {number} targetWeightUpper - Upper target weight.
+ * @property {number} targetWeightLower - Lower target weight.
+ * @property {number} durationDays - Duration in days.
+ * @property {number} durationDaysUpper - Upper duration in days.
+ * @property {number} durationDaysLower - Lower duration in days.
+ */
+
+/**
+ * @typedef {Object} WizardTargetWeightInput
+ * @property {number} age - The age of the user.
+ * @property {string} sex - The sex of the user (CalculationSex).
+ * @property {number} currentWeight - The current weight.
+ * @property {number} height - The height of the user.
+ * @property {number} targetWeight - The target weight.
+ * @property {string} startDate - The start date (deserialized with custom date function).
+ */
+
+/**
+ * @typedef {Object} WizardTargetWeightResult
+ * @property {Object} datePerRate - Date per rate map.
+ * @property {string} targetClassification - Target classification (BmiCategory).
+ * @property {boolean} warning - Indicates if there's a warning.
+ * @property {string} message - Message to the user.
+ */
+
+/**
+ * @typedef {Object} WizardTargetDateInput
+ * @property {number} age - The age of the user.
+ * @property {string} sex - The sex of the user (CalculationSex).
+ * @property {number} currentWeight - The current weight.
+ * @property {number} height - The height of the user.
+ * @property {string} calculationGoal - Calculation goal (CalculationGoal).
+ * @property {string} targetDate - The target date (deserialized with custom date function).
+ */

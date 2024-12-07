@@ -38,3 +38,7 @@ export const bmiCategoriesAsKeyValue = Object.keys(BmiCategory).map((key) => {
 export function enumKeys(obj) {
 	return Object.keys(obj).filter((k) => Number.isNaN(+k));
 }
+
+export const getBmiCategoryDisplayValue = (bmiCategory) => {
+	return bmiCategory.toLowerCase().replace('_', ' ')
+}

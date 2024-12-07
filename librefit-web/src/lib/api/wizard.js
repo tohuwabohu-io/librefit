@@ -3,6 +3,22 @@ import { api } from '$lib/api/index.js';
 import { getDateAsStr, parseStringAsDate } from '$lib/date.js';
 import { CalculationGoal } from '$lib/api/model.js';
 import { isAfter } from 'date-fns';
+import { invoke } from '@tauri-apps/api/core';
+
+/**
+ * @param {WizardInput} wizardInput
+ * @returns {Promise<WizardResult>}
+ */
+export const calculateTdee = async (wizardInput) => {
+	wizardInput.age = +wizardInput.age;
+	wizardInput.weight = +wizardInput.weight;
+	wizardInput.height = +wizardInput.height;
+	wizardInput.weeklyDifference = +wizardInput.weeklyDifference;
+
+	return invoke('wizard_calculate_tdee', {
+		input: wizardInput
+	});
+};
 
 /**
  * @param wizard {Wizard}

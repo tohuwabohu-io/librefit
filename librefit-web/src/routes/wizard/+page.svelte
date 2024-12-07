@@ -1,26 +1,24 @@
 <script>
     import TdeeStepper from '$lib/components/TdeeStepper.svelte';
-    import {getModalStore, getToastStore} from '@skeletonlabs/skeleton';
-    import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
-    import {getContext} from 'svelte';
-    import {proxyFetch} from '$lib/api/util.js';
-    import {api} from '$lib/api/index.js';
-    import {goto} from '$app/navigation';
+    import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
+    import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast.js';
+    import { getContext } from 'svelte';
     import {
-        postWizardResult,
         calculateForTargetDate,
         calculateForTargetWeight,
-        createTargetWeightTargets,
+        calculateTdee,
         createTargetDateTargets,
+        createTargetWeightTargets,
+        postWizardResult,
         validateCustomDate,
         validateCustomWeight
     } from '$lib/api/wizard.js';
     import WizardResult from '$lib/components/wizard/WizardResult.svelte';
     import WizardTarget from '$lib/components/wizard/WizardTarget.svelte';
-    import {addDays} from 'date-fns';
-    import {getDateAsStr} from '$lib/date.js';
-    import {WizardOptions} from '$lib/enum.js';
-    import {WizardRecommendation} from '$lib/api/model.js';
+    import { addDays } from 'date-fns';
+    import { getDateAsStr } from '$lib/date.js';
+    import { WizardOptions } from '$lib/enum.js';
+    import { WizardRecommendation } from '$lib/api/model.js';
 
     const toastStore = getToastStore();
     const modalStore = getModalStore();
@@ -28,12 +26,10 @@
     const indicator = getContext('indicator');
     const user = getContext('user');
 
-    if (!$user) goto('/');
-
-    /** @type WizardResult */
+    /** @type {WizardResult} */
     let calculationResult;
 
-    /** @type WizardInput */
+    /** @type {WizardInput} */
     let calculationInput;
 
     let calculationError;
@@ -43,23 +39,15 @@
         customDetails: undefined
     };
 
-    let customErrors = {
-        weight: undefined,
-        date: undefined
-    }
-
     const today = new Date();
 
     const calculate = async (e) => {
         $indicator = $indicator.start();
 
-        await proxyFetch(fetch, api.calculateTdee, e.detail.input).then(async response => {
-            if (response.ok) {
-                calculationResult = await response.json();
-                calculationInput = e.detail.input;
-            } else {
-                calculationError = true;
-            }
+        calculationInput = e.detail.input;
+
+        await calculateTdee(calculationInput).then(async response => {
+            calculationResult = response;
         }).catch(e => showToastError(toastStore, e)).finally(() => $indicator = $indicator.finish());
     }
 
