@@ -1,11 +1,8 @@
 <script>
-    import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {getContext} from 'svelte';
-    import {Avatar, getModalStore, getToastStore} from '@skeletonlabs/skeleton';
-    import {showToastError, showToastInfo, showToastSuccess, showToastWarning} from '$lib/toast.ts';
-    import {updateProfile} from '$lib/api/user.ts';
-    import {getFieldError} from '$lib/validation.ts';
-    import {goto} from '$app/navigation';
+    import { getContext } from 'svelte';
+    import { Avatar, getModalStore, getToastStore } from '@skeletonlabs/skeleton';
+    import { showToastError, showToastInfo, showToastSuccess, showToastWarning } from '$lib/toast.ts';
+    import { updateProfile } from '$lib/api/user.ts';
 
     const user = getContext('user');
     $: user;

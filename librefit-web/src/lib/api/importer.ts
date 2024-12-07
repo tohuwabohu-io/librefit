@@ -1,6 +1,3 @@
-import { fail } from '@sveltejs/kit';
-import { proxyFetch } from '$lib/api/util';
-
 /**
  * @param formData {FormData}
  * @return {Promise}
