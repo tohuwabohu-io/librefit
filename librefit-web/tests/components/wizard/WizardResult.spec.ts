@@ -1,7 +1,8 @@
 import { cleanup, render, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
-import WizardResult from '$lib/components/wizard/WizardResult.svelte';
-import { BmiCategory, WizardRecommendation } from '$lib/model';
+import WizardResultComponent from '$lib/components/wizard/WizardResult.svelte';
+import type { WizardInput, WizardResult } from '$lib/model';
+import { BmiCategory, CalculationGoal, CalculationSex, WizardRecommendation } from '$lib/model';
 
 /**
  * @vitest-environment jsdom
@@ -10,13 +11,17 @@ describe('WizardResult.svelte component', () => {
 	afterEach(() => cleanup());
 
 	it('should display underweight warning message for Underweight BMI category', async () => {
-		const calculationInput = {
+		const calculationInput: WizardInput = {
 			age: 24,
 			height: 180,
-			weight: 60
+			weight: 60,
+			sex: CalculationSex.Male,
+			activityLevel: 1,
+			weeklyDifference: 0.3,
+			calculationGoal: CalculationGoal.Gain
 		};
 
-		const calculationResult = {
+		const calculationResult: WizardResult = {
 			bmr: 1500,
 			tdee: 2500,
 			deficit: 500,
@@ -24,13 +29,18 @@ describe('WizardResult.svelte component', () => {
 			bmi: 18,
 			targetBmi: 23,
 			bmiCategory: BmiCategory.Underweight,
+			targetBmiLower: 20,
+			targetBmiUpper: 25,
 			targetWeight: 70,
 			targetWeightLower: 65,
 			targetWeightUpper: 80,
-			recommendation: WizardRecommendation.Gain
+			recommendation: WizardRecommendation.Gain,
+			durationDays: 150,
+			durationDaysLower: 130,
+			durationDaysUpper: 200
 		};
 
-		const { getByText } = render(WizardResult, { props: { calculationResult, calculationInput } });
+		const { getByText } = render(WizardResultComponent, { props: { calculationResult, calculationInput } });
 
 		expect(getByText('underweight.')).toBeTruthy();
 		expect(getByText('It is recommended to consult with a healthcare professional.')).toBeTruthy();
@@ -40,7 +50,11 @@ describe('WizardResult.svelte component', () => {
 		const calculationInput = {
 			age: 24,
 			height: 180,
-			weight: 80
+			weight: 80,
+			sex: CalculationSex.Male,
+			activityLevel: 1,
+			weeklyDifference: 0.3,
+			calculationGoal: CalculationGoal.Gain
 		};
 
 		const calculationResult = {
@@ -54,10 +68,15 @@ describe('WizardResult.svelte component', () => {
 			targetWeight: 70,
 			targetWeightLower: 60,
 			targetWeightUpper: 80,
-			recommendation: WizardRecommendation.Lose
+			recommendation: WizardRecommendation.Lose,
+			targetBmiLower: 20,
+			targetBmiUpper: 25,
+			durationDays: 150,
+			durationDaysLower: 130,
+			durationDaysUpper: 200
 		};
 
-		const { getByText } = render(WizardResult, { props: { calculationResult, calculationInput } });
+		const { getByText } = render(WizardResultComponent, { props: { calculationResult, calculationInput } });
 
 		expect(getByText('overweight.')).toBeTruthy();
 	});
@@ -66,7 +85,11 @@ describe('WizardResult.svelte component', () => {
 		const calculationInput = {
 			age: 24,
 			height: 180,
-			weight: 90
+			weight: 90,
+			sex: CalculationSex.Male,
+			activityLevel: 1,
+			weeklyDifference: 0.3,
+			calculationGoal: CalculationGoal.Gain
 		};
 
 		const calculationResult = {
@@ -80,10 +103,15 @@ describe('WizardResult.svelte component', () => {
 			targetWeight: 70,
 			targetWeightLower: 60,
 			targetWeightUpper: 80,
-			recommendation: WizardRecommendation.Lose
+			recommendation: WizardRecommendation.Lose,
+			targetBmiLower: 20,
+			targetBmiUpper: 25,
+			durationDays: 150,
+			durationDaysLower: 130,
+			durationDaysUpper: 200
 		};
 
-		const { getByText } = render(WizardResult, { props: { calculationResult, calculationInput } });
+		const { getByText } = render(WizardResultComponent, { props: { calculationResult, calculationInput } });
 
 		expect(getByText('obese.')).toBeTruthy();
 		expect(getByText('It is recommended to consult with a healthcare professional.')).toBeTruthy();
@@ -93,7 +121,11 @@ describe('WizardResult.svelte component', () => {
 		const calculationInput = {
 			age: 24,
 			height: 180,
-			weight: 100
+			weight: 100,
+			sex: CalculationSex.Male,
+			activityLevel: 1,
+			weeklyDifference: 0.3,
+			calculationGoal: CalculationGoal.Gain
 		};
 
 		const calculationResult = {
@@ -107,10 +139,15 @@ describe('WizardResult.svelte component', () => {
 			targetWeight: 70,
 			targetWeightLower: 60,
 			targetWeightUpper: 80,
-			recommendation: WizardRecommendation.Lose
+			recommendation: WizardRecommendation.Lose,
+			targetBmiLower: 20,
+			targetBmiUpper: 25,
+			durationDays: 150,
+			durationDaysLower: 130,
+			durationDaysUpper: 200
 		};
 
-		const { getByText } = render(WizardResult, { props: { calculationResult, calculationInput } });
+		const { getByText } = render(WizardResultComponent, { props: { calculationResult, calculationInput } });
 
 		expect(getByText('severely obese.')).toBeTruthy();
 		expect(getByText('It is recommended to consult with a healthcare professional.')).toBeTruthy();
@@ -120,7 +157,11 @@ describe('WizardResult.svelte component', () => {
 		const calculationInput = {
 			age: 24,
 			height: 180,
-			weight: 75
+			weight: 75,
+			sex: CalculationSex.Male,
+			activityLevel: 1,
+			weeklyDifference: 0.3,
+			calculationGoal: CalculationGoal.Gain
 		};
 
 		const calculationResult = {
@@ -130,14 +171,19 @@ describe('WizardResult.svelte component', () => {
 			target: 2000,
 			bmi: 23,
 			targetBmi: 23,
-			bmiCategory: BmiCategory.Standard_weight,
+			bmiCategory: BmiCategory.Standard_Weight,
 			targetWeight: 70,
 			targetWeightLower: 60,
 			targetWeightUpper: 80,
-			recommendation: WizardRecommendation.Lose
+			recommendation: WizardRecommendation.Lose,
+			targetBmiLower: 20,
+			targetBmiUpper: 25,
+			durationDays: 150,
+			durationDaysLower: 130,
+			durationDaysUpper: 200
 		};
 
-		const { getByRole } = render(WizardResult, { props: { calculationResult, calculationInput } });
+		const { getByRole } = render(WizardResultComponent, { props: { calculationResult, calculationInput } });
 
 		const yourResultTable = getByRole('table', { name: 'result table' });
 		const utils = within(yourResultTable);
@@ -151,7 +197,11 @@ describe('WizardResult.svelte component', () => {
 		const calculationInput = {
 			age: 24,
 			height: 180,
-			weight: 75
+			weight: 75,
+			sex: CalculationSex.Male,
+			activityLevel: 1,
+			weeklyDifference: 0.3,
+			calculationGoal: CalculationGoal.Gain
 		};
 
 		const calculationResult = {
@@ -161,14 +211,19 @@ describe('WizardResult.svelte component', () => {
 			target: 2000,
 			bmi: 23,
 			targetBmi: 23,
-			bmiCategory: BmiCategory.Standard_weight,
+			bmiCategory: BmiCategory.Standard_Weight,
 			targetWeight: 70,
 			targetWeightLower: 60,
 			targetWeightUpper: 80,
-			recommendation: WizardRecommendation.Hold
+			recommendation: WizardRecommendation.Hold,
+			targetBmiLower: 20,
+			targetBmiUpper: 25,
+			durationDays: 150,
+			durationDaysLower: 130,
+			durationDaysUpper: 200
 		};
 
-		const { getByRole } = render(WizardResult, { props: { calculationResult, calculationInput } });
+		const { getByRole } = render(WizardResultComponent, { props: { calculationResult, calculationInput } });
 
 		const bodyParametersTable = getByRole('table', { name: 'body parameter table' });
 		const utils = within(bodyParametersTable);

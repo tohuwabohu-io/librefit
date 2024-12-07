@@ -1,27 +1,34 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, getByText, render } from '@testing-library/svelte';
-import WeightTracker from '$lib/components/tracker/WeightTrackerComponent.svelte';
-import { convertDateStrToDisplayDateStr, getDateAsStr } from '$lib/date.ts';
+import WeightTrackerComponent from '$lib/components/tracker/WeightTrackerComponent.svelte';
 import { tick } from 'svelte';
 import * as skeleton from '@skeletonlabs/skeleton';
-import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.ts';
+import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy';
+import { convertDateStrToDisplayDateStr, getDateAsStr } from '$lib/date';
 
 const mockData = {
 	weightList: [
-		{ amount: 70, added: '2022-01-01', sequence: 1 },
-		{ amount: 69, added: '2022-02-01', sequence: 2 }
+		{ amount: 70, added: '2022-01-01', id: 1 },
+		{ amount: 69, added: '2022-02-01', id: 2 }
 	],
-	weightTarget: { targetWeight: 60, endDate: '2023-01-01' }
+	weightTarget: {
+		id: 1,
+		added: '2022-08-01',
+		initialWeight: 70,
+		targetWeight: 60,
+		startDate: '2022-08-01',
+		endDate: '2023-01-01'
+	}
 };
 
 /**
  * @vitest-environment jsdom
  */
-describe('WeightTracker.svelte component', () => {
+describe('WeightTrackerComponent.svelte component', () => {
 	afterEach(() => cleanup());
 
 	it('renders correctly', async () => {
-		const { getByText } = render(WeightTracker, mockData);
+		const { getByText } = render(WeightTrackerComponent, mockData);
 
 		expect(
 			getByText(
@@ -37,14 +44,14 @@ describe('WeightTracker.svelte component', () => {
 	});
 
 	it('renders an empty component correctly', () => {
-		const { getByText } = render(WeightTracker);
+		const { getByText } = render(WeightTrackerComponent);
 
 		expect(getByText('Nothing tracked for today. Now would be a good moment!')).toBeDefined();
 		expect(getByText(`No target weight set.`)).toBeDefined();
 	});
 
 	it('should trigger the quick add button and dispatch addWeight', async () => {
-		const { component, getByText, getByRole } = render(WeightTracker);
+		const { component, getByText, getByRole } = render(WeightTrackerComponent);
 
 		let dispatchEvent;
 		const dispatchMock = vi.fn((e) => {
@@ -74,7 +81,7 @@ describe('WeightTracker.svelte component', () => {
 			dispatchEvent = e.detail;
 		});
 
-		const { component, getByText } = render(WeightTracker, mockData);
+		const { component, getByText } = render(WeightTrackerComponent, mockData);
 
 		component.$on('updateWeight', dispatchMock);
 
@@ -124,7 +131,7 @@ describe('WeightTracker.svelte component', () => {
 			dispatchEvent = e.detail;
 		});
 
-		const { component, getByText } = render(WeightTracker, mockData);
+		const { component, getByText } = render(WeightTrackerComponent, mockData);
 
 		component.$on('deleteWeight', dispatchMock);
 

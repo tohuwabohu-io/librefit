@@ -49,7 +49,7 @@ describe('ValidatedInput.svelte', () => {
 		expect(label).toBeTruthy();
 
 		const input = screen.getByPlaceholderText(props.placeholder);
-		expect(input.value).toBe(props.value);
+		expect(input['value']).toBe(props.value);
 	});
 
 	it('validates non-empty required input correctly', async () => {

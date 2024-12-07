@@ -2,6 +2,12 @@ import { render, fireEvent, cleanup, screen } from '@testing-library/svelte';
 import { afterEach, expect, describe, it, vi } from 'vitest';
 import TrackerInput from '$lib/components/TrackerInput.svelte';
 import { tick } from 'svelte';
+import type { FoodCategory } from '$lib/model';
+
+const categories: Array<FoodCategory> = [
+	{ shortvalue: 'b', longvalue: 'Breakfast' },
+	{ shortvalue: 'd', longvalue: 'Dinner' }
+];
 
 /**
  * @vitest-environment jsdom
@@ -11,21 +17,24 @@ describe('TrackerInput.svelte', () => {
 
 	it('should render a blank component and trigger add', async () => {
 		const mockData = {
+			value: '',
+			dateStr: '2024-12-31',
 			unit: 'kg'
 		};
 
-		let addEvent;
+		let addEvent: any;
 		const addMock = vi.fn((event) => (addEvent = event.detail));
 
 		const { component } = render(TrackerInput, { ...mockData });
-		await component.$on('add', addMock);
+
+		component.$on('add', addMock);
 
 		const unitDisplay = screen.getByText(mockData.unit);
 		const amountInput = screen.getByRole('spinbutton', { name: 'amount' });
 
 		expect(unitDisplay).toBeDefined();
-		expect(amountInput.placeholder).toEqual('Amount...');
-		expect(amountInput.value).toBeFalsy();
+		expect(amountInput['placeholder']).toEqual('Amount...');
+		expect(amountInput['value']).toBeFalsy();
 
 		// check correct buttons being visible/invisible
 		expect(screen.queryByRole('button', { name: 'add' })).toBeDefined();
@@ -49,19 +58,19 @@ describe('TrackerInput.svelte', () => {
 
 	it('should render a blank component with categories and trigger add', async () => {
 		const mockData = {
-			categories: [
-				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
-				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
-			],
-			category: 'b', // set here to avoid time based issues
-			unit: 'kcal'
+			categories: categories,
+			category: { shortvalue: 'd', longvalue: 'Dinner'}, // set here to avoid time based issues
+			unit: 'kcal',
+			value: '',
+			type: 'number',
+			dateStr: '2025-01-01'
 		};
 
 		let addEvent;
 		const addMock = vi.fn((event) => (addEvent = event.detail));
 
 		const { component } = render(TrackerInput, { ...mockData });
-		await component.$on('add', addMock);
+		component.$on('add', addMock);
 
 		const unitDisplay = screen.getByText(mockData.unit);
 		const amountInput = screen.getByRole('spinbutton', { name: 'amount' });
@@ -69,9 +78,9 @@ describe('TrackerInput.svelte', () => {
 
 		// check values that can be set by the user
 		expect(unitDisplay).toBeDefined();
-		expect(amountInput.placeholder).toEqual('Amount...');
-		expect(amountInput.value).toBeFalsy();
-		expect(categoryCombobox.value).toStrictEqual('b');
+		expect(amountInput['placeholder']).toEqual('Amount...');
+		expect(amountInput['value']).toBeFalsy();
+		expect(categoryCombobox['value']).toStrictEqual('b');
 
 		// check correct buttons being visible/invisible
 		expect(screen.queryByRole('button', { name: 'add' })).toBeDefined();
@@ -84,8 +93,8 @@ describe('TrackerInput.svelte', () => {
 		await fireEvent.input(amountInput, { target: { value: 100 } });
 		await fireEvent.change(categoryCombobox, { target: { value: 'd' } });
 
-		expect(amountInput.value).toStrictEqual('100');
-		expect(categoryCombobox.value).toStrictEqual('d');
+		expect(amountInput['value']).toStrictEqual('100');
+		expect(categoryCombobox['value']).toStrictEqual('d');
 
 		await fireEvent.click(screen.getByRole('button', { name: 'add' }));
 		await tick();
@@ -101,23 +110,21 @@ describe('TrackerInput.svelte', () => {
 
 	it('should render a filled component without categories', async () => {
 		const mockData = {
+			id: 1,
 			dateStr: '2022-02-02',
-			sequence: 1,
 			existing: false,
-			/** @type Array<FoodCategory> */
-			categories: [
-				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
-				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
-			],
-			category: 'b', // set here to avoid time based issues
-			unit: 'kcal'
+			categories: categories,
+			category: { shortvalue: 'b', longvalue: 'Dinner'}, // set here to avoid time based issues
+			unit: 'kcal',
+			value: 500
 		};
 
-		let addEvent;
+		let addEvent: any;
 		const addMock = vi.fn((event) => (addEvent = event.detail));
 
 		const { component } = render(TrackerInput, { ...mockData });
-		await component.$on('add', addMock);
+
+		component.$on('add', addMock);
 
 		const unitDisplay = screen.getByText('kcal');
 		const amountInput = screen.getByRole('spinbutton', { name: 'amount' });
@@ -125,9 +132,9 @@ describe('TrackerInput.svelte', () => {
 
 		// check values that can be set by the user
 		expect(unitDisplay).toBeDefined();
-		expect(amountInput.placeholder).toEqual('Amount...');
-		expect(amountInput.value).toBeFalsy();
-		expect(categoryCombobox.value).toStrictEqual('b');
+		expect(amountInput['placeholder']).toEqual('Amount...');
+		expect(amountInput['value']).toBeFalsy();
+		expect(categoryCombobox['value']).toStrictEqual('b');
 
 		// check correct buttons being visible/invisible
 		expect(screen.queryByRole('button', { name: 'add' })).toBeDefined();
@@ -140,8 +147,8 @@ describe('TrackerInput.svelte', () => {
 		await fireEvent.input(amountInput, { target: { value: 100 } });
 		await fireEvent.change(categoryCombobox, { target: { value: 'd' } });
 
-		expect(amountInput.value).toStrictEqual('100');
-		expect(categoryCombobox.value).toStrictEqual('d');
+		expect(amountInput['value']).toStrictEqual('100');
+		expect(categoryCombobox['value']).toStrictEqual('d');
 
 		await fireEvent.click(screen.getByRole('button', { name: 'add' }));
 		await tick();
@@ -161,14 +168,17 @@ describe('TrackerInput.svelte', () => {
 		const mockData = {
 			value: 70,
 			unit: 'kg',
-			existing: true
+			existing: true,
+			type: 'number',
+			dateStr: '2022-02-02'
 		};
 
-		let updateEvent;
+		let updateEvent: any;
 		const updateMock = vi.fn((event) => (updateEvent = event.detail));
 
 		const { component } = render(TrackerInput, { ...mockData });
-		await component.$on('update', updateMock);
+
+		component.$on('update', updateMock);
 
 		const editButton = screen.queryByRole('button', { name: 'edit' });
 		const deleteButton = screen.queryByRole('button', { name: 'delete' });
@@ -215,14 +225,13 @@ describe('TrackerInput.svelte', () => {
 
 	it('should enter edit mode, change and cancel the change', async () => {
 		const mockData = {
-			value: '870',
+			value: 870,
 			unit: 'kcal',
-			categories: [
-				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
-				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
-			],
-			category: 'b', // set here to avoid time based issues
-			existing: true
+			categories: categories,
+			category: { shortvalue: 'b', longvalue: 'Breakfast' }, // set here to avoid time based issues
+			existing: true,
+			dateStr: '2023-01-21',
+			type: 'number'
 		};
 
 		let updateEvent;
@@ -252,7 +261,7 @@ describe('TrackerInput.svelte', () => {
 
 		expect(updateMock).toHaveBeenCalledTimes(0);
 		expect(updateEvent).toBeUndefined();
-		expect(amountInput.value).toEqual(mockData.value);
+		expect(amountInput['value']).toEqual(mockData.value);
 
 		expect(screen.queryByRole('button', { name: 'edit' })).not.toBeNull();
 		expect(screen.queryByRole('button', { name: 'delete' })).not.toBeNull();
@@ -262,15 +271,17 @@ describe('TrackerInput.svelte', () => {
 
 	it('should enter delete mode and confirm the delete', async () => {
 		const mockData = {
-			value: '780',
+			value: 780,
 			unit: 'kcal',
-			existing: true
+			existing: true,
+			dateStr: '2023-01-21',
+			type: 'number'
 		};
 
 		const deleteMock = vi.fn();
 
 		const { component } = render(TrackerInput, { ...mockData });
-		await component.$on('remove', deleteMock);
+		component.$on('remove', deleteMock);
 
 		const deleteButton = screen.queryByRole('button', { name: 'delete' });
 
@@ -299,7 +310,9 @@ describe('TrackerInput.svelte', () => {
 		const mockData = {
 			value: 70,
 			unit: 'kg',
-			existing: true
+			existing: true,
+			type: 'number',
+			dateStr: '2022-02-02'
 		};
 
 		let deleteEvent;

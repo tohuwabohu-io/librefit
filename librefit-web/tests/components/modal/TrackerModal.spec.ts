@@ -2,9 +2,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/svelte';
 import TargetModal from '$lib/components/modal/TargetModal.svelte';
 import { tick } from 'svelte';
-import { getDateAsStr } from '$lib/date.ts';
+import { getDateAsStr } from '$lib/date';
 import { addYears } from 'date-fns';
-import { updateModalStoreMock } from '../../__mocks__/skeletonProxy.ts';
+import { updateModalStoreMock } from '../../__mocks__/skeletonProxy';
 
 /**
  * @vitest-environment jsdom
@@ -98,16 +98,16 @@ describe('TargetModal.svelte component', () => {
 
 		const { getByRole } = render(TargetModal);
 
-		expect(getByRole('spinbutton', { name: 'Target intake kcal' }).value).toBe(
+		expect(getByRole('spinbutton', { name: 'Target intake kcal' })['value']).toBe(
 			mockData.calorieTarget.targetCalories
 		);
-		expect(getByRole('spinbutton', { name: 'Maximum intake kcal' }).value).toBe(
+		expect(getByRole('spinbutton', { name: 'Maximum intake kcal' })['value']).toBe(
 			mockData.calorieTarget.maximumCalories
 		);
-		expect(getByRole('spinbutton', { name: 'Starting weight kg' }).value).toBe(
+		expect(getByRole('spinbutton', { name: 'Starting weight kg' })['value']).toBe(
 			mockData.weightTarget.initialWeight
 		);
-		expect(getByRole('spinbutton', { name: 'Target weight kg' }).value).toBe(
+		expect(getByRole('spinbutton', { name: 'Target weight kg' })['value']).toBe(
 			mockData.weightTarget.targetWeight
 		);
 	});

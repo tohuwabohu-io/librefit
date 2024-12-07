@@ -1,31 +1,31 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, getByRole, getByText, render, screen } from '@testing-library/svelte';
-import CalorieTracker from '$lib/components/tracker/CalorieTrackerComponent.svelte';
+import { cleanup, fireEvent, getByRole, getByText, render } from '@testing-library/svelte';
+import CalorieTrackerComponent from '$lib/components/tracker/CalorieTrackerComponent.svelte';
 import * as skeleton from '@skeletonlabs/skeleton';
 import { tick } from 'svelte';
-import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.ts';
-import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.ts';
+import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy';
+import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date';
+import type { CalorieTarget, CalorieTracker, FoodCategory } from '$lib/model';
 
-const mockCategories = [
-	{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
-	{ shortvalue: 'l', longvalue: 'Lunch', visible: true },
-	{ shortvalue: 'd', longvalue: 'Dinner', visible: true },
-	{ shortvalue: 't', longvalue: 'Treat', visible: true },
-	{ shortvalue: 's', longvalue: 'Snack', visible: true }
+const mockCategories: Array<FoodCategory> = [
+	{ shortvalue: 'b', longvalue: 'Breakfast'},
+	{ shortvalue: 'l', longvalue: 'Lunch'},
+	{ shortvalue: 'd', longvalue: 'Dinner'},
+	{ shortvalue: 't', longvalue: 'Treat'},
+	{ shortvalue: 's', longvalue: 'Snack'}
 ];
 
-const mockEntries = [
-	{ added: '2023-11-10', sequence: 1, amount: 500, category: 'b' },
-	{ added: '2023-11-10', sequence: 2, amount: 300, category: 'l' },
-	{ added: '2023-11-10', sequence: 3, amount: 600, category: 'd' },
-	{ added: '2023-11-10', sequence: 4, amount: 200, category: 't' },
-	{ added: '2023-11-10', sequence: 5, amount: 150, category: 's' }
+const mockEntries: Array<CalorieTracker> = [
+	{ added: '2023-11-10', id: 1, amount: 500, category: 'b' },
+	{ added: '2023-11-10', id: 2, amount: 300, category: 'l' },
+	{ added: '2023-11-10', id: 3, amount: 600, category: 'd' },
+	{ added: '2023-11-10', id: 4, amount: 200, category: 't' },
+	{ added: '2023-11-10', id: 5, amount: 150, category: 's' }
 ];
 
-/** @type CalorieTarget */
-const mockCalorieTarget = {
+const mockCalorieTarget: CalorieTarget = {
 	added: '2023-01-01',
-	sequence: 1,
+	id: 1,
 	startDate: '2023-01-01',
 	endDate: '2023-12-31',
 	targetCalories: 2000,
@@ -35,12 +35,12 @@ const mockCalorieTarget = {
 /**
  * @vitest-environment jsdom
  */
-describe('CalorieTracker.svelte component', () => {
+describe('CalorieTrackerComponent.svelte component', () => {
 	afterEach(() => cleanup());
 
 	// Test that the CalorieTracker component renders correctly
 	it('renders correctly', () => {
-		const { getByText, getByRole, getByTestId } = render(CalorieTracker, {
+		const { getByText, getByRole, getByTestId } = render(CalorieTrackerComponent, {
 			categories: mockCategories,
 			calorieTracker: mockEntries,
 			calorieTarget: mockCalorieTarget
@@ -59,8 +59,8 @@ describe('CalorieTracker.svelte component', () => {
 
 		// tracker
 		expect(getByText('kcal')).toBeDefined();
-		expect(amountInput.placeholder).toEqual('Amount...');
-		expect(amountInput.value).toBeFalsy();
+		expect(amountInput['placeholder']).toEqual('Amount...');
+		expect(amountInput['value']).toBeFalsy();
 
 		// quickadd
 		expect(getByRole('button', { name: 'add calories' })).toBeTruthy();
@@ -71,7 +71,7 @@ describe('CalorieTracker.svelte component', () => {
 	});
 
 	it('should trigger the quick add button', async () => {
-		const { component, getByText, getByRole } = render(CalorieTracker);
+		const { component, getByText, getByRole } = render(CalorieTrackerComponent);
 
 		let dispatchEvent;
 		const dispatchMock = vi.fn((e) => {
@@ -102,7 +102,7 @@ describe('CalorieTracker.svelte component', () => {
 			dispatchEvent = e.detail;
 		});
 
-		const { component, getByText } = render(CalorieTracker);
+		const { component, getByText } = render(CalorieTrackerComponent);
 		component.$on('addCalories', dispatchMock);
 
 		// Expect that the add button is rendered
@@ -153,7 +153,7 @@ describe('CalorieTracker.svelte component', () => {
 			dispatchEvent = e.detail;
 		});
 
-		const { component, getByText } = render(CalorieTracker, {
+		const { component, getByText } = render(CalorieTrackerComponent, {
 			categories: mockCategories,
 			calorieTracker: mockEntries,
 			calorieTarget: mockCalorieTarget
@@ -209,7 +209,7 @@ describe('CalorieTracker.svelte component', () => {
 			dispatchEvent = e.detail;
 		});
 
-		const { component, getByText } = render(CalorieTracker, {
+		const { component, getByText } = render(CalorieTrackerComponent, {
 			categories: mockCategories,
 			calorieTracker: mockEntries,
 			calorieTarget: mockCalorieTarget

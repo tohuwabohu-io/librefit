@@ -10,7 +10,7 @@ const files = ['file1', 'file2', 'file3'];
  */
 describe('AvatarPicker.svelte', () => {
 	it('should trigger avatarClicked function when Avatar is clicked', async () => {
-		let chosenFile;
+		let chosenFile: string;
 		const chooseAvatarMock = vi.fn((event) => {
 			chosenFile = event.detail;
 		});
@@ -38,11 +38,6 @@ describe('AvatarPicker.svelte', () => {
 		const fakeUser = {
 			avatar: 'file3'
 		};
-
-		const { component } = render(AvatarPicker, {
-			props: { fileList: files, chosen: fakeUser.avatar }
-		});
-
 		const avatarImg = document.querySelector(`img[src$="${fakeUser.avatar}" i]`);
 		const avatarFigure = avatarImg.parentElement;
 
