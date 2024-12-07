@@ -25,10 +25,8 @@ export const calculateTdee = async (wizardInput) => {
  * @returns {Promise<void>}
  */
 export const postWizardResult = async (wizard) => {
-	return proxyFetch(fetch, api.postWizardResult, wizard).then(async (response) => {
-		if (response.ok) {
-			return Promise.resolve();
-		} else throw response;
+	return invoke('wizard_create_targets', {
+		input: wizard
 	});
 };
 

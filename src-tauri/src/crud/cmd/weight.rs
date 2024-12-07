@@ -8,7 +8,7 @@ use tauri::command;
 #[command]
 pub fn create_weight_target(new_target: NewWeightTarget) -> Result<WeightTarget, String> {
     let conn = &mut create_db_connection();
-    weight::create_weight_target(conn, new_target).map_err(handle_error)
+    weight::create_weight_target(conn, &new_target).map_err(handle_error)
 }
 
 /// Retrieve all weight targets

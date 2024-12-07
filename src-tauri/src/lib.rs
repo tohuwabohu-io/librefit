@@ -9,7 +9,7 @@ use crate::crud::cmd::weight::{
     create_weight_target, create_weight_tracker_entry, delete_weight_tracker_entry,
     get_weight_tracker_for_date_range, update_weight_tracker_entry,
 };
-use crate::crud::cmd::wizard::wizard_calculate_tdee;
+use crate::crud::cmd::wizard::{wizard_calculate_tdee, wizard_create_targets};
 
 pub mod calc;
 pub mod crud;
@@ -41,7 +41,8 @@ pub fn run() {
             create_calorie_target,
             create_weight_target,
             update_user,
-            wizard_calculate_tdee
+            wizard_calculate_tdee,
+            wizard_create_targets
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

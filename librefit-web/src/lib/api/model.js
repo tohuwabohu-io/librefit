@@ -139,9 +139,9 @@ export const WizardRecommendation = {
 
 /**
  * @typedef {Object} Wizard
- * @property {CalorieTarget} calorieTarget - The calorie target.
- * @property {WeightTarget} weightTarget - The weight target.
- * @property {WeightTracker} weightTracker - The weight tracker.
+ * @property {NewCalorieTarget} calorieTarget - The calorie target.
+ * @property {NewWeightTarget} weightTarget - The weight target.
+ * @property {NewWeightTracker} weightTracker - The weight tracker.
  */
 
 /**

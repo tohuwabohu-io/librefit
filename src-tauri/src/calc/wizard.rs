@@ -1,15 +1,15 @@
-use crate::crud::db::model::{CalorieTarget, WeightTarget, WeightTracker};
+use crate::crud::db::model::{CalorieTarget, NewCalorieTarget, NewWeightTarget, NewWeightTracker, WeightTarget, WeightTracker};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use validator::{Validate, ValidationError};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Wizard {
-    pub calorie_target: CalorieTarget,
-    pub weight_target: WeightTarget,
-    pub weight_tracker: WeightTracker,
+    pub calorie_target: NewCalorieTarget,
+    pub weight_target: NewWeightTarget,
+    pub weight_tracker: NewWeightTracker,
 }
 
 #[derive(Validate, Deserialize, Debug)]

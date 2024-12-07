@@ -7,10 +7,10 @@ use diesel::sqlite::SqliteConnection;
 /// Create a new weight target
 pub fn create_weight_target(
     conn: &mut SqliteConnection,
-    new_target: NewWeightTarget,
+    new_target: &NewWeightTarget,
 ) -> QueryResult<WeightTarget> {
     diesel::insert_into(weight_target)
-        .values(&new_target)
+        .values(new_target)
         .returning(WeightTarget::as_returning())
         .get_result(conn)
 }

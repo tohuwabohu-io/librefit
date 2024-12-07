@@ -80,7 +80,7 @@ pub struct NewCalorieTracker {
 }
 
 // For WeightTracker
-#[derive(Insertable, AsChangeset, Serialize, Deserialize)]
+#[derive(Insertable, AsChangeset, Serialize, Deserialize, Debug)]
 #[diesel(table_name = crate::crud::db::schema::weight_tracker)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[serde(rename_all = "camelCase")]
@@ -98,7 +98,7 @@ pub struct NewFoodCategory {
 }
 
 // For CalorieTarget
-#[derive(Insertable, AsChangeset, Serialize, Deserialize)]
+#[derive(Insertable, AsChangeset, Serialize, Deserialize, Debug)]
 #[diesel(table_name = crate::crud::db::schema::calorie_target)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[serde(rename_all = "camelCase")]
@@ -111,7 +111,7 @@ pub struct NewCalorieTarget {
 }
 
 // For WeightTarget
-#[derive(Insertable, AsChangeset, Serialize, Deserialize)]
+#[derive(Insertable, AsChangeset, Serialize, Deserialize, Debug)]
 #[diesel(table_name = crate::crud::db::schema::weight_target)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[serde(rename_all = "camelCase")]

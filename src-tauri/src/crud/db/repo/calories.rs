@@ -7,10 +7,10 @@ use diesel::sqlite::SqliteConnection;
 /// Create a new calorie target
 pub fn create_calorie_target(
     conn: &mut SqliteConnection,
-    new_target: NewCalorieTarget,
+    new_target: &NewCalorieTarget,
 ) -> QueryResult<CalorieTarget> {
     diesel::insert_into(calorie_target)
-        .values(&new_target)
+        .values(new_target)
         .returning(CalorieTarget::as_returning())
         .get_result(conn)
 }
