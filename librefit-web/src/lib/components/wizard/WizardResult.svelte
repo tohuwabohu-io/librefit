@@ -1,6 +1,6 @@
 <script>
-    import {BmiCategory} from '$lib/api/model.js';
-    import {getBmiCategoryDisplayValue} from '$lib/enum.js';
+    import {BmiCategory} from '$lib/model';
+    import {getBmiCategoryDisplayValue} from '$lib/enum';
 
     /** @type {WizardResult} */
     export let calculationResult;

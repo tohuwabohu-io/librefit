@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/svelte';
 import TargetModal from '$lib/components/modal/TargetModal.svelte';
 import { tick } from 'svelte';
-import { getDateAsStr } from '$lib/date.js';
+import { getDateAsStr } from '$lib/date.ts';
 import { addYears } from 'date-fns';
 import { updateModalStoreMock } from '../../__mocks__/skeletonProxy.js';
 

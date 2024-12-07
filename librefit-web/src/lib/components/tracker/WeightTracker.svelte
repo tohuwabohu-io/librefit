@@ -2,7 +2,7 @@
     import Scale from '$lib/assets/icons/scale-outline.svg?component';
     import {createEventDispatcher} from 'svelte';
     import {getModalStore} from '@skeletonlabs/skeleton';
-    import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.js';
+    import {convertDateStrToDisplayDateStr, getDateAsStr} from '$lib/date.ts';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
     import Target from '$lib/assets/icons/target-arrow.svg?component';
 

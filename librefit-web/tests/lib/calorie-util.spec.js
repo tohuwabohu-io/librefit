@@ -1,5 +1,5 @@
-import { getAverageCategoryIntake } from '$lib/calorie-util.js';
-import { getAverageDailyIntake } from '$lib/calorie-util.js';
+import { getAverageCategoryIntake } from '$lib/calorie-util.ts';
+import { getAverageDailyIntake } from '$lib/calorie-util.ts';
 import { describe, expect, it } from 'vitest';
 
 describe('getAverageCategoryIntake', () => {

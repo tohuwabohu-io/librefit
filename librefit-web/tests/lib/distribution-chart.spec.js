@@ -1,5 +1,5 @@
 import { expect, describe, it, vi } from 'vitest';
-import { createDistributionChart } from '$lib/distribution-chart.js';
+import { createDistributionChart } from '$lib/distribution-chart.ts';
 
 /**
  * @vitest-environment jsdom

@@ -1,7 +1,7 @@
 <script>
     import TrackerRadial from '$lib/components/TrackerRadial.svelte';
     import {createEventDispatcher} from 'svelte';
-    import {getDateAsStr, getDaytimeFoodCategory} from '$lib/date.js';
+    import {getDateAsStr, getDaytimeFoodCategory} from '$lib/date.ts';
     import Plus from '$lib/assets/icons/plus.svg';
     import Edit from '$lib/assets/icons/pencil.svg?component';
     import {getModalStore} from '@skeletonlabs/skeleton';

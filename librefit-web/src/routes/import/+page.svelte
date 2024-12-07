@@ -1,7 +1,7 @@
 <script>
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {getFieldError} from '$lib/validation.js';
-    import {showToastError, showToastSuccess} from '$lib/toast.js';
+    import {getFieldError} from '$lib/validation.ts';
+    import {showToastError, showToastSuccess} from '$lib/toast.ts';
     import {FileDropzone, getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
     import FileUpload from '$lib/assets/icons/file-upload.svg?component';
     import {getContext} from 'svelte';

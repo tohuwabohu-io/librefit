@@ -1,4 +1,4 @@
-import { showToastError, showToastSuccess, showToastInfo, showToastWarning } from '$lib/toast.js';
+import { showToastError, showToastSuccess, showToastInfo, showToastWarning } from '$lib/toast.ts';
 import { expect, test, vi } from 'vitest';
 
 test('showToastError should trigger toastStore with correct params', () => {

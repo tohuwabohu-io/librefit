@@ -1,6 +1,6 @@
 <script>
     import {createEventDispatcher} from 'svelte';
-    import {getDateAsStr, parseStringAsDate} from '$lib/date.js';
+    import {getDateAsStr, parseStringAsDate} from '$lib/date.ts';
     import {subDays} from 'date-fns';
 
     const dispatch = createEventDispatcher();

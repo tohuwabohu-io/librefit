@@ -1,23 +1,16 @@
 import { invoke } from '@tauri-apps/api/core';
+import { CalorieTarget, NewCalorieTarget, NewWeightTarget, WeightTarget } from '../model';
 
-/**
- * @param calorieTarget {CalorieTarget}
- * @return {Promise<* | undefined>}
- */
-export const createCalorieTarget = async (calorieTarget) => {
+export const createCalorieTarget = async (calorieTarget: NewCalorieTarget): Promise<CalorieTarget> => {
 	calorieTarget.targetCalories = +calorieTarget.targetCalories;
 	calorieTarget.maximumCalories = +calorieTarget.maximumCalories;
 
 	return invoke('create_calorie_target', { newTarget: calorieTarget });
 };
 
-/**
- * @param weightTarget {WeightTarget}
- * @return {Promise<* | undefined>}
- */
-export const createWeightTarget = async (weightTarget) => {
+export const createWeightTarget = async (weightTarget: NewWeightTarget): Promise<WeightTarget> => {
 	weightTarget.targetWeight = +weightTarget.targetWeight;
 	weightTarget.initialWeight = +weightTarget.initialWeight;
-	
+
 	return invoke('create_weight_target', { newTarget: weightTarget });
 };

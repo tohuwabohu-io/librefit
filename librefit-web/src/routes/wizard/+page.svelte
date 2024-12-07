@@ -1,7 +1,7 @@
 <script>
     import TdeeStepper from '$lib/components/TdeeStepper.svelte';
     import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
-    import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast.js';
+    import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast.ts';
     import { getContext } from 'svelte';
     import {
         calculateForTargetDate,
@@ -12,13 +12,13 @@
         postWizardResult,
         validateCustomDate,
         validateCustomWeight
-    } from '$lib/api/wizard.js';
+    } from '$lib/api/wizard';
     import WizardResult from '$lib/components/wizard/WizardResult.svelte';
     import WizardTarget from '$lib/components/wizard/WizardTarget.svelte';
     import { addDays } from 'date-fns';
-    import { getDateAsStr } from '$lib/date.js';
-    import { WizardOptions } from '$lib/enum.js';
-    import { WizardRecommendation } from '$lib/api/model.js';
+    import { getDateAsStr } from '$lib/date.ts';
+    import { WizardOptions } from '$lib/enum.ts';
+    import { WizardRecommendation } from '$lib/model';
 
     const toastStore = getToastStore();
     const modalStore = getModalStore();

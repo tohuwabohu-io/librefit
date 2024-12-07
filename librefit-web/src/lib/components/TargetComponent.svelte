@@ -1,5 +1,5 @@
 <script>
-    import {validateTargetAmount} from '$lib/validation.js';
+    import {validateTargetAmount} from '$lib/validation.ts';
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
 
     export let startDate;

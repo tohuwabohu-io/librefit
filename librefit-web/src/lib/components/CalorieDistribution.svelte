@@ -7,9 +7,9 @@
     import Overflow2 from '$lib/assets/icons/overflow-2.svg?component';
     import {PolarArea} from 'svelte-chartjs';
     import {Chart, registerables} from 'chart.js';
-    import {observeToggle} from '$lib/theme-toggle.js';
-    import {createDistributionChart} from '$lib/distribution-chart.js';
-    import {getAverageDailyIntake} from '$lib/calorie-util.js';
+    import {observeToggle} from '$lib/theme-toggle.ts';
+    import {createDistributionChart} from '$lib/distribution-chart.ts';
+    import {getAverageDailyIntake} from '$lib/calorie-util.ts';
 
     Chart.register(...registerables);
 

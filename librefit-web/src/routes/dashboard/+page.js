@@ -1,4 +1,4 @@
-import { getDateAsStr } from '$lib/date.js';
+import { getDateAsStr } from '$lib/date.ts';
 import { invoke } from '@tauri-apps/api/core';
 
 /** @type {import('./$types').PageLoad} */

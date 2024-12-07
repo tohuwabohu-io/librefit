@@ -10,11 +10,7 @@ export const proxyFetch = async (fetchApi, api, data) => {
 	return await invoke("greet", { name });
 };
 
-/**
- * @param {String} path
- * @param {any} json
- */
-export const replaceGetParamsJson = (path, json) => {
+export const replaceGetParamsJson = (path: string, json: any) => {
 	if (json) {
 		Object.entries(json).forEach(([key, value]) => {
 			path = path.replace(`{${key}}`, String(value));
@@ -24,12 +20,8 @@ export const replaceGetParamsJson = (path, json) => {
 	return path;
 };
 
-/**
- * @param {FormData} formData
- */
-export const convertFormDataToJson = (formData) => {
-	/** @type {any} */
-	const json = {};
+export const convertFormDataToJson = (formData: FormData): any => {
+	const json: any = {};
 	formData.forEach((value, key) => (json[key] = value));
 
 	return json;

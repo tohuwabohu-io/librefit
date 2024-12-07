@@ -1,7 +1,7 @@
 <script>
     import {getModalStore, Tab, TabGroup} from '@skeletonlabs/skeleton';
-    import {getDateAsStr} from '$lib/date.js';
-    import {validateCalorieTarget, validateWeightTarget} from '$lib/validation.js';
+    import {getDateAsStr} from '$lib/date.ts';
+    import {validateCalorieTarget, validateWeightTarget} from '$lib/validation.ts';
     import TargetComponent from '$lib/components/TargetComponent.svelte';
 
     const today = new Date();

@@ -1,5 +1,5 @@
 <script>
-	import { paintWeightTracker } from '$lib/weight-chart.js';
+	import { paintWeightTracker } from '$lib/weight-chart.ts';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import {
@@ -11,23 +11,23 @@
 		listWeightRange,
 		updateCalories,
 		updateWeight
-	} from '$lib/api/tracker.js';
-	import { createCalorieTarget, createWeightTarget } from '$lib/api/target.js';
+	} from '$lib/api/tracker.ts';
+	import { createCalorieTarget, createWeightTarget } from '$lib/api/target.ts';
 	import { getContext } from 'svelte';
 	import { Chart, registerables } from 'chart.js';
 	import { Line } from 'svelte-chartjs';
 	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
-	import { validateAmount } from '$lib/validation.js';
-	import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast.js';
-	import { DataViews } from '$lib/enum.js';
-	import { getDaytimeGreeting } from '$lib/date.js';
-	import { getFoodCategoryLongvalue } from '$lib/api/category.js';
+	import { validateAmount } from '$lib/validation.ts';
+	import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast.ts';
+	import { DataViews } from '$lib/enum.ts';
+	import { getDaytimeGreeting } from '$lib/date.ts';
+	import { getFoodCategoryLongvalue } from '$lib/api/category';
 	import { subMonths, subWeeks } from 'date-fns';
 	import ScaleOff from '$lib/assets/icons/scale-outline-off.svg?component';
-	import { observeToggle } from '$lib/theme-toggle.js';
+	import { observeToggle } from '$lib/theme-toggle.ts';
 	import CalorieQuickview from '$lib/components/CalorieQuickview.svelte';
 	import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-	import { getDateAsStr } from '$lib/date.js';
+	import { getDateAsStr } from '$lib/date.ts';
 
 	Chart.register(...registerables);
 

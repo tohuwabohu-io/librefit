@@ -1,11 +1,7 @@
-import { display_date_format_day, getDateAsStr, parseStringAsDate } from '$lib/date.js';
+import { display_date_format_day, getDateAsStr, parseStringAsDate } from './date';
+import { CalorieTarget, CalorieTracker } from './model';
 
-/**
- * @param {Array<CalorieTracker>} calories
- * @param {CalorieTarget} calorieTarget
- * @return {{backgroundColor: *, data: number, label: string}[]}
- */
-const createCalorieTrackerQuickviewDataset = (calories, calorieTarget) => {
+const createCalorieTrackerQuickviewDataset = (calories: Array<CalorieTracker>, calorieTarget: CalorieTarget)=> {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 

@@ -1,5 +1,5 @@
 import { afterEach, expect, describe, it } from 'vitest';
-import { Indicator } from '$lib/indicator.js';
+import { Indicator } from '$lib/indicator.ts';
 
 describe('Indicator', () => {
 	const indicator = new Indicator();

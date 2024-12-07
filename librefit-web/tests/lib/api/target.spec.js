@@ -1,11 +1,11 @@
-import { createCalorieTarget, createWeightTarget } from '$lib/api/target.js';
+import { createCalorieTarget, createWeightTarget } from '$lib/api/target.ts';
 import { assert, describe, expect, it, vi } from 'vitest';
 import {
 	validateCalorieTarget,
 	validateEndDate,
 	validateTargetAmount,
 	validateWeightTarget
-} from '$lib/validation.js';
+} from '$lib/validation.ts';
 
 describe('createTarget functions', () => {
 	it('createCalorieTarget should make API call and handle responses correctly', async () => {

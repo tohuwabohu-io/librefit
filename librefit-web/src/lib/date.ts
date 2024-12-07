@@ -3,40 +3,29 @@ import { getHours, format, parse } from 'date-fns';
 export const default_date_format = 'yyyy-MM-dd'; // used for internal storage and fetch requests
 export const display_date_format = 'dd.MM.yyyy'; // used for display only
 export const display_date_format_day = 'dd.MM';
-/**
- * @param {number | Date} d
- * @param {string | undefined} [displayFormat]
- */
-export function getDateAsStr(d, displayFormat) {
+
+export function getDateAsStr(d: number | Date, displayFormat?: string | undefined) {
 	if (!displayFormat) {
 		displayFormat = default_date_format;
 	}
 	return format(d, displayFormat.valueOf());
 }
 
-/**
- * @param {string} str
- * @param {string | undefined} [dateFormat]
- */
-export function parseStringAsDate(str, dateFormat) {
+export function parseStringAsDate(str: string, dateFormat?: string | undefined) {
 	if (!dateFormat) {
 		dateFormat = default_date_format;
 	}
 	return parse(str.valueOf(), dateFormat.valueOf(), new Date());
 }
 
-/**
- * @param {String} str
- * @param {String | undefined} [displayFormat]
- */
-export function convertDateStrToDisplayDateStr(str, displayFormat) {
+export function convertDateStrToDisplayDateStr(str: string, displayFormat: string | undefined) {
 	const date = parseStringAsDate(str, displayFormat);
 	return getDisplayDateAsStr(date);
 }
 
 export const getDisplayDateAsStr = (
-	/** @type {number | Date} */ d,
-	/** @type {string | undefined} */ locale
+	d: number | Date,
+	locale?: string
 ) => {
 	/*if (!locale && navigator !== undefined) { no clue why this does not work
         locale = navigator.language;
@@ -89,7 +78,7 @@ export const getDaytimeFoodCategory = (date) => {
 		return 'b';
 	} else if (hours >= 12 && hours <= 15) {
 		return 'l';
-	} else if ((hours) => 16 && hours <= 20) {
+	} else if (hours >= 16 && hours <= 20) {
 		return 'd';
 	} else {
 		return 't';

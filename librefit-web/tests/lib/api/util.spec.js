@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { convertFormDataToJson, proxyFetch, replaceGetParamsJson } from '$lib/api/util.js';
+import { convertFormDataToJson, proxyFetch, replaceGetParamsJson } from '$lib/api/util.ts';
 import { api } from '$lib/api/index.js';
 
 test('proxyFetch should return valid response for API calls', async () => {

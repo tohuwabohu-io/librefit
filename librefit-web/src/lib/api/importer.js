@@ -1,6 +1,6 @@
 import { api } from '$lib/api/index.js';
 import { fail } from '@sveltejs/kit';
-import { proxyFetch } from '$lib/api/util.js';
+import { proxyFetch } from '$lib/api/util.ts';
 
 /**
  * @param formData {FormData}

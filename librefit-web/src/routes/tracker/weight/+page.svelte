@@ -1,14 +1,14 @@
 <script>
     import FilterComponent from '$lib/components/FilterComponent.svelte';
     import {getContext} from 'svelte';
-    import {deleteWeight, listWeightRange, updateWeight} from '$lib/api/tracker.js';
-    import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
+    import {deleteWeight, listWeightRange, updateWeight} from '$lib/api/tracker.ts';
+    import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.ts';
     import {goto} from '$app/navigation';
     import {getToastStore, Paginator} from '@skeletonlabs/skeleton';
     import ScaleOff from '$lib/assets/icons/scale-outline-off.svg';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
-    import {validateAmount} from '$lib/validation.js';
-    import {convertDateStrToDisplayDateStr} from '$lib/date.js';
+    import {validateAmount} from '$lib/validation.ts';
+    import {convertDateStrToDisplayDateStr} from '$lib/date.ts';
     import {subDays} from 'date-fns';
 
     const toastStore = getToastStore();

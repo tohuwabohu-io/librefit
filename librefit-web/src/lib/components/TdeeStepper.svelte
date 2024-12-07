@@ -1,6 +1,6 @@
 <script>
     import {RadioGroup, RadioItem, RangeSlider, Step, Stepper} from '@skeletonlabs/skeleton';
-    import {CalculationGoal, CalculationSex} from '$lib/api/model.js';
+    import {CalculationGoal, CalculationSex} from '$lib/model';
     import {createEventDispatcher} from 'svelte';
 
     /** @type WizardInput */

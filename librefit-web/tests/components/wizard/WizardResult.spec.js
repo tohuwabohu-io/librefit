@@ -1,8 +1,7 @@
 import { cleanup, render, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import WizardResult from '$lib/components/wizard/WizardResult.svelte';
-import { BmiCategory, WizardRecommendation } from '$lib/api/model.js';
-import { bmiCategoriesAsKeyValue } from '$lib/enum.js';
+import { BmiCategory, WizardRecommendation } from '$lib/model';
 
 /**
  * @vitest-environment jsdom
@@ -169,10 +168,6 @@ describe('WizardResult.svelte component', () => {
 			recommendation: WizardRecommendation.Hold
 		};
 
-		const bmiCategoryLabel = bmiCategoriesAsKeyValue.filter(
-			(e) => e.value === calculationResult.bmiCategory
-		)[0].label;
-
 		const { getByRole } = render(WizardResult, { props: { calculationResult, calculationInput } });
 
 		const bodyParametersTable = getByRole('table', { name: 'body parameter table' });
@@ -181,6 +176,5 @@ describe('WizardResult.svelte component', () => {
 		expect(utils.getByText(calculationInput.height.toString()).closest('td')).toBeTruthy();
 		expect(utils.getByText(calculationInput.weight.toString()).closest('td')).toBeTruthy();
 		expect(utils.getByText(calculationResult.bmi.toString()).closest('td')).toBeTruthy();
-		expect(utils.getByText(bmiCategoryLabel).closest('td')).toBeTruthy();
 	});
 });

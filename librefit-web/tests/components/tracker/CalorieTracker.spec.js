@@ -4,7 +4,7 @@ import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
 import * as skeleton from '@skeletonlabs/skeleton';
 import { tick } from 'svelte';
 import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.js';
-import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.js';
+import { getDateAsStr, getDaytimeFoodCategory } from '$lib/date.ts';
 
 const mockCategories = [
 	{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },

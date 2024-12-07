@@ -2,12 +2,12 @@
     import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
     import {getContext} from 'svelte';
     import {goto} from '$app/navigation';
-    import {DataViews, enumKeys} from '$lib/enum.js';
+    import {DataViews, enumKeys} from '$lib/enum.ts';
     import {getToastStore, RadioGroup, RadioItem} from '@skeletonlabs/skeleton';
-    import {listCaloriesFiltered} from '$lib/api/tracker.js';
-    import {showToastError} from '$lib/toast.js';
+    import {listCaloriesFiltered} from '$lib/api/tracker.ts';
+    import {showToastError} from '$lib/toast.ts';
     import NoFood from '$lib/assets/icons/food-off.svg?component'
-    import {getFoodCategoryLongvalue, skimCategories} from '$lib/api/category.js';
+    import {getFoodCategoryLongvalue, skimCategories} from '$lib/api/category';
 
     export let data;
 

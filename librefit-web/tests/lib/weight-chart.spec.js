@@ -2,9 +2,9 @@ import {
 	createWeightChart,
 	createWeightChartDataset,
 	paintWeightTracker
-} from '$lib/weight-chart.js';
+} from '$lib/weight-chart.ts';
 import { describe, expect, it, vi } from 'vitest';
-import { DataViews } from '$lib/enum.js';
+import { DataViews } from '$lib/enum.ts';
 
 describe('createWeightChart function', () => {
 	it('should create data and legend for a week', () => {

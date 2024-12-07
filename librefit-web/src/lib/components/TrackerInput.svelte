@@ -1,6 +1,6 @@
 <script>
 	import {createEventDispatcher} from 'svelte';
-	import {getDaytimeFoodCategory} from '$lib/date.js';
+	import {getDaytimeFoodCategory} from '$lib/date.ts';
 	import TrackerButtons from './TrackerButtons.svelte';
 
 	export let value, dateStr, id;

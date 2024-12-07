@@ -2,9 +2,9 @@
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
     import {getContext} from 'svelte';
     import {Avatar, getModalStore, getToastStore} from '@skeletonlabs/skeleton';
-    import {showToastError, showToastInfo, showToastSuccess, showToastWarning} from '$lib/toast.js';
-    import {updateProfile} from '$lib/api/user.js';
-    import {getFieldError} from '$lib/validation.js';
+    import {showToastError, showToastInfo, showToastSuccess, showToastWarning} from '$lib/toast.ts';
+    import {updateProfile} from '$lib/api/user.ts';
+    import {getFieldError} from '$lib/validation.ts';
     import {goto} from '$app/navigation';
 
     const user = getContext('user');

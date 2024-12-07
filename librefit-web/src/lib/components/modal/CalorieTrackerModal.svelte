@@ -1,7 +1,7 @@
 <script>
     import {getModalStore} from '@skeletonlabs/skeleton';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
-    import {display_date_format, getDateAsStr, getDaytimeFoodCategory} from '$lib/date.js';
+    import {display_date_format, getDateAsStr, getDaytimeFoodCategory} from '$lib/date.ts';
 
     const modalStore = getModalStore();
 

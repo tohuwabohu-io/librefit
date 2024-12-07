@@ -1,6 +1,6 @@
 import { subMonths } from 'date-fns';
-import { listCalorieTrackerRange } from '$lib/api/tracker.js';
-import { getDateAsStr } from '$lib/date.js';
+import { listCalorieTrackerRange } from '$lib/api/tracker.ts';
+import { getDateAsStr } from '$lib/date.ts';
 
 /** @type {import('./$types').PageLoad} */
 export const load = async ({ fetch }) => {

@@ -1,8 +1,7 @@
 <script>
-    import {WizardRecommendation} from '$lib/api/model.js';
-    import {WizardOptions} from '$lib/enum.js';
+    import {WizardRecommendation} from '$lib/model';
+    import {WizardOptions} from '$lib/enum.ts';
     import ValidatedInput from '$lib/components/ValidatedInput.svelte';
-    import {validateCustomDate, validateCustomWeight} from '$lib/api/wizard.js';
 
     /** @type {WizardResult} */
     export let calculationResult;

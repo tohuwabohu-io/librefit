@@ -1,6 +1,6 @@
 <script>
     import {getModalStore} from '@skeletonlabs/skeleton';
-    import {convertDateStrToDisplayDateStr} from '$lib/date.js';
+    import {convertDateStrToDisplayDateStr} from '$lib/date.ts';
     import TrackerInput from '$lib/components/TrackerInput.svelte';
 
     const modalStore = getModalStore();

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, getByText, render } from '@testing-library/svelte';
 import WeightTracker from '$lib/components/tracker/WeightTracker.svelte';
-import { convertDateStrToDisplayDateStr, getDateAsStr } from '$lib/date.js';
+import { convertDateStrToDisplayDateStr, getDateAsStr } from '$lib/date.ts';
 import { tick } from 'svelte';
 import * as skeleton from '@skeletonlabs/skeleton';
 import { extractModalStoreMockTriggerCallback } from '../../__mocks__/skeletonProxy.js';

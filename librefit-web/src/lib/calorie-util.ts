@@ -1,8 +1,6 @@
-/**
- * @param {Array<CalorieTracker>} entries
- * @param {Array<FoodCategory>} foodCategories
- */
-export const getAverageCategoryIntake = (entries, foodCategories) => {
+import { CalorieTracker, FoodCategory } from './model';
+
+export const getAverageCategoryIntake = (entries: Array<CalorieTracker>, foodCategories: Array<FoodCategory>) => {
 	const nonEmpty = entries.filter((e) => e.amount > 0);
 
 	if (nonEmpty.length > 0) {
@@ -27,8 +25,7 @@ export const getAverageCategoryIntake = (entries, foodCategories) => {
 	return null;
 };
 
-/** @param {Array<CalorieTracker>} entries */
-export const getAverageDailyIntake = (entries) => {
+export const getAverageDailyIntake = (entries: Array<CalorieTracker>): number => {
 	const nonEmpty = entries.filter((e) => e.amount > 0);
 
 	if (nonEmpty.length > 0) {
@@ -36,12 +33,12 @@ export const getAverageDailyIntake = (entries) => {
 
 		let sum = 0;
 
-		for (let day of days) {
+		days.forEach((day) => {
 			sum += entries
 				.filter((e) => e.added === day)
 				.map((e) => e.amount)
 				.reduce((a, b) => a + b);
-		}
+		})
 
 		return Math.round(sum / days.size);
 	}

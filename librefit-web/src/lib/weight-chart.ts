@@ -1,20 +1,19 @@
 import { format, sub } from 'date-fns';
 import { enGB } from 'date-fns/locale';
-import { DataViews } from '$lib/enum.js';
-import { getDateAsStr, parseStringAsDate } from '$lib/date.js';
+import { DataViews } from './enum';
+import { getDateAsStr, parseStringAsDate } from './date';
+import { WeightTracker } from './model';
 
-/**
- * @param {DataViews} view
- * @param {Date} start
- * @param {Array<WeightTracker>} entries
- */
-export const createWeightChart = (view, start, entries) => {
+export const createWeightChart = (view: DataViews, start: Date, entries: Array<WeightTracker>) => {
 	const legend = [];
 	const data = [];
 	const begin = 1;
-	let end;
-	let displayFormat;
-	let duration;
+	let end: number | Date;
+	let displayFormat: String;
+	let duration: {
+		months?: number,
+		days?: number
+	};
 	switch (view) {
 		case DataViews.Year:
 			end = 12;
@@ -77,10 +76,7 @@ export const createWeightChart = (view, start, entries) => {
 	return { legend, data };
 };
 
-/**
- * @param {any} weight
- */
-export const createWeightChartDataset = (weight) => {
+export const createWeightChartDataset = (weight: any) => {
 	const style = getComputedStyle(document.body);
 	const elemHtmlClasses = document.documentElement.classList;
 

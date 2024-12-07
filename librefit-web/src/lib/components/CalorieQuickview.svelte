@@ -5,10 +5,10 @@
     import TargetOff from '$lib/assets/icons/target-off.svg?component';
     import Wand from '$lib/assets/icons/wand.svg?component';
 
-    import {paintCalorieTrackerQuickview} from '$lib/quickview-chart.js';
+    import {paintCalorieTrackerQuickview} from '$lib/quickview-chart.ts';
     import {goto} from '$app/navigation';
     import {getModalStore} from '@skeletonlabs/skeleton';
-    import {observeToggle} from '$lib/theme-toggle.js';
+    import {observeToggle} from '$lib/theme-toggle.ts';
 
     /** @type Array<CalorieTracker> */
     export let calorieTracker;

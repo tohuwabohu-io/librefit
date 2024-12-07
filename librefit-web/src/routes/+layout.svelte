@@ -9,10 +9,10 @@
 	import { writable } from 'svelte/store';
 	import AvatarModal from '$lib/components/modal/AvatarModal.svelte';
 	import TosModal from '$lib/components/modal/TosModal.svelte';
-	import { Indicator } from '$lib/indicator.js';
+	import { Indicator } from '$lib/indicator.ts';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import CalorieTrackerModal from '$lib/components/modal/CalorieTrackerModal.svelte';
-	import { observeToggle } from '$lib/theme-toggle.js';
+	import { observeToggle } from '$lib/theme-toggle.ts';
 
 	initializeStores();
 

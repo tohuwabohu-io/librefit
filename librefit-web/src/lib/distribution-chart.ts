@@ -1,11 +1,7 @@
-import { getAverageCategoryIntake } from '$lib/calorie-util.js';
+import { getAverageCategoryIntake } from './calorie-util';
+import { CalorieTracker, FoodCategory } from './model';
 
-/**
- * @param {Array<CalorieTracker>} entries
- * @param {Array<FoodCategory>} foodCategories
- * @param {boolean} [displayHistory]
- */
-export const createDistributionChart = (entries, foodCategories, displayHistory) => {
+export const createDistributionChart = (entries: Array<CalorieTracker>, foodCategories: Array<FoodCategory>, displayHistory: boolean) => {
 	if (
 		!entries ||
 		(entries && entries.length <= 0) ||

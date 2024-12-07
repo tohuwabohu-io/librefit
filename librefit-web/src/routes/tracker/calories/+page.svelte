@@ -1,15 +1,21 @@
 <script>
-	import {Accordion, AccordionItem, getToastStore, Paginator} from '@skeletonlabs/skeleton';
+	import { Accordion, AccordionItem, getToastStore, Paginator } from '@skeletonlabs/skeleton';
 	import CalorieTracker from '$lib/components/tracker/CalorieTracker.svelte';
-	import {validateAmount} from '$lib/validation.js';
-	import {showToastError, showToastSuccess, showToastWarning} from '$lib/toast.js';
-	import {getContext} from 'svelte';
-	import {convertDateStrToDisplayDateStr, getDateAsStr, parseStringAsDate} from '$lib/date.js';
-	import {goto} from '$app/navigation';
+	import { validateAmount } from '$lib/validation.ts';
+	import { showToastError, showToastSuccess, showToastWarning } from '$lib/toast.ts';
+	import { getContext } from 'svelte';
+	import { convertDateStrToDisplayDateStr, getDateAsStr } from '$lib/date.ts';
+	import { goto } from '$app/navigation';
 	import FilterComponent from '$lib/components/FilterComponent.svelte';
-	import { addCalories, updateCalories, deleteCalories, listCaloriesForDate, listCalorieTrackerDatesRange} from '$lib/api/tracker.js';
+	import {
+		addCalories,
+		deleteCalories,
+		listCaloriesForDate,
+		listCalorieTrackerDatesRange,
+		updateCalories
+	} from '$lib/api/tracker.ts';
 	import FoodOff from '$lib/assets/icons/food-off.svg';
-	import {getFoodCategoryLongvalue} from '$lib/api/category.js';
+	import { getFoodCategoryLongvalue } from '$lib/api/category';
 	import CalorieDistribution from '$lib/components/CalorieDistribution.svelte';
 
 	let today = new Date();
