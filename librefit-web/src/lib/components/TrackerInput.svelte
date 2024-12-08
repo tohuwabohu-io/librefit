@@ -11,7 +11,8 @@
 
 	export let categories: Array<FoodCategory> | undefined = undefined;
 
-	export let category: FoodCategory = categories ? categories.filter(c => c.shortvalue === getDaytimeFoodCategory(new Date()))[0] : undefined;
+	export let category: string = categories ? 
+    categories.filter(c => c.shortvalue === getDaytimeFoodCategory(new Date()))[0].shortvalue : undefined;
 
 	export let unit: string;
 

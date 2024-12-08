@@ -19,8 +19,8 @@ describe('WeightTrackerModal.svelte component', () => {
 	it('should render a prefilled component and remove an entry', async () => {
 		const mockData = {
 			weightList: [
-				{ added: '2022-02-02', weight: 61, sequence: 1 },
-				{ added: '2022-02-02', weight: 60, sequence: 2 }
+				{ added: '2022-02-02', weight: 61, id: 1 },
+				{ added: '2022-02-02', weight: 60, id: 2 }
 			]
 		};
 
@@ -41,7 +41,7 @@ describe('WeightTrackerModal.svelte component', () => {
 			close: true,
 			detail: {
 				dateStr: '2022-02-02',
-				sequence: 2,
+				id: 2,
 				target: null,
 				callback: expect.any(Function)
 			}
@@ -59,8 +59,8 @@ describe('WeightTrackerModal.svelte component', () => {
 	it('should render a already filled component and update one entry', async () => {
 		const mockData = {
 			weightList: [
-				{ added: '2022-02-02', weight: 71, sequence: 1 },
-				{ added: '2022-02-02', weight: 70, sequence: 2 }
+				{ added: '2022-02-02', weight: 71, id: 1 },
+				{ added: '2022-02-02', weight: 70, id: 2 }
 			]
 		};
 
@@ -85,7 +85,7 @@ describe('WeightTrackerModal.svelte component', () => {
 			close: true,
 			detail: {
 				dateStr: '2022-02-02',
-				sequence: 2,
+				id: 2,
 				value: 75,
 				callback: expect.any(Function)
 			}

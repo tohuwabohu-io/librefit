@@ -43,7 +43,7 @@ describe('WeightTrackerComponent.svelte component', () => {
 		).toBeDefined();
 	});
 
-	it('renders an empty component correctly', () => {
+it('renders an empty component correctly', () => {
 		const { getByText } = render(WeightTrackerComponent);
 
 		expect(getByText('Nothing tracked for today. Now would be a good moment!')).toBeDefined();
@@ -107,9 +107,9 @@ describe('WeightTrackerComponent.svelte component', () => {
 		expect(dispatchMock).toHaveBeenCalledTimes(0);
 
 		const callbackDetails = {
+      id: 1,
 			dateStr: getDateAsStr(new Date()),
-			value: 71,
-			sequence: 2
+			value: 71
 		};
 
 		const callbackParams = {
@@ -148,7 +148,7 @@ describe('WeightTrackerComponent.svelte component', () => {
 
 		const callbackDetails = {
 			dateStr: getDateAsStr(new Date()),
-			sequence: 2
+			id: 2
 		};
 
 		const callbackParams = {

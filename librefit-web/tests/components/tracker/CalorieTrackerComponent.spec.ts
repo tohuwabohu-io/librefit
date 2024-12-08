@@ -186,7 +186,7 @@ describe('CalorieTrackerComponent.svelte component', () => {
 		const callbackDetails = {
 			dateStr: getDateAsStr(new Date()),
 			value: 100,
-			sequence: 2,
+			id: 2,
 			category: getDaytimeFoodCategory(new Date())
 		};
 
@@ -225,7 +225,7 @@ describe('CalorieTrackerComponent.svelte component', () => {
 
 		const callbackDetails = {
 			dateStr: getDateAsStr(new Date()),
-			sequence: 2
+			id: 2
 		};
 
 		const callbackParams = {

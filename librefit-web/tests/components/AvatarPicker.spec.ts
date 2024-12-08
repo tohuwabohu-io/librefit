@@ -2,7 +2,6 @@ import { fireEvent, screen, render } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 import AvatarPicker from '$lib/components/AvatarPicker.svelte';
 
-const getAvatar = (fileName) => `/assets/images/avatars/${fileName}`;
 const files = ['file1', 'file2', 'file3'];
 
 /**
@@ -25,11 +24,11 @@ describe('AvatarPicker.svelte', () => {
 
 		// loop through buttons with index
 		buttons.forEach((button, index) => {
-			fireEvent.click(buttons[index]);
+			fireEvent.click(button);
 
 			expect(chooseAvatarMock).toHaveBeenCalledTimes(index + 1);
 			expect(chosenFile).toEqual({
-				avatar: getAvatar(files[index])
+				avatar: files[index]
 			});
 		});
 	});

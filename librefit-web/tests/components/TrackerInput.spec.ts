@@ -52,17 +52,19 @@ describe('TrackerInput.svelte', () => {
 
 		expect(addEvent).toEqual({
 			callback: expect.any(Function),
-			value: 50
+			value: 50,
+			id: undefined,
+			category: undefined,
+			dateStr: mockData.dateStr
 		});
 	});
 
 	it('should render a blank component with categories and trigger add', async () => {
 		const mockData = {
 			categories: categories,
-			category: { shortvalue: 'd', longvalue: 'Dinner'}, // set here to avoid time based issues
+			category: 'b', // set here to avoid time based issues
 			unit: 'kcal',
 			value: '',
-			type: 'number',
 			dateStr: '2025-01-01'
 		};
 
@@ -104,7 +106,9 @@ describe('TrackerInput.svelte', () => {
 		expect(addEvent).toEqual({
 			callback: expect.any(Function),
 			category: 'd',
-			value: 100
+			value: 100,
+			id: undefined,
+			dateStr: mockData.dateStr
 		});
 	});
 
@@ -114,7 +118,7 @@ describe('TrackerInput.svelte', () => {
 			dateStr: '2022-02-02',
 			existing: false,
 			categories: categories,
-			category: { shortvalue: 'b', longvalue: 'Dinner'}, // set here to avoid time based issues
+			category: 'b', // set here to avoid time based issues
 			unit: 'kcal',
 			value: 500
 		};
@@ -133,7 +137,7 @@ describe('TrackerInput.svelte', () => {
 		// check values that can be set by the user
 		expect(unitDisplay).toBeDefined();
 		expect(amountInput['placeholder']).toEqual('Amount...');
-		expect(amountInput['value']).toBeFalsy();
+		expect(amountInput['value']).toBeTruthy();
 		expect(categoryCombobox['value']).toStrictEqual('b');
 
 		// check correct buttons being visible/invisible
@@ -158,7 +162,7 @@ describe('TrackerInput.svelte', () => {
 		expect(addEvent).toEqual({
 			callback: expect.any(Function),
 			dateStr: '2022-02-02',
-			sequence: 1,
+			id: 1,
 			category: 'd',
 			value: 100
 		});
@@ -169,7 +173,6 @@ describe('TrackerInput.svelte', () => {
 			value: 70,
 			unit: 'kg',
 			existing: true,
-			type: 'number',
 			dateStr: '2022-02-02'
 		};
 
@@ -211,7 +214,10 @@ describe('TrackerInput.svelte', () => {
 
 		expect(updateEvent).toEqual({
 			callback: expect.any(Function),
-			value: 100
+			value: 100,
+      category: undefined,
+      dateStr: "2022-02-02",
+      id: undefined
 		});
 
 		// after the update event finishes, confirm and discard should disappear
@@ -228,10 +234,9 @@ describe('TrackerInput.svelte', () => {
 			value: 870,
 			unit: 'kcal',
 			categories: categories,
-			category: { shortvalue: 'b', longvalue: 'Breakfast' }, // set here to avoid time based issues
+			category: 'b', // set here to avoid time based issues
 			existing: true,
 			dateStr: '2023-01-21',
-			type: 'number'
 		};
 
 		let updateEvent;
@@ -261,7 +266,7 @@ describe('TrackerInput.svelte', () => {
 
 		expect(updateMock).toHaveBeenCalledTimes(0);
 		expect(updateEvent).toBeUndefined();
-		expect(amountInput['value']).toEqual(mockData.value);
+		expect(+amountInput['value']).toEqual(mockData.value);
 
 		expect(screen.queryByRole('button', { name: 'edit' })).not.toBeNull();
 		expect(screen.queryByRole('button', { name: 'delete' })).not.toBeNull();
@@ -275,7 +280,6 @@ describe('TrackerInput.svelte', () => {
 			unit: 'kcal',
 			existing: true,
 			dateStr: '2023-01-21',
-			type: 'number'
 		};
 
 		const deleteMock = vi.fn();
@@ -311,7 +315,6 @@ describe('TrackerInput.svelte', () => {
 			value: 70,
 			unit: 'kg',
 			existing: true,
-			type: 'number',
 			dateStr: '2022-02-02'
 		};
 

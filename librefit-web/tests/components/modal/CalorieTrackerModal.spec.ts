@@ -19,15 +19,15 @@ describe('CalorieTrackerModal.svelte component', () => {
 	it('should render a pristine component and add an entry', async () => {
 		const mockData = {
 			categories: [
-				{ shortvalue: 'b', longvalue: 'Breakfast', visible: true },
-				{ shortvalue: 'l', longvalue: 'Lunch', visible: true },
-				{ shortvalue: 'd', longvalue: 'Dinner', visible: true }
+				{ shortvalue: 'b', longvalue: 'Breakfast'},
+				{ shortvalue: 'l', longvalue: 'Lunch' },
+				{ shortvalue: 'd', longvalue: 'Dinner'}
 			],
 			entries: [
 				{
 					// there must always be one entry prepended or otherwise the component won't have any controls
 					added: '2022-02-02',
-					sequence: undefined,
+					id: undefined,
 					category: 'l'
 				}
 			]
@@ -66,7 +66,7 @@ describe('CalorieTrackerModal.svelte component', () => {
 					value: 100,
 					category: 'd',
 					dateStr: '2022-02-02',
-					sequence: undefined,
+					id: undefined,
 					callback: expect.any(Function)
 				}
 			}
@@ -80,9 +80,9 @@ describe('CalorieTrackerModal.svelte component', () => {
 	 *  - callback type 'remove' must have been triggered once with data to remove
 	 */
 	it('should render a prefilled component and remove an entry', async () => {
-		const lunch = { added: '2022-02-02', amount: 500, sequence: 1, category: 'l' };
-		const dinner = { added: '2022-02-02', amount: 500, sequence: 2, category: 'd' };
-		const empty = { added: '2022-02-02', sequence: undefined, category: 'l' };
+		const lunch = { added: '2022-02-02', amount: 500, id: 1, category: 'l' };
+		const dinner = { added: '2022-02-02', amount: 500, id: 2, category: 'd' };
+		const empty = { added: '2022-02-02', id: undefined, category: 'l' };
 
 		let mockData = {
 			categories: [
@@ -115,7 +115,7 @@ describe('CalorieTrackerModal.svelte component', () => {
 				detail: {
 					callback: expect.any(Function),
 					dateStr: lunch.added,
-					sequence: lunch.sequence,
+					id: lunch.id,
 					target: null
 				}
 			}
@@ -129,8 +129,8 @@ describe('CalorieTrackerModal.svelte component', () => {
 	 *  - callback type 'update' must have been triggered once with data to update
 	 */
 	it('should render a prefilled component and update one entry', async () => {
-		const breakfast = { added: '2022-02-02', amount: 500, sequence: 1, category: 'b' };
-		const empty = { added: '2022-02-02', sequence: undefined, category: 'l' };
+		const breakfast = { added: '2022-02-02', amount: 500, id: 1, category: 'b' };
+		const empty = { added: '2022-02-02', id: undefined, category: 'l' };
 
 		const mockData = {
 			categories: [
@@ -161,7 +161,7 @@ describe('CalorieTrackerModal.svelte component', () => {
 				close: true,
 				detail: {
 					callback: expect.any(Function),
-					sequence: 1,
+					id: 1,
 					dateStr: '2022-02-02',
 					category: 'b',
 					value: 600

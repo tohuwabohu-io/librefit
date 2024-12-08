@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getAverageCategoryIntake, getAverageDailyIntake } from '../../src/lib/calorie-util';
-import { CalorieTracker, FoodCategory } from '../../src/lib/model';
+import { getAverageCategoryIntake, getAverageDailyIntake } from '$lib/calorie-util';
+import { CalorieTracker, FoodCategory } from '$lib/model';
 
 describe('getAverageCategoryIntake', () => {
 	it('should return a map of average daily intake per category', async () => {
@@ -19,9 +19,9 @@ describe('getAverageCategoryIntake', () => {
 		const result = getAverageCategoryIntake(entries, foodCategories);
 
 		// Verify the function returns correct value
-		expect(result.get('fruit')).toBe(75);
-		expect(result.get('vegetables')).toBe(100);
-		expect(result.get('dairy')).toBe(75);
+		expect(result.get('f')).toBe(75);
+		expect(result.get('v')).toBe(100);
+		expect(result.get('d')).toBe(75);
 	});
 
 	it('should return null if no entries', () => {

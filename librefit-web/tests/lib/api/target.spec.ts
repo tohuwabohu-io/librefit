@@ -1,45 +1,51 @@
-import { assert, describe, expect, it, vi } from 'vitest';
-import { CalorieTarget, NewCalorieTarget, NewWeightTarget, WeightTarget } from '../../../src/lib/model';
-import { createCalorieTarget, createWeightTarget } from '../../../src/lib/api/target';
+import { assert, beforeAll, describe, expect, it, vi } from 'vitest';
+import type { CalorieTarget, NewCalorieTarget, NewWeightTarget, WeightTarget } from '$lib/model';
+import { createCalorieTarget, createWeightTarget } from '$lib/api/target';
 import {
 	validateCalorieTarget,
 	validateEndDate,
 	validateTargetAmount,
 	validateWeightTarget
-} from '../../../src/lib/validation';
+} from '$lib/validation';
+import { mockIPC } from '@tauri-apps/api/mocks';
+import { invoke } from '@tauri-apps/api/core';
+import { randomFillSync } from 'crypto';
 
+const mockCalorieTarget: NewCalorieTarget = {
+	added: '2022-08-12',
+	targetCalories: 2000,
+	maximumCalories: 2500,
+	startDate: '2025-01-01',
+	endDate: '2025-12-31'
+};
+
+// mocking successful API call response
+const mockApiResponseOk = new Response(
+	new Blob([JSON.stringify(mockCalorieTarget)], { type: 'application/json' })
+);
+
+beforeAll(() => {
+  Object.defineProperty(window, 'crypto', {
+    value: {
+      getRandomValues: (buffer) => {
+        return randomFillSync(buffer);
+      }
+    }
+  })
+});
+
+/**
+ * @vitest-environment jsdom
+ */
 describe('createTarget functions', () => {
 	it('createCalorieTarget should make API call and handle responses correctly', async () => {
-		const mockCalorieTarget: NewCalorieTarget = {
-			added: '2022-08-12',
-			targetCalories: 2000,
-			maximumCalories: 2500,
-			startDate: '2025-01-01',
-			endDate: '2025-12-31'
-		};
-
-		// mocking successful API call response
-		const mockApiResponseOk = new Response(
-			new Blob([JSON.stringify(mockCalorieTarget)], { type: 'application/json' })
-		);
-
-		// mocking unsuccessful API call response
-		const mockApiResponseNotOk = new Response(null, { status: 400 });
-
 		// testing successful API call
-		global.fetch = vi.fn().mockResolvedValueOnce(mockApiResponseOk);
+		mockIPC((cmd, args) => {
+      return mockCalorieTarget;
+    });
+
 		const result = await createCalorieTarget(mockCalorieTarget);
-
 		expect(result).toEqual(mockCalorieTarget);
-
-		// testing unsuccessful API call
-		global.fetch = vi.fn().mockResolvedValueOnce(mockApiResponseNotOk);
-
-		try {
-			await createCalorieTarget(mockCalorieTarget);
-		} catch (error) {
-			assert.strictEqual(error, mockApiResponseNotOk);
-		}
 	});
 
 	it('createWeightTarget should make API call and handle responses correctly', async () => {
@@ -51,22 +57,13 @@ describe('createTarget functions', () => {
 			endDate: '2025-12-31'
 		};
 
-		// mocking successful API call response
-		const mockApiResponseOk = new Response(
-			new Blob([JSON.stringify(mockWeightTarget)], { type: 'application/json' })
-		);
+    // testing successful API call
+    mockIPC((cmd, args) => {
+      return mockWeightTarget;
+    });
 
-		// mocking unsuccessful API call response
-		const mockApiResponseNotOk = new Response(null, { status: 400 });
-
-		// testing successful API call
-		global.fetch = vi.fn().mockResolvedValueOnce(mockApiResponseOk);
 		const result = await createWeightTarget(mockWeightTarget);
-
 		expect(result).toEqual(mockWeightTarget);
-
-		// testing unsuccessful API call
-		global.fetch = vi.fn().mockResolvedValueOnce(mockApiResponseNotOk);
 
 		try {
 			await createWeightTarget(mockWeightTarget);
