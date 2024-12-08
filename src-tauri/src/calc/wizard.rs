@@ -1,8 +1,7 @@
-use crate::crud::db::model::{CalorieTarget, NewCalorieTarget, NewWeightTarget, NewWeightTracker, WeightTarget, WeightTracker};
+use crate::crud::db::model::{NewCalorieTarget, NewWeightTarget, NewWeightTracker};
 use chrono::{Duration, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::ops::RangeInclusive;
 use validator::{Validate, ValidationError};
 
 #[derive(Serialize, Deserialize, Debug)]
