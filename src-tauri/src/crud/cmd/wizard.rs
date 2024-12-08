@@ -1,5 +1,7 @@
 use crate::calc;
-use crate::calc::wizard::{Wizard, WizardInput, WizardResult};
+use crate::calc::wizard::{Wizard, WizardInput, WizardResult, 
+    WizardTargetDateInput, WizardTargetDateResult,
+    WizardTargetWeightInput, WizardTargetWeightResult};
 use crate::crud::db;
 use crate::crud::db::connection::create_db_connection;
 use diesel::Connection;
@@ -30,4 +32,26 @@ pub fn wizard_create_targets(input: Wizard) -> Result<(), String> {
 
         Ok(())
     }).map_err(handle_error)
+}
+
+#[command]
+pub fn wizard_calculate_for_target_date(input: WizardTargetDateInput) -> Result<WizardTargetDateResult, String> {
+    log::info!(">>> wizard_calculate_for_target_date: {:?}", input);
+    
+    let wizard_result = calc::wizard::calculate_for_target_date(&input);
+    
+    log::info!(">>> result={:?}", wizard_result);
+    
+    Ok(wizard_result)
+}
+
+#[command]
+pub fn wizard_calculate_for_target_weight(input: WizardTargetWeightInput) -> Result<WizardTargetWeightResult, String> {
+    log::info!(">>> wizard_calculate_for_target_weight {:?}", input);
+
+    let wizard_result = calc::wizard::calculate_for_target_weight(&input);
+
+    log::info!(">>> result={:?}", wizard_result);
+
+    Ok(wizard_result)
 }
