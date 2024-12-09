@@ -92,7 +92,7 @@ pub struct WizardTargetWeightInput {
 #[serde(rename_all = "camelCase")]
 pub struct WizardTargetWeightResult {
     #[serde(deserialize_with = "crate::crud::serde::date::deserialize")]
-    date_per_rate: HashMap<i32, String>,
+    date_by_rate: HashMap<i32, String>,
     target_classification: BmiCategory,
     warning: bool,
     message: String,
@@ -320,19 +320,19 @@ pub fn calculate_for_target_weight(input: &WizardTargetWeightInput) -> WizardTar
         }
     }
 
-    let mut date_per_rate = HashMap::new();
+    let mut date_by_rate = HashMap::new();
 
     if message.is_empty() {
         let rates = vec![100, 200, 300, 400, 500, 600, 700];
         for rate in rates {
             let days = (difference * 7000.0 / rate as f32).round() as i64;
             let date = NaiveDate::parse_from_str(&input.start_date, "%Y-%m-%d").unwrap();
-            date_per_rate.insert(rate, (date + Duration::days(days)).to_string());
+            date_by_rate.insert(rate, (date + Duration::days(days)).to_string());
         }
     }
 
     let result = WizardTargetWeightResult {
-        date_per_rate,
+        date_by_rate,
         target_classification,
         warning,
         message,

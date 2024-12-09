@@ -41,15 +41,12 @@ export const calculateForTargetDate = async (wizardTargetDateInput: WizardTarget
 	});
 };
 
-export const calculateForTargetWeight = async (wizardTargetDateInput: WizardTargetWeightInput): Promise<WizardTargetWeightResult> => {
-  wizardTargetDateInput.targetWeight = +wizardTargetDateInput.targetWeight;
-  wizardTargetDateInput.startDate = "2024-12-31";
-
-  console.log(wizardTargetDateInput);
-  console.log(JSON.stringify(wizardTargetDateInput));
+export const calculateForTargetWeight = async (wizardTargetWeightInput: WizardTargetWeightInput): Promise<WizardTargetWeightResult> => {
+  wizardTargetWeightInput.targetWeight = +wizardTargetWeightInput.targetWeight;
+  wizardTargetWeightInput.startDate = "2024-12-31";
 
 	return invoke('wizard_calculate_for_target_weight', {
-		input: wizardTargetDateInput
+		input: wizardTargetWeightnput
 	});
 };
 
@@ -76,7 +73,7 @@ export const createTargetWeightTargets = (
 		const calorieTarget: NewCalorieTarget = {
 			added: todayStr,
 			startDate: getDateAsStr(startDate),
-			endDate: customWizardResult.resultByRate[rate],
+			endDate: customWizardResult.dateByRate[rate],
 			targetCalories: wizardResult.tdee + multiplier * parseFloat(rate),
 			maximumCalories: wizardResult.tdee
 		};
@@ -84,7 +81,7 @@ export const createTargetWeightTargets = (
 		const weightTarget: NewWeightTarget = {
 			added: todayStr,
 			startDate: getDateAsStr(startDate),
-			endDate: customWizardResult.resultByRate[rate],
+			endDate: customWizardResult.dateByRate[rate],
 			initialWeight: wizardInput.weight,
 			targetWeight: targetWeight
 		};
