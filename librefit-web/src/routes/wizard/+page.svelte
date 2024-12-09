@@ -64,7 +64,7 @@
             await calculateForTargetDate({
                 age: calculationInput.age,
                 height: calculationInput.height,
-                weight: calculationInput.weight,
+                currentWeight: calculationInput.weight,
                 sex: calculationInput.sex,
                 targetDate: wizardDetails.targetDate,
                 calculationGoal: calculationInput.calculationGoal
@@ -92,7 +92,7 @@
             await calculateForTargetWeight({
                 age: calculationInput.age,
                 height: calculationInput.height,
-                weight: calculationInput.weight,
+                currentWeight: calculationInput.weight,
                 sex: calculationInput.sex,
                 targetWeight: wizardDetails.targetWeight
             }).then(/** @type WizardTargetWeightResult */ customWizardResult => {

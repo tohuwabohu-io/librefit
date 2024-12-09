@@ -42,6 +42,12 @@ export const calculateForTargetDate = async (wizardTargetDateInput: WizardTarget
 };
 
 export const calculateForTargetWeight = async (wizardTargetDateInput: WizardTargetWeightInput): Promise<WizardTargetWeightResult> => {
+  wizardTargetDateInput.targetWeight = +wizardTargetDateInput.targetWeight;
+  wizardTargetDateInput.startDate = "2024-12-31";
+
+  console.log(wizardTargetDateInput);
+  console.log(JSON.stringify(wizardTargetDateInput));
+
 	return invoke('wizard_calculate_for_target_weight', {
 		input: wizardTargetDateInput
 	});
@@ -62,7 +68,7 @@ export const createTargetWeightTargets = (
 	startDate: Date,
 	targetWeight: number
 ): Map<string, { calorieTarget: CalorieTarget; weightTarget: WeightTarget }> => {
-	const rates = Object.keys(customWizardResult.datePerRate);
+	const rates = Object.keys(customWizardResult.resultByRate);
 	const multiplier = targetWeight < wizardInput.weight ? -1 : 1;
 	const todayStr = getDateAsStr(new Date());
 
@@ -70,7 +76,7 @@ export const createTargetWeightTargets = (
 		const calorieTarget: NewCalorieTarget = {
 			added: todayStr,
 			startDate: getDateAsStr(startDate),
-			endDate: customWizardResult.datePerRate[rate],
+			endDate: customWizardResult.resultByRate[rate],
 			targetCalories: wizardResult.tdee + multiplier * parseFloat(rate),
 			maximumCalories: wizardResult.tdee
 		};
@@ -78,7 +84,7 @@ export const createTargetWeightTargets = (
 		const weightTarget: NewWeightTarget = {
 			added: todayStr,
 			startDate: getDateAsStr(startDate),
-			endDate: customWizardResult.datePerRate[rate],
+			endDate: customWizardResult.resultByRate[rate],
 			initialWeight: wizardInput.weight,
 			targetWeight: targetWeight
 		};
@@ -96,12 +102,14 @@ export const createTargetDateTargets = (
 	startDate: Date,
 	endDateStr: string
 ): Map<string, { calorieTarget: CalorieTarget; weightTarget: WeightTarget }> => {
-	const rates = Object.keys(customWizardResult.datePerRate);
+  console.log(customWizardResult);
+
+	const rates = Object.keys(customWizardResult.resultByRate);
 	const multiplier = wizardInput.calculationGoal === CalculationGoal.Loss ? -1 : 1;
 	const todayStr = getDateAsStr(new Date());
 
 	return rates.reduce((acc, rate) => {
-		const rateWizardResult = customWizardResult.datePerRate[rate] as WizardResult;
+		const rateWizardResult = customWizardResult.resultByRate[rate] as WizardResult;
 
 		const calorieTarget: NewCalorieTarget = {
 			added: todayStr,
@@ -119,7 +127,7 @@ export const createTargetDateTargets = (
 			targetWeight: rateWizardResult.targetWeight
 		};
 
-		acc.set(rate, { calorieTarget, weightTarget });
+    acc.set(rate, { calorieTarget, weightTarget });
 
 		return acc;
 	}, new Map());

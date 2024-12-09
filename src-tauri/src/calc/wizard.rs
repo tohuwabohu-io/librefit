@@ -85,8 +85,7 @@ pub struct WizardTargetWeightInput {
     current_weight: f32,
     height: f32,
     target_weight: f32,
-    #[serde(deserialize_with = "crate::crud::serde::date::deserialize")]
-    start_date: NaiveDate,
+    start_date: String,
 }
 
 #[derive(Serialize, Debug)]
@@ -107,11 +106,11 @@ pub struct WizardTargetDateInput {
     current_weight: f32,
     height: f32,
     calculation_goal: CalculationGoal,
-    #[serde(deserialize_with = "crate::crud::serde::date::deserialize")]
-    target_date: NaiveDate,
+    target_date: String
 }
 
 #[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct WizardTargetDateResult {
     result_by_rate: HashMap<i32, WizardResult>,
 }
@@ -213,8 +212,9 @@ pub fn calculate(wizard_input: WizardInput) -> WizardResult {
 
 pub fn calculate_for_target_date(input: &WizardTargetDateInput) -> WizardTargetDateResult {
     let today = Utc::now().date_naive();
+    let target_naive_date = NaiveDate::parse_from_str(&input.target_date, "%Y-%m-%d").unwrap();
 
-    let days_between = (input.target_date - today).num_days() as i32;
+    let days_between = (target_naive_date - today).num_days() as i32;
 
     let current_bmi = calculate_bmi(&input.current_weight, &input.height);
     let current_classification = calculate_bmi_category(&input.sex, &current_bmi);
@@ -326,7 +326,8 @@ pub fn calculate_for_target_weight(input: &WizardTargetWeightInput) -> WizardTar
         let rates = vec![100, 200, 300, 400, 500, 600, 700];
         for rate in rates {
             let days = (difference * 7000.0 / rate as f32).round() as i64;
-            date_per_rate.insert(rate, (input.start_date + Duration::days(days)).to_string());
+            let date = NaiveDate::parse_from_str(&input.start_date, "%Y-%m-%d").unwrap();
+            date_per_rate.insert(rate, (date + Duration::days(days)).to_string());
         }
     }
 

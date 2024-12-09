@@ -52,7 +52,7 @@ export interface CalorieTracker {
 export interface WeightTracker {
 	id: number;
 	added: string;
-	amount: number;
+  amount: number;
 }
 
 export interface FoodCategory {
@@ -172,7 +172,7 @@ export interface WizardTargetDateInput {
 }
 
 export interface WizardTargetDateResult {
-	datePerRate: Object;
+	resultByRate: Object;
 	targetClassification: BmiCategory;
 	warning: boolean;
 	message: string;
