@@ -9,12 +9,14 @@ use crate::crud::cmd::weight::{
     create_weight_target, create_weight_tracker_entry, delete_weight_tracker_entry,
     get_weight_tracker_for_date_range, update_weight_tracker_entry,
 };
-use crate::crud::cmd::wizard::{wizard_calculate_tdee, wizard_create_targets, 
-    wizard_calculate_for_target_date, wizard_calculate_for_target_weight
+use crate::crud::cmd::wizard::{
+    wizard_calculate_for_target_date, wizard_calculate_for_target_weight, wizard_calculate_tdee,
+    wizard_create_targets,
 };
 
 pub mod calc;
 pub mod crud;
+pub mod test;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
