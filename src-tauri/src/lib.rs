@@ -1,3 +1,8 @@
+#[macro_use]
+extern crate rust_i18n;
+
+i18n!("locales", fallback = "en");
+
 use crate::crud::cmd::calorie::{
     create_calorie_target, create_calorie_tracker_entry, delete_calorie_tracker_entry,
     get_calorie_tracker_dates_in_range, get_calorie_tracker_for_date_range,
@@ -16,6 +21,7 @@ use crate::crud::cmd::wizard::{
 
 pub mod calc;
 pub mod crud;
+pub mod i18n;
 pub mod test;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

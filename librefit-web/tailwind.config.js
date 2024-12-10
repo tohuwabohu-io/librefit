@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { skeleton } from '@skeletonlabs/tw-plugin';
-import { librefitTheme } from './src/librefit-theme.ts';
+import { librefitTheme } from './src/librefit-theme.js';
 
 /** @type {import('tailwindcss').Config} */
 const config = {

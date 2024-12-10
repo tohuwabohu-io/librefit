@@ -9,16 +9,17 @@ use crud::db;
 use crud::db::connection::create_db_connection;
 use diesel::Connection;
 use tauri::command;
+use validator::ValidationErrors;
 
 #[command]
-pub fn wizard_calculate_tdee(input: WizardInput) -> Result<WizardResult, String> {
+pub fn wizard_calculate_tdee(input: WizardInput) -> Result<WizardResult, ValidationErrors> {
     log::info!(">>> wizard_calculate_tdee: {:?}", input);
 
     let wizard_result = calc::wizard::calculate(input);
 
     log::info!(">>> result={:?}", wizard_result);
 
-    Ok(wizard_result)
+    wizard_result
 }
 
 #[command]
@@ -41,25 +42,25 @@ pub fn wizard_create_targets(input: Wizard) -> Result<(), String> {
 #[command]
 pub fn wizard_calculate_for_target_date(
     input: WizardTargetDateInput,
-) -> Result<WizardTargetDateResult, String> {
+) -> Result<WizardTargetDateResult, ValidationErrors> {
     log::info!(">>> wizard_calculate_for_target_date: {:?}", input);
 
     let wizard_result = calc::wizard::calculate_for_target_date(&input);
 
     log::info!(">>> result={:?}", wizard_result);
 
-    Ok(wizard_result)
+    return wizard_result;
 }
 
 #[command]
 pub fn wizard_calculate_for_target_weight(
     input: WizardTargetWeightInput,
-) -> Result<WizardTargetWeightResult, String> {
+) -> Result<WizardTargetWeightResult, ValidationErrors> {
     log::info!(">>> wizard_calculate_for_target_weight {:?}", input);
 
     let wizard_result = calc::wizard::calculate_for_target_weight(&input);
 
     log::info!(">>> result={:?}", wizard_result);
 
-    Ok(wizard_result)
+    return wizard_result;
 }

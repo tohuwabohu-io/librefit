@@ -1,8 +1,9 @@
 use crate::crud::db::model::{NewCalorieTarget, NewWeightTarget, NewWeightTracker};
+use crate::i18n::localize;
 use chrono::{Duration, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use validator::{Validate, ValidationError};
+use validator::{Validate, ValidationError, ValidationErrors};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -15,16 +16,19 @@ pub struct Wizard {
 #[derive(Validate, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct WizardInput {
-    #[validate(range(min = 18, max = 99))]
+    #[validate(range(min = 18, max = 99, code = "validation.wizard.age"))]
     pub age: i32,
     pub sex: CalculationSex,
-    #[validate(range(min = 30f32, max = 300f32))]
+    #[validate(range(min = 30.0, max = 300.0, code = "validation.wizard.weight"))]
     pub weight: f32,
-    #[validate(range(min = 100f32, max = 300f32))]
+    #[validate(range(min = 100.0, max = 220.0, code = "validation.wizard.height"))]
     pub height: f32,
-    #[validate(custom(function = "validate_activity_level"))]
+    #[validate(custom(
+        function = "validate_activity_level",
+        code = "validation.wizard.activity_level"
+    ))]
     pub activity_level: f32,
-    #[validate(range(min = 0, max = 7))]
+    #[validate(range(min = 0, max = 7, code = "validation.wizard.weekly_difference"))]
     pub weekly_difference: i32,
     pub calculation_goal: CalculationGoal,
 }
@@ -73,13 +77,17 @@ impl WizardResult {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Validate, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct WizardTargetWeightInput {
+    #[validate(range(min = 18, max = 99, code = "validation.wizard.age"))]
     pub age: i32,
     pub sex: CalculationSex,
+    #[validate(range(min = 30.0, max = 300.0, code = "validation.wizard.weight"))]
     pub current_weight: f32,
+    #[validate(range(min = 100.0, max = 220.0, code = "validation.wizard.height"))]
     pub height: f32,
+    #[validate(range(min = 30.0, max = 3000.0, message = "validation.wizard.weight"))]
     pub target_weight: f32,
     pub start_date: String,
 }
@@ -94,12 +102,15 @@ pub struct WizardTargetWeightResult {
     pub message: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Validate, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct WizardTargetDateInput {
+    #[validate(range(min = 18, max = 99, code = "validation.wizard.age"))]
     pub age: i32,
     pub sex: CalculationSex,
+    #[validate(range(min = 30.0, max = 300.0, code = "validation.wizard.weight"))]
     pub current_weight: f32,
+    #[validate(range(min = 100.0, max = 220.0, code = "validation.wizard.height"))]
     pub height: f32,
     pub calculation_goal: CalculationGoal,
     pub target_date: String,
@@ -145,6 +156,10 @@ pub struct ErrorDescription {
     message: String,
 }
 
+fn validate(input: &dyn Validate) -> Result<(), ValidationErrors> {
+    input.validate()
+}
+
 fn validate_activity_level(activity_level: f32) -> Result<(), ValidationError> {
     match activity_level {
         1f32 | 1.25f32 | 1.5f32 | 1.75f32 | 2f32 => Ok(()),
@@ -152,200 +167,221 @@ fn validate_activity_level(activity_level: f32) -> Result<(), ValidationError> {
     }
 }
 
-pub fn calculate(wizard_input: WizardInput) -> WizardResult {
-    let target_bmi_range = calculate_target_bmi(&wizard_input.age);
+pub fn calculate(wizard_input: WizardInput) -> Result<WizardResult, ValidationErrors> {
+    match validate(&wizard_input) {
+        Err(e) => Err(localize::localize_validation_errors(&e)),
+        Ok(_) => {
+            let target_bmi_range = calculate_target_bmi(&wizard_input.age);
 
-    let bmr = calculate_bmr(
-        &wizard_input.sex,
-        &wizard_input.weight,
-        &wizard_input.height,
-        &wizard_input.age,
-    );
+            let bmr = calculate_bmr(
+                &wizard_input.sex,
+                &wizard_input.weight,
+                &wizard_input.height,
+                &wizard_input.age,
+            );
 
-    let tdee = calculate_tdee(&wizard_input.activity_level, &bmr);
-    let deficit = calculate_deficit(&wizard_input.weekly_difference);
-    let target = calculate_target(&wizard_input.calculation_goal, &tdee, &deficit);
+            let tdee = calculate_tdee(&wizard_input.activity_level, &bmr);
+            let deficit = calculate_deficit(&wizard_input.weekly_difference);
+            let target = calculate_target(&wizard_input.calculation_goal, &tdee, &deficit);
 
-    let bmi = calculate_bmi(&wizard_input.weight, &wizard_input.height);
-    let bmi_category = calculate_bmi_category(&wizard_input.sex, &bmi);
+            let bmi = calculate_bmi(&wizard_input.weight, &wizard_input.height);
+            let bmi_category = calculate_bmi_category(&wizard_input.sex, &bmi);
 
-    let target_bmi_lower = target_bmi_range.start().clone();
-    let target_bmi_upper = target_bmi_range.end().clone();
-    let target_bmi = (target_bmi_upper + target_bmi_lower) / 2;
+            let target_bmi_lower = target_bmi_range.start().clone();
+            let target_bmi_upper = target_bmi_range.end().clone();
+            let target_bmi = (target_bmi_upper + target_bmi_lower) / 2;
 
-    let target_weight = calculate_target_weight(&target_bmi_range, &wizard_input.height);
-    let target_weight_lower =
-        calculate_target_weight_lower(&target_bmi_range, &wizard_input.height);
-    let target_weight_upper =
-        calculate_target_weight_upper(&target_bmi_range, &wizard_input.height);
+            let target_weight = calculate_target_weight(&target_bmi_range, &wizard_input.height);
+            let target_weight_lower =
+                calculate_target_weight_lower(&target_bmi_range, &wizard_input.height);
+            let target_weight_upper =
+                calculate_target_weight_upper(&target_bmi_range, &wizard_input.height);
 
-    let recommendation = calculate_recommendation(&bmi_category);
+            let recommendation = calculate_recommendation(&bmi_category);
 
-    let mut wizard_result = WizardResult {
-        bmr,
-        tdee,
-        deficit,
-        target,
-        bmi,
-        bmi_category,
-        recommendation,
-        target_bmi,
-        target_bmi_upper,
-        target_bmi_lower,
-        target_weight,
-        target_weight_upper,
-        target_weight_lower,
-        duration_days: 0,
-        duration_days_upper: 0,
-        duration_days_lower: 0,
-    };
+            let mut wizard_result = WizardResult {
+                bmr,
+                tdee,
+                deficit,
+                target,
+                bmi,
+                bmi_category,
+                recommendation,
+                target_bmi,
+                target_bmi_upper,
+                target_bmi_lower,
+                target_weight,
+                target_weight_upper,
+                target_weight_lower,
+                duration_days: 0,
+                duration_days_upper: 0,
+                duration_days_lower: 0,
+            };
 
-    calculate_duration_days_total(&wizard_input, &mut wizard_result);
+            calculate_duration_days_total(&wizard_input, &mut wizard_result);
 
-    wizard_result
+            Ok(wizard_result)
+        }
+    }
 }
 
-pub fn calculate_for_target_date(input: &WizardTargetDateInput) -> WizardTargetDateResult {
-    let today = Utc::now().date_naive();
-    let target_naive_date = NaiveDate::parse_from_str(&input.target_date, "%Y-%m-%d").unwrap();
+pub fn calculate_for_target_date(
+    input: &WizardTargetDateInput,
+) -> Result<WizardTargetDateResult, ValidationErrors> {
+    match input.validate() {
+        Err(e) => Err(localize::localize_validation_errors(&e)),
+        Ok(_) => {
+            let today = Utc::now().date_naive();
+            let target_naive_date =
+                NaiveDate::parse_from_str(&input.target_date, "%Y-%m-%d").unwrap();
 
-    let days_between = (target_naive_date - today).num_days() as i32;
+            let days_between = (target_naive_date - today).num_days() as i32;
 
-    let current_bmi = calculate_bmi(&input.current_weight, &input.height);
-    let current_classification = calculate_bmi_category(&input.sex, &current_bmi);
+            let current_bmi = calculate_bmi(&input.current_weight, &input.height);
+            let current_classification = calculate_bmi_category(&input.sex, &current_bmi);
 
-    let rates: Vec<i32> = vec![100, 200, 300, 400, 500, 600, 700];
-    let multiplier = if matches!(input.calculation_goal, CalculationGoal::LOSS) {
-        -1
-    } else {
-        1
-    };
-    let obese_list = vec![BmiCategory::OBESE, BmiCategory::SEVERELY_OBESE];
+            let rates: Vec<i32> = vec![100, 200, 300, 400, 500, 600, 700];
+            let multiplier = if matches!(input.calculation_goal, CalculationGoal::LOSS) {
+                -1
+            } else {
+                1
+            };
 
-    let mut result_by_rate: HashMap<i32, WizardResult> = rates
-        .into_iter()
-        .filter_map(|rate| {
-            let weight =
-                input.current_weight + ((multiplier * days_between * rate) as f32) / 7000.0;
+            let obese_list = vec![BmiCategory::OBESE, BmiCategory::SEVERELY_OBESE];
 
-            let result_bmi = calculate_bmi(&weight, &input.height);
-            let result_bmi_category = calculate_bmi_category(&input.sex, &result_bmi);
+            let mut result_by_rate: HashMap<i32, WizardResult> = rates
+                .into_iter()
+                .filter_map(|rate| {
+                    let weight =
+                        input.current_weight + ((multiplier * days_between * rate) as f32) / 7000.0;
 
-            let result = WizardResult::specific(&result_bmi, result_bmi_category.clone(), &weight);
+                    let result_bmi = calculate_bmi(&weight, &input.height);
+                    let result_bmi_category = calculate_bmi_category(&input.sex, &result_bmi);
 
-            match input.calculation_goal {
-                CalculationGoal::LOSS => {
-                    if result_bmi_category != BmiCategory::UNDERWEIGHT {
-                        Some((rate, result))
-                    } else {
-                        None
+                    let result =
+                        WizardResult::specific(&result_bmi, result_bmi_category.clone(), &weight);
+
+                    match input.calculation_goal {
+                        CalculationGoal::LOSS => {
+                            if result_bmi_category != BmiCategory::UNDERWEIGHT {
+                                Some((rate, result))
+                            } else {
+                                None
+                            }
+                        }
+                        _ => {
+                            if !obese_list.contains(&result_bmi_category)
+                                || obese_list.contains(&current_classification)
+                            {
+                                Some((rate, result))
+                            } else {
+                                None
+                            }
+                        }
                     }
+                })
+                .collect();
+
+            // calculate a custom rate to present at least one viable result
+            if result_by_rate.is_empty() {
+                let target_bmi = calculate_target_bmi(&input.age);
+                let target_weight = calculate_target_weight(&target_bmi, &input.height);
+
+                let difference = match input.calculation_goal {
+                    CalculationGoal::GAIN => target_weight - input.current_weight,
+                    CalculationGoal::LOSS => input.current_weight - target_weight,
                 }
-                _ => {
-                    if !obese_list.contains(&result_bmi_category)
-                        || obese_list.contains(&current_classification)
-                    {
-                        Some((rate, result))
-                    } else {
-                        None
-                    }
-                }
+                .round() as i32;
+
+                let rate = (difference as f32 * 7000.0 / (days_between as f32)).round() as i32;
+
+                let result_bmi = calculate_bmi(&target_weight, &input.height);
+                let result_bmi_category = calculate_bmi_category(&input.sex, &result_bmi);
+
+                let result = WizardResult::specific(
+                    &result_bmi,
+                    result_bmi_category.clone(),
+                    &target_weight,
+                );
+
+                result_by_rate.insert(rate, result);
             }
-        })
-        .collect();
 
-    // calculate a custom rate to present at least one viable result
-    if result_by_rate.is_empty() {
-        let target_bmi = calculate_target_bmi(&input.age);
-        let target_weight = calculate_target_weight(&target_bmi, &input.height);
-
-        let difference = match input.calculation_goal {
-            CalculationGoal::GAIN => target_weight - input.current_weight,
-            CalculationGoal::LOSS => input.current_weight - target_weight,
+            Ok(WizardTargetDateResult { result_by_rate })
         }
-        .round() as i32;
-
-        let rate = (difference as f32 * 7000.0 / (days_between as f32)).round() as i32;
-
-        let result_bmi = calculate_bmi(&target_weight, &input.height);
-        let result_bmi_category = calculate_bmi_category(&input.sex, &result_bmi);
-
-        let result =
-            WizardResult::specific(&result_bmi, result_bmi_category.clone(), &target_weight);
-
-        result_by_rate.insert(rate, result);
     }
-
-    WizardTargetDateResult { result_by_rate }
 }
 
-pub fn calculate_for_target_weight(input: &WizardTargetWeightInput) -> WizardTargetWeightResult {
-    let current_bmi = calculate_bmi(&input.current_weight, &input.height);
-    let target_bmi = calculate_bmi(&input.target_weight, &input.height);
+pub fn calculate_for_target_weight(
+    input: &WizardTargetWeightInput,
+) -> Result<WizardTargetWeightResult, ValidationErrors> {
+    match input.validate() {
+        Err(e) => Err(localize::localize_validation_errors(&e)),
+        Ok(_) => {
+            let current_bmi = calculate_bmi(&input.current_weight, &input.height);
+            let target_bmi = calculate_bmi(&input.target_weight, &input.height);
 
-    let current_classification = calculate_bmi_category(&input.sex, &current_bmi);
-    let target_classification = calculate_bmi_category(&input.sex, &target_bmi);
+            let current_classification = calculate_bmi_category(&input.sex, &current_bmi);
+            let target_classification = calculate_bmi_category(&input.sex, &target_bmi);
 
-    let difference = if input.target_weight > input.current_weight {
-        input.target_weight - input.current_weight
-    } else {
-        input.current_weight - input.target_weight
-    };
-
-    let warning = matches!(
-        target_classification,
-        BmiCategory::UNDERWEIGHT | BmiCategory::OBESE | BmiCategory::SEVERELY_OBESE
-    );
-    let mut message = String::new();
-
-    if let BmiCategory::UNDERWEIGHT = target_classification {
-        if input.target_weight < input.current_weight {
-            if current_classification == BmiCategory::UNDERWEIGHT {
-                message =
-                    "Your target weight is even lower than your current weight...".to_string();
+            let difference = if input.target_weight > input.current_weight {
+                input.target_weight - input.current_weight
             } else {
-                message = "Your target weight will classify you as underweight...".to_string();
+                input.current_weight - input.target_weight
+            };
+
+            let warning = matches!(
+                target_classification,
+                BmiCategory::UNDERWEIGHT | BmiCategory::OBESE | BmiCategory::SEVERELY_OBESE
+            );
+
+            let mut message = String::new();
+
+            if let BmiCategory::UNDERWEIGHT = target_classification {
+                if input.target_weight < input.current_weight {
+                    if current_classification == BmiCategory::UNDERWEIGHT {
+                        message = "wizard.warning.underweight".to_string();
+                    } else {
+                        message = "wizard.classification.underweight".to_string();
+                    }
+                }
+            } else if let BmiCategory::OBESE = target_classification {
+                if input.target_weight > input.current_weight {
+                    if current_classification == BmiCategory::OBESE {
+                        message = "wizard.warning.obese".to_string();
+                    } else {
+                        message = "wizard.classification.obese".to_string();
+                    }
+                }
+            } else if let BmiCategory::SEVERELY_OBESE = target_classification {
+                if input.target_weight > input.current_weight {
+                    if current_classification == BmiCategory::SEVERELY_OBESE {
+                        message = "wizard.warning.severely_obese".to_string();
+                    } else {
+                        message = "wizard.classification.severely_obese".to_string();
+                    }
+                }
             }
-        }
-    } else if let BmiCategory::OBESE = target_classification {
-        if input.target_weight > input.current_weight {
-            if current_classification == BmiCategory::OBESE {
-                message =
-                    "Your target weight is even higher than your current weight...".to_string();
-            } else {
-                message = "Your target weight will classify you as obese...".to_string();
+
+            let mut date_by_rate = HashMap::new();
+
+            if message.is_empty() {
+                let rates = vec![100, 200, 300, 400, 500, 600, 700];
+                for rate in rates {
+                    let days = (difference * 7000.0 / rate as f32).round() as i64;
+                    let date = NaiveDate::parse_from_str(&input.start_date, "%Y-%m-%d").unwrap();
+                    date_by_rate.insert(rate, (date + Duration::days(days)).to_string());
+                }
             }
-        }
-    } else if let BmiCategory::SEVERELY_OBESE = target_classification {
-        if input.target_weight > input.current_weight {
-            if current_classification == BmiCategory::SEVERELY_OBESE {
-                message =
-                    "Your target weight is even higher than your current weight...".to_string();
-            } else {
-                message = "Your target weight will classify you as severely obese...".to_string();
-            }
+
+            Ok(WizardTargetWeightResult {
+                date_by_rate,
+                target_classification,
+                warning,
+                message: t!(message).into_owned(),
+            })
         }
     }
-
-    let mut date_by_rate = HashMap::new();
-
-    if message.is_empty() {
-        let rates = vec![100, 200, 300, 400, 500, 600, 700];
-        for rate in rates {
-            let days = (difference * 7000.0 / rate as f32).round() as i64;
-            let date = NaiveDate::parse_from_str(&input.start_date, "%Y-%m-%d").unwrap();
-            date_by_rate.insert(rate, (date + Duration::days(days)).to_string());
-        }
-    }
-
-    let result = WizardTargetWeightResult {
-        date_by_rate,
-        target_classification,
-        warning,
-        message,
-    };
-
-    result
 }
 
 fn calculate_bmr(sex: &CalculationSex, weight: &f32, height: &f32, age: &i32) -> f32 {
@@ -373,14 +409,10 @@ fn calculate_target(calculation_goal: &CalculationGoal, tdee: &f32, deficit: &f3
 }
 
 fn calculate_bmi(weight: &f32, height: &f32) -> f32 {
-    println!("Calculate BMI for weight {:?} height {:?}", weight, height);
-
     (weight / ((height / 100.0).powi(2))).round()
 }
 
 fn calculate_bmi_category(sex: &CalculationSex, bmi: &f32) -> BmiCategory {
-    println!("Get BMI Category for sex {:?} bmi {:?}", sex, bmi);
-
     match sex {
         CalculationSex::FEMALE => match bmi {
             0.0..=18.0 => BmiCategory::UNDERWEIGHT,

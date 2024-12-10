@@ -18,7 +18,7 @@ was born.
 
 ### Dependencies
 
-- cargo 1.83.0
+- rust 1.77.2
 - diesel 2.2.6 
 - tauro 2.0
 - sqlite 3
