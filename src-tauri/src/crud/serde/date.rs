@@ -2,7 +2,7 @@ use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
 
 fn date_to_json(t: NaiveDate) -> String {
-    DateTime::<Utc>::from_utc(NaiveDateTime::from(t), Utc).to_rfc3339()
+    DateTime::<Utc>::from_naive_utc_and_offset(NaiveDateTime::from(t), Utc).to_rfc3339()
 }
 
 pub fn serialize<S: Serializer>(date: &NaiveDate, serializer: S) -> Result<S::Ok, S::Error> {
