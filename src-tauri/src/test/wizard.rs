@@ -60,7 +60,7 @@ pub fn calculate_weight_gain_for_women() {
 }
 
 #[test]
-fn calculate_underweight_classification() {
+fn calculate_underweight_classification_for_men() {
     let input_underweight = WizardInput {
         age: 25,
         weight: 60f32,
@@ -77,7 +77,7 @@ fn calculate_underweight_classification() {
 }
 
 #[test]
-fn calculate_obese_classification() {
+fn calculate_obese_classification_for_men() {
     let input_obese = WizardInput {
         age: 25,
         weight: 130f32,
@@ -94,7 +94,7 @@ fn calculate_obese_classification() {
 }
 
 #[test]
-fn calulcate_severely_obese_classification() {
+fn calulcate_severely_obese_classification_for_men() {
     let input_severely_obese = WizardInput {
         age: 45,
         weight: 150f32,
@@ -103,6 +103,60 @@ fn calulcate_severely_obese_classification() {
         activity_level: 1f32,
         calculation_goal: CalculationGoal::LOSS,
         sex: CalculationSex::MALE,
+    };
+
+    let result_severely_obese = calculate(input_severely_obese);
+
+    assert_eq!(
+        result_severely_obese.bmi_category,
+        BmiCategory::SEVERELY_OBESE
+    );
+}
+
+#[test]
+fn calculate_obese_classification_for_women() {
+    let input_obese = WizardInput {
+        age: 30,
+        weight: 80.0,
+        height: 160.0,
+        weekly_difference: 0,
+        activity_level: 1f32,
+        calculation_goal: CalculationGoal::LOSS,
+        sex: CalculationSex::FEMALE,
+    };
+
+    let result_obese = calculate(input_obese);
+
+    assert_eq!(result_obese.bmi_category, BmiCategory::OBESE);
+}
+
+#[test]
+fn calculate_underweight_classification_for_women() {
+    let input_underweight = WizardInput {
+        age: 18,
+        weight: 40.0,
+        height: 150.0,
+        weekly_difference: 0,
+        activity_level: 1f32,
+        calculation_goal: CalculationGoal::LOSS,
+        sex: CalculationSex::FEMALE,
+    };
+
+    let result_underweight = calculate(input_underweight);
+
+    assert_eq!(result_underweight.bmi_category, BmiCategory::UNDERWEIGHT);
+}
+
+#[test]
+fn calulcate_severely_obese_classification_for_women() {
+    let input_severely_obese = WizardInput {
+        age: 45,
+        weight: 120.0,
+        height: 165.0,
+        weekly_difference: 0,
+        activity_level: 1f32,
+        calculation_goal: CalculationGoal::LOSS,
+        sex: CalculationSex::FEMALE,
     };
 
     let result_severely_obese = calculate(input_severely_obese);
