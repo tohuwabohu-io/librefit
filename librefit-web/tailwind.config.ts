@@ -1,9 +1,8 @@
 import { join } from 'path';
 import { skeleton } from '@skeletonlabs/tw-plugin';
-import { librefitTheme } from './src/librefit-theme.js';
+import { librefitTheme } from './src/librefit-theme';
 
-/** @type {import('tailwindcss').Config} */
-const config = {
+const config: import('tailwindcss').Config = {
 	darkMode: 'media',
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',

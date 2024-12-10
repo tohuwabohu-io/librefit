@@ -46,7 +46,7 @@ export const calculateForTargetWeight = async (wizardTargetWeightInput: WizardTa
   wizardTargetWeightInput.startDate = "2024-12-31";
 
 	return invoke('wizard_calculate_for_target_weight', {
-		input: wizardTargetWeightnput
+		input: wizardTargetWeightInput
 	});
 };
 
@@ -65,7 +65,7 @@ export const createTargetWeightTargets = (
 	startDate: Date,
 	targetWeight: number
 ): Map<string, { calorieTarget: CalorieTarget; weightTarget: WeightTarget }> => {
-	const rates = Object.keys(customWizardResult.resultByRate);
+	const rates = Object.keys(customWizardResult.dateByRate);
 	const multiplier = targetWeight < wizardInput.weight ? -1 : 1;
 	const todayStr = getDateAsStr(new Date());
 
