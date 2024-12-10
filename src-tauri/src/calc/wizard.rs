@@ -373,23 +373,27 @@ fn calculate_target(calculation_goal: &CalculationGoal, tdee: &f32, deficit: &f3
 }
 
 fn calculate_bmi(weight: &f32, height: &f32) -> f32 {
+    println!("Calculate BMI for weight {:?} height {:?}", weight, height);
+
     (weight / ((height / 100.0).powi(2))).round()
 }
 
 fn calculate_bmi_category(sex: &CalculationSex, bmi: &f32) -> BmiCategory {
+    println!("Get BMI Category for sex {:?} bmi {:?}", sex, bmi);
+
     match sex {
         CalculationSex::FEMALE => match bmi {
-            0.0..18.0 => BmiCategory::UNDERWEIGHT,
-            19.0..24.0 => BmiCategory::STANDARD_WEIGHT,
-            25.0..30.0 => BmiCategory::OVERWEIGHT,
-            31.0..40.0 => BmiCategory::OBESE,
+            0.0..=18.0 => BmiCategory::UNDERWEIGHT,
+            19.0..=24.0 => BmiCategory::STANDARD_WEIGHT,
+            25.0..=30.0 => BmiCategory::OVERWEIGHT,
+            31.0..=40.0 => BmiCategory::OBESE,
             _ => BmiCategory::SEVERELY_OBESE,
         },
         CalculationSex::MALE => match bmi {
-            0.0..19.0 => BmiCategory::UNDERWEIGHT,
-            20.0..25.0 => BmiCategory::STANDARD_WEIGHT,
-            26.0..30.0 => BmiCategory::OVERWEIGHT,
-            31.0..40.0 => BmiCategory::OBESE,
+            0.0..=19.0 => BmiCategory::UNDERWEIGHT,
+            20.0..=25.0 => BmiCategory::STANDARD_WEIGHT,
+            26.0..=30.0 => BmiCategory::OVERWEIGHT,
+            31.0..=40.0 => BmiCategory::OBESE,
             _ => BmiCategory::SEVERELY_OBESE,
         },
     }
