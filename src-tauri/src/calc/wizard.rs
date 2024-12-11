@@ -87,7 +87,7 @@ pub struct WizardTargetWeightInput {
     pub current_weight: f32,
     #[validate(range(min = 100.0, max = 220.0, code = "validation.wizard.height"))]
     pub height: f32,
-    #[validate(range(min = 30.0, max = 3000.0, message = "validation.wizard.weight"))]
+    #[validate(range(min = 30.0, max = 300.0, code = "validation.wizard.weight"))]
     pub target_weight: f32,
     pub start_date: String,
 }
