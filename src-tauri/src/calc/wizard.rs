@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use validator::{Validate, ValidationError, ValidationErrors};
 
+use super::math_f32::floor_f32;
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Wizard {
@@ -61,9 +63,9 @@ impl WizardResult {
             tdee: 0.0,
             deficit: 0.0,
             target: 0.0,
-            bmi: *bmi,
+            bmi: floor_f32(*bmi, 1),
             bmi_category: bmi_category_clone,
-            target_weight: *target_weight,
+            target_weight: floor_f32(*target_weight, 1),
             target_bmi: 0,
             target_bmi_upper: 0,
             target_bmi_lower: 0,
@@ -185,7 +187,7 @@ pub fn calculate(wizard_input: WizardInput) -> Result<WizardResult, ValidationEr
             let target = calculate_target(&wizard_input.calculation_goal, &tdee, &deficit);
 
             let bmi = calculate_bmi(&wizard_input.weight, &wizard_input.height);
-            let bmi_category = calculate_bmi_category(&wizard_input.sex, &bmi);
+            let bmi_category = calculate_bmi_category(&bmi);
 
             let target_bmi_lower = target_bmi_range.start().clone();
             let target_bmi_upper = target_bmi_range.end().clone();
@@ -200,19 +202,19 @@ pub fn calculate(wizard_input: WizardInput) -> Result<WizardResult, ValidationEr
             let recommendation = calculate_recommendation(&bmi_category);
 
             let mut wizard_result = WizardResult {
-                bmr,
-                tdee,
-                deficit,
-                target,
-                bmi,
+                bmr: floor_f32(bmr, 2),
+                tdee: floor_f32(tdee, 0),
+                deficit: floor_f32(deficit, 0),
+                target: floor_f32(target, 0),
+                bmi: floor_f32(bmi, 1),
                 bmi_category,
                 recommendation,
                 target_bmi,
                 target_bmi_upper,
                 target_bmi_lower,
-                target_weight,
-                target_weight_upper,
-                target_weight_lower,
+                target_weight: floor_f32(target_weight, 1),
+                target_weight_upper: floor_f32(target_weight_upper, 1),
+                target_weight_lower: floor_f32(target_weight_lower, 1),
                 duration_days: 0,
                 duration_days_upper: 0,
                 duration_days_lower: 0,
@@ -238,7 +240,7 @@ pub fn calculate_for_target_date(
             let days_between = (target_naive_date - today).num_days() as i32;
 
             let current_bmi = calculate_bmi(&input.current_weight, &input.height);
-            let current_classification = calculate_bmi_category(&input.sex, &current_bmi);
+            let current_classification = calculate_bmi_category(&current_bmi);
 
             let rates: Vec<i32> = vec![100, 200, 300, 400, 500, 600, 700];
             let multiplier = if matches!(input.calculation_goal, CalculationGoal::LOSS) {
@@ -256,7 +258,7 @@ pub fn calculate_for_target_date(
                         input.current_weight + ((multiplier * days_between * rate) as f32) / 7000.0;
 
                     let result_bmi = calculate_bmi(&weight, &input.height);
-                    let result_bmi_category = calculate_bmi_category(&input.sex, &result_bmi);
+                    let result_bmi_category = calculate_bmi_category(&result_bmi);
 
                     let result =
                         WizardResult::specific(&result_bmi, result_bmi_category.clone(), &weight);
@@ -287,16 +289,18 @@ pub fn calculate_for_target_date(
                 let target_bmi = calculate_target_bmi(&input.age);
                 let target_weight = calculate_target_weight(&target_bmi, &input.height);
 
-                let difference = match input.calculation_goal {
-                    CalculationGoal::GAIN => target_weight - input.current_weight,
-                    CalculationGoal::LOSS => input.current_weight - target_weight,
-                }
-                .round() as i32;
+                let difference = floor_f32(
+                    match input.calculation_goal {
+                        CalculationGoal::GAIN => target_weight - input.current_weight,
+                        CalculationGoal::LOSS => input.current_weight - target_weight,
+                    },
+                    0,
+                ) as i32;
 
-                let rate = (difference as f32 * 7000.0 / (days_between as f32)).round() as i32;
+                let rate = floor_f32(difference as f32 * 7000.0 / (days_between as f32), 0) as i32;
 
                 let result_bmi = calculate_bmi(&target_weight, &input.height);
-                let result_bmi_category = calculate_bmi_category(&input.sex, &result_bmi);
+                let result_bmi_category = calculate_bmi_category(&result_bmi);
 
                 let result = WizardResult::specific(
                     &result_bmi,
@@ -321,8 +325,18 @@ pub fn calculate_for_target_weight(
             let current_bmi = calculate_bmi(&input.current_weight, &input.height);
             let target_bmi = calculate_bmi(&input.target_weight, &input.height);
 
-            let current_classification = calculate_bmi_category(&input.sex, &current_bmi);
-            let target_classification = calculate_bmi_category(&input.sex, &target_bmi);
+            println!(
+                "calculated current_bmi={:?} target_bmi={:?} with target_weight={:?} and height={:?}",
+                &current_bmi, &target_bmi, &input.target_weight, &input.height
+            );
+
+            let current_classification = calculate_bmi_category(&current_bmi);
+            let target_classification = calculate_bmi_category(&target_bmi);
+
+            println!(
+                "current_classification={:?} target_classification={:?}",
+                &current_classification, &target_classification
+            );
 
             let difference = if input.target_weight > input.current_weight {
                 input.target_weight - input.current_weight
@@ -368,7 +382,7 @@ pub fn calculate_for_target_weight(
             if message.is_empty() {
                 let rates = vec![100, 200, 300, 400, 500, 600, 700];
                 for rate in rates {
-                    let days = (difference * 7000.0 / rate as f32).round() as i64;
+                    let days = floor_f32(difference * 7000.0 / rate as f32, 0) as i64;
                     let date = NaiveDate::parse_from_str(&input.start_date, "%Y-%m-%d").unwrap();
                     date_by_rate.insert(rate, (date + Duration::days(days)).to_string());
                 }
@@ -394,11 +408,11 @@ fn calculate_bmr(sex: &CalculationSex, weight: &f32, height: &f32, age: &i32) ->
 }
 
 fn calculate_tdee(activity_level: &f32, bmr: &f32) -> f32 {
-    (activity_level * bmr).round()
+    activity_level * bmr
 }
 
 fn calculate_deficit(weekly_difference: &i32) -> f32 {
-    (weekly_difference.clone() as f32 / 10.0 * 7000.0 / 7.0).round()
+    weekly_difference.clone() as f32 / 10.0 * 7000.0 / 7.0
 }
 
 fn calculate_target(calculation_goal: &CalculationGoal, tdee: &f32, deficit: &f32) -> f32 {
@@ -409,25 +423,18 @@ fn calculate_target(calculation_goal: &CalculationGoal, tdee: &f32, deficit: &f3
 }
 
 fn calculate_bmi(weight: &f32, height: &f32) -> f32 {
-    (weight / ((height / 100.0).powi(2))).round()
+    weight / ((height / 100.0).powi(2))
 }
 
-fn calculate_bmi_category(sex: &CalculationSex, bmi: &f32) -> BmiCategory {
-    match sex {
-        CalculationSex::FEMALE => match bmi {
-            0.0..=18.0 => BmiCategory::UNDERWEIGHT,
-            19.0..=24.0 => BmiCategory::STANDARD_WEIGHT,
-            25.0..=30.0 => BmiCategory::OVERWEIGHT,
-            31.0..=40.0 => BmiCategory::OBESE,
-            _ => BmiCategory::SEVERELY_OBESE,
-        },
-        CalculationSex::MALE => match bmi {
-            0.0..=19.0 => BmiCategory::UNDERWEIGHT,
-            20.0..=25.0 => BmiCategory::STANDARD_WEIGHT,
-            26.0..=30.0 => BmiCategory::OVERWEIGHT,
-            31.0..=40.0 => BmiCategory::OBESE,
-            _ => BmiCategory::SEVERELY_OBESE,
-        },
+fn calculate_bmi_category(bmi: &f32) -> BmiCategory {
+    let bmi_rounded_1 = floor_f32(*bmi, 1);
+
+    match bmi_rounded_1 {
+        0.0..=18.4 => BmiCategory::UNDERWEIGHT,
+        18.5..=24.9 => BmiCategory::STANDARD_WEIGHT,
+        25.0..=29.9 => BmiCategory::OVERWEIGHT,
+        30.0..=40.0 => BmiCategory::OBESE,
+        _ => BmiCategory::SEVERELY_OBESE,
     }
 }
 
@@ -443,15 +450,15 @@ fn calculate_target_bmi(age: &i32) -> std::ops::RangeInclusive<i32> {
 }
 
 fn calculate_target_weight(target_bmi: &std::ops::RangeInclusive<i32>, height: &f32) -> f32 {
-    (((target_bmi.start() + target_bmi.end()) as f32 / 2.0) * (height / 100.0).powi(2)).round()
+    ((target_bmi.start() + target_bmi.end()) as f32 / 2.0) * (height / 100.0).powi(2)
 }
 
 fn calculate_target_weight_lower(target_bmi: &std::ops::RangeInclusive<i32>, height: &f32) -> f32 {
-    (*(target_bmi.start()) as f32 * (height / 100.0).powi(2)).round()
+    *(target_bmi.start()) as f32 * (height / 100.0).powi(2)
 }
 
 fn calculate_target_weight_upper(target_bmi: &std::ops::RangeInclusive<i32>, height: &f32) -> f32 {
-    (*(target_bmi.end()) as f32 * (height / 100.0).powi(2)).round()
+    *(target_bmi.end()) as f32 * (height / 100.0).powi(2)
 }
 
 fn calculate_duration_days_total(wizard_input: &WizardInput, wizard_result: &mut WizardResult) {
@@ -494,7 +501,7 @@ fn calculate_duration_days_total(wizard_input: &WizardInput, wizard_result: &mut
 }
 
 fn calculate_duration_days(weight: f32, target_weight: f32, deficit: f32) -> i32 {
-    ((weight - target_weight) * 7000.0 / deficit).floor() as i32
+    floor_f32((weight - target_weight) * 7000.0 / deficit, 0) as i32
 }
 
 fn calculate_recommendation(bmi_category: &BmiCategory) -> WizardRecommendation {

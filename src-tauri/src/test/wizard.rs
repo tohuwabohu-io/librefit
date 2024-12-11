@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::ops::Add;
 
 use crate::calc::wizard;
@@ -30,16 +31,16 @@ pub fn calculate_weight_loss_for_men() {
 
     assert_eq!(1995.0, result.bmr);
     assert_eq!(500.0, result.deficit);
-    assert_eq!(28.0, result.bmi);
+    assert_eq!(27.8, result.bmi);
     assert_eq!(2993.0, result.tdee);
     assert_eq!(BmiCategory::OVERWEIGHT, result.bmi_category);
     assert_eq!(20, result.target_bmi_lower);
     assert_eq!(25, result.target_bmi_upper);
-    assert_eq!(65.0, result.target_weight_lower);
+    assert_eq!(64.8, result.target_weight_lower);
     assert_eq!(81.0, result.target_weight_upper);
-    assert_eq!(73.0, result.target_weight);
+    assert_eq!(72.9, result.target_weight);
     assert_eq!(2493.0, result.target);
-    assert_eq!(238, result.duration_days);
+    assert_eq!(239, result.duration_days);
 }
 
 /// Test integrity of the default calculation function.
@@ -63,17 +64,17 @@ pub fn calculate_weight_gain_for_women() {
 
     assert_eq!(1316.0, result.bmr);
     assert_eq!(100.0, result.deficit);
-    assert_eq!(22.0, result.bmi);
+    assert_eq!(21.6, result.bmi);
     assert_eq!(1645.0, result.tdee);
     assert_eq!(BmiCategory::STANDARD_WEIGHT, result.bmi_category);
     assert_eq!(20, result.target_bmi_lower);
     assert_eq!(25, result.target_bmi_upper);
     assert_eq!(22, result.target_bmi);
     assert_eq!(48.0, result.target_weight_lower);
-    assert_eq!(60.0, result.target_weight_upper);
-    assert_eq!(54.0, result.target_weight);
+    assert_eq!(60.1, result.target_weight_upper);
+    assert_eq!(54.1, result.target_weight);
     assert_eq!(1745.0, result.target);
-    assert_eq!(140, result.duration_days);
+    assert_eq!(147, result.duration_days);
 }
 
 /// Verify expected result: Current BMI is classified as 'underweight'.
@@ -81,7 +82,7 @@ pub fn calculate_weight_gain_for_women() {
 fn calculate_underweight_classification_for_men() {
     let input_underweight = WizardInput {
         age: 25,
-        weight: 60.0,
+        weight: 59.7,
         height: 180.0,
         weekly_difference: 0,
         activity_level: 1.0,
@@ -91,6 +92,7 @@ fn calculate_underweight_classification_for_men() {
 
     let result_underweight = wizard::calculate(input_underweight).unwrap();
 
+    assert_eq!(result_underweight.bmi, 18.4);
     assert_eq!(result_underweight.bmi_category, BmiCategory::UNDERWEIGHT);
 }
 
@@ -99,7 +101,7 @@ fn calculate_underweight_classification_for_men() {
 fn calculate_obese_classification_for_men() {
     let input_obese = WizardInput {
         age: 25,
-        weight: 130.0,
+        weight: 125.0,
         height: 180.0,
         weekly_difference: 0,
         activity_level: 1.0,
@@ -110,6 +112,7 @@ fn calculate_obese_classification_for_men() {
     let result_obese = wizard::calculate(input_obese).unwrap();
 
     assert_eq!(result_obese.bmi_category, BmiCategory::OBESE);
+    assert_eq!(result_obese.bmi, 38.6);
 }
 
 /// Verify expected result: Current BMI is classified as 'severely obese'.
@@ -131,6 +134,7 @@ fn calulcate_severely_obese_classification_for_men() {
         result_severely_obese.bmi_category,
         BmiCategory::SEVERELY_OBESE
     );
+    assert_eq!(result_severely_obese.bmi, 46.3);
 }
 
 /// Verify expected result: Current BMI is classified as 'obese'.
@@ -149,6 +153,7 @@ fn calculate_obese_classification_for_women() {
     let result_obese = wizard::calculate(input_obese).unwrap();
 
     assert_eq!(result_obese.bmi_category, BmiCategory::OBESE);
+    assert_eq!(result_obese.bmi, 31.2);
 }
 
 /// Verify expected result: Current BMI is classified as 'underweight'.
@@ -167,6 +172,7 @@ fn calculate_underweight_classification_for_women() {
     let result_underweight = wizard::calculate(input_underweight).unwrap();
 
     assert_eq!(result_underweight.bmi_category, BmiCategory::UNDERWEIGHT);
+    assert_eq!(result_underweight.bmi, 17.8);
 }
 
 /// Verify expected result: Current BMI is classified as 'severely obese'.
@@ -188,6 +194,7 @@ fn calulcate_severely_obese_classification_for_women() {
         result_severely_obese.bmi_category,
         BmiCategory::SEVERELY_OBESE
     );
+    assert_eq!(result_severely_obese.bmi, 44.1);
 }
 
 /// Verify integrity of the calculation function that aims for a desired end date.
@@ -470,4 +477,201 @@ fn return_severely_obese_warning() {
 
     assert_eq!(result.warning, true);
     assert_eq!(result.message, "wizard.warning.severely_obese");
+}
+
+#[test]
+fn calculate_weight_loss_duration() {
+    let expected: std::collections::HashMap<i32, i64> = vec![
+        (100, 1190),
+        (200, 595),
+        (300, 397),
+        (400, 298),
+        (500, 238),
+        (600, 198),
+        (700, 170),
+    ]
+    .into_iter()
+    .collect();
+
+    let calculation_start_date_nd = NaiveDate::from_ymd_opt(2025, 01, 01).unwrap();
+
+    let input = WizardTargetWeightInput {
+        age: 30,
+        sex: CalculationSex::MALE,
+        current_weight: 100.0,
+        height: 170.0,
+        target_weight: 83.0,
+        start_date: calculation_start_date_nd.format("%Y-%m-%d").to_string(),
+    };
+
+    let result = wizard::calculate_for_target_weight(&input).unwrap();
+
+    assert_eq!(result.target_classification, BmiCategory::OVERWEIGHT);
+    assert_eq!(result.warning, false);
+    assert_eq!(result.message, "".to_string());
+
+    for (rate, days) in expected {
+        let expected_date = calculation_start_date_nd
+            .clone()
+            .checked_add_days(Days::new(days as u64))
+            .unwrap();
+
+        assert_eq!(
+            result.date_by_rate.get(&rate).unwrap(),
+            &expected_date.format("%Y-%m-%d").to_string()
+        );
+    }
+}
+
+#[test]
+fn calculate_weight_gain_duration() {
+    let expected: HashMap<i32, i64> = vec![
+        (100, 350),
+        (200, 175),
+        (300, 117),
+        (400, 88),
+        (500, 70),
+        (600, 58),
+        (700, 50),
+    ]
+    .into_iter()
+    .collect();
+
+    let calculation_start_date_nd = NaiveDate::from_ymd_opt(2025, 01, 01).unwrap();
+
+    let input = WizardTargetWeightInput {
+        age: 30,
+        sex: CalculationSex::FEMALE,
+        current_weight: 50.0,
+        height: 155.0,
+        target_weight: 45.0,
+        start_date: calculation_start_date_nd.format("%Y-%m-%d").to_string(),
+    };
+
+    let result = wizard::calculate_for_target_weight(&input).unwrap();
+
+    assert_eq!(result.target_classification, BmiCategory::STANDARD_WEIGHT);
+    assert_eq!(result.warning, false);
+    assert_eq!(result.message, "".to_string());
+
+    for (rate, days) in expected {
+        let expected_date = calculation_start_date_nd
+            .clone()
+            .checked_add_days(Days::new(days as u64))
+            .unwrap();
+
+        assert_eq!(
+            result.date_by_rate.get(&rate).unwrap(),
+            &expected_date.format("%Y-%m-%d").to_string()
+        );
+    }
+}
+
+#[test]
+fn calculate_target_weights_for_specific_weight_loss_goal() {
+    let start_date_nd = NaiveDate::from_ymd_opt(2025, 1, 1).unwrap();
+    let target_date_nd = start_date_nd.checked_add_days(Days::new(250)).unwrap();
+
+    let expected_weight_by_rate: HashMap<i32, f32> = vec![
+        (100, 81.1),
+        (200, 77.3),
+        (300, 73.4),
+        (400, 69.5),
+        (500, 65.6),
+    ]
+    .into_iter()
+    .collect();
+
+    let expected_bmi_by_rate: HashMap<i32, f32> = vec![
+        (100, 28.1),
+        (200, 26.7),
+        (300, 25.4),
+        (400, 24.1),
+        (500, 22.7),
+    ]
+    .into_iter()
+    .collect();
+
+    let wizard_target_date_input = WizardTargetDateInput {
+        age: 30,
+        height: 170.0,
+        current_weight: 85.0,
+        sex: CalculationSex::MALE,
+        target_date: target_date_nd.format("%Y-%m-%d").to_string(),
+        calculation_goal: CalculationGoal::LOSS,
+    };
+
+    let wizard_result = wizard::calculate_for_target_date(&wizard_target_date_input).unwrap();
+
+    // compare calculated and expected weights
+    assert_eq!(
+        *expected_weight_by_rate.get(&100).unwrap(),
+        wizard_result
+            .result_by_rate
+            .get(&100)
+            .unwrap()
+            .target_weight
+    );
+
+    assert_eq!(
+        *expected_weight_by_rate.get(&200).unwrap(),
+        wizard_result
+            .result_by_rate
+            .get(&200)
+            .unwrap()
+            .target_weight
+    );
+
+    assert_eq!(
+        *expected_weight_by_rate.get(&300).unwrap(),
+        wizard_result
+            .result_by_rate
+            .get(&300)
+            .unwrap()
+            .target_weight
+    );
+
+    assert_eq!(
+        *expected_weight_by_rate.get(&400).unwrap(),
+        wizard_result
+            .result_by_rate
+            .get(&400)
+            .unwrap()
+            .target_weight
+    );
+
+    assert_eq!(
+        *expected_weight_by_rate.get(&500).unwrap(),
+        wizard_result
+            .result_by_rate
+            .get(&500)
+            .unwrap()
+            .target_weight
+    );
+
+    // compare calculated and expected BMI values
+    assert_eq!(
+        *expected_bmi_by_rate.get(&100).unwrap(),
+        wizard_result.result_by_rate.get(&100).unwrap().bmi
+    );
+
+    assert_eq!(
+        *expected_bmi_by_rate.get(&200).unwrap(),
+        wizard_result.result_by_rate.get(&200).unwrap().bmi
+    );
+
+    assert_eq!(
+        *expected_bmi_by_rate.get(&300).unwrap(),
+        wizard_result.result_by_rate.get(&300).unwrap().bmi
+    );
+
+    assert_eq!(
+        *expected_bmi_by_rate.get(&400).unwrap(),
+        wizard_result.result_by_rate.get(&400).unwrap().bmi
+    );
+
+    assert_eq!(
+        *expected_bmi_by_rate.get(&500).unwrap(),
+        wizard_result.result_by_rate.get(&500).unwrap().bmi
+    );
 }
