@@ -22,7 +22,6 @@ use crate::crud::cmd::wizard::{
 pub mod calc;
 pub mod crud;
 pub mod i18n;
-pub mod test;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

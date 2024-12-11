@@ -1,13 +1,11 @@
 use std::collections::HashMap;
-use std::ops::Add;
 
-use crate::calc::wizard;
-use crate::calc::wizard::{
-    calculate, calculate_for_target_date, calculate_for_target_weight, BmiCategory,
-    CalculationGoal, CalculationSex, WizardInput, WizardResult, WizardTargetDateInput,
+use chrono::{Days, NaiveDate, Utc};
+use librefit_lib::calc::wizard;
+use librefit_lib::calc::wizard::{
+    BmiCategory, CalculationGoal, CalculationSex, WizardInput, WizardTargetDateInput,
     WizardTargetWeightInput,
 };
-use chrono::{Days, NaiveDate, Utc};
 use validator::Validate;
 
 /// Test integrity of the default calculation function.
