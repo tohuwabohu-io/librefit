@@ -1,5 +1,6 @@
 use std::ops::Add;
 
+use crate::calc::wizard;
 use crate::calc::wizard::{
     calculate, calculate_for_target_date, calculate_for_target_weight, BmiCategory,
     CalculationGoal, CalculationSex, WizardInput, WizardResult, WizardTargetDateInput,
@@ -8,6 +9,7 @@ use crate::calc::wizard::{
 use chrono::{Days, NaiveDate, Utc};
 use validator::Validate;
 
+/// Test integrity of the default calculation function.
 #[test]
 pub fn calculate_weight_loss_for_men() {
     let input: WizardInput = WizardInput {
@@ -20,7 +22,7 @@ pub fn calculate_weight_loss_for_men() {
         calculation_goal: CalculationGoal::LOSS,
     };
 
-    let wizard_result = calculate(input);
+    let wizard_result = wizard::calculate(input);
 
     assert_eq!(wizard_result.is_ok(), true);
 
@@ -40,6 +42,7 @@ pub fn calculate_weight_loss_for_men() {
     assert_eq!(238, result.duration_days);
 }
 
+/// Test integrity of the default calculation function.
 #[test]
 pub fn calculate_weight_gain_for_women() {
     let input = WizardInput {
@@ -52,7 +55,7 @@ pub fn calculate_weight_gain_for_women() {
         sex: CalculationSex::FEMALE,
     };
 
-    let wizard_result = calculate(input);
+    let wizard_result = wizard::calculate(input);
 
     assert_eq!(wizard_result.is_ok(), true);
 
@@ -73,6 +76,7 @@ pub fn calculate_weight_gain_for_women() {
     assert_eq!(140, result.duration_days);
 }
 
+/// Verify expected result: Current BMI is classified as 'underweight'.
 #[test]
 fn calculate_underweight_classification_for_men() {
     let input_underweight = WizardInput {
@@ -85,11 +89,12 @@ fn calculate_underweight_classification_for_men() {
         sex: CalculationSex::MALE,
     };
 
-    let result_underweight = calculate(input_underweight).unwrap();
+    let result_underweight = wizard::calculate(input_underweight).unwrap();
 
     assert_eq!(result_underweight.bmi_category, BmiCategory::UNDERWEIGHT);
 }
 
+/// Verify expected result: Current BMI is classified as 'obese'.
 #[test]
 fn calculate_obese_classification_for_men() {
     let input_obese = WizardInput {
@@ -102,11 +107,12 @@ fn calculate_obese_classification_for_men() {
         sex: CalculationSex::MALE,
     };
 
-    let result_obese = calculate(input_obese).unwrap();
+    let result_obese = wizard::calculate(input_obese).unwrap();
 
     assert_eq!(result_obese.bmi_category, BmiCategory::OBESE);
 }
 
+/// Verify expected result: Current BMI is classified as 'severely obese'.
 #[test]
 fn calulcate_severely_obese_classification_for_men() {
     let input_severely_obese = WizardInput {
@@ -119,7 +125,7 @@ fn calulcate_severely_obese_classification_for_men() {
         sex: CalculationSex::MALE,
     };
 
-    let result_severely_obese = calculate(input_severely_obese).unwrap();
+    let result_severely_obese = wizard::calculate(input_severely_obese).unwrap();
 
     assert_eq!(
         result_severely_obese.bmi_category,
@@ -127,6 +133,7 @@ fn calulcate_severely_obese_classification_for_men() {
     );
 }
 
+/// Verify expected result: Current BMI is classified as 'obese'.
 #[test]
 fn calculate_obese_classification_for_women() {
     let input_obese = WizardInput {
@@ -139,11 +146,12 @@ fn calculate_obese_classification_for_women() {
         sex: CalculationSex::FEMALE,
     };
 
-    let result_obese = calculate(input_obese).unwrap();
+    let result_obese = wizard::calculate(input_obese).unwrap();
 
     assert_eq!(result_obese.bmi_category, BmiCategory::OBESE);
 }
 
+/// Verify expected result: Current BMI is classified as 'underweight'.
 #[test]
 fn calculate_underweight_classification_for_women() {
     let input_underweight = WizardInput {
@@ -156,11 +164,12 @@ fn calculate_underweight_classification_for_women() {
         sex: CalculationSex::FEMALE,
     };
 
-    let result_underweight = calculate(input_underweight).unwrap();
+    let result_underweight = wizard::calculate(input_underweight).unwrap();
 
     assert_eq!(result_underweight.bmi_category, BmiCategory::UNDERWEIGHT);
 }
 
+/// Verify expected result: Current BMI is classified as 'severely obese'.
 #[test]
 fn calulcate_severely_obese_classification_for_women() {
     let input_severely_obese = WizardInput {
@@ -173,7 +182,7 @@ fn calulcate_severely_obese_classification_for_women() {
         sex: CalculationSex::FEMALE,
     };
 
-    let result_severely_obese = calculate(input_severely_obese).unwrap();
+    let result_severely_obese = wizard::calculate(input_severely_obese).unwrap();
 
     assert_eq!(
         result_severely_obese.bmi_category,
@@ -181,6 +190,7 @@ fn calulcate_severely_obese_classification_for_women() {
     );
 }
 
+/// Verify integrity of the calculation function that aims for a desired end date.
 #[test]
 fn caclulate_target_date_weight_loss() {
     let target_date_nd = Utc::now()
@@ -197,13 +207,14 @@ fn caclulate_target_date_weight_loss() {
         target_date: target_date_nd.format("%Y-%m-%d").to_string(),
     };
 
-    let result = calculate_for_target_date(&input_target_date).unwrap();
+    let result = wizard::calculate_for_target_date(&input_target_date).unwrap();
 
     assert_ne!(result.result_by_rate.len(), 0);
 
     // todo check rates on a granular level
 }
 
+/// Verify integrity of the calculation function that aims for a desired target weight.
 #[test]
 fn calculate_target_weight_date() {
     let start_date_nd = Utc::now().date_naive();
@@ -217,7 +228,7 @@ fn calculate_target_weight_date() {
         start_date: start_date_nd.format("%Y-%m-%d").to_string(),
     };
 
-    let result = calculate_for_target_weight(&input_target_weight).unwrap();
+    let result = wizard::calculate_for_target_weight(&input_target_weight).unwrap();
 
     assert_eq!(result.warning, false);
     assert_eq!(result.message, "".to_string());
@@ -227,6 +238,7 @@ fn calculate_target_weight_date() {
     // todo check rates on more granular level
 }
 
+/// Verfiy [WizardInput] validation and expected error codes.
 #[test]
 fn return_validation_errors() {
     let invalid_input = WizardInput {
@@ -276,6 +288,7 @@ fn return_validation_errors() {
     assert_eq!(activity_level_error, "validation.wizard.activity_level");
 }
 
+/// Verify [WizardTargetDateInput] validation and expected error codes.
 #[test]
 fn return_target_date_validation_errors() {
     let invalid_target_date_input = WizardTargetDateInput {
@@ -309,6 +322,7 @@ fn return_target_date_validation_errors() {
     assert_eq!(height_error, "validation.wizard.height");
 }
 
+/// Verfiy [WizardTargetWeightInput] validation and expected error codes.
 #[test]
 fn return_target_weight_validation_errors() {
     let invalid_target_weight_input = WizardTargetWeightInput {
@@ -348,4 +362,112 @@ fn return_target_weight_validation_errors() {
     assert_eq!(current_weight_error, "validation.wizard.weight");
     assert_eq!(height_error, "validation.wizard.height");
     assert_eq!(target_weight_error, "validation.wizard.weight");
+}
+
+/// Verify that input leads to 'underweight' BMI classification.
+#[test]
+fn return_underweight_classification() {
+    let underweight_target_weight_input = WizardTargetWeightInput {
+        age: 30,
+        sex: CalculationSex::MALE,
+        current_weight: 60.0,
+        height: 170.0,
+        target_weight: 50.0,
+        start_date: "2025-01-01".to_string(),
+    };
+
+    let result = wizard::calculate_for_target_weight(&underweight_target_weight_input).unwrap();
+
+    assert_eq!(result.warning, true);
+    assert_eq!(result.message, "wizard.classification.underweight");
+}
+
+/// Verify that input leads to 'obese' BMI classification.
+#[test]
+fn return_obese_classification() {
+    let obese_target_weight_input = WizardTargetWeightInput {
+        age: 30,
+        sex: CalculationSex::MALE,
+        current_weight: 60.0,
+        height: 170.0,
+        target_weight: 110.0,
+        start_date: "2025-01-01".to_string(),
+    };
+
+    let result = wizard::calculate_for_target_weight(&obese_target_weight_input).unwrap();
+
+    assert_eq!(result.warning, true);
+    assert_eq!(result.message, "wizard.classification.obese");
+}
+
+/// Verify that input leads to 'severely obese' BMI classification.
+#[test]
+fn return_severely_obese_classification() {
+    let severely_obese_target_weight_input = WizardTargetWeightInput {
+        age: 30,
+        sex: CalculationSex::MALE,
+        current_weight: 60.0,
+        height: 170.0,
+        target_weight: 150.0,
+        start_date: "2025-01-01".to_string(),
+    };
+
+    let result = wizard::calculate_for_target_weight(&severely_obese_target_weight_input).unwrap();
+
+    assert_eq!(result.warning, true);
+    assert_eq!(result.message, "wizard.classification.severely_obese");
+}
+
+/// Verify that input leads to warning for already 'underweight' classified BMI values.
+#[test]
+fn return_underweight_warning() {
+    let underweight_target_weight_input = WizardTargetWeightInput {
+        age: 30,
+        sex: CalculationSex::MALE,
+        current_weight: 50.0, // currently underweight
+        height: 170.0,
+        target_weight: 45.0, // desired weight even lower
+        start_date: "2025-01-01".to_string(),
+    };
+
+    let result = wizard::calculate_for_target_weight(&underweight_target_weight_input).unwrap();
+
+    assert_eq!(result.warning, true);
+    assert_eq!(result.message, "wizard.warning.underweight");
+}
+
+/// Verify that input leads to warning for already 'obese' classified BMI values.
+#[test]
+fn return_obese_warning() {
+    let obese_target_weight_input = WizardTargetWeightInput {
+        age: 30,
+        sex: CalculationSex::MALE,
+        current_weight: 100.0, // currently obese
+        height: 170.0,
+        target_weight: 110.0, // desired weight even higher
+        start_date: "2025-01-01".to_string(),
+    };
+
+    let result = wizard::calculate_for_target_weight(&obese_target_weight_input).unwrap();
+
+    assert_eq!(result.warning, true);
+    assert_eq!(result.message, "wizard.warning.obese");
+}
+
+/// Verify that input leads to warning for already 'severely_obese' classified BMI values.
+#[test]
+fn return_severely_obese_warning() {
+    let severely_obese_target_weight_input = WizardTargetWeightInput {
+        age: 30,
+        sex: CalculationSex::MALE,
+        current_weight: 150.0, // currently severely obese
+        height: 170.0,
+        target_weight: 160.0, // desired weight even higher
+        start_date: "2025-01-01".to_string(),
+    };
+
+    let result = wizard::calculate_for_target_weight(&severely_obese_target_weight_input).unwrap();
+
+    assert_eq!(result.warning, true);
+    assert_eq!(result.message, "wizard.warning.severely_obese");
 }

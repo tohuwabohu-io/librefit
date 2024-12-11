@@ -378,7 +378,7 @@ pub fn calculate_for_target_weight(
                 date_by_rate,
                 target_classification,
                 warning,
-                message: t!(message).into_owned(),
+                message,
             })
         }
     }
