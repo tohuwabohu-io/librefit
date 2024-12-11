@@ -138,11 +138,11 @@ pub enum CalculationSex {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum BmiCategory {
-    UNDERWEIGHT,
-    STANDARD_WEIGHT,
-    OVERWEIGHT,
-    OBESE,
-    SEVERELY_OBESE,
+    Underweight,
+    StandardWeight,
+    Overweight,
+    Obese,
+    SeverelyObese,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -249,7 +249,7 @@ pub fn calculate_for_target_date(
                 1
             };
 
-            let obese_list = vec![BmiCategory::OBESE, BmiCategory::SEVERELY_OBESE];
+            let obese_list = vec![BmiCategory::Obese, BmiCategory::SeverelyObese];
 
             let mut result_by_rate: HashMap<i32, WizardResult> = rates
                 .into_iter()
@@ -265,7 +265,7 @@ pub fn calculate_for_target_date(
 
                     match input.calculation_goal {
                         CalculationGoal::LOSS => {
-                            if result_bmi_category != BmiCategory::UNDERWEIGHT {
+                            if result_bmi_category != BmiCategory::Underweight {
                                 Some((rate, result))
                             } else {
                                 None
@@ -346,30 +346,30 @@ pub fn calculate_for_target_weight(
 
             let warning = matches!(
                 target_classification,
-                BmiCategory::UNDERWEIGHT | BmiCategory::OBESE | BmiCategory::SEVERELY_OBESE
+                BmiCategory::Underweight | BmiCategory::Obese | BmiCategory::SeverelyObese
             );
 
             let mut message = String::new();
 
-            if let BmiCategory::UNDERWEIGHT = target_classification {
+            if let BmiCategory::Underweight = target_classification {
                 if input.target_weight < input.current_weight {
-                    if current_classification == BmiCategory::UNDERWEIGHT {
+                    if current_classification == BmiCategory::Underweight {
                         message = "wizard.warning.underweight".to_string();
                     } else {
                         message = "wizard.classification.underweight".to_string();
                     }
                 }
-            } else if let BmiCategory::OBESE = target_classification {
+            } else if let BmiCategory::Obese = target_classification {
                 if input.target_weight > input.current_weight {
-                    if current_classification == BmiCategory::OBESE {
+                    if current_classification == BmiCategory::Obese {
                         message = "wizard.warning.obese".to_string();
                     } else {
                         message = "wizard.classification.obese".to_string();
                     }
                 }
-            } else if let BmiCategory::SEVERELY_OBESE = target_classification {
+            } else if let BmiCategory::SeverelyObese = target_classification {
                 if input.target_weight > input.current_weight {
-                    if current_classification == BmiCategory::SEVERELY_OBESE {
+                    if current_classification == BmiCategory::SeverelyObese {
                         message = "wizard.warning.severely_obese".to_string();
                     } else {
                         message = "wizard.classification.severely_obese".to_string();
@@ -430,11 +430,11 @@ fn calculate_bmi_category(bmi: &f32) -> BmiCategory {
     let bmi_rounded_1 = floor_f32(*bmi, 1);
 
     match bmi_rounded_1 {
-        0.0..=18.4 => BmiCategory::UNDERWEIGHT,
-        18.5..=24.9 => BmiCategory::STANDARD_WEIGHT,
-        25.0..=29.9 => BmiCategory::OVERWEIGHT,
-        30.0..=40.0 => BmiCategory::OBESE,
-        _ => BmiCategory::SEVERELY_OBESE,
+        0.0..=18.4 => BmiCategory::Underweight,
+        18.5..=24.9 => BmiCategory::StandardWeight,
+        25.0..=29.9 => BmiCategory::Overweight,
+        30.0..=40.0 => BmiCategory::Obese,
+        _ => BmiCategory::SeverelyObese,
     }
 }
 
@@ -506,10 +506,10 @@ fn calculate_duration_days(weight: f32, target_weight: f32, deficit: f32) -> i32
 
 fn calculate_recommendation(bmi_category: &BmiCategory) -> WizardRecommendation {
     match bmi_category {
-        BmiCategory::STANDARD_WEIGHT => WizardRecommendation::HOLD,
-        BmiCategory::UNDERWEIGHT => WizardRecommendation::GAIN,
-        BmiCategory::OVERWEIGHT => WizardRecommendation::LOSE,
-        BmiCategory::OBESE => WizardRecommendation::LOSE,
-        BmiCategory::SEVERELY_OBESE => WizardRecommendation::LOSE,
+        BmiCategory::StandardWeight => WizardRecommendation::HOLD,
+        BmiCategory::Underweight => WizardRecommendation::GAIN,
+        BmiCategory::Overweight => WizardRecommendation::LOSE,
+        BmiCategory::Obese => WizardRecommendation::LOSE,
+        BmiCategory::SeverelyObese => WizardRecommendation::LOSE,
     }
 }

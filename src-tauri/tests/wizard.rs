@@ -31,7 +31,7 @@ pub fn calculate_weight_loss_for_men() {
     assert_eq!(500.0, result.deficit);
     assert_eq!(27.8, result.bmi);
     assert_eq!(2993.0, result.tdee);
-    assert_eq!(BmiCategory::OVERWEIGHT, result.bmi_category);
+    assert_eq!(BmiCategory::Overweight, result.bmi_category);
     assert_eq!(20, result.target_bmi_lower);
     assert_eq!(25, result.target_bmi_upper);
     assert_eq!(64.8, result.target_weight_lower);
@@ -64,7 +64,7 @@ pub fn calculate_weight_gain_for_women() {
     assert_eq!(100.0, result.deficit);
     assert_eq!(21.6, result.bmi);
     assert_eq!(1645.0, result.tdee);
-    assert_eq!(BmiCategory::STANDARD_WEIGHT, result.bmi_category);
+    assert_eq!(BmiCategory::StandardWeight, result.bmi_category);
     assert_eq!(20, result.target_bmi_lower);
     assert_eq!(25, result.target_bmi_upper);
     assert_eq!(22, result.target_bmi);
@@ -91,7 +91,7 @@ fn calculate_underweight_classification_for_men() {
     let result_underweight = wizard::calculate(input_underweight).unwrap();
 
     assert_eq!(result_underweight.bmi, 18.4);
-    assert_eq!(result_underweight.bmi_category, BmiCategory::UNDERWEIGHT);
+    assert_eq!(result_underweight.bmi_category, BmiCategory::Underweight);
 }
 
 /// Verify expected result: Current BMI is classified as 'obese'.
@@ -109,7 +109,7 @@ fn calculate_obese_classification_for_men() {
 
     let result_obese = wizard::calculate(input_obese).unwrap();
 
-    assert_eq!(result_obese.bmi_category, BmiCategory::OBESE);
+    assert_eq!(result_obese.bmi_category, BmiCategory::Obese);
     assert_eq!(result_obese.bmi, 38.6);
 }
 
@@ -130,7 +130,7 @@ fn calulcate_severely_obese_classification_for_men() {
 
     assert_eq!(
         result_severely_obese.bmi_category,
-        BmiCategory::SEVERELY_OBESE
+        BmiCategory::SeverelyObese
     );
     assert_eq!(result_severely_obese.bmi, 46.3);
 }
@@ -150,7 +150,7 @@ fn calculate_obese_classification_for_women() {
 
     let result_obese = wizard::calculate(input_obese).unwrap();
 
-    assert_eq!(result_obese.bmi_category, BmiCategory::OBESE);
+    assert_eq!(result_obese.bmi_category, BmiCategory::Obese);
     assert_eq!(result_obese.bmi, 31.2);
 }
 
@@ -169,7 +169,7 @@ fn calculate_underweight_classification_for_women() {
 
     let result_underweight = wizard::calculate(input_underweight).unwrap();
 
-    assert_eq!(result_underweight.bmi_category, BmiCategory::UNDERWEIGHT);
+    assert_eq!(result_underweight.bmi_category, BmiCategory::Underweight);
     assert_eq!(result_underweight.bmi, 17.8);
 }
 
@@ -190,7 +190,7 @@ fn calulcate_severely_obese_classification_for_women() {
 
     assert_eq!(
         result_severely_obese.bmi_category,
-        BmiCategory::SEVERELY_OBESE
+        BmiCategory::SeverelyObese
     );
     assert_eq!(result_severely_obese.bmi, 44.1);
 }
@@ -504,7 +504,7 @@ fn calculate_weight_loss_duration() {
 
     let result = wizard::calculate_for_target_weight(&input).unwrap();
 
-    assert_eq!(result.target_classification, BmiCategory::OVERWEIGHT);
+    assert_eq!(result.target_classification, BmiCategory::Overweight);
     assert_eq!(result.warning, false);
     assert_eq!(result.message, "".to_string());
 
@@ -548,7 +548,7 @@ fn calculate_weight_gain_duration() {
 
     let result = wizard::calculate_for_target_weight(&input).unwrap();
 
-    assert_eq!(result.target_classification, BmiCategory::STANDARD_WEIGHT);
+    assert_eq!(result.target_classification, BmiCategory::StandardWeight);
     assert_eq!(result.warning, false);
     assert_eq!(result.message, "".to_string());
 

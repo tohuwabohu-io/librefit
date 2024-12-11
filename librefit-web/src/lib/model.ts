@@ -1,11 +1,11 @@
 // types/model.d.ts
 
 export enum BmiCategory {
-	Underweight = 'UNDERWEIGHT',
-	Standard_Weight = 'STANDARD_WEIGHT',
-	Overweight = 'OVERWEIGHT',
-	Obese = 'OBESE',
-	Severely_obese = 'SEVERELY_OBESE'
+	Underweight = 'Underweight',
+	Standard_Weight = 'StandardWeight',
+	Overweight = 'Overweight',
+	Obese = 'Obese',
+	Severely_obese = 'SeverelyObese'
 }
 
 export enum CalculationGoal {
