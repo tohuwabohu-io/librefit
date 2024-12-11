@@ -10,7 +10,7 @@ use validator::Validate;
 
 /// Test integrity of the default calculation function.
 #[test]
-pub fn calculate_weight_loss_for_men() {
+fn calculate_weight_loss_for_men() {
     let input: WizardInput = WizardInput {
         age: 30,
         weight: 90.0,
@@ -43,7 +43,7 @@ pub fn calculate_weight_loss_for_men() {
 
 /// Test integrity of the default calculation function.
 #[test]
-pub fn calculate_weight_gain_for_women() {
+fn calculate_weight_gain_for_women() {
     let input = WizardInput {
         age: 25,
         weight: 52.0,
@@ -576,6 +576,8 @@ fn calculate_target_weights_for_specific_weight_loss_goal() {
         (300, 73.4),
         (400, 69.5),
         (500, 65.6),
+        (600, 61.8),
+        (700, 57.9),
     ]
     .into_iter()
     .collect();
@@ -586,6 +588,8 @@ fn calculate_target_weights_for_specific_weight_loss_goal() {
         (300, 25.4),
         (400, 24.1),
         (500, 22.7),
+        (600, 21.4),
+        (700, 20.0),
     ]
     .into_iter()
     .collect();
@@ -601,75 +605,119 @@ fn calculate_target_weights_for_specific_weight_loss_goal() {
 
     let wizard_result = wizard::calculate_for_target_date(&wizard_target_date_input).unwrap();
 
-    // compare calculated and expected weights
-    assert_eq!(
-        *expected_weight_by_rate.get(&100).unwrap(),
-        wizard_result
-            .result_by_rate
-            .get(&100)
-            .unwrap()
-            .target_weight
-    );
+    wizard_result.result_by_rate.keys().for_each(|rate| {
+        assert_eq!(
+            *expected_weight_by_rate.get(&rate).unwrap(),
+            wizard_result
+                .result_by_rate
+                .get(&rate)
+                .unwrap()
+                .target_weight
+        );
 
-    assert_eq!(
-        *expected_weight_by_rate.get(&200).unwrap(),
-        wizard_result
-            .result_by_rate
-            .get(&200)
-            .unwrap()
-            .target_weight
-    );
+        assert_eq!(
+            *expected_bmi_by_rate.get(&rate).unwrap(),
+            wizard_result.result_by_rate.get(&rate).unwrap().bmi
+        );
+    });
+}
 
-    assert_eq!(
-        *expected_weight_by_rate.get(&300).unwrap(),
-        wizard_result
-            .result_by_rate
-            .get(&300)
-            .unwrap()
-            .target_weight
-    );
+#[test]
+fn calculate_target_weights_for_specific_weight_gain_goal() {
+    let start_date_nd = NaiveDate::from_ymd_opt(2025, 1, 1).unwrap();
+    let target_date_nd = start_date_nd.checked_add_days(Days::new(150)).unwrap();
 
-    assert_eq!(
-        *expected_weight_by_rate.get(&400).unwrap(),
-        wizard_result
-            .result_by_rate
-            .get(&400)
-            .unwrap()
-            .target_weight
-    );
+    let expected_weight_by_rate: HashMap<i32, f32> = vec![
+        (100, 47.4),
+        (200, 49.9),
+        (300, 52.3),
+        (400, 54.8),
+        (500, 57.2),
+        (600, 59.7),
+        (700, 62.1),
+    ]
+    .into_iter()
+    .collect();
 
-    assert_eq!(
-        *expected_weight_by_rate.get(&500).unwrap(),
-        wizard_result
-            .result_by_rate
-            .get(&500)
-            .unwrap()
-            .target_weight
-    );
+    let expected_bmi_by_rate: HashMap<i32, f32> = vec![
+        (100, 19.7),
+        (200, 20.8),
+        (300, 21.8),
+        (400, 22.8),
+        (500, 23.8),
+        (600, 24.8),
+        (700, 25.8),
+    ]
+    .into_iter()
+    .collect();
 
-    // compare calculated and expected BMI values
-    assert_eq!(
-        *expected_bmi_by_rate.get(&100).unwrap(),
-        wizard_result.result_by_rate.get(&100).unwrap().bmi
-    );
+    let wizard_target_date_input = WizardTargetDateInput {
+        age: 30,
+        height: 155.0,
+        current_weight: 45.0,
+        sex: CalculationSex::FEMALE,
+        target_date: target_date_nd.format("%Y-%m-%d").to_string(),
+        calculation_goal: CalculationGoal::GAIN,
+    };
 
-    assert_eq!(
-        *expected_bmi_by_rate.get(&200).unwrap(),
-        wizard_result.result_by_rate.get(&200).unwrap().bmi
-    );
+    let wizard_result = wizard::calculate_for_target_date(&wizard_target_date_input).unwrap();
 
-    assert_eq!(
-        *expected_bmi_by_rate.get(&300).unwrap(),
-        wizard_result.result_by_rate.get(&300).unwrap().bmi
-    );
+    wizard_result.result_by_rate.keys().for_each(|rate| {
+        assert_eq!(
+            *expected_weight_by_rate.get(&rate).unwrap(),
+            wizard_result
+                .result_by_rate
+                .get(&rate)
+                .unwrap()
+                .target_weight
+        );
 
-    assert_eq!(
-        *expected_bmi_by_rate.get(&400).unwrap(),
-        wizard_result.result_by_rate.get(&400).unwrap().bmi
-    );
+        assert_eq!(
+            *expected_bmi_by_rate.get(&rate).unwrap(),
+            wizard_result.result_by_rate.get(&rate).unwrap().bmi
+        );
+    });
+}
 
-    assert_eq!(
-        *expected_bmi_by_rate.get(&500).unwrap(),
-        wizard_result.result_by_rate.get(&500).unwrap().bmi
-    );
+#[test]
+fn filter_non_recommendable_results_for_weight_loss() {
+    let start_date_nd = NaiveDate::from_ymd_opt(2025, 1, 1).unwrap();
+    let target_date_nd = start_date_nd.checked_add_days(Days::new(300)).unwrap();
+
+    let wizard_target_date_input = WizardTargetDateInput {
+        age: 30,
+        sex: CalculationSex::MALE,
+        height: 170.0,
+        current_weight: 60.0,
+        target_date: target_date_nd.format("%Y-%m-%d").to_string(),
+        calculation_goal: CalculationGoal::LOSS,
+    };
+
+    let wizard_result = wizard::calculate_for_target_date(&wizard_target_date_input).unwrap();
+
+    wizard_result.result_by_rate.values().for_each(|result| {
+        assert_ne!(result.bmi_category, BmiCategory::Underweight);
+    });
+}
+
+#[test]
+fn filter_non_recommendable_results_for_weight_gain() {
+    let start_date_nd = NaiveDate::from_ymd_opt(2025, 1, 1).unwrap();
+    let target_date_nd = start_date_nd.checked_add_days(Days::new(300)).unwrap();
+
+    let wizard_target_date_input = WizardTargetDateInput {
+        age: 30,
+        sex: CalculationSex::FEMALE,
+        height: 155.0,
+        current_weight: 45.0,
+        target_date: target_date_nd.format("%Y-%m-%d").to_string(),
+        calculation_goal: CalculationGoal::GAIN,
+    };
+
+    let wizard_result = wizard::calculate_for_target_date(&wizard_target_date_input).unwrap();
+
+    wizard_result.result_by_rate.values().for_each(|result| {
+        assert_ne!(result.bmi_category, BmiCategory::Obese);
+        assert_ne!(result.bmi_category, BmiCategory::SeverelyObese);
+    });
 }
