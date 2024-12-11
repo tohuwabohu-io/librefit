@@ -77,9 +77,9 @@
 	observeToggle(document.documentElement, () => repaintWeightChart());
 
 	const onAddCalories = async (event) => {
-		const amountMessage = validateAmount(event.detail.value);
+  const amountMessage = validateAmount(event.detail.value);
 
-		if (!amountMessage) {
+  if (!amountMessage) {
 			await addCalories(event).then(async response => {
 				event.detail.callback();
 

@@ -156,7 +156,7 @@ export interface WizardTargetWeightInput {
 }
 
 export interface WizardTargetWeightResult {
-	dateByRate: HashMap<i32, string>;
+	dateByRate: Map<number, string>;
 	targetClassification: BmiCategory;
 	warning: boolean;
 	message: string;
@@ -193,3 +193,4 @@ export interface ValidationMessage {
 	errorMessage?: string,
 	skip?: boolean
 }
+
