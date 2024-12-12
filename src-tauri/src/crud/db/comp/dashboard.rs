@@ -1,5 +1,7 @@
+use crate::crud::db::model::{
+    CalorieTarget, CalorieTracker, FoodCategory, LibreUser, WeightTarget, WeightTracker,
+};
 use serde::{Deserialize, Serialize};
-use crate::crud::db::model::{CalorieTarget, CalorieTracker, FoodCategory, LibreUser, WeightTarget, WeightTracker};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -11,5 +13,5 @@ pub struct Dashboard {
     pub weight_target: Option<WeightTarget>,
     pub weight_today_list: Vec<WeightTracker>,
     pub weight_month_list: Vec<WeightTracker>,
-    pub food_categories: Vec<FoodCategory>
+    pub food_categories: Vec<FoodCategory>,
 }

@@ -19,6 +19,12 @@ use crate::crud::cmd::wizard::{
     wizard_create_targets,
 };
 
+use dotenv::dotenv;
+use std::env;
+use tauri::path::BaseDirectory;
+use tauri::Manager;
+use tauri_plugin_fs::FsExt;
+
 pub mod calc;
 pub mod crud;
 pub mod i18n;
@@ -26,6 +32,7 @@ pub mod i18n;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -34,6 +41,20 @@ pub fn run() {
                         .build(),
                 )?;
             }
+
+            dotenv().ok();
+
+            let scope = app.fs_scope();
+            let _ = scope.allow_directory("res", false);
+            _ = scope.allow_directory("migrations", true);
+
+            let resource_path = app
+                .path()
+                .resolve("res/tracker.db", BaseDirectory::AppData)
+                .unwrap();
+
+            env::set_var("DATABASE_URL", resource_path.clone());
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

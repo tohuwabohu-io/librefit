@@ -37,8 +37,9 @@ pub fn daily_dashboard(date_str: String) -> Result<Dashboard, String> {
             let weight_target_opt = find_last_weight_target(conn).ok();
             let weight_today_vec =
                 find_weight_tracker_by_date(conn, &date_str).unwrap_or_else(|_| vec![]);
-            let weight_month_vec = find_weight_tracker_by_date_range(conn, &month_start_str, &date_str)
-                .unwrap_or_else(|_| vec![]);
+            let weight_month_vec =
+                find_weight_tracker_by_date_range(conn, &month_start_str, &date_str)
+                    .unwrap_or_else(|_| vec![]);
 
             let food_categories_vec = get_food_categories(conn).unwrap_or_else(|_| vec![]);
 

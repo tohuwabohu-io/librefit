@@ -70,9 +70,10 @@ pub fn delete_weight_tracker_entry(
 #[command]
 pub fn get_weight_tracker_for_date_range(
     date_from_str: String,
-    date_to_str: String
+    date_to_str: String,
 ) -> Result<Vec<WeightTracker>, String> {
     let conn = &mut create_db_connection();
 
-    weight::find_weight_tracker_by_date_range(conn, &date_from_str, &date_to_str).map_err(handle_error)
+    weight::find_weight_tracker_by_date_range(conn, &date_from_str, &date_to_str)
+        .map_err(handle_error)
 }

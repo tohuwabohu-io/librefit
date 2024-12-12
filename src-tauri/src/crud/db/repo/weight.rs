@@ -105,7 +105,7 @@ pub fn find_weight_tracker_by_date(
 pub fn find_weight_tracker_by_date_range(
     conn: &mut SqliteConnection,
     date_from: &String,
-    date_to: &String
+    date_to: &String,
 ) -> QueryResult<Vec<WeightTracker>> {
     use crate::crud::db::schema::weight_tracker::dsl::added;
 

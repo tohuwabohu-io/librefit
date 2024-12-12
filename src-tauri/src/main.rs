@@ -4,7 +4,7 @@
 #[macro_use]
 extern crate rust_i18n;
 
-i18n!("locales", fallback = "en");
+i18n!("locales", fallback = "de");
 
 fn main() {
     librefit_lib::run();

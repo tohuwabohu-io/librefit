@@ -25,6 +25,9 @@ was born.
 - sveltekit 2.5.2
 - skeleton 2.9.0 
 
+### Tools
+ - Android Studio
+
 ## Structure
 
 The project follows the default [tauri setup](https://tauri.app/start/create-project/).
@@ -49,6 +52,27 @@ To start the development server, go to the project root and issue
 
 ```shell
 cargo tauri dev
+```
+
+To start the android development server:
+
+* Navigate to $NDK_HOME.
+* Search for the x86_64-android libclang file. If you followed the steps in the tauri docs, the path should look like this:
+
+`$NDK_HOME/toolchains/llvm/prebuild/<host>/lib/clang/<clang-version>/lib/<os>/libclang_rt.builtins-<guest>.a`
+
+- <host>:   Your system type, e..g linux-x86_64
+- <os>:     Your OS type, eg linux
+- <guest>:  Guest system type, e.g. x86_64-android
+
+export that as env variable, e.g. `$LINKER`
+
+Force cargo to use that linker with `RUSTFLAGS=-C link-arg=$LINKER`
+
+Example command (works on my machine (tm)):
+
+```shell
+RUSTFLAGS="-C link-arg=$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/19/lib/linux/libclang_rt.builtins-x86_64-android.a" cargo tauri android dev
 ```
 
 ## Attribution
