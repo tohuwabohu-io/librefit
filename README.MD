@@ -56,12 +56,23 @@ cargo tauri dev
 
 To start the android development server:
 
+```shell
+cargo tauri android dev
+```
+
+If you encounter an error like this:
+
+´java.lang.UnsatisfiedLinkError: dlopen failed: cannot locate symbol "__floatunditf"´
+
+The linker path found in `build.rs` does not match.
+
 * Navigate to $NDK_HOME.
 * Search for the x86_64-android libclang file. If you followed the steps in the tauri docs, the path should look like this:
 
-`$NDK_HOME/toolchains/llvm/prebuild/<host>/lib/clang/<clang-version>/lib/<os>/libclang_rt.builtins-<guest>.a`
+`$NDK_HOME/toolchains/llvm/prebuild/<host>/<lib>/clang/<clang-version>/lib/<os>/libclang_rt.builtins-<guest>.a`
 
 - <host>:   Your system type, e..g linux-x86_64
+- <lib>:    Either lib or lib64
 - <os>:     Your OS type, eg linux
 - <guest>:  Guest system type, e.g. x86_64-android
 
