@@ -19,15 +19,17 @@ use crate::crud::cmd::wizard::{
     wizard_create_targets,
 };
 
+use crate::crud::db::connection;
+
 use dotenv::dotenv;
 use std::env;
 use tauri::path::BaseDirectory;
 use tauri::Manager;
-use tauri_plugin_fs::FsExt;
 
 pub mod calc;
 pub mod crud;
 pub mod i18n;
+pub mod init;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -44,16 +46,15 @@ pub fn run() {
 
             dotenv().ok();
 
-            let scope = app.fs_scope();
-            let _ = scope.allow_directory("res", false);
-            _ = scope.allow_directory("migrations", true);
-
+            // hardwire db path. bundling resources does not work on android for some reason.
             let resource_path = app
                 .path()
-                .resolve("res/tracker.db", BaseDirectory::AppData)
+                .resolve("tracker.db", BaseDirectory::AppData)
                 .unwrap();
 
             env::set_var("DATABASE_URL", resource_path.clone());
+
+            let _ = init::db_setup::run_migrations(&mut connection::create_db_connection());
 
             Ok(())
         })
