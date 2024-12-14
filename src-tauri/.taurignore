@@ -1,4 +1,4 @@
 res/tracker.db-journal
 
-node_modules/
+../librefit-web/node_modules
 gen/
