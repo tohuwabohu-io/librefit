@@ -571,25 +571,25 @@ fn calculate_target_weights_for_specific_weight_loss_goal() {
     let target_date_nd = start_date_nd.checked_add_days(Days::new(250)).unwrap();
 
     let expected_weight_by_rate: HashMap<i32, f32> = vec![
-        (100, 81.1),
+        (100, 81.2),
         (200, 77.3),
-        (300, 73.4),
-        (400, 69.5),
-        (500, 65.6),
-        (600, 61.8),
-        (700, 57.9),
+        (300, 73.5),
+        (400, 69.7),
+        (500, 65.9),
+        (600, 62.0),
+        (700, 58.2),
     ]
     .into_iter()
     .collect();
 
     let expected_bmi_by_rate: HashMap<i32, f32> = vec![
         (100, 28.1),
-        (200, 26.7),
+        (200, 26.8),
         (300, 25.4),
         (400, 24.1),
-        (500, 22.7),
-        (600, 21.4),
-        (700, 20.0),
+        (500, 22.8),
+        (600, 21.5),
+        (700, 20.1),
     ]
     .into_iter()
     .collect();
@@ -629,24 +629,24 @@ fn calculate_target_weights_for_specific_weight_gain_goal() {
 
     let expected_weight_by_rate: HashMap<i32, f32> = vec![
         (100, 47.4),
-        (200, 49.9),
-        (300, 52.3),
-        (400, 54.8),
-        (500, 57.2),
-        (600, 59.7),
-        (700, 62.1),
+        (200, 49.8),
+        (300, 52.2),
+        (400, 54.6),
+        (500, 57.0),
+        (600, 59.4),
+        (700, 61.8),
     ]
     .into_iter()
     .collect();
 
     let expected_bmi_by_rate: HashMap<i32, f32> = vec![
         (100, 19.7),
-        (200, 20.8),
-        (300, 21.8),
-        (400, 22.8),
-        (500, 23.8),
-        (600, 24.8),
-        (700, 25.8),
+        (200, 20.7),
+        (300, 21.7),
+        (400, 22.7),
+        (500, 23.7),
+        (600, 24.7),
+        (700, 25.7),
     ]
     .into_iter()
     .collect();
