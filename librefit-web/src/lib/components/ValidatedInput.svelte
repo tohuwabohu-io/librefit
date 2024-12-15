@@ -1,6 +1,7 @@
 <svelte:options accessors={true} />
 
 <script lang="ts">
+	import { CheckboxEventTarget } from '$lib/event';
 	import type { ValidationMessage } from '$lib/model';
 
 	export let value: any = '';
@@ -22,21 +23,19 @@
 	export let required = false;
 	export let errorMessage = undefined;
 
-	export let readOnly = false;
+	export let readonly = false;
 
-	const getType = (node) => {
+	const getType = (node: any) => {
 		node.type = type;
 	};
 
 	export let validate = () => {
-
 		let valid = false;
 		let detail = validateDetail({
 			value: value,
 			label: label
 		});
 		if (required && isEmpty()) {
-
 			errorMessage = emptyMessage;
 		} else if (!detail.skip) {
 			valid = detail.valid;
@@ -46,11 +45,14 @@
 			valid = true;
 		}
 		return valid;
-
 	};
-	const isEmpty = () => {
 
+	const isEmpty = () => {
 		return value === undefined || value === null || value.length <= 0;
+	};
+
+	const handleCheckboxEvent = (e: Event) => {
+		this.checked = (<CheckboxEventTarget>e.target).checked;
 	};
 
 	$: value;
@@ -83,13 +85,13 @@
 			{/if}
 			<input
 				{name}
-				class={styling + (!unit ? '' : 'rounded-none') + (!errorMessage ? '' : ' input-error' )}
+				class={styling + (!unit ? '' : 'rounded-none') + (!errorMessage ? '' : ' input-error')}
 				use:getType
 				{placeholder}
 				{required}
 				bind:value
 				on:focusout={validate}
-				{readOnly}
+				{readonly}
 			/>
 		</div>
 	{:else}
@@ -103,9 +105,9 @@
 					class={styling + (!errorMessage ? '' : ' input-error')}
 					use:getType
 					bind:value
-					on:change={(e) => (value = e.target.checked)}
+					on:change={handleCheckboxEvent}
 					on:focusout={validate}
-					{readOnly}
+					{readonly}
 				/>
 			</span>
 

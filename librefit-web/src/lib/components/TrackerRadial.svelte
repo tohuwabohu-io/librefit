@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CalorieTarget } from '$lib/model';
+	import type { CalorieTarget } from "$lib/model";
 
 	export let calorieTarget: CalorieTarget;
 	export let entries: Array<number>;

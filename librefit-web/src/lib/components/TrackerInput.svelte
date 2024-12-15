@@ -4,7 +4,9 @@
 	import TrackerButtons from './TrackerButtons.svelte';
 	import type { FoodCategory } from '$lib/model';
 
-	export let value: any, dateStr: string, id: number | undefined = undefined;
+	export let value: any = undefined;
+  export let dateStr: string;
+  export let id: number | undefined = undefined;
 	export let existing = false;
 	export let disabled = false;
 	export let compact = false;
