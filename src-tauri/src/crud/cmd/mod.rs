@@ -1,3 +1,4 @@
+pub mod body;
 pub mod calorie;
 pub mod dashboard;
 pub mod error_handler;

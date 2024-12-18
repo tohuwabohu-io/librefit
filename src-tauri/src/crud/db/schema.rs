@@ -1,6 +1,16 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    body_data (id) {
+        id -> Integer,
+        age -> Integer,
+        height -> Float,
+        weight -> Float,
+        sex -> Text,
+    }
+}
+
+diesel::table! {
     calorie_target (id) {
         id -> Integer,
         added -> Text,
@@ -25,6 +35,15 @@ diesel::table! {
     food_category (shortvalue) {
         longvalue -> Text,
         shortvalue -> Text,
+    }
+}
+
+diesel::table! {
+    health_data (id) {
+        id -> Integer,
+        height -> Float,
+        weight -> Float,
+        sex -> Text,
     }
 }
 
@@ -56,9 +75,11 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
+    body_data,
     calorie_target,
     calorie_tracker,
     food_category,
+    health_data,
     libre_user,
     weight_target,
     weight_tracker,

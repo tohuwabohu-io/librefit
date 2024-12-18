@@ -57,3 +57,12 @@ CREATE TABLE weight_target
     start_date     TEXT    NOT NULL,
     target_weight  REAL    NOT NULL
 );
+
+CREATE TABLE body_data
+(
+    id      INTEGER NOT NULL PRIMARY KEY,
+    age     INTEGER NOT NULL,
+    height  REAL NOT NULL,
+    weight  REAL NOT NULL,
+    sex     TEXT NOT NULL
+);

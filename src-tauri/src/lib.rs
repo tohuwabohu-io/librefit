@@ -3,6 +3,7 @@ extern crate rust_i18n;
 
 i18n!("locales", fallback = "en");
 
+use crate::crud::cmd::body::{get_body_data, update_body_data};
 use crate::crud::cmd::calorie::{
     create_calorie_target, create_calorie_tracker_entry, delete_calorie_tracker_entry,
     get_calorie_tracker_dates_in_range, get_calorie_tracker_for_date_range,
@@ -76,7 +77,9 @@ pub fn run() {
             wizard_calculate_tdee,
             wizard_create_targets,
             wizard_calculate_for_target_date,
-            wizard_calculate_for_target_weight
+            wizard_calculate_for_target_weight,
+            get_body_data,
+            update_body_data
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
